@@ -2,59 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Eventos | Coach 3D Latam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach 3D | Sincronizando</title>
     <style>
-        /* Estética coherente con Coach 3D mientras carga */
-        body { 
-            margin: 0; 
-            padding: 0; 
-            height: 100vh; 
-            width: 100vw; 
-            background-color: #000; 
-            color: #00fbff; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            text-align: center;
-        }
-
-        .loader {
-            border: 4px solid rgba(0, 251, 255, 0.1);
-            border-left-color: #00fbff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        p {
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-        }
+        body { background-color: #000; color: #00fbff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
     </style>
 </head>
 <body>
-
-    <div class="loader"></div>
-    <p>Sincronizando con la Matrix...</p>
+    <div style="text-align: center;">
+        <p>Cargando portal seguro...</p>
+    </div>
 
     <script>
-        // Definimos la URL con el Selector de Cuentas de Google
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbxaI3uOiJRPCAg5h9RxSemP019bdShRMWUOOcr5rvkGTjL9KMWK85pnilXsYV30hc-c6A/exec";
-        const accountChooserUrl = "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent(webAppUrl);
+        (function() {
+            var urlWebApp = "https://script.google.com/macros/s/AKfycbxaI3uOiJRPCAg5h9RxSemP019bdShRMWUOOcr5rvkGTjL9KMWK85pnilXsYV30hc-c6A/exec";
+            var urlFinal = "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent(urlWebApp);
 
-        // Redirección inmediata para evitar bloqueos de Iframe
-        window.location.replace(accountChooserUrl);
+            // ESTO ES LO IMPORTANTE:
+            // Si la página está dentro de un iframe, forzamos a la ventana principal (top) a cambiar
+            if (window.top !== window.self) {
+                window.top.location.replace(urlFinal);
+            } else {
+                window.location.replace(urlFinal);
+            }
+        })();
     </script>
 </body>
 </html>
