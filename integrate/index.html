@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Concedido | Coach 3D Latam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #00fbff;
+            --dark-bg: #020202;
+            --grid-color: rgba(0, 251, 255, 0.03);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            /* Fondo de rejilla tecnológica minimalista */
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 450px;
+            width: 90%;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(0, 251, 255, 0.1);
+            border-radius: 4px; /* Minimalismo: bordes menos redondeados */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Línea de escaneo decorativa superior */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--cyan);
+            box-shadow: 0 0 15px var(--cyan);
+        }
+
+        h1 {
+            font-family: 'Orbitron';
+            color: white;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+        }
+
+        .btn-cta {
+            display: block;
+            padding: 18px;
+            margin: 15px 0;
+            text-decoration: none;
+            border-radius: 2px;
+            font-weight: bold;
+            font-family: 'Orbitron';
+            font-size: 0.75rem;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Estética común para los 3 botones */
+            border: 1px solid rgba(0, 251, 255, 0.3);
+            color: var(--cyan); /* Texto Cyan para máximo contraste y armonía */
+            background: rgba(0, 251, 255, 0.02);
+        }
+
+        /* Colores sutiles de fondo para diferenciar pero manteniendo el texto igual */
+        .wa:hover { background: rgba(37, 211, 102, 0.1); border-color: #25D366; box-shadow: 0 0 20px rgba(37, 211, 102, 0.2); }
+        .ins:hover { background: rgba(225, 48, 108, 0.1); border-color: #E1306C; box-shadow: 0 0 20px rgba(225, 48, 108, 0.2); }
+        .com:hover { background: rgba(0, 251, 255, 0.1); border-color: var(--cyan); box-shadow: 0 0 20px rgba(0, 251, 255, 0.2); }
+
+        .btn-cta:active { transform: scale(0.98); }
+
+        /* SECCIÓN REGALO MINIMALISTA */
+        .gift-box {
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+        }
+
+        .gift-box h3 {
+            color: #ffcc00; /* Oro/Amarillo para el regalo */
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .gift-box ul {
+            list-style: none;
+            padding: 0;
+            font-size: 0.85rem;
+            color: #888;
+            line-height: 2;
+        }
+
+        .gift-box li::before {
+            content: "→ ";
+            color: var(--cyan);
+            margin-right: 10px;
+        }
+
+        .gift-box b { color: #eee; font-weight: 500; }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.6rem;
+            opacity: 0.3;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Acceso Concedido</h1>
+        
+        <p style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 30px; letter-spacing: 1px;">
+            Sincronización completa. Selecciona tu portal:
+        </p>
+
+        <a href="https://chat.whatsapp.com/KJn5P2gWNfWFt2oaGkDXV4" class="btn-cta wa">Comunidad WhatsApp</a>
+        <a href="https://www.instagram.com/coach3dlatam/" class="btn-cta ins">Validar Regalo IG</a>
+        <a href="https://coach3dlatam.app/" class="btn-cta com">Plataforma C3D</a>
+
+        <div class="gift-box">
+            <h3>Sesión Coaching Gratis</h3>
+            <ul>
+                <li><b>Follow</b> @coach3dlatam</li>
+                <li><b>Share</b> Post del evento</li>
+                <li><b>Tag</b> 2 amigos en comentarios</li>
+            </ul>
+        </div>
+
+        <div class="footer">Ecosistema Coach 3D Latam</div>
+    </div>
+
+</body>
+</html>
