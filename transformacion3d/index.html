@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transformación 3D con IA | Registro</title>
-    <meta http-equiv="refresh" content="0; url=https://forms.gle/yYCLa7GziJ26PWqi9">
+    
+    <meta http-equiv="refresh" content="0; url=https://docs.google.com/forms/d/e/1FAIpQLSfVXXMpjUNLvtMtprEQLLW-V3wSo4lPiAYw_tr22w2y4NXXxQ/viewform?usp=dialog">
     
     <style>
         body {
@@ -12,7 +13,7 @@
             padding: 0;
             background-color: #050505;
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,23 +31,26 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .card {
-            padding: 20px;
-        }
+        .card { padding: 20px; max-width: 90%; }
         
-        a {
+        .btn-manual {
+            display: inline-block;
             color: #0066ff;
             text-decoration: none;
             font-weight: bold;
             border: 1px solid #0066ff;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 25px;
+            border-radius: 8px;
             transition: 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
         }
         
-        a:hover {
+        .btn-manual:hover {
             background: #0066ff;
             color: white;
+            box-shadow: 0 0 15px rgba(0, 102, 255, 0.4);
         }
     </style>
 </head>
@@ -54,15 +58,34 @@
 
     <div class="card">
         <div class="loader"></div>
-        <p>Sincronizando con el portal de registro...</p>
-        <p style="font-size: 0.8rem; opacity: 0.6;">Si no eres redirigido automáticamente, haz clic abajo:</p>
-        <br>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfVXXMpjUNLvtMtprEQLLW-V3wSo4lPiAYw_tr22w2y4NXXxQ/viewform?usp=dialog">INGRESAR AL FORMULARIO</a>
+        <p style="letter-spacing: 1px;">Sincronizando con el portal de registro...</p>
+        <p style="font-size: 0.8rem; opacity: 0.5;">Estableciendo conexión segura con Google Servers</p>
+        
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfVXXMpjUNLvtMtprEQLLW-V3wSo4lPiAYw_tr22w2y4NXXxQ/viewform?usp=dialog" class="btn-manual">
+            Ingresar Manualmente
+        </a>
     </div>
 
     <script>
-        // Refuerzo de redirección por JavaScript
-        window.location.href = "https://forms.gle/yYCLa7GziJ26PWqi9";
+        // URL LARGA DEFINITIVA
+        var urlFinal = "https://docs.google.com/forms/d/e/1FAIpQLSfVXXMpjUNLvtMtprEQLLW-V3wSo4lPiAYw_tr22w2y4NXXxQ/viewform?usp=dialog";
+
+        // 2. Refuerzo de redirección por JS (Rompiendo posibles iframes)
+        function redirect() {
+            if (window.top !== window.self) {
+                window.top.location.replace(urlFinal);
+            } else {
+                window.location.replace(urlFinal);
+            }
+        }
+
+        // Ejecutar inmediatamente
+        redirect();
+
+        // 3. Tercer intento de seguridad tras 1 segundo si sigue en la página
+        setTimeout(function() {
+            window.location.href = urlFinal;
+        }, 1000);
     </script>
 </body>
 </html>
