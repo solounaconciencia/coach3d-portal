@@ -5,26 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coach 3D | Sincronizando</title>
     <style>
-        body { background-color: #000; color: #00fbff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+        body { 
+            background-color: #000; 
+            color: #00fbff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'Orbitron', sans-serif; 
+        }
+        .matrix-text {
+            text-align: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
-    <div style="text-align: center;">
-        <p>Cargando portal seguro...</p>
+    <div class="matrix-text">
+        <p>Estableciendo conexión segura...</p>
     </div>
 
     <script>
         (function() {
+            // URL Directa de la Web App (Sin AccountChooser para evitar conflicto de cookies)
             var urlWebApp = "https://script.google.com/macros/s/AKfycbxaI3uOiJRPCAg5h9RxSemP019bdShRMWUOOcr5rvkGTjL9KMWK85pnilXsYV30hc-c6A/exec";
-            var urlFinal = "https://accounts.google.com/AccountChooser?continue=" + encodeURIComponent(urlWebApp);
 
-            // ESTO ES LO IMPORTANTE:
-            // Si la página está dentro de un iframe, forzamos a la ventana principal (top) a cambiar
-            if (window.top !== window.self) {
-                window.top.location.replace(urlFinal);
-            } else {
-                window.location.replace(urlFinal);
+            // Función para ejecutar el salto
+            function redirect() {
+                // Forzamos la salida de cualquier iframe (GitHub Pages usa frames a veces)
+                if (window.top !== window.self) {
+                    window.top.location.href = urlWebApp;
+                } else {
+                    window.location.href = urlWebApp;
+                }
             }
+
+            // Ejecutamos tras un micro-retraso para asegurar que el DOM esté listo
+            window.onload = function() {
+                setTimeout(redirect, 100);
+            };
         })();
     </script>
 </body>
