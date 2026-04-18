@@ -2,28 +2,49 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Coach 3D | Sincronizando</title>
+    
     <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec">
     
     <style>
-        body { 
+        body, html { 
             background-color: #000; 
-            color: #00fbff; 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            width: 100%; 
+            overflow: hidden; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'Segoe UI', sans-serif; /* Usamos una fuente de sistema para carga instantánea */
+            font-family: 'Segoe UI', sans-serif; 
         }
+
+        /* Estética Matrix para la transición */
         .matrix-text {
+            color: #00fbff; 
             text-align: center;
             letter-spacing: 3px;
             text-transform: uppercase;
             font-size: 0.8rem;
             animation: pulse 1.5s infinite;
+            z-index: 1;
+            position: absolute;
         }
+
+        /* El iFrame: Ocultamos la barra celeste de Google (-45px) */
+        iframe {
+            position: absolute;
+            top: -45px; 
+            left: 0;
+            width: 100%;
+            height: calc(100% + 45px); 
+            border: none;
+            z-index: 2; /* Se coloca sobre el texto una vez carga */
+            background-color: transparent;
+        }
+
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.4; }
@@ -32,30 +53,40 @@
     </style>
 </head>
 <body>
+
     <div class="matrix-text">
         <p>Estableciendo conexión segura...</p>
     </div>
 
+    <iframe 
+        id="portal-frame"
+        src="https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec" 
+        allow="camera; microphone; clipboard-read; clipboard-write">
+    </iframe>
+
     <script>
         (function() {
-            // URL Actualizada que me entregaste
             var urlWebApp = "https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec";
 
             function redirect() {
-                // window.location.replace es mejor que .href porque no deja rastro en el historial 
-                // y evita que el usuario quede atrapado al presionar "atrás"
-                if (window.top !== window.self) {
-                    window.top.location.replace(urlWebApp);
-                } else {
-                    window.location.replace(urlWebApp);
+                // Forzamos salida de frames para evitar conflictos de cookies y multicuenta
+                try {
+                    if (window.top !== window.self) {
+                        window.top.location.replace(urlWebApp);
+                    } else {
+                        window.location.replace(urlWebApp);
+                    }
+                } catch (e) {
+                    // Si el navegador bloquea el salto top, lo intentamos en el frame actual
+                    window.location.href = urlWebApp;
                 }
             }
 
-            // Ejecutamos inmediatamente sin esperar al window.onload para ganar milisegundos
+            // Ejecución de salto inmediata
             redirect();
 
-            // Respaldo de seguridad por si el navegador bloquea el salto inicial
-            setTimeout(redirect, 500);
+            // Respaldo de seguridad
+            setTimeout(redirect, 600);
         })();
     </script>
 </body>
