@@ -31,17 +31,17 @@
             position: absolute;
         }
 
-        /* El iFrame: Ocultamos la barra celeste subiéndolo 45px */
+        /* AJUSTE QUIRÚRGICO: Ocultamos la franja celeste de Google Workspace */
         iframe {
             position: absolute;
-            top: -45px; 
+            top: -45px; /* Sube el frame para dejar la barra fuera del visor */
             left: 0;
             width: 100%;
-            height: calc(100% + 45px); 
+            height: calc(100% + 45px); /* Compensa el movimiento para no dejar espacios vacíos */
             border: none;
             z-index: 2; 
             background-color: transparent;
-            visibility: hidden; /* Oculto hasta que cargue para ver el texto Matrix */
+            visibility: hidden; /* Se mantiene oculto mientras carga para mostrar el texto Matrix */
         }
 
         @keyframes pulse {
@@ -68,17 +68,18 @@
             var frame = document.getElementById('portal-frame');
             var loaderText = document.getElementById('loader-text');
 
-            // Cuando el frame carga, lo hacemos visible y quitamos el texto
+            // EVENTO DE CARGA: Muestra el portal solo cuando Google responde
             frame.onload = function() {
                 frame.style.visibility = 'visible';
                 loaderText.style.display = 'none';
-                console.log("Portal Coach 3D Sincronizado.");
+                console.log("Portal Coach 3D Sincronizado con Workspace.");
             };
 
-            // SEGUNDA CAPA DE SEGURIDAD:
-            // Si el frame falla en cargar por multicuenta, intentamos un refresco forzado del frame
+            // SEGUNDA CAPA DE SEGURIDAD (ANTI-BLOQUEO MULTICUENTA):
+            // Si pasan 5 segundos y no ha cargado (falla de cookies de Google), fuerza un refresco del iFrame
             setTimeout(function() {
                 if (frame.style.visibility !== 'visible') {
+                    console.warn("Reintentando conexión por latencia de sesión...");
                     frame.src = frame.src; 
                 }
             }, 5000);
