@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Coach 3D | Sincronizando</title>
     
-    <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec">
-    
     <style>
         body, html { 
             background-color: #000; 
@@ -33,7 +31,7 @@
             position: absolute;
         }
 
-        /* El iFrame: Ocultamos la barra celeste de Google (-45px) */
+        /* El iFrame: Ocultamos la barra celeste subiéndolo 45px */
         iframe {
             position: absolute;
             top: -45px; 
@@ -41,8 +39,9 @@
             width: 100%;
             height: calc(100% + 45px); 
             border: none;
-            z-index: 2; /* Se coloca sobre el texto una vez carga */
+            z-index: 2; 
             background-color: transparent;
+            visibility: hidden; /* Oculto hasta que cargue para ver el texto Matrix */
         }
 
         @keyframes pulse {
@@ -54,7 +53,7 @@
 </head>
 <body>
 
-    <div class="matrix-text">
+    <div class="matrix-text" id="loader-text">
         <p>Estableciendo conexión segura...</p>
     </div>
 
@@ -66,27 +65,23 @@
 
     <script>
         (function() {
-            var urlWebApp = "https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec";
+            var frame = document.getElementById('portal-frame');
+            var loaderText = document.getElementById('loader-text');
 
-            function redirect() {
-                // Forzamos salida de frames para evitar conflictos de cookies y multicuenta
-                try {
-                    if (window.top !== window.self) {
-                        window.top.location.replace(urlWebApp);
-                    } else {
-                        window.location.replace(urlWebApp);
-                    }
-                } catch (e) {
-                    // Si el navegador bloquea el salto top, lo intentamos en el frame actual
-                    window.location.href = urlWebApp;
+            // Cuando el frame carga, lo hacemos visible y quitamos el texto
+            frame.onload = function() {
+                frame.style.visibility = 'visible';
+                loaderText.style.display = 'none';
+                console.log("Portal Coach 3D Sincronizado.");
+            };
+
+            // SEGUNDA CAPA DE SEGURIDAD:
+            // Si el frame falla en cargar por multicuenta, intentamos un refresco forzado del frame
+            setTimeout(function() {
+                if (frame.style.visibility !== 'visible') {
+                    frame.src = frame.src; 
                 }
-            }
-
-            // Ejecución de salto inmediata
-            redirect();
-
-            // Respaldo de seguridad
-            setTimeout(redirect, 600);
+            }, 5000);
         })();
     </script>
 </body>
