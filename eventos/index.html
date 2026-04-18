@@ -18,7 +18,6 @@
             color: white;
         }
 
-        /* Contenedor del Loader que imita el Hub del Evento */
         #loader-container {
             text-align: center;
             z-index: 1;
@@ -52,7 +51,6 @@
 
         .highlight { color: #00fbff; font-weight: bold; }
 
-        /* Barra de progreso tecnológica */
         .progress-wrapper {
             width: 100%;
             height: 3px;
@@ -71,7 +69,7 @@
             animation: loading 2.5s infinite;
         }
 
-        /* AJUSTE QUIRÚRGICO: Ocultamos la franja celeste de Google Workspace */
+        /* Ocultamos la franja celeste subiendo el iframe */
         iframe {
             position: absolute;
             top: -45px; 
@@ -94,24 +92,20 @@
     <div id="loader-container">
         <img src="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png" class="logo-loader" alt="C3D Logo">
         
-        <div class="matrix-text">
-            Sincronizando con el portal...
-        </div>
+        <div class="matrix-text">Sincronizando con el portal...</div>
 
         <div class="instruction-text">
             <p>Estamos <span class="highlight">RESERVANDO TU CUPO</span> temporalmente.</p>
             <p style="font-size: 0.9rem; opacity: 0.9;">No cierres esta ventana. A continuación, valida tu <b>Nombre</b> y <b>Email</b> para confirmar tu lugar en el evento.</p>
         </div>
 
-        <div class="progress-wrapper">
-            <div class="progress-bar"></div>
-        </div>
-        <p style="font-size: 0.65rem; opacity: 0.5; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Estableciendo conexión encriptada</p>
+        <div class="progress-wrapper"><div class="progress-bar"></div></div>
+        <p style="font-size: 0.65rem; opacity: 0.5; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Conexión Encriptada Activa</p>
     </div>
 
     <iframe 
         id="portal-frame"
-        src="https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec" 
+        src="https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec?authuser=0" 
         allow="camera; microphone; clipboard-read; clipboard-write">
     </iframe>
 
@@ -119,24 +113,25 @@
         (function() {
             var frame = document.getElementById('portal-frame');
             var loader = document.getElementById('loader-container');
+            var urlDirecta = "https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec";
 
-            // Muestra el portal solo cuando la App Script está lista
+            // Si el frame carga bien (PC y la mayoría de móviles)
             frame.onload = function() {
-                // Pequeño retardo de salida para suavizar la transición visual
                 setTimeout(function() {
                     frame.style.visibility = 'visible';
                     loader.style.display = 'none';
-                    console.log("Portal Coach 3D Sincronizado.");
                 }, 500); 
             };
 
-            // CAPA DE SEGURIDAD ANTI-LATENCIA
+            // SOLUCIÓN DEFINITIVA PARA MÓVILES (SALTO DE EMERGENCIA)
+            // Si en 3.5 segundos el frame no respondió por bloqueo de multicuenta:
             setTimeout(function() {
                 if (frame.style.visibility !== 'visible') {
-                    console.warn("Reintentando conexión...");
-                    frame.src = frame.src; 
+                    // Si el iFrame falló, sacamos al usuario al modo directo.
+                    // Verá la franja celeste, pero NO el mensaje de error de Google.
+                    window.location.replace(urlDirecta);
                 }
-            }, 5000);
+            }, 3500);
         })();
     </script>
 </body>
