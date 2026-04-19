@@ -12,9 +12,9 @@
       --cyan: #00fbff; 
       --dark-bg: #050505; 
       --glass: rgba(255, 255, 255, 0.02);
-      --neon-f: #10b981; /* Verde Menta / Nutrición */
-      --neon-n: #ffb700; /* Oro / Finanzas */
-      --neon-m: #ff85a1; /* Rose Gold / Mentalidad */
+      --neon-f: #10b981; 
+      --neon-n: #ffb700; 
+      --neon-m: #ff85a1; 
       --yellow: #ffff00; --red: #ff0000;
     }
 
@@ -58,41 +58,54 @@
       #main-title { font-size: 1.3rem; }
     }
 
-    /* FILAS DE DÍAS CON CONEXIÓN VISUAL */
+    /* AJUSTE HD: FILAS DE DÍAS SIN DEFORMACIÓN */
     .dia-row {
       display: flex;
       align-items: center;
       background: rgba(255, 255, 255, 0.03);
-      margin-bottom: 12px;
-      padding: 10px;
-      border-radius: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       text-align: left;
     }
 
     .dia-icon {
-      width: 40px;
-      height: 40px;
+      flex-shrink: 0; /* EVITA QUE SE ESTIRE */
+      width: 48px;
+      height: 48px;
+      aspect-ratio: 1 / 1;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: 15px;
-      font-size: 1.2rem;
+      margin-right: 18px;
+      font-size: 1.3rem;
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
     }
 
-    /* Colores que conectan con la publicidad */
     .icon-nutricion { border: 1px solid var(--neon-f); color: var(--neon-f); background: rgba(16, 185, 129, 0.1); }
     .icon-finanzas { border: 1px solid var(--neon-n); color: var(--neon-n); background: rgba(255, 183, 0, 0.1); }
     .icon-mentalidad { border: 1px solid var(--neon-m); color: var(--neon-m); background: rgba(255, 133, 161, 0.1); }
 
     .dia-badge { 
-      font-family: 'Orbitron'; font-size: 0.65rem; color: var(--cyan); 
-      display: block; font-weight: bold; margin-bottom: 2px;
+      font-family: 'Orbitron', sans-serif; 
+      font-size: 0.7rem; 
+      color: var(--cyan); 
+      display: block; 
+      font-weight: 700; 
+      margin-bottom: 4px;
+      letter-spacing: 1.5px;
     }
 
-    .dia-texto { font-size: 0.85rem; margin: 0; opacity: 0.9; }
+    .dia-texto { 
+      font-size: 0.9rem; 
+      line-height: 1.5; /* MÁS AIRE PARA NO USAR LENTES */
+      margin: 0; 
+      opacity: 0.9; 
+      font-weight: 300;
+    }
+    .dia-texto b { font-weight: 500; color: #fff; }
 
     .registro-llamado-urgente { 
       color: var(--red) !important; font-weight: 900; font-size: 1.1rem; 
@@ -156,7 +169,7 @@
         No es solo usar IA, es saber <b>qué preguntarle</b>. Domina los fundamentos y delega la ejecución a la Inteligencia Artificial para acelerar tus resultados:
       </p>
       
-      <div style="margin: 20px auto; max-width: 520px;">
+      <div style="margin: 20px auto; max-width: 540px; padding: 0 10px;">
         <div class="dia-row">
           <div class="dia-icon icon-nutricion">🌿</div>
           <div>
@@ -181,11 +194,6 @@
           </div>
         </div>
       </div>
-
-      <div class="registro-llamado-urgente"> 
-        <span class="flecha-blink">⬇</span> REGÍSTRATE GRATIS AQUÍ <span class="flecha-blink">⬇</span> 
-      </div>
-    </div>
 
       <div class="registro-llamado-urgente"> <span class="flecha-blink">⬇</span> REGÍSTRATE GRATIS AQUÍ <span class="flecha-blink">⬇</span> </div>
     </div>
