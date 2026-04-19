@@ -237,26 +237,29 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyGjpCPhIXfd2oljjKWaLVcl9_EpgONPs1ZFqnNnnW5EHcTr70aAcbYZUkWBdvzg4nXg/exec"; 
 
     async function loadTestimonios() {
-      try {
-        const response = await fetch(SCRIPT_URL + "?action=getTestimonios");
-        const data = await response.json();
-        const list = document.getElementById('testimonios-list');
-        list.innerHTML = "";
-        data.forEach(t => {
-          list.innerHTML += `
-            <div class="testimonio-card">
-              <div class="test-header">
-                <img src="${t.foto}" class="test-foto" onerror="this.src='https://via.placeholder.com/50'">
-                <div class="test-info"><b>${t.nombre}</b><span>${t.edad_pais}</span></div>
-              </div>
-              <p class="test-texto">"${t.texto}"</p>
-            </div>`;
-        });
-      } catch(e) {
-        console.log("Error cargando testimonios", e);
-      }
-    }
-    window.onload = loadTestimonios;
+  try {
+    // Esta línea detecta automáticamente la URL de tu WebApp de Google
+    const scriptUrl = window.location.href.split('?')[0].split('#')[0];
+    
+    const res = await fetch(scriptUrl + "?action=getTestimonios");
+    const data = await res.json();
+    
+    const list = document.getElementById('testimonios-list');
+    list.innerHTML = "";
+    data.forEach(t => {
+      list.innerHTML += `
+        <div class="testimonio-card">
+          <div class="test-header">
+            <img src="${t.foto}" class="test-foto" onerror="this.src='https://via.placeholder.com/50'">
+            <div class="test-info"><b>${t.nombre}</b><span>${t.edad_pais}</span></div>
+          </div>
+          <p class="test-texto">"${t.texto}"</p>
+        </div>`;
+    });
+  } catch(e) { 
+    console.error("Error en la conexión de testimonios:", e); 
+  }
+}
 
     function checkFormReady() {
       var email = document.getElementById('u-email').value;
