@@ -113,35 +113,49 @@
     }
 
     async function runRegister() {
-      var nombre = document.getElementById('u-nombre').value;
-      var email = document.getElementById('u-email').value;
-      var evento = document.getElementById('event-selector').value;
+  const nombre = document.getElementById('u-nombre').value;
+  const email = document.getElementById('u-email').value;
+  const evento = document.getElementById('event-selector').value;
+  const btn = document.getElementById('btn-register');
 
-      if(!nombre || !email) return mostrarAlerta("COMPLETA TODOS LOS DATOS");
+  if(!nombre || !email) return mostrarAlerta("COMPLETA TODOS LOS DATOS");
 
-      var btn = document.getElementById('btn-register');
-      btn.innerText = "CONECTANDO CON LA MATRIX...";
-      btn.disabled = true;
-      mostrarAlerta("SINCRONIZANDO...");
+  btn.innerText = "CONECTANDO CON LA MATRIX...";
+  btn.disabled = true;
 
-      // GUARDADO EN SUPABASE
-      const { error } = await _supabase
-        .from('registros')
-        .insert([{ nombre, email, evento_id: evento }]);
+  // 1. Guardar en Supabase (Base de datos principal)
+  const { error } = await _supabase
+    .from('registros')
+    .insert([{ nombre, email, evento_id: evento }]);
 
-      if (error) {
-        mostrarAlerta("ERROR: " + error.message);
-        btn.disabled = false;
-        btn.innerText = "REINTENTAR REGISTRO";
-      } else {
-        // MOSTRAR TU PÁGINA DE GRACIAS
-        document.getElementById('main-content').style.display = 'none';
-        var thanks = document.getElementById('thanks-page');
-        thanks.style.display = 'flex';
-        window.scrollTo(0, 0);
-        mostrarAlerta("¡ACCESO CONCEDIDO!");
-      }
-    }
+  if (error) {
+    mostrarAlerta("Error Supabase: " + error.message);
+    btn.disabled = false;
+    return;
+  }
+
+  // 2. Avisar a Google Script (Para enviar correos y recordatorios)
+  // Reemplaza la URL de abajo por la que copiaste en el PASO 1
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyGjpCPhIXfd2oljjKWaLVcl9_EpgONPs1ZFqnNnnW5EHcTr70aAcbYZUkWBdvzg4nXg/exec";
+  
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // Importante para Google Scripts
+    body: JSON.stringify({ nombre, email, evento_id: evento })
+  });
+
+  // 3. Mostrar pantalla de éxito y corregir links
+  document.getElementById('main-content').style.display = 'none';
+  const thanks = document.getElementById('thanks-page');
+  thanks.style.display = 'flex';
+  
+  // LINKS CORREGIDOS SEGÚN TU .GS
+  document.querySelector('.wa').href = "https://chat.whatsapp.com/KJn5P2gWNfWFt2oaGkDXV4";
+  document.querySelector('.ins').href = "https://www.instagram.com/coach3dlatam/";
+  
+  window.scrollTo(0, 0);
+  mostrarAlerta("¡REGISTRO EXITOSO!");
+}
 
     function mostrarAlerta(mensaje) {
       var box = document.getElementById('custom-alert');
