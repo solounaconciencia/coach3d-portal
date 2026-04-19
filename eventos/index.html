@@ -10,63 +10,113 @@
   <style>
     :root {
       --cyan: #00fbff; 
-      --dark-bg: #07090b; /* Evolución: Gris Carbón Profundo para elegancia neutra */
-      --glass: rgba(255, 255, 255, 0.03);
+      --dark-bg: #050505; 
+      --glass: rgba(255, 255, 255, 0.02);
       --neon-f: #10b981; --neon-n: #00fbff; --neon-m: #a855f7;
       --yellow: #ffff00; --red: #ff0000;
     }
 
-    body { margin: 0; padding: 0; background: var(--dark-bg); color: white; font-family: 'Roboto', sans-serif; text-align: center; overflow-x: hidden; }
+    body { 
+      margin: 0; padding: 0; 
+      /* Evolución: Fondo con profundidad radial */
+      background: radial-gradient(circle at top, #0d1a25 0%, #050505 80%); 
+      color: white; font-family: 'Roboto', sans-serif; text-align: center; overflow-x: hidden; 
+    }
+
     .container { max-width: 600px; margin: auto; padding: 20px; position: relative; }
     
     h1, h2, h3 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; font-weight: 700; }
-    #main-title { font-size: 1.4rem; margin-top: 10px; color: #ffffff; text-shadow: 0 0 15px rgba(0,251,255,0.2); line-height: 1.3; }
-    .certificado-destacado { color: var(--yellow) !important; font-size: 1rem; text-shadow: 0 0 15px rgba(255, 255, 0, 0.4); display: block; margin: 10px 0; text-transform: uppercase; }
+    
+    /* Título Evolucionado: Mezcla de limpieza y tech */
+    #main-title { 
+      font-size: 1.5rem; margin-top: 10px; line-height: 1.3;
+      background: linear-gradient(to right, #ffffff, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
 
-    /* AJUSTE VIDEO: Equilibrio entre mística y claridad */
+    .certificado-destacado { 
+      color: var(--yellow) !important; font-size: 0.9rem; 
+      text-shadow: 0 0 15px rgba(255, 255, 0, 0.4); 
+      display: block; margin: 10px 0; text-transform: uppercase; 
+      font-weight: 500; letter-spacing: 1px;
+    }
+
     #media-container { display: flex; justify-content: center; margin: 15px 0 25px 0; width: 100%; }
+    
     iframe {
       width: 65% !important;
       aspect-ratio: 16/9;
-      border-radius: 12px;
-      border: 1px solid rgba(0, 251, 255, 0.3);
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+      border: 1px solid rgba(0, 251, 255, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     }
 
     @media (max-width: 480px) {
       iframe { width: 85% !important; }
-      #main-title { font-size: 1.2rem; }
+      #main-title { font-size: 1.3rem; }
     }
 
-    .dia-badge { display: inline-block; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--cyan); padding: 2px 10px; border-radius: 5px; color: var(--cyan); font-weight: bold; margin-right: 8px; font-family: 'Orbitron'; font-size: 0.8rem; }
-    .registro-llamado-urgente { color: var(--red) !important; font-weight: 900; font-size: 1.2rem; margin: 20px 0; font-family: 'Orbitron'; text-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+    /* Badges Evolucionados: Orgánicos y Tech */
+    .dia-badge { 
+      display: inline-block; 
+      background: rgba(0, 251, 255, 0.08); 
+      border: 1px solid rgba(0, 251, 255, 0.3); 
+      padding: 4px 14px; border-radius: 30px; 
+      color: var(--cyan); font-weight: bold; margin-right: 8px; 
+      font-family: 'Orbitron'; font-size: 0.75rem; 
+    }
+
+    .registro-llamado-urgente { 
+      color: var(--red) !important; font-weight: 900; font-size: 1.1rem; 
+      margin: 25px 0; font-family: 'Orbitron'; 
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.2); 
+    }
+
     .flecha-blink { animation: blink-animation 0.8s step-start infinite; }
     @keyframes blink-animation { 50% { opacity: 0; } }
 
-    /* FORMULARIO: Evolución Estilo "Nave Espacial" */
-    .form-card { background: var(--glass); padding: 25px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); margin-top: 20px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    label { font-family: 'Orbitron'; font-size: 0.65rem; color: #888; display: block; margin-bottom: 5px; text-align: left; letter-spacing: 1px; }
-    input, select { width: 100%; padding: 14px; margin: 8px 0; background: rgba(0,0,0,0.4); border: 1px solid #222; color: white; border-radius: 10px; box-sizing: border-box; font-size: 1rem; transition: 0.3s; }
-    input:focus { border-color: var(--cyan); background: rgba(0,0,0,0.6); outline: none; }
+    /* FORMULARIO: Estilo Cristalismo Premium */
+    .form-card { 
+      background: var(--glass); 
+      padding: 30px; border-radius: 30px; 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+      margin-top: 20px; 
+      backdrop-filter: blur(20px); /* Efecto Glassmorphism */
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
+    }
+
+    label { font-family: 'Orbitron'; font-size: 0.6rem; color: #666; display: block; margin-bottom: 5px; text-align: left; letter-spacing: 1.5px; }
     
-    /* BOTÓN HÍBRIDO: Cian a Blanco para atraer ambos perfiles */
+    input, select { 
+      width: 100%; padding: 15px; margin: 10px 0; 
+      background: rgba(0,0,0,0.3); border: 1px solid #222; 
+      color: white; border-radius: 12px; box-sizing: border-box; 
+      font-size: 1rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    }
+
+    input:focus { border-color: var(--cyan); background: rgba(0,0,0,0.5); outline: none; box-shadow: 0 0 15px rgba(0, 251, 255, 0.1); }
+    
     #btn-register { 
         width: 100%; padding: 18px; 
         background: linear-gradient(90deg, var(--cyan), #ffffff); 
-        color: black; border: none; border-radius: 10px; 
+        color: black; border: none; border-radius: 12px; 
         font-weight: 900; cursor: pointer; margin-top: 15px; 
-        font-family: 'Orbitron'; font-size: 0.85rem; 
+        font-family: 'Orbitron'; font-size: 0.8rem; 
         transition: 0.4s; text-transform: uppercase;
-        box-shadow: 0 0 20px rgba(0, 251, 255, 0.2);
+        box-shadow: 0 10px 20px rgba(0, 251, 255, 0.2);
     }
-    #btn-register:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 25px var(--cyan); }
-    #btn-register:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+
+    #btn-register:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 0 30px var(--cyan); }
+    #btn-register:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; border: 1px solid #333; }
 
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 40px 20px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; }
-    .btn-cta { display: block; width: 100%; max-width: 320px; padding: 15px; margin: 10px auto; text-decoration: none; border-radius: 8px; font-weight: bold; color: white; font-family: 'Orbitron'; font-size: 0.9rem; text-align: center; }
+    .btn-cta { display: block; width: 100%; max-width: 320px; padding: 15px; margin: 10px auto; text-decoration: none; border-radius: 10px; font-weight: bold; color: white; font-family: 'Orbitron'; font-size: 0.9rem; text-align: center; transition: 0.3s; }
+    .btn-cta:hover { transform: translateY(-3px); filter: brightness(1.2); }
     .wa { background: #25d366; } .ins { background: #e1306c; } .com { background: var(--cyan); color: black; }
 
-    #custom-alert { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--cyan); color: black; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 3000; font-family: 'Orbitron'; }
+    #custom-alert { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--cyan); color: black; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 3000; font-family: 'Orbitron'; font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -80,15 +130,15 @@
     </div>
 
     <div id="main-desc">
-      <p style="font-size: 0.95rem; line-height: 1.6; margin-top:10px; opacity: 0.9;">
+      <p style="font-size: 0.95rem; line-height: 1.7; margin-top:10px; opacity: 0.85;">
         El viejo sistema ha colapsado. Sincroniza la <b>Tecnología de Conciencia</b> necesaria para optimizar tus tres pilares: 
         <span style="color:var(--neon-f)">Finanzas</span>, <span style="color:var(--neon-n)">Nutrición</span> y <span style="color:var(--neon-m)">Mentalidad</span>. 
       </p>
       
-      <div style="margin: 20px auto; max-width: 520px; text-align: left;">
-        <div style="margin-bottom: 12px; display: flex;"><span class="dia-badge">DÍA 1</span><p style="margin: 0; font-size: 0.9rem;"><b>NUTRICIÓN:</b> IA aplicada a la bio-optimización.</p></div>
-        <div style="margin-bottom: 12px; display: flex;"><span class="dia-badge">DÍA 2</span><p style="margin: 0; font-size: 0.9rem;"><b>FINANZAS:</b> Método 3D y libertad financiera.</p></div>
-        <div style="margin-bottom: 12px; display: flex;"><span class="dia-badge">DÍA 3</span><p style="margin: 0; font-size: 0.9rem;"><b>MENTALIDAD:</b> Arquitectura del interior.</p></div>
+      <div style="margin: 25px auto; max-width: 520px; text-align: left;">
+        <div style="margin-bottom: 15px; display: flex;"><span class="dia-badge">DÍA 1</span><p style="margin: 0; font-size: 0.85rem;"><b>NUTRICIÓN:</b> IA aplicada a la bio-optimización.</p></div>
+        <div style="margin-bottom: 15px; display: flex;"><span class="dia-badge">DÍA 2</span><p style="margin: 0; font-size: 0.85rem;"><b>FINANZAS:</b> Método 3D y libertad financiera.</p></div>
+        <div style="margin-bottom: 15px; display: flex;"><span class="dia-badge">DÍA 3</span><p style="margin: 0; font-size: 0.85rem;"><b>MENTALIDAD:</b> Arquitectura del interior.</p></div>
       </div>
 
       <div class="registro-llamado-urgente"> <span class="flecha-blink">⬇</span> REGÍSTRATE GRATIS AQUÍ <span class="flecha-blink">⬇</span> </div>
@@ -107,9 +157,9 @@
 
   <div id="thanks-page" class="modal">
     <h2 style="color:var(--cyan); font-family:'Orbitron';">¡ACCESO CONCEDIDO!</h2>
-    <div style="border:1px dashed var(--cyan); padding:15px; margin:20px 0; background:rgba(0,251,255,0.05);">
-      <h3 style="color:yellow; font-size:1em;">🎁 REGALO: SESIÓN DE COACHING GRATIS</h3>
-      <p style="font-size:0.85em;">Para activar tu regalo envíanos DM por Instagram con la palabra <b>"SESION"</b>.</p>
+    <div style="border:1px dashed var(--cyan); padding:20px; margin:25px 0; background:rgba(0,251,255,0.05); border-radius:15px;">
+      <h3 style="color:yellow; font-size:1.1em; margin-top:0;">🎁 REGALO: SESIÓN DE COACHING GRATIS</h3>
+      <p style="font-size:0.9em; opacity:0.9;">Para activar tu regalo envíanos DM por Instagram con la palabra <b>"SESION"</b>.</p>
     </div>
     <a href="https://chat.whatsapp.com/KJn5P2gWNfWFt2oaGkDXV4" target="_blank" class="btn-cta wa">UNIRSE AL WHATSAPP</a>
     <a href="https://www.instagram.com/coach3dlatam/" target="_blank" class="btn-cta ins">PASO 1: ACTIVAR REGALO (IG)</a>
