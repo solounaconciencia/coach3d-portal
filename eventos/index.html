@@ -210,7 +210,31 @@
     <div id="testimonios-container" style="margin-top: 50px; margin-bottom: 30px;">
       <h3 style="font-family:'Orbitron'; color:var(--cyan); font-size: 0.9em; letter-spacing: 2px; margin-bottom:30px;">VOCES DEL DESPERTAR</h3>
       <div id="testimonios-list">
-        <p style="opacity:0.5; font-size:0.8rem;">Sincronizando testimonios reales...</p>
+        
+        <div class="testimonio-card">
+          <div class="test-header">
+            <img src="https://i.postimg.cc/SRDLd8Cy/DIEGO_FOTO.jpg" class="test-foto">
+            <div class="test-info"><b>DIEGO</b><span>38 años - Chileno</span></div>
+          </div>
+          <p class="test-texto">"Como fundador de la metodología 3D, mi mayor logro no ha sido el éxito financiero, sino la Coherencia Total. Aplicando los 3 pilares a nivel de maestría, logré un control físico definitivo, libertad financiera de alto impacto y, sobre todo, la maestría del desapego material. Tras 20 años en ventas y terapias, hoy mi propósito es entregarte la llave para vivir en paz, donde el flujo de dinero es solo una consecuencia de tu expansión mental."</p>
+        </div>
+
+        <div class="testimonio-card">
+          <div class="test-header">
+            <img src="https://i.postimg.cc/rmTSLg96/maria.png" class="test-foto">
+            <div class="test-info"><b>MARÍA</b><span>45 años - Colombiana</span></div>
+          </div>
+          <p class="test-texto">"Mi mayor transformación no ha sido solo física o económica, sino el despertar de una vida en equilibrio y propósito. A través de la metodología 3D descubrí que el verdadero bienestar nace cuando alineamos nuestra alimentación, nuestra mentalidad y nuestra conciencia personal. Desde mi experiencia como mujer, madre y emprendedora, he aprendido que cuidar de nosotros mismos es el primer paso para transformar nuestro entorno."</p>
+        </div>
+
+        <div class="testimonio-card">
+          <div class="test-header">
+            <img src="https://i.postimg.cc/XYsyDQFL/Lina.jpg" class="test-foto">
+            <div class="test-info"><b>LINA</b><span>28 años - Colombiana</span></div>
+          </div>
+          <p class="test-texto">"Mi camino dentro de Coach 3D LATAM ha sido una transformación de adentro hacia afuera. Como mamá y mujer que ha vivido los desafíos de equilibrar bienestar, familia y crecimiento personal, entendí que la verdadera transformación no se trata solo del físico, sino de aprender a construir hábitos sostenibles, energía diaria y una mentalidad de evolución constante."</p>
+        </div>
+
       </div>
     </div>
   </div> 
@@ -233,33 +257,7 @@
     const SUPABASE_KEY = 'sb_publishable_eMen1iFEwGk8QspzXS1tmA_2uW2YAS9';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
-    // URL de este mismo script de AppScript
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAWUmK2XVSAxI73GIwDauXnuQrGLuHU0VGACON33-iRgZR7DzBLL-QFI-gwClYLPNzZA/exec"; 
-
-    async function loadTestimonios() {
-  try {
-    // Esta línea detecta automáticamente la URL de tu WebApp de Google
-    const scriptUrl = window.location.href.split('?')[0].split('#')[0];
-    
-    const res = await fetch(scriptUrl + "?action=getTestimonios");
-    const data = await res.json();
-    
-    const list = document.getElementById('testimonios-list');
-    list.innerHTML = "";
-    data.forEach(t => {
-      list.innerHTML += `
-        <div class="testimonio-card">
-          <div class="test-header">
-            <img src="${t.foto}" class="test-foto" onerror="this.src='https://via.placeholder.com/50'">
-            <div class="test-info"><b>${t.nombre}</b><span>${t.edad_pais}</span></div>
-          </div>
-          <p class="test-texto">"${t.texto}"</p>
-        </div>`;
-    });
-  } catch(e) { 
-    console.error("Error en la conexión de testimonios:", e); 
-  }
-}
 
     function checkFormReady() {
       var email = document.getElementById('u-email').value;
@@ -280,7 +278,6 @@
 
       const { error } = await _supabase.from('registros').insert([{ nombre, email, evento_id: evento }]);
       
-      // Enviar al mismo script para el Sheet
       fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre, email, evento_id: evento }) });
 
       document.getElementById('main-content').style.display = 'none';
