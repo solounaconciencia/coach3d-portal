@@ -60,7 +60,6 @@
       #main-title { font-size: 1.3rem; }
     }
 
-    /* FILAS DE DÍAS HD */
     .dia-row {
       display: flex;
       align-items: center;
@@ -108,7 +107,6 @@
     .flecha-blink { animation: blink-animation 0.8s step-start infinite; }
     @keyframes blink-animation { 50% { opacity: 0; } }
 
-    /* FORMULARIO CRISTALISMO */
     .form-card { 
       background: var(--glass); padding: 30px; border-radius: 30px; 
       border: 1px solid rgba(255, 255, 255, 0.08); 
@@ -137,7 +135,7 @@
     #btn-register:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 0 30px var(--cyan); }
     #btn-register:disabled { background: #222; color: #555; cursor: not-allowed; }
 
-    /* TESTIMONIOS CRISTAL */
+    /* TESTIMONIOS EVOLUCIONADOS */
     .testimonio-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.05);
@@ -151,7 +149,7 @@
     .test-texto { font-style: italic; font-size: 0.85rem; line-height: 1.5; color: rgba(255,255,255,0.85); }
 
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 40px 20px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; }
-    .btn-cta { display: block; width: 100%; max-width: 320px; padding: 15px; margin: 10px auto; text-decoration: none; border-radius: 10px; font-weight: bold; color: white; font-family: 'Orbitron'; font-size: 0.9rem; text-align: center; }
+    .btn-cta { display: block; width: 100%; max-width: 320px; padding: 15px; margin: 10px auto; text-decoration: none; border-radius: 10px; font-weight: bold; color: white; font-family: 'Orbitron'; font-size: 0.9rem; text-align: center; transition: 0.3s; }
     .wa { background: #25d366; } .ins { background: #e1306c; } .com { background: var(--cyan); color: #000; }
 
     #custom-alert { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--cyan); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 3000; font-family: 'Orbitron'; font-size: 0.8rem; }
@@ -180,7 +178,6 @@
             <p class="dia-texto"><b>Bio-Optimización:</b> Aprende principios de salud celular y usa la IA para diseñar un plan de nutrición con precisión quirúrgica.</p>
           </div>
         </div>
-
         <div class="dia-row">
           <div class="dia-icon icon-finanzas">💎</div>
           <div>
@@ -188,7 +185,6 @@
             <p class="dia-texto"><b>Arquitectura de Riqueza:</b> Domina el Método 3D e integra la IA para automatizar tu ahorro y detectar oportunidades de inversión.</p>
           </div>
         </div>
-
         <div class="dia-row">
           <div class="dia-icon icon-mentalidad">✨</div>
           <div>
@@ -213,27 +209,8 @@
 
     <div id="testimonios-container" style="margin-top: 50px; margin-bottom: 30px;">
       <h3 style="font-family:'Orbitron'; color:var(--cyan); font-size: 0.9em; letter-spacing: 2px; margin-bottom:30px;">VOCES DEL DESPERTAR</h3>
-      
-      <div class="testimonio-card">
-        <div class="test-header">
-          <img src="https://i.postimg.cc/44K3M0mX/user-1.png" class="test-foto">
-          <div class="test-info">
-            <b>CARLOS M.</b>
-            <span>Empresario - 38 años</span>
-          </div>
-        </div>
-        <p class="test-texto">"El Método 3D cambió mi forma de ver el dinero. Con la IA ahora mis finanzas se gestionan solas."</p>
-      </div>
-
-      <div class="testimonio-card">
-        <div class="test-header">
-          <img src="https://i.postimg.cc/mD8zYpLh/user-2.png" class="test-foto">
-          <div class="test-info">
-            <b>ELENA R.</b>
-            <span>Coach Nutricional - 29 años</span>
-          </div>
-        </div>
-        <p class="test-texto">"Nunca pensé que la IA podría personalizar una dieta con tanta precisión. Mi energía está en otro nivel."</p>
+      <div id="testimonios-list">
+        <p style="opacity:0.5; font-size:0.8rem;">Sincronizando testimonios reales...</p>
       </div>
     </div>
   </div> 
@@ -244,9 +221,9 @@
       <h3 style="color:yellow; font-size:1.1em; margin-top:0;">🎁 REGALO: SESIÓN DE COACHING GRATIS</h3>
       <p style="font-size:0.9em; opacity:0.9;">Para activar tu regalo envíanos DM por Instagram con la palabra <b>"SESION"</b>.</p>
     </div>
-    <a href="https://chat.whatsapp.com/KJn5P2gWNfWFt2oaGkDXV4" target="_blank" class="btn-cta wa">UNIRSE AL WHATSAPP</a>
-    <a href="https://www.instagram.com/coach3dlatam/" target="_blank" class="btn-cta ins">PASO 1: ACTIVAR REGALO (IG)</a>
-    <a href="https://coach3dlatam.app" target="_blank" class="btn-cta com">COMUNIDAD EXCLUSIVA</a>
+    <a href="<?= linkWA ?>" target="_blank" class="btn-cta wa">UNIRSE AL WHATSAPP</a>
+    <a href="<?= linkIG ?>" target="_blank" class="btn-cta ins">PASO 1: ACTIVAR REGALO (IG)</a>
+    <a href="<?= linkC3D ?>" target="_blank" class="btn-cta com">COMUNIDAD EXCLUSIVA</a>
   </div>
 
   <div id="custom-alert"></div>
@@ -255,17 +232,37 @@
     const SUPABASE_URL = 'https://btupljtijgupyldxwile.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_eMen1iFEwGk8QspzXS1tmA_2uW2YAS9';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // URL de este mismo script de AppScript
+    const SCRIPT_URL = "URL_DE_TU_SCRIPT_PUBLICADO"; 
+
+    async function loadTestimonios() {
+      try {
+        const response = await fetch(SCRIPT_URL + "?action=getTestimonios");
+        const data = await response.json();
+        const list = document.getElementById('testimonios-list');
+        list.innerHTML = "";
+        data.forEach(t => {
+          list.innerHTML += `
+            <div class="testimonio-card">
+              <div class="test-header">
+                <img src="${t.foto}" class="test-foto" onerror="this.src='https://via.placeholder.com/50'">
+                <div class="test-info"><b>${t.nombre}</b><span>${t.edad_pais}</span></div>
+              </div>
+              <p class="test-texto">"${t.texto}"</p>
+            </div>`;
+        });
+      } catch(e) {
+        console.log("Error cargando testimonios", e);
+      }
+    }
+    window.onload = loadTestimonios;
 
     function checkFormReady() {
       var email = document.getElementById('u-email').value;
       var btn = document.getElementById('btn-register');
-      if(email.includes('@') && email.includes('.')) {
-        btn.disabled = false;
-        btn.innerText = "RESERVAR MI CUPO AL PORTAL (GRATIS)";
-      } else {
-        btn.disabled = true;
-        btn.innerText = "COMPLETA TU EMAIL PARA RESERVAR";
-      }
+      btn.disabled = !(email.includes('@') && email.includes('.'));
+      if(!btn.disabled) btn.innerText = "RESERVAR MI CUPO GRATIS";
     }
 
     async function runRegister() {
@@ -275,20 +272,13 @@
       const btn = document.getElementById('btn-register');
 
       if(!nombre || !email) return mostrarAlerta("COMPLETA TODOS LOS DATOS");
-
       btn.innerText = "SINCRONIZANDO...";
       btn.disabled = true;
 
       const { error } = await _supabase.from('registros').insert([{ nombre, email, evento_id: evento }]);
-
-      if (error) {
-        mostrarAlerta("Error: " + error.message);
-        btn.disabled = false;
-        return;
-      }
-
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyGjpCPhIXfd2oljjKWaLVcl9_EpgONPs1ZFqnNnnW5EHcTr70aAcbYZUkWBdvzg4nXg/exec";
-      fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre, email, evento_id: evento }) });
+      
+      // Enviar al mismo script para el Sheet
+      fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ nombre, email, evento_id: evento }) });
 
       document.getElementById('main-content').style.display = 'none';
       document.getElementById('thanks-page').style.display = 'flex';
