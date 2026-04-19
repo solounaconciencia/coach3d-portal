@@ -12,13 +12,14 @@
       --cyan: #00fbff; 
       --dark-bg: #050505; 
       --glass: rgba(255, 255, 255, 0.02);
-      --neon-f: #10b981; --neon-n: #00fbff; --neon-m: #a855f7;
+      --neon-f: #10b981; /* Verde Menta / Nutrición */
+      --neon-n: #ffb700; /* Oro / Finanzas */
+      --neon-m: #ff85a1; /* Rose Gold / Mentalidad */
       --yellow: #ffff00; --red: #ff0000;
     }
 
     body { 
       margin: 0; padding: 0; 
-      /* Evolución: Fondo con profundidad radial */
       background: radial-gradient(circle at top, #0d1a25 0%, #050505 80%); 
       color: white; font-family: 'Roboto', sans-serif; text-align: center; overflow-x: hidden; 
     }
@@ -27,7 +28,6 @@
     
     h1, h2, h3 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; font-weight: 700; }
     
-    /* Título Evolucionado: Mezcla de limpieza y tech */
     #main-title { 
       font-size: 1.5rem; margin-top: 10px; line-height: 1.3;
       background: linear-gradient(to right, #ffffff, var(--cyan));
@@ -37,10 +37,10 @@
     }
 
     .certificado-destacado { 
-      color: var(--yellow) !important; font-size: 0.9rem; 
+      color: var(--yellow) !important; font-size: 0.8rem; 
       text-shadow: 0 0 15px rgba(255, 255, 0, 0.4); 
       display: block; margin: 10px 0; text-transform: uppercase; 
-      font-weight: 500; letter-spacing: 1px;
+      font-weight: 500; letter-spacing: 2px;
     }
 
     #media-container { display: flex; justify-content: center; margin: 15px 0 25px 0; width: 100%; }
@@ -58,15 +58,41 @@
       #main-title { font-size: 1.3rem; }
     }
 
-    /* Badges Evolucionados: Orgánicos y Tech */
-    .dia-badge { 
-      display: inline-block; 
-      background: rgba(0, 251, 255, 0.08); 
-      border: 1px solid rgba(0, 251, 255, 0.3); 
-      padding: 4px 14px; border-radius: 30px; 
-      color: var(--cyan); font-weight: bold; margin-right: 8px; 
-      font-family: 'Orbitron'; font-size: 0.75rem; 
+    /* FILAS DE DÍAS CON CONEXIÓN VISUAL */
+    .dia-row {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 12px;
+      padding: 10px;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: left;
     }
+
+    .dia-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 1.2rem;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Colores que conectan con la publicidad */
+    .icon-nutricion { border: 1px solid var(--neon-f); color: var(--neon-f); background: rgba(16, 185, 129, 0.1); }
+    .icon-finanzas { border: 1px solid var(--neon-n); color: var(--neon-n); background: rgba(255, 183, 0, 0.1); }
+    .icon-mentalidad { border: 1px solid var(--neon-m); color: var(--neon-m); background: rgba(255, 133, 161, 0.1); }
+
+    .dia-badge { 
+      font-family: 'Orbitron'; font-size: 0.65rem; color: var(--cyan); 
+      display: block; font-weight: bold; margin-bottom: 2px;
+    }
+
+    .dia-texto { font-size: 0.85rem; margin: 0; opacity: 0.9; }
 
     .registro-llamado-urgente { 
       color: var(--red) !important; font-weight: 900; font-size: 1.1rem; 
@@ -77,13 +103,12 @@
     .flecha-blink { animation: blink-animation 0.8s step-start infinite; }
     @keyframes blink-animation { 50% { opacity: 0; } }
 
-    /* FORMULARIO: Estilo Cristalismo Premium */
+    /* FORMULARIO */
     .form-card { 
       background: var(--glass); 
       padding: 30px; border-radius: 30px; 
       border: 1px solid rgba(255, 255, 255, 0.08); 
-      margin-top: 20px; 
-      backdrop-filter: blur(20px); /* Efecto Glassmorphism */
+      backdrop-filter: blur(20px);
       box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
     }
 
@@ -93,27 +118,24 @@
       width: 100%; padding: 15px; margin: 10px 0; 
       background: rgba(0,0,0,0.3); border: 1px solid #222; 
       color: white; border-radius: 12px; box-sizing: border-box; 
-      font-size: 1rem; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      font-size: 1rem; outline: none;
     }
 
-    input:focus { border-color: var(--cyan); background: rgba(0,0,0,0.5); outline: none; box-shadow: 0 0 15px rgba(0, 251, 255, 0.1); }
-    
     #btn-register { 
         width: 100%; padding: 18px; 
         background: linear-gradient(90deg, var(--cyan), #ffffff); 
         color: black; border: none; border-radius: 12px; 
         font-weight: 900; cursor: pointer; margin-top: 15px; 
         font-family: 'Orbitron'; font-size: 0.8rem; 
-        transition: 0.4s; text-transform: uppercase;
+        text-transform: uppercase;
         box-shadow: 0 10px 20px rgba(0, 251, 255, 0.2);
     }
 
     #btn-register:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 0 30px var(--cyan); }
-    #btn-register:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; border: 1px solid #333; }
+    #btn-register:disabled { background: #222; color: #555; cursor: not-allowed; }
 
     .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 40px 20px; display: none; flex-direction: column; align-items: center; justify-content: flex-start; }
-    .btn-cta { display: block; width: 100%; max-width: 320px; padding: 15px; margin: 10px auto; text-decoration: none; border-radius: 10px; font-weight: bold; color: white; font-family: 'Orbitron'; font-size: 0.9rem; text-align: center; transition: 0.3s; }
-    .btn-cta:hover { transform: translateY(-3px); filter: brightness(1.2); }
+    .btn-cta { display: block; width: 100%; max-width: 320px; padding: 15px; margin: 10px auto; text-decoration: none; border-radius: 10px; font-weight: bold; color: white; font-family: 'Orbitron'; font-size: 0.9rem; text-align: center; }
     .wa { background: #25d366; } .ins { background: #e1306c; } .com { background: var(--cyan); color: black; }
 
     #custom-alert { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--cyan); color: black; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 3000; font-family: 'Orbitron'; font-size: 0.8rem; }
@@ -130,15 +152,34 @@
     </div>
 
     <div id="main-desc">
-      <p style="font-size: 0.95rem; line-height: 1.7; margin-top:10px; opacity: 0.85;">
-        El viejo sistema ha colapsado. Sincroniza la <b>Tecnología de Conciencia</b> necesaria para optimizar tus tres pilares: 
-        <span style="color:var(--neon-f)">Finanzas</span>, <span style="color:var(--neon-n)">Nutrición</span> y <span style="color:var(--neon-m)">Mentalidad</span>. 
+      <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; opacity: 0.85;">
+        Sincroniza la <b>Tecnología de Conciencia</b> para optimizar tus pilares fundamentales:
       </p>
       
-      <div style="margin: 25px auto; max-width: 520px; text-align: left;">
-        <div style="margin-bottom: 15px; display: flex;"><span class="dia-badge">DÍA 1</span><p style="margin: 0; font-size: 0.85rem;"><b>NUTRICIÓN:</b> IA aplicada a la bio-optimización.</p></div>
-        <div style="margin-bottom: 15px; display: flex;"><span class="dia-badge">DÍA 2</span><p style="margin: 0; font-size: 0.85rem;"><b>FINANZAS:</b> Método 3D y libertad financiera.</p></div>
-        <div style="margin-bottom: 15px; display: flex;"><span class="dia-badge">DÍA 3</span><p style="margin: 0; font-size: 0.85rem;"><b>MENTALIDAD:</b> Arquitectura del interior.</p></div>
+      <div style="margin: 20px auto; max-width: 520px;">
+        <div class="dia-row">
+          <div class="dia-icon icon-nutricion">🌿</div>
+          <div>
+            <span class="dia-badge">DÍA 1</span>
+            <p class="dia-texto"><b>NUTRICIÓN:</b> IA aplicada a la bio-optimización.</p>
+          </div>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-icon icon-finanzas">💎</div>
+          <div>
+            <span class="dia-badge">DÍA 2</span>
+            <p class="dia-texto"><b>FINANZAS:</b> Método 3D y libertad financiera.</p>
+          </div>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-icon icon-mentalidad">✨</div>
+          <div>
+            <span class="dia-badge">DÍA 3</span>
+            <p class="dia-texto"><b>MENTALIDAD:</b> Arquitectura del interior.</p>
+          </div>
+        </div>
       </div>
 
       <div class="registro-llamado-urgente"> <span class="flecha-blink">⬇</span> REGÍSTRATE GRATIS AQUÍ <span class="flecha-blink">⬇</span> </div>
