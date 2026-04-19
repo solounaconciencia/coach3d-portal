@@ -3,83 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Coach 3D | Sincronizando Reserva</title>
+    <title>Coach 3D | Registro de Eventos</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
+        :root { --cyan: #00fbff; --blue: #0066ff; }
         body, html { 
-            background-color: #000; 
-            margin: 0; padding: 0; 
-            height: 100%; width: 100%; 
-            overflow: hidden; 
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            color: white;
+            background-color: #000; margin: 0; padding: 0; 
+            height: 100%; width: 100%; overflow-x: hidden;
+            font-family: 'Segoe UI', sans-serif; color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
 
+        /* --- ESTÉTICA DEL LOADER (Tu diseño original) --- */
         #loader-container {
-            text-align: center;
-            z-index: 1;
-            padding: 30px;
-            max-width: 450px;
+            text-align: center; z-index: 10; padding: 30px; max-width: 450px;
             animation: fadeIn 0.8s ease-in-out;
         }
+        .logo-loader { width: 140px; margin-bottom: 25px; filter: drop-shadow(0 0 10px var(--cyan)); }
+        .matrix-text { color: var(--cyan); font-family: 'Orbitron'; letter-spacing: 2px; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        .instruction-text { font-size: 1rem; line-height: 1.6; color: #e0e0e0; margin-bottom: 30px; }
+        .highlight { color: var(--cyan); font-weight: bold; }
+        
+        .progress-wrapper { width: 100%; height: 3px; background: #111; position: relative; overflow: hidden; border-radius: 4px; }
+        .progress-bar { position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--cyan), transparent); animation: loading 2.5s infinite; }
 
-        .logo-loader {
-            width: 140px;
-            margin-bottom: 25px;
-            filter: drop-shadow(0 0 10px rgba(0, 251, 255, 0.4));
+        /* --- CONTENEDOR DE LA APP (Aparece tras cargar) --- */
+        #main-app { display: none; width: 90%; max-width: 450px; text-align: center; animation: fadeIn 0.8s ease; }
+        .event-card { 
+            background: rgba(10, 10, 10, 0.95); border: 1px solid var(--blue);
+            padding: 30px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 102, 255, 0.2);
         }
 
-        .matrix-text {
-            color: #00fbff; 
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            animation: pulse 1.5s infinite;
+        input {
+            width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px;
+            border: 1px solid #333; background: #0a0a0a; color: white; box-sizing: border-box; font-size: 1rem;
         }
-
-        .instruction-text {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-            margin-bottom: 30px;
-        }
-
-        .highlight { color: #00fbff; font-weight: bold; }
-
-        .progress-wrapper {
-            width: 100%;
-            height: 3px;
-            background: #111;
-            position: relative;
-            overflow: hidden;
-            border-radius: 4px;
-        }
-
-        .progress-bar {
-            position: absolute;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, #00fbff, transparent);
-            animation: loading 2.5s infinite;
-        }
-
-        /* Ocultamos la franja celeste subiendo el iframe */
-        iframe {
-            position: absolute;
-            top: -45px; 
-            left: 0;
-            width: 100%;
-            height: calc(100% + 45px); 
-            border: none;
-            z-index: 2; 
-            background-color: #000;
-            visibility: hidden; 
+        .btn-register {
+            width: 100%; padding: 16px; background: var(--blue); color: white;
+            border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; margin-top: 20px; font-family: 'Orbitron'; letter-spacing: 1px;
         }
 
         @keyframes loading { 100% { left: 100%; } }
@@ -91,48 +55,64 @@
 
     <div id="loader-container">
         <img src="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png" class="logo-loader" alt="C3D Logo">
-        
         <div class="matrix-text">Sincronizando con el portal...</div>
-
         <div class="instruction-text">
             <p>Estamos <span class="highlight">RESERVANDO TU CUPO</span> temporalmente.</p>
-            <p style="font-size: 0.9rem; opacity: 0.9;">No cierres esta ventana. A continuación, valida tu <b>Nombre</b> y <b>Email</b> para confirmar tu lugar en el evento.</p>
+            <p style="font-size: 0.9rem; opacity: 0.9;">No cierres esta ventana. A continuación, valida tu <b>Nombre</b> y <b>Email</b> para confirmar tu lugar.</p>
         </div>
-
         <div class="progress-wrapper"><div class="progress-bar"></div></div>
-        <p style="font-size: 0.65rem; opacity: 0.5; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Conexión Encriptada Activa</p>
     </div>
 
-    <iframe 
-        id="portal-frame"
-        src="https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec?authuser=0" 
-        allow="camera; microphone; clipboard-read; clipboard-write">
-    </iframe>
+    <div id="main-app">
+        <div class="event-card">
+            <h2 style="font-family: 'Orbitron'; color: var(--cyan); font-size: 1.1rem; margin-bottom: 20px;">VALIDA TU ACCESO</h2>
+            
+            <input type="text" id="u-nombre" placeholder="NOMBRE COMPLETO">
+            <input type="email" id="u-email" placeholder="TU MEJOR CORREO">
+            
+            <button class="btn-register" id="btn-submit" onclick="saveToSupabase()">CONFIRMAR REGISTRO</button>
+            <p style="font-size: 0.65rem; opacity: 0.5; margin-top: 20px; text-transform: uppercase;">Conexión Encriptada vía Supabase</p>
+        </div>
+    </div>
 
     <script>
-        (function() {
-            var frame = document.getElementById('portal-frame');
-            var loader = document.getElementById('loader-container');
-            var urlDirecta = "https://script.google.com/macros/s/AKfycby2SS_WMBwV8-7Y9GHCvksJAuQRWHYcVS21-KDeQtO5sZQGII6rTJD204q_5XRH1zhXNQ/exec";
+        // CONFIGURACIÓN DE TU SUPABASE
+        const SUPABASE_URL = 'https://btupljtijgupyldxwile.supabase.co'; 
+        const SUPABASE_KEY = 'PON_AQUI_TU_KEY_COMPLETA'; // La que empieza por sb_publishable
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            // Si el frame carga bien (PC y la mayoría de móviles)
-            frame.onload = function() {
-                setTimeout(function() {
-                    frame.style.visibility = 'visible';
-                    loader.style.display = 'none';
-                }, 500); 
-            };
+        // Control de transición del Loader
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loader-container').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+            }, 3000); // 3 segundos de carga épica
+        };
 
-            // SOLUCIÓN DEFINITIVA PARA MÓVILES (SALTO DE EMERGENCIA)
-            // Si en 3.5 segundos el frame no respondió por bloqueo de multicuenta:
-            setTimeout(function() {
-                if (frame.style.visibility !== 'visible') {
-                    // Si el iFrame falló, sacamos al usuario al modo directo.
-                    // Verá la franja celeste, pero NO el mensaje de error de Google.
-                    window.location.replace(urlDirecta);
-                }
-            }, 3500);
-        })();
+        async function saveToSupabase() {
+            const btn = document.getElementById('btn-submit');
+            const nombre = document.getElementById('u-nombre').value.trim();
+            const email = document.getElementById('u-email').value.trim();
+
+            if(!nombre || !email) return alert("Por favor completa los datos");
+
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+
+            // Guardado directo en la tabla 'registros'
+            const { error } = await _supabase
+                .from('registros')
+                .insert([{ nombre: nombre, email: email, evento_id: 'ABRIL_3D' }]);
+
+            if (error) {
+                alert("Error: " + error.message);
+                btn.innerText = "REINTENTAR";
+                btn.disabled = false;
+            } else {
+                // REDIRECCIÓN FINAL (Cambia esto por tu URL de WhatsApp o Gracias)
+                window.location.href = "https://coach3dlatam.app/gracias"; 
+            }
+        }
     </script>
 </body>
 </html>
