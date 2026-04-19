@@ -18,8 +18,28 @@
     body { margin: 0; padding: 0; background: var(--dark-bg); color: white; font-family: 'Roboto', sans-serif; text-align: center; overflow-x: hidden; }
     .container { max-width: 600px; margin: auto; padding: 20px; position: relative; }
     .logo { width: 180px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(0,251,255,0.3)); }
-    #media-container { margin-bottom: 25px; position: relative; }
-    iframe { width: 100%; aspect-ratio: 16/9; border-radius: 15px; border: 1px solid var(--cyan); box-shadow: 0 0 20px rgba(0, 251, 255, 0.2); }
+    /* AJUSTE VIDEO: Mitad del tamaño y centrado */
+#media-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    width: 100%;
+}
+
+iframe {
+    width: 50% !important; /* Aquí forzamos la mitad del ancho */
+    aspect-ratio: 16/9;
+    border-radius: 15px;
+    border: 1px solid var(--cyan);
+    box-shadow: 0 0 20px rgba(0, 251, 255, 0.2);
+}
+
+/* Ajuste para móviles: si al 50% se ve muy pequeño, puedes subirlo a 80% */
+@media (max-width: 480px) {
+    iframe {
+        width: 70% !important; 
+    }
+}
     h1, h2, h3 { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
     #main-title { font-size: 1.5rem; margin-top: 20px; color: white; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
     .certificado-destacado { color: var(--yellow) !important; font-size: 1.3rem; text-shadow: 0 0 15px rgba(255, 255, 0, 0.6); display: block; margin: 15px 0; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-weight: 700; }
