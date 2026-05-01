@@ -6,13 +6,11 @@
     <title>El Rincón de Cauquenes</title>
     
     <link rel="icon" href="https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png" type="image/png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
     <style>
-        /* =========================================
-           1. ESTILOS BASE Y BARRA DE DESPLAZAMIENTO PRO
-           ========================================= */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { 
@@ -22,18 +20,1609 @@
         }
         ::-webkit-scrollbar-thumb:hover { background: var(--cian-pro); }
 
-        /* =========================================
-           2. PEGA AQUÍ TODO EL CONTENIDO DE TU 'estilos'
-           ========================================= */
-        /* -> Pega desde la línea 442 de tu código hasta el final de los estilos [cite: 442-1259] <- */
+        :root {
+    --bg-negro: #050505;
+    --bg-card: #111111;
+    --cian-pro: #00e5ff;
+    --amber-premium: #f1c40f;
+    --blanco-puro: #ffffff;
+    --gris-tenue: #888888;
+    --fuente-titulo: 'Orbitron', sans-serif;
+    --fuente-texto: 'Montserrat', sans-serif;
+    --sombra-neon: 0 0 20px rgba(0, 229, 255, 0.15);
+    --transicion-suave: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Fondo con Imagen y Degradado Superior para Legibilidad */
+    background: 
+        linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(5,5,5,0) 20%),
+        url('https://i.postimg.cc/ydCBWbTv/fondo.png');
+    
+    /* Configuración de Expansión (No Mosaico) */
+    background-size: cover;          /* Expande y cubre todo el ancho/alto */
+    background-position: center;     /* Centra la imagen */
+    background-repeat: no-repeat;    /* Prohíbe el mosaico */
+    background-attachment: fixed;    /* Efecto Parallax: La web desliza sobre el fondo */
+    
+    /* Estilos base existentes */
+    color: var(--blanco-puro);
+    font-family: var(--fuente-texto);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* 1. TOP BAR: ESTRUCTURA QUIRÚRGICA */
+.top-bar {
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparente para mayor sutileza */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 8px 0; /* Más delgada */
+}
+
+.top-bar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.trust-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.6rem;
+    font-weight: 400; /* Menos peso visual */
+    color: rgba(255, 255, 255, 0.5); /* Blanco con transparencia para no brillar */
+    letter-spacing: 1px;
+}
+
+.trust-card i {
+    color: rgba(255, 255, 255, 0.4); /* Igual que el texto, muy sutil */
+    font-size: 0.85rem;
+}
+
+.wa-link {
+    cursor: pointer;
+    transition: var(--transicion-suave);
+}
+
+.wa-link:hover {
+    color: var(--blanco-puro);
+}
+
+/* 2. HEADER: IDENTIDAD CENTRAL */
+.header-wrap {
+    padding: 40px 0 20px 0;
+    text-align: center;
+    background: linear-gradient(to bottom, #000, var(--bg-negro));
+}
+
+.main-logo {
+    max-width: 170px;
+    filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.1));
+}
+
+/* 3. NAVBAR: NAVEGACIÓN DE FLUJO */
+.main-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(5, 5, 5, 0.9);
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+    border-bottom: 1px solid #111;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 35px;
+}
+
+.nav-links a {
+    color: var(--blanco-puro);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    transition: var(--transicion-suave);
+}
+
+.nav-links a:hover {
+    color: var(--cian-pro);
+    text-shadow: 0 0 8px var(--cian-pro);
+}
+
+/* LÓGICA DROPDOWN CATEGORÍAS */
+.dropdown { position: relative; }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: var(--bg-card);
+    min-width: 220px;
+    flex-direction: column;
+    border: 1px solid #222;
+    border-radius: 12px;
+    top: 100%;
+    left: 0;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    padding: 10px 0;
+    /* CORRECCIÓN DE CAPAS (Z-INDEX) */
+    z-index: 2000 !important; 
+}
+.dropdown:hover .dropdown-content { display: flex; }
+.dropdown-content a {
+    padding: 12px 20px !important;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.7rem !important;
+    display: block;
+}
+.dropdown-content a:last-child { border-bottom: none; }
+
+.search-container {
+    position: relative;
+    width: 300px;
+    /* Mantenemos una capa base baja para que el menú pase por encima */
+    z-index: 10; 
+}
+
+.search-container input {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.8rem;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gris-tenue);
+}
+
+/* 4. SLIDER: FORMATO CONTENIDO (NO EXPANDIDO AL INFINITO) */
+.slider-container {
+    max-width: 1200px;
+    height: 500px;
+    margin: 30px auto;
+    position: relative;
+    background: #000;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+}
+
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 80px;
+    transition: opacity 0.8s ease, visibility 0.8s;
+    /* CORRECCIÓN QUIRÚRGICA: */
+    pointer-events: none; /* Evita que el slide invisible atrape clics */
+    visibility: hidden;   /* Lo oculta totalmente del flujo */
+    z-index: 1;
+}
+
+.slide.active {
+    opacity: 1;
+    pointer-events: auto; /* Solo el slide activo puede recibir clics */
+    visibility: visible;
+    z-index: 10; /* Lo trae al frente de la pila */
+}
+
+.slide-info {
+    flex: 1;
+    max-width: 50%;
+}
+
+.slide-info h1 {
+    font-family: var(--fuente-titulo);
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 15px;
+    color: var(--blanco-puro);
+}
+
+.slide-info h2 {
+    color: var(--amber-premium);
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+}
+
+.slide-img-box {
+    flex: 1;
+    height: 85%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,255,255,0.02);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.slide-img-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Mantiene la proporción del producto */
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+}
+
+/* 5. VITRINA: PRODUCTOS */
+.content-wrapper {
+    max-width: 1250px;
+    margin: 60px auto;
+    padding: 0 25px;
+}
+
+.section-title {
+    font-family: var(--fuente-titulo);
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 4px;
+    color: var(--gris-tenue);
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 40px;
+}
+
+.product-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid #1a1a1a;
+    transition: var(--transicion-suave);
+    cursor: pointer;
+    text-align: center; position: relative; overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-12px);
+    border-color: var(--cian-pro);
+    box-shadow: 0 20px 40px rgba(0, 229, 255, 0.05);
+}
+
+.product-card:hover img { transform: scale(1.1); }
+
+/* BOTÓN VER DETALLES DINÁMICO */
+.ver-detalles-btn {
+    position: absolute;
+    bottom: -60px; pointer-events: none;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--cian-pro);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    transition: var(--transicion-suave);
+    z-index: 5;
+}
+.product-card:hover .ver-detalles-btn { bottom: 25px;
+pointer-events: auto; /* Se activa al ser visible */
+}
+
+.product-card img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 20px; transition: var(--transicion-suave);
+}
+
+.card-brand {
+    color: var(--amber-premium);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0;
+    height: 50px;
+    overflow: hidden;
+}
+
+.card-price {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--cian-pro);
+}
+
+/* 6. COMPONENTES: WHATSAPP Y TOAST */
+.wa-bubble, .cart-float-bubble {
+    position: fixed;
+    right: 40px; /* Mismo eje derecho para ambas */
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transicion-suave);
+    z-index: 9999;
+}
+
+.wa-bubble {
+    bottom: 40px;
+    background: #25d366;
+    box-shadow: 0 15px 30px rgba(37, 211, 102, 0.3);
+}
+
+.cart-float-bubble {
+    bottom: 115px; /* 40 base + 65 altura + 10 aire */
+    background: var(--cian-pro);
+    color: #000;
+    font-size: 1.6rem;
+    box-shadow: 0 15px 30px rgba(0, 229, 255, 0.3);
+}
+
+.wa-bubble img {
+    width: 35px;
+}
+
+.wa-bubble:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+/* CONTROLES DE NAVEGACIÓN MODERNOS (FOCUS) */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px; /* Tamaño ideal para dedos */
+    height: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px); /* Efecto cristal moderno */
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    color: var(--cian-pro);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 12px; /* Esquinas redondeadas premium */
+    z-index: 100;
+    transition: var(--transicion-suave);
+    user-select: none;
+}
+
+.slider-btn:hover {
+    background: var(--cian-pro);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+.slider-btn:active {
+    transform: translateY(-50%) scale(0.9); /* Feedback de presión */
+}
+
+.slider-btn.prev { left: 20px; }
+.slider-btn.next { right: 20px; }
+/* RESPONSIVO */
+@media (max-width: 768px) {
+    body { padding: 0 15px; } /* Evita que el contenido toque los bordes del celular */
+    .slider-btn {
+        width: 44px;
+        height: 44px;
+        background: rgba(0, 0, 0, 0.6); /* Más contraste en móvil */
+        bottom: 20px; /* Las bajamos para no tapar la imagen */
+        top: auto;
+        transform: none;
+    }
+    .slider-btn.prev { left: 15px; }
+    .slider-btn.next { right: 15px; }
+    .slider-btn:active { transform: scale(0.9); }
+    .slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 80px;
+    transition: opacity 0.8s ease;
+    pointer-events: none; /* BLOQUEA CLICS EN SLIDES INVISIBLES */
+    visibility: hidden;   /* OCULTA TOTALMENTE PARA EL NAVEGADOR */
+}
+    .slide-info {
+        max-width: 100%;
+        margin-bottom: 30px;
+    }
+    .slide-info h1 { font-size: 2.2rem; }
+    .slider-container { 
+        height: auto; 
+        min-height: 550px; /* Espacio suficiente para todo el contenido */
+        margin: 10px; 
+    }
+    .main-nav { flex-direction: column; gap: 20px; }
+    .search-container { width: 90%; }
+    .product-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 12px; 
+    }
+    .product-card { padding: 10px; }
+    .product-card img { height: 180px; margin-bottom: 10px; }
+    .card-title { font-size: 0.8rem; height: 35px; }
+    .card-price { font-size: 1.1rem; }
+    .img-slide {
+        max-height: 200px; /* Limitamos la imagen para dar espacio al texto */
+        width: auto;
+        object-fit: contain;
+        margin-top: 10px;
+    }
+    .slide-content {
+        text-align: center;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .slide-content h2 { font-size: 0.8rem !important; } /* Título gancho */
+    .slide-content h1 { font-size: 1.8rem !important; line-height: 1.1; } /* Nombre producto */
+    .slide-content p { font-size: 0.8rem !important; line-height: 1.3; margin-bottom: 10px; } /* Descripción */
+    
+    /* El precio debe resaltar pero no tapar */
+    .slide-content div { font-size: 1.5rem !important; margin-bottom: 15px !important; } 
+    
+    .btn-buy-now { 
+        padding: 10px 25px !important; 
+        font-size: 0.8rem !important; 
+        width: 100% !important; /* Botón ancho para pulgar */
+    }
+
+}
+
+/* VENTANA MODAL (DETALLES Y ADMIN) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: var(--bg-card);
+    margin: 50px auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 20px;
+    position: relative;
+    border: 1px solid #333;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    color: var(--gris-tenue);
+    cursor: pointer;
+}
+.close-modal:hover { color: var(--cian-pro); }
+
+/* CARRITO: APERTURA POR LA IZQUIERDA */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -450px; 
+    width: 400px;
+    max-width: 90%;
+    height: 100vh; /* Altura total de la pantalla */
+    background: #080808;
+    z-index: 11000;
+    transition: var(--transicion-suave);
+    box-shadow: 20px 0 60px rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column; /* Alinea header, items y footer en vertical */
+    border-right: 1px solid #1a1a1a;
+    overflow: hidden; /* Evita que el panel entero se desplace */
+}
+
+.cart-sidebar.active {
+    left: 0; /* Aparece desde la izquierda */
+}
+
+.cart-header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+/* CORRECCIÓN DE NOMBRE: Usamos la clase real de tu index.html */
+.cart-items-container { 
+    flex: 1; /* Ocupa todo el espacio disponible */
+    overflow-y: auto; /* ACTIVA LA BARRA DE DESPLAZAMIENTO */
+    padding: 20px;
+    min-height: 0; /* Obliga a Flexbox a permitir el scroll interno */
+    
+    /* Estética de la barra de desplazamiento (Cian) */
+    scrollbar-width: thin;
+    scrollbar-color: var(--cian-pro) #111;
+}
+
+.cart-items-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-items-container::-webkit-scrollbar-thumb {
+    background: var(--cian-pro);
+    border-radius: 10px;
+}
+
+.cart-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-body::-webkit-scrollbar-thumb {
+    background: var(--cian-pro);
+    border-radius: 10px;
+}
+
+.cart-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.cart-body::-webkit-scrollbar-thumb {
+    background: var(--cian-pro);
+    border-radius: 10px;
+}
+.cart-footer { 
+    padding: 20px; 
+    border-top: 1px solid #1a1a1a; 
+    background: #0a0a0a; 
+    flex-shrink: 0; /* PROHÍBE que el botón se achique o desaparezca */
+}
+
+/* TOAST: NOTIFICACIÓN FLOTANTE CENTRADA */
+.toast-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrado perfecto */
+    background-color: #000000;
+    color: var(--cian-pro);
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-family: var(--font-stencil);
+    font-size: 1.1rem;
+    z-index: 20000;
+    border: 2px solid var(--cian-pro);
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.toast-notification.show {
+    animation: fade-in-out 3s ease-in-out;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1); /* Efecto de "pop" */
+}
+
+/* Animación de aparición y desvanecimiento */
+@keyframes fade-in-out {
+    0% { opacity: 0; transform: translate(-50%, -60%); }
+    15% { opacity: 1; transform: translate(-50%, -50%); }
+    85% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -40%); }
+}
+
+/* BOTONES GLOBALES: ELIMINACIÓN WINDOWS 95 */
+button {
+    border: none;
+    cursor: pointer;
+    font-family: var(--fuente-texto);
+    transition: var(--transicion-suave);
+    outline: none;
+}
+
+/* BOTÓN DE CIERRE (CTA PRINCIPAL) */
+.btn-checkout {
+    width: 100%;
+    padding: 18px;
+    background: var(--cian-pro);
+    color: #000;
+    font-weight: 800;
+    font-family: var(--fuente-titulo);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 229, 255, 0.2);
+    text-transform: uppercase;
+    margin-top: 20px;
+}
+.btn-checkout:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 229, 255, 0.4);
+    background: #fff;
+}
+
+/* BOTONES DE CANTIDAD (UX MEJORADA) */
+.btn-qty {
+    background: #222;
+    color: var(--blanco-puro);
+    width: 35px; /* Más grandes para dedos */
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    border: 1px solid #333;
+}
+.btn-qty:hover {
+    background: var(--cian-pro);
+    color: #000;
+}
+
+/* BOTÓN ELIMINAR */
+.btn-del {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    padding: 8px;
+    border-radius: 8px;
+    margin-left: 10px;
+}
+.btn-del:hover {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* MEJORA VISUAL DEL CARRITO */
+.cart-item {
+    background: rgba(255,255,255,0.02);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* REFINAMIENTO FORMULARIO DE SOPORTE */
+#modal-soporte textarea {
+    width: 100%;
+    height: 120px;
+    background: #0a0a0a; /* Más profundo */
+    color: var(--blanco-puro);
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 15px;
+    font-family: var(--fuente-texto);
+    font-size: 0.9rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#modal-soporte textarea:focus {
+    border-color: var(--cian-pro); /* Brillo al escribir */
+}
+
+/* ESTILO PARA EL INPUT DE ARCHIVO */
+#modal-soporte input[type="file"] {
+    background: #111;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px dashed #333;
+    width: 100%;
+    color: #888;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+#modal-soporte input[type="file"]::-webkit-file-upload-button {
+    background: #222;
+    color: var(--cian-pro);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+#modal-soporte input[type="file"]::-webkit-file-upload-button:hover {
+    background: var(--cian-pro);
+    color: #000;
+}
+
+/* BURBUJA CARRITO FLOTANTE */
+.cart-bubble {
+    position: fixed;
+    bottom: 120px; /* Sobre la de WhatsApp */
+    right: 40px;
+    width: 65px;
+    height: 65px;
+    background: var(--cian-pro);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 15px 30px rgba(0, 229, 255, 0.3);
+    z-index: 9998;
+    cursor: pointer;
+    transition: var(--transicion-suave);
+    color: #000;
+    font-size: 1.5rem;
+}
+
+.cart-bubble:hover {
+    transform: scale(1.1);
+    background: #fff;
+}
+
+.cart-badge-bubble {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff3b30; /* Rojo vibrante para alerta */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--bg-negro);
+}
+
+/* BURBUJA CARRITO FLOTANTE - PROTOCOLO FOCUS */
+.cart-float-bubble {
+    position: fixed;
+    bottom: 115px; /* Posicionada sobre la de WhatsApp (40px + 65px + 10px de aire) */
+    right: 40px;
+    width: 65px;
+    height: 65px;
+    background: var(--cian-pro); /* Color de acción definido en root */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0, 229, 255, 0.3);
+    z-index: 9998;
+    cursor: pointer;
+    transition: var(--transicion-suave);
+    color: #000;
+    font-size: 1.6rem;
+}
+
+.cart-float-bubble:hover {
+    transform: scale(1.1);
+    background: var(--blanco-puro);
+}
+
+.cart-badge-float {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff3b30; /* Rojo alerta para el contador */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--bg-negro);
+}
+
+/* Ajuste móvil para no tapar contenido */
+@media (max-width: 850px) {
+    .cart-float-bubble { right: 20px; bottom: 110px; width: 55px; height: 55px; font-size: 1.3rem; }
+    /* SINCRONIZACIÓN DE BURBUJAS EN MÓVIL */
+    .wa-bubble, .cart-float-bubble {
+        right: 20px !important; /* Más pegadas al borde para ganar espacio */
+        width: 55px !important;
+        height: 55px !important;
+    }
+    .wa-bubble { bottom: 20px !important; }
+    .cart-float-bubble { bottom: 85px !important; } /* 20 + 55 + 10 gap */
+    
+    .cart-badge-float {
+        min-width: 18px !important;
+        height: 18px !important;
+        font-size: 0.6rem !important;
+    }
+}
+
+/* REFINAMIENTO ADMIN - PROTOCOLO FOCUS */
+.admin-modal .admin-input {
+    width: 100%;
+    padding: 15px;
+    background: #0a0a0a;
+    color: var(--blanco-puro);
+    border: 1px solid #222;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-family: var(--fuente-texto);
+    outline: none;
+    transition: var(--transicion-suave);
+}
+
+.admin-modal .admin-input:focus {
+    border-color: var(--cian-pro);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+}
+
+.admin-grid-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-admin {
+    background: #111;
+    border: 1px solid #333;
+    color: var(--blanco-puro);
+    padding: 20px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transicion-suave);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-admin i { font-size: 1.5rem; color: var(--cian-pro); }
+
+.btn-admin:hover {
+    border-color: var(--cian-pro);
+    background: rgba(0, 229, 255, 0.05);
+    transform: translateY(-3px);
+}
+
+.btn-back {
+    background: transparent;
+    border: 1px solid #444;
+    color: var(--gris-tenue);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.btn-back:hover { color: var(--amber-premium); border-color: var(--amber-premium); }
         
     </style>
 </head>
 <body>
 
     <script>
-        // Aquí construiremos al "Mesero" (Fetch API) en el próximo paso.
-        console.log("Estructura Visual 2.0 Cargada Correctamente.");
+        /**
+ * MOTOR LÓGICO API - EL RINCÓN DE CAUQUENES 2.0
+ * PARTE 1: Inicialización, Slider, Filtros y Carrito
+ * PROTOCOLO: FOCUS
+ */
+
+// ==========================================
+// 1. VARIABLES GLOBALES Y MOTOR API
+// ==========================================
+var configGlobal = {};
+var productosGlobal = [];
+var carrito = [];
+var slideIndex = 0;
+var sliderInterval;
+
+// ¡CRÍTICO! Aquí pondremos la URL que te dará Google en el próximo paso
+const API_URL = "https://script.google.com/macros/s/AKfycbzJUS0wYpdA4F_un0-YD6p6NPenfSRyJmubhO4G6biV-jAbKV4RwjB7s90R5JpARxuayQ/exec";
+
+/**
+ * TRADUCTOR UNIVERSAL (Reemplaza a google.script.run)
+ * Envía mensajes a Google y espera la respuesta en JSON.
+ */
+async function apiCall(action, payload = null) {
+    let url = API_URL + "?action=" + action;
+    let options = { method: "GET" };
+    
+    if (payload) {
+        options = {
+            method: "POST",
+            body: JSON.stringify(payload)
+        };
+    }
+    
+    try {
+        const res = await fetch(url, options);
+        return await res.json();
+    } catch(e) {
+        console.error("API Error:", e);
+        return { error: e.message };
+    }
+}
+
+// ==========================================
+// 2. ARRANQUE DEL SISTEMA (Reescrito para API)
+// ==========================================
+window.onload = async function() {
+    console.log("Iniciando El Rincón de Cauquenes 2.0 (Modo API)...");
+    
+    const loadingMsg = document.getElementById('loading-msg');
+    if(loadingMsg) loadingMsg.innerText = "CONECTANDO CON BODEGA CENTRAL...";
+
+    // Pedimos todos los datos iniciales de un solo golpe
+    const data = await apiCall("getInitialData");
+
+    if (data && !data.error) {
+        configGlobal = data.config;
+        productosGlobal = data.productos;
+
+        renderSocials(); 
+        renderSlider(data.destacados); 
+
+        if(loadingMsg) loadingMsg.remove();
+
+        renderProductos(productosGlobal);
+        generarMenuCategorias(productosGlobal);
+        cargarCarritoPrevio();
+        
+        console.log("Vitrina cargada exitosamente vía API.");
+    } else {
+        if(loadingMsg) loadingMsg.innerText = "Error de conexión. Intenta recargar la página.";
+        console.error("Fallo al cargar datos:", data ? data.error : "Sin respuesta");
+    }
+};
+
+// ==========================================
+// 3. RENDERIZADO VISUAL (Intacto de tu v15.0)
+// ==========================================
+function renderSocials() {
+    const box = document.getElementById('social-box');
+    if (!box) return;
+    let html = '';
+    if (configGlobal['LINK_INSTAGRAM'] && configGlobal['LINK_INSTAGRAM'].trim() !== "") {
+        html += '<a href="' + configGlobal['LINK_INSTAGRAM'] + '" target="_blank" title="Síguenos en Instagram"><i class="fab fa-instagram"></i></a>';
+    }
+    if (configGlobal['LINK_FACEBOOK'] && configGlobal['LINK_FACEBOOK'].trim() !== "") {
+        html += '<a href="' + configGlobal['LINK_FACEBOOK'] + '" target="_blank" title="Síguenos en Facebook"><i class="fab fa-facebook"></i></a>';
+    }
+    box.innerHTML = html;
+}
+
+function renderSlider(data) {
+    const container = document.getElementById('hero-slider');
+    if (!data || data.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    container.innerHTML = data.map((s, i) => `
+    <div class="slide ${i === 0 ? 'active' : ''}">
+        <img src="${s.img}" class="img-slide" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
+        <div class="slide-content">
+            <h2 style="color:var(--amber-premium); font-size:1.1rem; margin-bottom:5px; letter-spacing:2px;">${s.titulo}</h2>
+            <h1 style="font-family:var(--fuente-titulo); font-size:3rem; line-height:1.1; margin-bottom:10px;">${s.nombre}</h1>
+            <p style="color:#ccc; font-size:0.95rem; margin-bottom:15px; line-height:1.4;">${s.desc}</p>
+            <div style="font-size:2.2rem; font-weight:800; color:var(--cian-pro); margin-bottom:25px; text-shadow: 0 0 15px rgba(0,229,255,0.3);">
+                $${Number(s.precio).toLocaleString('es-CL')}
+            </div>
+            <button class="btn-buy-now" style="width:auto; padding:15px 40px; background:var(--cian-pro); color:black; border:none; border-radius:12px; font-weight:800; cursor:pointer; font-family:var(--fuente-texto); transition:0.3s;" onclick="agregarAlCarrito('${s.sku}')">
+                ¡LO QUIERO! <i class="fas fa-shopping-cart"></i>
+            </button>
+        </div>
+    </div>`).join('') + `
+    <button class="slider-btn prev" onclick="cambiarSlide(-1)">&#10094;</button>
+    <button class="slider-btn next" onclick="cambiarSlide(1)">&#10095;</button>`;
+    iniciarAutoPlay();
+}
+
+function cambiarSlide(n) {
+    const slides = document.querySelectorAll('.slide');
+    if (slides.length === 0) return;
+    slides[slideIndex].classList.remove('active');
+    slideIndex = (slideIndex + n + slides.length) % slides.length;
+    slides[slideIndex].classList.add('active');
+}
+
+function iniciarAutoPlay() {
+    if(sliderInterval) clearInterval(sliderInterval);
+    sliderInterval = setInterval(() => cambiarSlide(1), 5000);
+}
+
+// ==========================================
+// 4. BÚSQUEDA Y FILTRADO
+// ==========================================
+function filtrar() {
+    const term = document.getElementById('main-search').value.toLowerCase();
+    const slider = document.getElementById('hero-slider');
+    if (slider && term.length > 0) slider.style.display = 'none';
+    const filtrados = productosGlobal.filter(p => {
+        return (p.NOMBRE.toString().toLowerCase().includes(term) || p.MARCA.toString().toLowerCase().includes(term) || p.CATEGORIA.toString().toLowerCase().includes(term));
+    });
+    renderProductos(filtrados);
+}
+
+function generarMenuCategorias(productos) {
+    const categorias = [...new Set(productos.map(p => p.CATEGORIA))];
+    const dropdown = document.getElementById('category-list');
+    if (!dropdown) return;
+    let html = '<a href="javascript:void(0)" onclick="filtrarPorCat(\'TODOS\')">VER TODO</a>';
+    html += categorias.map(cat => `<a href="javascript:void(0)" onclick="filtrarPorCat('${cat}')">${cat.toUpperCase()}</a>`).join('');
+    dropdown.innerHTML = html;
+}
+
+function filtrarPorCat(cat) {
+    const slider = document.getElementById('hero-slider');
+    if (slider) slider.style.display = 'none';
+    const filtrados = (cat === 'TODOS') ? productosGlobal : productosGlobal.filter(p => p.CATEGORIA === cat);
+    renderProductos(filtrados);
+    document.getElementById('grid-productos').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderProductos(lista) {
+    const grid = document.getElementById('grid-productos');
+    if (!grid) return;
+    if (lista.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:50px; opacity:0.5;">No encontramos lo que buscas en esta órbita...</p>';
+        return;
+    }
+    grid.innerHTML = lista.map(p => {
+        const stockBajo = (Number(p.STOCK) < 5);
+        const img = p.IMAGEN_URL || 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png';
+        return `
+        <div class="product-card" onclick="abrirDetalle('${p.SKU}')">
+            ${stockBajo ? '<div class="scarcity-label">STOCK CRÍTICO</div>' : ''}
+            <img src="${img}" loading="lazy" alt="${p.NOMBRE}" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
+            <div style="padding:15px; text-align:center;">
+                <small style="color:var(--amber); font-weight:bold; text-transform:uppercase;">${p.MARCA}</small>
+                <div style="font-size:0.9rem; margin-top:5px; font-weight:600; color:white; height:40px; overflow:hidden;">${p.NOMBRE}</div>
+                <div style="color:var(--cian); font-weight:800; margin-top:10px;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>
+                <div class="ver-detalles-btn" onclick="event.stopPropagation(); abrirDetalle('${p.SKU}')">VER DETALLES</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function volverInicio() {
+    document.getElementById('main-search').value = '';
+    const slider = document.getElementById('hero-slider');
+    if (slider) slider.style.display = 'block';
+    renderProductos(productosGlobal);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function abrirCategorias() {
+    const content = document.getElementById('category-list');
+    content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+}
+
+// ==========================================
+// 5. LÓGICA DEL CARRITO (Intacta, 100% Local)
+// ==========================================
+function toggleCart() { document.getElementById('cart-drawer').classList.toggle('active'); }
+
+function agregarAlCarrito(sku) {
+    const skuBusqueda = sku.toString().trim().toLowerCase();
+    const p = productosGlobal.find(x => (x.SKU || x.sku || "").toString().trim().toLowerCase() === skuBusqueda);
+    if (!p) return;
+    insertarEnCarrito(p, "Estándar");
+}
+
+function agregarAlCarritoConOpcion(sku) {
+    const p = productosGlobal.find(x => x.SKU == sku);
+    const selector = document.getElementById('variante-producto');
+    const opcionElegida = selector ? selector.value : "Estándar";
+    insertarEnCarrito(p, opcionElegida);
+    cerrarModal();
+}
+
+function insertarEnCarrito(p, opcion) {
+    const idUnico = p.SKU + "-" + opcion;
+    const existe = carrito.find(item => item.idUnico === idUnico);
+    if (existe) {
+        existe.cantidad++;
+    } else {
+        carrito.push({
+            idUnico: idUnico,
+            SKU: p.SKU,
+            NOMBRE: p.NOMBRE + (opcion !== "Estándar" ? " (" + opcion + ")" : ""),
+            PRECIO: (p.PRECIO_PROMO > 0) ? Number(p.PRECIO_PROMO) : Number(p.PRECIO),
+            cantidad: 1
+        });
+    }
+    guardarCarrito();
+    mostrarToast("Añadido: " + p.NOMBRE);
+}
+
+function renderCarrito() {
+    const container = document.getElementById('cart-items');
+    if (carrito.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:40px; opacity:0.4; font-size:0.8rem;">Tu carro está vacío...</p>';
+        return;
+    }
+    container.innerHTML = carrito.map((item, index) => `
+    <div class="cart-item">
+        <div style="margin-bottom:10px;">
+            <div style="font-weight:600; font-size:0.9rem; color:var(--blanco-puro);">${item.NOMBRE}</div>
+            <div style="color:var(--cian-pro); font-weight:700; font-size:0.85rem;">$${item.PRECIO.toLocaleString('es-CL')}</div>
+        </div>
+        <div class="cart-item-actions" style="display:flex; align-items:center; justify-content: space-between;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
+                <span style="font-weight:bold; min-width:20px; text-align:center;">${item.cantidad}</span>
+                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
+            </div>
+            <button class="btn-del" onclick="eliminarDelCarrito(${index})"><i class="fas fa-trash-alt"></i></button>
+        </div>
+    </div>`).join('');
+}
+
+function cambiarCantidad(index, delta) {
+    carrito[index].cantidad += delta;
+    if (carrito[index].cantidad <= 0) eliminarDelCarrito(index);
+    else guardarCarrito();
+}
+
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    guardarCarrito();
+}
+
+function guardarCarrito() {
+    localStorage.setItem('carrito_rincon_v12', JSON.stringify(carrito));
+    actualizarUI();
+}
+
+function cargarCarritoPrevio() {
+    const storage = localStorage.getItem('carrito_rincon_v12');
+    if (storage) {
+        carrito = JSON.parse(storage);
+        actualizarUI();
+    }
+}
+
+function actualizarUI() {
+    const totalItems = carrito.reduce((sum, i) => sum + i.cantidad, 0);
+    const countTop = document.getElementById('cart-count');
+    if(countTop) countTop.innerText = "(" + totalItems + ")";
+    const countBubble = document.getElementById('cart-count-bubble');
+    if(countBubble) {
+        countBubble.innerText = totalItems;
+        countBubble.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+    renderCarrito();
+    actualizarTotalCarrito();
+}
+
+function actualizarTotalCarrito() {
+    const subtotal = carrito.reduce((sum, i) => sum + (i.PRECIO * i.cantidad), 0);
+    const necesitaEnvio = document.getElementById('chk-envio').checked;
+    const costoEnvio = necesitaEnvio ? (Number(configGlobal['COSTO_ENVIO']) || 3500) : 0;
+    const dirInput = document.getElementById('direccion-envio');
+    dirInput.style.display = necesitaEnvio ? 'block' : 'none';
+    const total = subtotal + costoEnvio;
+    document.getElementById('cart-total-value').innerText = '$' + total.toLocaleString('es-CL');
+}
+
+// ==========================================
+// 6. PROCESAMIENTO DE COMPRA Y WHATSAPP
+// ==========================================
+async function procesarCompra() {
+    if (carrito.length === 0) return;
+    
+    const btn = document.querySelector('.btn-checkout');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+    btn.disabled = true;
+
+    const necesitaEnvio = document.getElementById('chk-envio').checked;
+    const direccion = document.getElementById('direccion-envio').value.trim();
+
+    if (necesitaEnvio && direccion === "") {
+        mostrarToast("Por favor, ingresa tu dirección de envío");
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        return;
+    }
+
+    const idPedido = "RC-" + Math.floor(Math.random() * 1000000);
+    const total = carrito.reduce((sum, i) => sum + (i.PRECIO * i.cantidad), 0) + (necesitaEnvio ? (Number(configGlobal['COSTO_ENVIO']) || 3500) : 0);
+
+    let textoWA = `Hola, quiero confirmar el pedido *${idPedido}*:\n\n`;
+    carrito.forEach(i => { textoWA += `- ${i.cantidad}x ${i.NOMBRE} ($${i.PRECIO.toLocaleString('es-CL')})\n`; });
+    textoWA += `\n*Envío:* ${necesitaEnvio ? 'A domicilio (' + direccion + ')' : 'Retiro en tienda'}`;
+    textoWA += `\n*Total final:* $${total.toLocaleString('es-CL')}`;
+
+    const numeroWA = configGlobal['WHATSAPP'] || "56900000000"; // Fallback por seguridad
+    const linkWA = `https://wa.me/${numeroWA}?text=${encodeURIComponent(textoWA)}`;
+
+    const pedidoData = {
+        id: idPedido,
+        productos: carrito.map(i => `${i.cantidad}x ${i.NOMBRE}`).join(" | "),
+        total: total,
+        envio: necesitaEnvio ? direccion : "Retiro"
+    };
+
+    // EL MESERO LLEVA EL PEDIDO A LA BODEGA (Google Sheets)
+    const res = await apiCall("guardarPedido", pedidoData);
+
+    if (res && !res.error) {
+        carrito = [];
+        guardarCarrito();
+        toggleCart();
+        window.open(linkWA, '_blank');
+    } else {
+        mostrarToast("Hubo un error al registrar. Intenta nuevamente.");
+        console.error("Error al guardar pedido:", res ? res.error : "Unknown");
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+}
+
+function irWhatsApp() {
+    const msj = "Hola, necesito soporte técnico...";
+    const linkWA = `https://wa.me/${configGlobal['WHATSAPP'] || "56900000000"}?text=${encodeURIComponent(msj)}`;
+    window.open(linkWA, '_blank');
+}
+
+// ==========================================
+// 7. VENTANAS MODALES Y TOAST (Notificaciones)
+// ==========================================
+function mostrarToast(mensaje) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.innerText = mensaje;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function abrirDetalle(sku) {
+    const p = productosGlobal.find(x => x.SKU == sku);
+    if (!p) return;
+    const desc = p.DESCRIPCION || "Sin descripción disponible.";
+    const img = p.IMAGEN_URL || 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png';
+    const link = p.LINK_YOUTUBE || "";
+    
+    let html = `
+    <div style="display:flex; flex-direction:column; gap:20px; text-align:center;">
+        <img src="${img}" style="width:100%; max-height:300px; object-fit:contain; border-radius:15px;" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
+        <h2 style="color:var(--cian-pro); font-family:var(--fuente-titulo);">${p.NOMBRE}</h2>
+        <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">${desc}</p>
+        <div style="font-size:1.8rem; font-weight:bold; color:var(--blanco-puro);">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>`;
+    
+    if (p.VARIANTES && p.VARIANTES.trim() !== "") {
+        const opciones = p.VARIANTES.split(',').map(o => o.trim());
+        html += `<select id="variante-producto" style="padding:10px; background:#111; color:white; border:1px solid #333; border-radius:8px; margin-top:10px;">
+            ${opciones.map(o => `<option value="${o}">${o}</option>`).join('')}
+        </select>`;
+        html += `<button class="btn-checkout" style="margin-top:20px;" onclick="agregarAlCarritoConOpcion('${p.SKU}')">AGREGAR AL CARRO</button>`;
+    } else {
+        html += `<button class="btn-checkout" style="margin-top:20px;" onclick="agregarAlCarrito('${p.SKU}'); cerrarModal();">AGREGAR AL CARRO</button>`;
+    }
+    
+    if (link !== "") {
+        html += `<a href="${link}" target="_blank" style="color:#ff0000; margin-top:15px; font-weight:bold; text-decoration:none;"><i class="fab fa-youtube"></i> VER VIDEO DEMOSTRATIVO</a>`;
+    }
+    html += `</div>`;
+    
+    document.getElementById('detalle-body').innerHTML = html;
+    document.getElementById('modal-detalle').style.display = 'block';
+}
+
+function cerrarModal() { document.getElementById('modal-detalle').style.display = 'none'; }
+function abrirSoporte() { document.getElementById('modal-soporte').style.display = 'block'; }
+function cerrarSoporte() { document.getElementById('modal-soporte').style.display = 'none'; }
+
+// ==========================================
+// 8. FORMULARIO DE SOPORTE TÉCNICO
+// ==========================================
+function enviarSolicitudSoporte() {
+    const msj = document.getElementById('soporte-mensaje').value.trim();
+    const fileInput = document.getElementById('soporte-adjunto');
+    const btn = document.getElementById('btn-envio-soporte');
+
+    if (msj === "") {
+        mostrarToast("Escribe un mensaje breve");
+        return;
+    }
+
+    btn.innerText = "ENVIANDO...";
+    btn.disabled = true;
+
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const base64 = e.target.result.split(',')[1];
+            const payload = { mensaje: msj, nombreArchivo: file.name, mimeType: file.type, base64Data: base64 };
+            await procesarEnvioSoporte(payload, btn);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        procesarEnvioSoporte({ mensaje: msj, nombreArchivo: "", mimeType: "", base64Data: "" }, btn);
+    }
+}
+
+async function procesarEnvioSoporte(payload, btn) {
+    const res = await apiCall("guardarSoporte", payload);
+    if(res && !res.error) {
+        mostrarToast("SOLICITUD ENVIADA CORRECTAMENTE");
+        document.getElementById('soporte-mensaje').value = "";
+        document.getElementById('soporte-adjunto').value = "";
+        cerrarSoporte();
+    } else {
+        mostrarToast("ERROR AL ENVIAR SOLICITUD");
+    }
+    btn.innerText = "ENVIAR SOLICITUD";
+    btn.disabled = false;
+}
+
+// ==========================================
+// 9. LÓGICA DEL PANEL DE ADMINISTRACIÓN
+// ==========================================
+function abrirLoginAdmin() {
+    document.getElementById('admin-login-view').style.display = 'block';
+    document.getElementById('admin-modal').style.display = 'block';
+}
+
+function cerrarAdmin() {
+    document.getElementById('admin-modal').style.display = 'none';
+    resetVistasAdmin();
+}
+
+async function verificarLogin() {
+    const u = document.getElementById('admin-user').value;
+    const p = document.getElementById('admin-pass').value;
+    
+    if (u === "" || p === "") {
+        mostrarToast("Ingrese credenciales");
+        return;
+    }
+    mostrarToast("VERIFICANDO...");
+    
+    const res = await apiCall("loginAdmin", { u: u, p: p });
+    if (res && res.success) {
+        document.getElementById('admin-login-view').style.display = 'none';
+        document.getElementById('admin-menu-view').style.display = 'block';
+    } else {
+        mostrarToast("ACCESO DENEGADO");
+    }
+}
+
+let tipoGestionActiva = '';
+function mostrarGestion(tipo) {
+    tipoGestionActiva = tipo;
+    document.getElementById('admin-menu-view').style.display = 'none';
+    document.getElementById('admin-stock-view').style.display = 'block';
+    document.getElementById('titulo-gestion').innerText = tipo === 'VENTA' ? 'REGISTRAR VENTA' : 'INGRESAR STOCK';
+    document.getElementById('input-sku-admin').value = '';
+    document.getElementById('input-cant-admin').value = '';
+}
+
+async function guardarRegistroAdmin() {
+    const sku = document.getElementById('input-sku-admin').value.trim();
+    let cant = Number(document.getElementById('input-cant-admin').value);
+
+    if (sku === "" || cant <= 0 || isNaN(cant)) {
+        mostrarToast("Datos inválidos");
+        return;
+    }
+    if (tipoGestionActiva === 'VENTA') cant = -cant;
+
+    mostrarToast("GUARDANDO...");
+    const res = await apiCall("ingresarStock", { sku: sku, cant: cant });
+    
+    if (res && res.success) {
+        mostrarToast("REGISTRO EXITOSO");
+        volverAlMenuAdmin();
+    } else {
+        mostrarToast(res.error || "SKU no encontrado o Error");
+    }
+}
+
+async function mostrarMetricas() {
+    document.getElementById('admin-menu-view').style.display = 'none';
+    document.getElementById('admin-metrics-view').style.display = 'block';
+    cargarGrafico(1); // Por defecto último mes
+}
+
+async function cargarGrafico(meses) {
+    const chartDiv = document.getElementById('chart_div');
+    chartDiv.innerHTML = '<div style="color:var(--cian-pro); text-align:center; padding-top:100px;">AUDITANDO VENTAS...</div>';
+
+    const res = await apiCall("obtenerMetricas", { meses: meses });
+
+    if (!res || !res.datos || res.datos.length === 0) {
+        chartDiv.innerHTML = '<div style="color:#666; text-align:center; padding-top:100px;">SIN ACTIVIDAD EN ESTE PERIODO</div>';
+        return;
+    }
+
+    // Resumen debajo del gráfico
+    const resumenHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; padding:15px; background:#0a0a0a; border-radius:12px; border:1px solid #222;">
+        <div style="text-align:center;">
+          <small style="color:var(--gris-tenue); display:block; font-size:0.6rem;">CANTIDAD DE VENTAS</small>
+          <span style="color:var(--blanco-puro); font-weight:bold; font-size:1.3rem;">${res.totalVentas}</span>
+        </div>
+        <div style="text-align:center; border-left:1px solid #222;">
+          <small style="color:var(--gris-tenue); display:block; font-size:0.6rem;">VENTA NETA TOTAL</small>
+          <span style="color:var(--cian-pro); font-weight:bold; font-size:1.3rem;">$${res.montoTotal.toLocaleString()}</span>
+        </div>
+      </div>
+    `;
+    let container = document.getElementById('admin-metrics-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'admin-metrics-container';
+        chartDiv.parentNode.appendChild(container);
+    }
+    container.innerHTML = resumenHTML;
+
+    // Dependencia de Google Charts, asumiendo que está cargada en el HTML
+    if(typeof google !== 'undefined' && google.charts) {
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(() => {
+            const dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'Fecha');
+            dataTable.addColumn('number', 'Pagadas ($)');
+            dataTable.addColumn('number', 'Pendientes ($)');
+            dataTable.addRows(res.datos);
+
+            const options = {
+                backgroundColor: 'transparent',
+                colors: ['#00e5ff', '#ffc107'],
+                curveType: 'function',
+                legend: { position: 'top', textStyle: { color: '#888', fontSize: 11 } },
+                hAxis: { textStyle: { color: '#555' }, gridlines: { color: 'transparent' } },
+                vAxis: { textStyle: { color: '#555' }, gridlines: { color: '#111' } },
+                chartArea: { width: '85%', height: '70%' },
+                lineWidth: 3, pointSize: 9,
+                series: { 0: { pointShape: 'circle' }, 1: { pointShape: 'circle' } }
+            };
+
+            const chart = new google.visualization.LineChart(chartDiv);
+            google.visualization.events.addListener(chart, 'ready', function() {
+                const circles = chartDiv.getElementsByTagName('circle');
+                for (let i = 0; i < circles.length; i++) {
+                    circles[i].setAttribute('fill', '#000000');
+                    circles[i].setAttribute('stroke-width', '2');
+                }
+            });
+            chart.draw(dataTable, options);
+        });
+    } else {
+        chartDiv.innerHTML = '<div style="color:red; text-align:center; padding-top:100px;">Librería de gráficos no disponible.</div>';
+    }
+}
+
+// ==========================================
+// 10. GESTIÓN DE ESTADOS DE VENTAS
+// ==========================================
+let pedidosAdminGlobal = [];
+
+function abrirGestionEstados() {
+    document.getElementById('admin-menu-view').style.display = 'none';
+    document.getElementById('admin-status-view').style.display = 'block';
+    document.getElementById('search-pedidos').value = '';
+    cargarPedidosAdmin();
+}
+
+async function cargarPedidosAdmin() {
+    const lista = document.getElementById('lista-pedidos-status');
+    lista.innerHTML = '<p style="text-align:center; color:var(--cian-pro); padding:20px;">CONSULTANDO BASE DE DATOS...</p>';
+    
+    const res = await apiCall("obtenerVentasAdmin");
+    if(res && !res.error) {
+        pedidosAdminGlobal = res.datos;
+        renderizarPedidosAdmin(res.datos);
+    } else {
+        lista.innerHTML = '<p style="text-align:center; color:red; padding:20px;">Error al cargar ventas.</p>';
+    }
+}
+
+function renderizarPedidosAdmin(pedidos) {
+    const lista = document.getElementById('lista-pedidos-status');
+    lista.innerHTML = '';
+    if(!pedidos || pedidos.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#555; padding:20px;">No hay registros.</p>';
+        return;
+    }
+
+    pedidos.forEach(p => {
+        const div = document.createElement('div');
+        div.style = "background:#111; border:1px solid #222; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;";
+        div.innerHTML = `
+            <div style="flex:1;">
+                <div style="color:var(--cian-pro); font-weight:bold; font-size:0.8rem;">${p.id}</div>
+                <div style="font-size:0.75rem; color:#888;">${p.fecha} - $${Number(p.total).toLocaleString('es-CL')}</div>
+            </div>
+            <div style="flex:1; text-align:right;">
+                <select onchange="cambiarEstadoPedido('${p.id}', this.value)" style="background:#000; color:var(--amber-premium); border:1px solid #333; padding:5px; border-radius:5px; font-size:0.7rem; outline:none;">
+                    <option value="Pendiente de Pago" ${p.estado === 'Pendiente de Pago' ? 'selected' : ''}>PENDIENTE</option>
+                    <option value="Pagado" ${p.estado === 'Pagado' ? 'selected' : ''}>PAGADO</option>
+                </select>
+            </div>
+        `;
+        lista.appendChild(div);
+    });
+}
+
+function filtrarPedidosAdmin() {
+    const texto = document.getElementById('search-pedidos').value.toLowerCase();
+    const filtrados = pedidosAdminGlobal.filter(p => p.id.toLowerCase().includes(texto));
+    renderizarPedidosAdmin(filtrados);
+}
+
+async function cambiarEstadoPedido(id, nuevoEstado) {
+    mostrarToast("ACTUALIZANDO ESTADO...");
+    const res = await apiCall("actualizarEstadoPedido", { id: id, nuevoEstado: nuevoEstado });
+    if(res && res.success) {
+        mostrarToast("ESTADO ACTUALIZADO CON ÉXITO");
+        cargarPedidosAdmin();
+    } else {
+        mostrarToast("ERROR AL ACTUALIZAR");
+    }
+}
+
+// ==========================================
+// 11. NAVEGACIÓN ADMIN
+// ==========================================
+function volverAlMenuAdmin() {
+    document.getElementById('admin-stock-view').style.display = 'none';
+    document.getElementById('admin-metrics-view').style.display = 'none';
+    const statusView = document.getElementById('admin-status-view');
+    if (statusView) statusView.style.display = 'none';
+    document.getElementById('admin-menu-view').style.display = 'block';
+}
+
+function resetVistasAdmin() {
+    document.getElementById('admin-login-view').style.display = 'block';
+    document.getElementById('admin-menu-view').style.display = 'none';
+    document.getElementById('admin-stock-view').style.display = 'none';
+    document.getElementById('admin-metrics-view').style.display = 'none';
+    const statusView = document.getElementById('admin-status-view');
+    if (statusView) statusView.style.display = 'none';
+    document.getElementById('admin-user').value = '';
+    document.getElementById('admin-pass').value = '';
+}
     </script>
+
 </body>
 </html>
