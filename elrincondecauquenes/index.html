@@ -74,18 +74,18 @@ body {
 }
 
 .trust-card {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.6rem;
-    font-weight: 400; /* Menos peso visual */
-    color: rgba(255, 255, 255, 0.5); /* Blanco con transparencia para no brillar */
-    letter-spacing: 1px;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 0.8rem; /* Letra más grande */
+font-weight: 700; /* Más gruesa */
+color: rgba(255, 255, 255, 0.7); 
+letter-spacing: 1px;
 }
 
 .trust-card i {
-    color: rgba(255, 255, 255, 0.4); /* Igual que el texto, muy sutil */
-    font-size: 0.85rem;
+color: rgba(255, 255, 255, 0.7); 
+font-size: 1.2rem; /* Icono más grande */
 }
 
 .wa-link {
@@ -184,7 +184,7 @@ body {
     border: 1px solid #333;
     border-radius: 20px;
     color: white;
-    font-size: 0.8rem;
+    font-size: 1rem;
 }
 
 .search-icon {
@@ -722,7 +722,7 @@ button {
     border-radius: 12px;
     padding: 15px;
     font-family: var(--fuente-texto);
-    font-size: 0.9rem;
+    font-size: 1rem;
     resize: none;
     outline: none;
     transition: border-color 0.3s ease;
@@ -847,24 +847,23 @@ button {
 }
 
 /* Ajuste móvil para no tapar contenido */
+/* Ajuste móvil para UX (Tamaño Dedo) */
 @media (max-width: 850px) {
-    .cart-float-bubble { right: 20px; bottom: 110px; width: 55px; height: 55px; font-size: 1.3rem; }
-    /* SINCRONIZACIÓN DE BURBUJAS EN MÓVIL */
-    .wa-bubble, .cart-float-bubble {
-        right: 20px !important; /* Más pegadas al borde para ganar espacio */
-        width: 55px !important;
-        height: 55px !important;
-    }
-    .wa-bubble { bottom: 20px !important; }
-    .cart-float-bubble { bottom: 85px !important; } /* 20 + 55 + 10 gap */
-    
-    .cart-badge-float {
-        min-width: 18px !important;
-        height: 18px !important;
-        font-size: 0.6rem !important;
-    }
+.wa-bubble, .cart-float-bubble {
+right: 15px !important; 
+width: 65px !important; /* Vuelven a ser grandes */
+height: 65px !important;
+font-size: 1.8rem !important; /* Icono más grande */
 }
+.wa-bubble { bottom: 20px !important; }
+.cart-float-bubble { bottom: 95px !important; }
 
+.cart-badge-float {
+min-width: 25px !important;
+height: 25px !important;
+font-size: 0.85rem !important; /* Número legible */
+}
+}
 /* REFINAMIENTO ADMIN - PROTOCOLO FOCUS */
 .admin-modal .admin-input {
     width: 100%;
@@ -927,50 +926,6 @@ button {
 }
 
 .btn-back:hover { color: var(--amber-premium); border-color: var(--amber-premium); }
-
-/* =========================================
-   AJUSTES MÓVILES DEFINITIVOS (UX & TOUCH TARGETS)
-   ========================================= */
-@media (max-width: 768px) {
-    /* 1. TOP BAR MÁS LEGIBLE (Sin amontonarse) */
-    .top-bar-container { justify-content: center; gap: 12px; }
-    .trust-card { font-size: 0.75rem; padding: 6px 0; font-weight: 700; }
-    .trust-card i { font-size: 1rem; }
-
-    /* 2. MENÚ Y BUSCADOR (Botones gordos y anti-zoom) */
-    .nav-links { gap: 12px; flex-wrap: wrap; justify-content: center; }
-    .nav-links a { 
-        font-size: 0.95rem; 
-        padding: 12px 18px; 
-        background: rgba(255,255,255,0.05); 
-        border-radius: 8px; 
-    }
-    /* El input a 1rem (16px) evita el zoom en iPhone */
-    .search-container input { font-size: 1rem; padding: 14px 45px 14px 20px; } 
-
-    /* 3. BURBUJAS FLOTANTES (Anulamos la reducción para que el dedo acierte) */
-    .wa-bubble, .cart-float-bubble { 
-        width: 65px !important; 
-        height: 65px !important; 
-        font-size: 1.8rem !important;
-        right: 15px !important;
-    }
-    .wa-bubble { bottom: 20px !important; }
-    .cart-float-bubble { bottom: 95px !important; }
-    .cart-badge-float { 
-        min-width: 25px !important; 
-        height: 25px !important; 
-        font-size: 0.85rem !important; 
-    }
-
-    /* 4. MODALES Y FORMULARIOS (Textos claros sin forzar la vista) */
-    .modal-content { padding: 25px 20px; width: 95%; margin: 20px auto; }
-    .modal-content h2, .admin-modal h3 { font-size: 1.5rem !important; }
-    .modal-content p { font-size: 1rem !important; }
-    #modal-soporte textarea { font-size: 1rem; padding: 15px; height: 130px; }
-    .btn-checkout { font-size: 1rem; padding: 18px; }
-    .section-title { font-size: 1.2rem; }
-}
         
     </style>
 </head>
