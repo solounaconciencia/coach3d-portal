@@ -118,13 +118,34 @@
         .close-modal:hover { color: var(--cian-pro); }
 
         /* 8. CARRITO SIDEBAR */
-        .cart-sidebar { position: fixed; top: 0; bottom: 0; left: -450px; width: 100%; max-width: 400px; height: 100dvh; background: #080808; z-index: 11000; transition: var(--transicion-suave); box-shadow: 20px 0 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; border-right: 1px solid #1a1a1a; overflow: hidden; }
+        .cart-sidebar { 
+            position: fixed; 
+            top: 0 !important;
+            bottom: 0 !important; 
+            left: -450px; 
+            width: 100% !important; 
+            max-width: 100% !important; 
+            height: 100dvh !important; 
+            background: #080808; 
+            z-index: 11000; 
+            transition: var(--transicion-suave); 
+            box-shadow: 20px 0 60px rgba(0,0,0,0.9); 
+            display: flex; flex-direction: column; 
+            border-right: 1px solid #1a1a1a;
+            overflow: hidden;
+        }
         .cart-sidebar.active { left: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
         .cart-items-container { flex: 1; overflow-y: auto; padding: 20px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--cian-pro) #111; }
         .cart-items-container::-webkit-scrollbar { width: 6px; }
         .cart-items-container::-webkit-scrollbar-thumb { background: var(--cian-pro); border-radius: 10px; }
-        .cart-footer { padding: 20px; padding-bottom: 40px; border-top: 1px solid #1a1a1a; background: #0a0a0a; flex-shrink: 0; }
+        .cart-footer { 
+            padding: 20px; 
+            padding-bottom: 40px !important; 
+            border-top: 1px solid #1a1a1a; 
+            background: #0a0a0a; 
+            flex-shrink: 0; 
+        }
         .cart-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
 
         .toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #000000; color: var(--cian-pro); padding: 20px 40px; border-radius: 50px; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; z-index: 20000; border: 2px solid var(--cian-pro); box-shadow: 0 0 30px rgba(0,0,0,0.8); pointer-events: none; opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; }
@@ -158,6 +179,7 @@
         @media (max-width: 850px) {
             /* Fix iOS Background Bug */
             body { padding: 0 15px; background-attachment: scroll !important; } 
+            
             
             /* BURBUJAS GIGANTES Y SINCRONIZADAS */
             .wa-bubble, .cart-float-bubble { right: 15px !important; width: 65px !important; height: 65px !important; font-size: 1.8rem !important; }
@@ -406,12 +428,23 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxaoRAnUIT1ZHW7XJS6MdCs
 // El "Mesero" que reemplaza a google.script.run
 async function apiCall(action, payload = null) {
     let url = API_URL + "?action=" + action;
+    
+    // FOCUS: Doble anclaje de la acción y credenciales universales
+    payload = payload || {};
+    payload.action = action; 
+    
     if (["ingresarStock", "obtenerMetricas", "obtenerVentasAdmin", "actualizarEstadoPedido", "loginAdmin"].includes(action)) {
-        payload = payload || {};
+        payload.u = sessionUser;
+        payload.p = sessionPass;
         payload.userAdmin = sessionUser;
         payload.passAdmin = sessionPass;
     }
-    let options = { method: payload ? "POST" : "GET", body: payload ? JSON.stringify(payload) : null };
+
+    let options = {
+        method: payload.action === "getInitialData" ? "GET" : "POST",
+        body: payload.action === "getInitialData" ? null : JSON.stringify(payload)
+    };
+    
     try {
         const res = await fetch(url, options);
         return await res.json();
