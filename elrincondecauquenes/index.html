@@ -118,13 +118,13 @@
         .close-modal:hover { color: var(--cian-pro); }
 
         /* 8. CARRITO SIDEBAR */
-        .cart-sidebar { position: fixed; top: 0; bottom: 0; left: -450px; width: 400px; max-width: 90%; height: 100vh; background: #080808; z-index: 11000; transition: var(--transicion-suave); box-shadow: 20px 0 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; border-right: 1px solid #1a1a1a; overflow: hidden; }
+        .cart-sidebar { position: fixed; top: 0; bottom: 0; left: -450px; width: 100%; max-width: 400px; height: 100dvh; background: #080808; z-index: 11000; transition: var(--transicion-suave); box-shadow: 20px 0 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; border-right: 1px solid #1a1a1a; overflow: hidden; }
         .cart-sidebar.active { left: 0; }
         .cart-header { padding: 20px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
         .cart-items-container { flex: 1; overflow-y: auto; padding: 20px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--cian-pro) #111; }
         .cart-items-container::-webkit-scrollbar { width: 6px; }
         .cart-items-container::-webkit-scrollbar-thumb { background: var(--cian-pro); border-radius: 10px; }
-        .cart-footer { padding: 20px; border-top: 1px solid #1a1a1a; background: #0a0a0a; flex-shrink: 0; }
+        .cart-footer { padding: 20px; padding-bottom: 40px; border-top: 1px solid #1a1a1a; background: #0a0a0a; flex-shrink: 0; }
         .cart-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
 
         .toast-notification { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #000000; color: var(--cian-pro); padding: 20px 40px; border-radius: 50px; font-weight: bold; font-family: 'Orbitron', sans-serif; font-size: 1.1rem; z-index: 20000; border: 2px solid var(--cian-pro); box-shadow: 0 0 30px rgba(0,0,0,0.8); pointer-events: none; opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; }
@@ -389,94 +389,79 @@
         </div>
     </div>
 
-    <script>
-// ==========================================
-// 1. VARIABLES GLOBALES Y MOTOR API
-// ==========================================
+<script>
+    // Variables Globales
 var configGlobal = {};
 var productosGlobal = [];
 var carrito = [];
 var slideIndex = 0;
 var sliderInterval;
 var pedidosAdminGlobal = [];
-
-// URL DE TU GOOGLE APPS SCRIPT
-const API_URL = "https://script.google.com/macros/s/AKfycbzJUS0wYpdA4F_un0-YD6p6NPenfSRyJmubhO4G6biV-jAbKV4RwjB7s90R5JpARxuayQ/exec";
-
-// Variables para guardar tu sesión en la memoria del navegador
 let sessionUser = "";
 let sessionPass = "";
 
+// PEGA AQUÍ TU NUEVA URL DE GOOGLE APPS SCRIPT
+const API_URL = "https://script.google.com/macros/s/AKfycbxaoRAnUIT1ZHW7XJS6MdCsl6TiHP1g4V9eHCz9r8iVlBq1ICUZ6ZaAgK6_XulnAUGUXg/exec";
+
+// El "Mesero" que reemplaza a google.script.run
 async function apiCall(action, payload = null) {
     let url = API_URL + "?action=" + action;
-    
-    // FORMATO DE SEGURIDAD UNIVERSAL PARA GOOGLE SCRIPT
     if (["ingresarStock", "obtenerMetricas", "obtenerVentasAdmin", "actualizarEstadoPedido", "loginAdmin"].includes(action)) {
         payload = payload || {};
-        // Se envían ambos formatos para asegurar que el backend lo atrape
-        payload.u = sessionUser;
-        payload.p = sessionPass;
         payload.userAdmin = sessionUser;
         payload.passAdmin = sessionPass;
     }
-
-    let options = {
-        method: payload ? "POST" : "GET",
-        body: payload ? JSON.stringify(payload) : null
-    };
-    
+    let options = { method: payload ? "POST" : "GET", body: payload ? JSON.stringify(payload) : null };
     try {
         const res = await fetch(url, options);
         return await res.json();
-    } catch(e) {
-        return { error: "Error de conexión con el servidor." };
-    }
+    } catch(e) { return { error: "Error de red" }; }
 }
 
-// ==========================================
-// 2. ARRANQUE DEL SISTEMA
-// ==========================================
 window.onload = async function() {
-    console.log("Iniciando Arquitectura API 2.0...");
-    
+    const loadingMsg = document.getElementById('loading-msg');
+    if(loadingMsg) loadingMsg.innerText = "CONECTANDO CON BODEGA CENTRAL...";
+
+    // Inyectar librería de gráficos
     const scriptCharts = document.createElement('script');
     scriptCharts.src = "https://www.gstatic.com/charts/loader.js";
     document.head.appendChild(scriptCharts);
 
-    const loadingMsg = document.getElementById('loading-msg');
-    if(loadingMsg) loadingMsg.innerText = "CONECTANDO CON BODEGA CENTRAL...";
-
     const data = await apiCall("getInitialData");
-
     if (data && !data.error) {
         configGlobal = data.config;
         productosGlobal = data.productos;
-
         renderSocials(); 
         renderSlider(data.destacados); 
-
         if(loadingMsg) loadingMsg.remove();
-
         renderProductos(productosGlobal);
         generarMenuCategorias(productosGlobal);
         cargarCarritoPrevio();
     } else {
-        if(loadingMsg) loadingMsg.innerText = "Error de conexión. Intenta recargar la página.";
+        if(loadingMsg) loadingMsg.innerText = "Error de conexión.";
     }
 };
 
-// ==========================================
-// 3. RENDERIZADO VISUAL
-// ==========================================
-function renderSocials() {}
+function renderSocials() {
+    const box = document.getElementById('social-box');
+    if (!box) return;
+    let html = '';
+    if (configGlobal['LINK_INSTAGRAM']) html += `<a href="${configGlobal['LINK_INSTAGRAM']}" target="_blank"><i class="fab fa-instagram"></i></a>`;
+    if (configGlobal['LINK_FACEBOOK']) html += `<a href="${configGlobal['LINK_FACEBOOK']}" target="_blank"><i class="fab fa-facebook"></i></a>`;
+    box.innerHTML = html;
+}
 
+function irWhatsApp() {
+    let numeroWA = configGlobal['WHATSAPP'] || configGlobal['WHATSAPP_ADMIN'] || "56900000000";
+    numeroWA = numeroWA.toString().replace(/\D/g, ''); // Limpia símbolos
+    const msj = encodeURIComponent("Hola, necesito soporte técnico...");
+    window.open(`https://wa.me/${numeroWA}?text=${msj}`, '_blank');
+}
+
+// Slider y UI
 function renderSlider(data) {
     const container = document.getElementById('hero-slider');
-    if (!container) return; 
-    if (!data || data.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
+    if (!container || !data || data.length === 0) { if(container) container.style.display = 'none'; return; }
     container.innerHTML = data.map((s, i) => `
     <div class="slide ${i === 0 ? 'active' : ''}">
         <img src="${s.img}" class="img-slide" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
@@ -484,16 +469,10 @@ function renderSlider(data) {
             <h2 style="color:var(--amber-premium); font-size:1.1rem; margin-bottom:5px; letter-spacing:2px;">${s.titulo}</h2>
             <h1 style="font-family:var(--fuente-titulo); font-size:3rem; line-height:1.1; margin-bottom:10px;">${s.nombre}</h1>
             <p style="color:#ccc; font-size:0.95rem; margin-bottom:15px; line-height:1.4;">${s.desc}</p>
-            <div style="font-size:2.2rem; font-weight:800; color:var(--cian-pro); margin-bottom:25px; text-shadow: 0 0 15px rgba(0,229,255,0.3);">
-                $${Number(s.precio).toLocaleString('es-CL')}
-            </div>
-            <button class="btn-buy-now" style="width:auto; padding:15px 40px; background:var(--cian-pro); color:black; border:none; border-radius:12px; font-weight:800; cursor:pointer; font-family:var(--fuente-texto); transition:0.3s;" onclick="agregarAlCarrito('${s.sku}')">
-                ¡LO QUIERO! <i class="fas fa-shopping-cart"></i>
-            </button>
+            <div style="font-size:2.2rem; font-weight:800; color:var(--cian-pro); margin-bottom:25px;">$${Number(s.precio).toLocaleString('es-CL')}</div>
+            <button class="btn-buy-now" style="width:auto; padding:15px 40px; background:var(--cian-pro); color:black; border:none; border-radius:12px; font-weight:800; cursor:pointer;" onclick="agregarAlCarrito('${s.sku}')">¡LO QUIERO!</button>
         </div>
-    </div>`).join('') + `
-    <button class="slider-btn prev" onclick="cambiarSlide(-1)">&#10094;</button>
-    <button class="slider-btn next" onclick="cambiarSlide(1)">&#10095;</button>`;
+    </div>`).join('') + `<button class="slider-btn prev" onclick="cambiarSlide(-1)">&#10094;</button><button class="slider-btn next" onclick="cambiarSlide(1)">&#10095;</button>`;
     iniciarAutoPlay();
 }
 
@@ -504,19 +483,13 @@ function cambiarSlide(n) {
     slideIndex = (slideIndex + n + slides.length) % slides.length;
     slides[slideIndex].classList.add('active');
 }
-
-function iniciarAutoPlay() {
-    if(sliderInterval) clearInterval(sliderInterval);
-    sliderInterval = setInterval(() => cambiarSlide(1), 5000);
-}
+function iniciarAutoPlay() { if(sliderInterval) clearInterval(sliderInterval); sliderInterval = setInterval(() => cambiarSlide(1), 5000); }
 
 function filtrar() {
     const term = document.getElementById('main-search').value.toLowerCase();
     const slider = document.getElementById('hero-slider');
     if (slider && term.length > 0) slider.style.display = 'none';
-    const filtrados = productosGlobal.filter(p => {
-        return (p.NOMBRE.toString().toLowerCase().includes(term) || p.MARCA.toString().toLowerCase().includes(term) || p.CATEGORIA.toString().toLowerCase().includes(term));
-    });
+    const filtrados = productosGlobal.filter(p => (p.NOMBRE.toString().toLowerCase().includes(term) || p.MARCA.toString().toLowerCase().includes(term) || p.CATEGORIA.toString().toLowerCase().includes(term)));
     renderProductos(filtrados);
 }
 
@@ -534,331 +507,175 @@ function filtrarPorCat(cat) {
     if (slider) slider.style.display = 'none';
     const filtrados = (cat === 'TODOS') ? productosGlobal : productosGlobal.filter(p => p.CATEGORIA === cat);
     renderProductos(filtrados);
-    const grid = document.getElementById('grid-productos');
-    if(grid) grid.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('grid-productos').scrollIntoView({ behavior: 'smooth' });
 }
 
 function renderProductos(lista) {
     const grid = document.getElementById('grid-productos');
     if (!grid) return;
-    if (lista.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:50px; opacity:0.5;">No encontramos lo que buscas en esta órbita...</p>';
-        return;
-    }
+    if (lista.length === 0) { grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding:50px; opacity:0.5;">Sin resultados...</p>'; return; }
     grid.innerHTML = lista.map(p => {
-        const stockBajo = (Number(p.STOCK) < 5);
         const img = p.IMAGEN_URL || 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png';
-        return `
-        <div class="product-card" onclick="abrirDetalle('${p.SKU}')">
-            ${stockBajo ? '<div class="scarcity-label">STOCK CRÍTICO</div>' : ''}
-            <img src="${img}" loading="lazy" alt="${p.NOMBRE}" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
+        return `<div class="product-card" onclick="abrirDetalle('${p.SKU}')">
+            ${Number(p.STOCK) < 5 ? '<div class="scarcity-label">STOCK CRÍTICO</div>' : ''}
+            <img src="${img}" loading="lazy" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
             <div style="padding:15px; text-align:center;">
-                <small style="color:var(--amber); font-weight:bold; text-transform:uppercase;">${p.MARCA}</small>
+                <small style="color:var(--amber-premium); font-weight:bold; text-transform:uppercase;">${p.MARCA}</small>
                 <div style="font-size:0.9rem; margin-top:5px; font-weight:600; color:white; height:40px; overflow:hidden;">${p.NOMBRE}</div>
-                <div style="color:var(--cian); font-weight:800; margin-top:10px;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>
+                <div style="color:var(--cian-pro); font-weight:800; margin-top:10px;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>
                 <div class="ver-detalles-btn" onclick="event.stopPropagation(); abrirDetalle('${p.SKU}')">VER DETALLES</div>
             </div>
         </div>`;
     }).join('');
 }
 
-function volverInicio() {
-    document.getElementById('main-search').value = '';
-    const slider = document.getElementById('hero-slider');
-    if (slider) slider.style.display = 'block';
-    renderProductos(productosGlobal);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+function volverInicio() { document.getElementById('main-search').value = ''; const slider = document.getElementById('hero-slider'); if (slider) slider.style.display = 'block'; renderProductos(productosGlobal); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-// ==========================================
-// 4. LÓGICA DEL CARRITO
-// ==========================================
+// Lógica de Carrito
 function toggleCart() { document.getElementById('cart-drawer').classList.toggle('active'); }
-
-function agregarAlCarrito(sku) {
-    const skuBusqueda = sku.toString().trim().toLowerCase();
-    const p = productosGlobal.find(x => (x.SKU || x.sku || "").toString().trim().toLowerCase() === skuBusqueda);
-    if (!p) return;
-    insertarEnCarrito(p, "Estándar");
-}
-
-function agregarAlCarritoConOpcion(sku) {
-    const p = productosGlobal.find(x => x.SKU == sku);
-    const selector = document.getElementById('variante-producto');
-    const opcionElegida = selector ? selector.value : "Estándar";
-    insertarEnCarrito(p, opcionElegida);
-    cerrarModal();
-}
-
+function agregarAlCarrito(sku) { const p = productosGlobal.find(x => x.SKU.toString().toLowerCase() === sku.toString().toLowerCase()); if (p) insertarEnCarrito(p, "Estándar"); }
+function agregarAlCarritoConOpcion(sku) { const p = productosGlobal.find(x => x.SKU == sku); const selector = document.getElementById('variante-producto'); insertarEnCarrito(p, selector ? selector.value : "Estándar"); cerrarModal(); }
 function insertarEnCarrito(p, opcion) {
     const idUnico = p.SKU + "-" + opcion;
-    const existe = carrito.find(item => item.idUnico === idUnico);
-    if (existe) {
-        existe.cantidad++;
-    } else {
-        carrito.push({
-            idUnico: idUnico,
-            SKU: p.SKU,
-            NOMBRE: p.NOMBRE + (opcion !== "Estándar" ? " (" + opcion + ")" : ""),
-            PRECIO: (p.PRECIO_PROMO > 0) ? Number(p.PRECIO_PROMO) : Number(p.PRECIO),
-            cantidad: 1
-        });
-    }
-    guardarCarrito();
-    mostrarToast("Añadido: " + p.NOMBRE);
+    const existe = carrito.find(i => i.idUnico === idUnico);
+    if (existe) existe.cantidad++; else carrito.push({ idUnico: idUnico, SKU: p.SKU, NOMBRE: p.NOMBRE + (opcion !== "Estándar" ? " ("+opcion+")" : ""), PRECIO: (p.PRECIO_PROMO > 0) ? Number(p.PRECIO_PROMO) : Number(p.PRECIO), cantidad: 1 });
+    guardarCarrito(); mostrarToast("Añadido: " + p.NOMBRE);
 }
-
 function renderCarrito() {
     const container = document.getElementById('cart-items');
-    if (!container) return;
-    if (carrito.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:40px; opacity:0.4; font-size:0.8rem;">Tu carro está vacío...</p>';
-        return;
-    }
-    container.innerHTML = carrito.map((item, index) => `
-    <div class="cart-item">
-        <div style="margin-bottom:10px;">
-            <div style="font-weight:600; font-size:0.9rem; color:#fff;">${item.NOMBRE}</div>
-            <div style="color:var(--cian-pro); font-weight:700; font-size:0.85rem;">$${item.PRECIO.toLocaleString('es-CL')}</div>
-        </div>
-        <div class="cart-item-actions" style="display:flex; align-items:center; justify-content: space-between;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button>
-                <span style="font-weight:bold; min-width:20px; text-align:center;">${item.cantidad}</span>
-                <button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button>
-            </div>
-            <button class="btn-del" onclick="eliminarDelCarrito(${index})"><i class="fas fa-trash-alt"></i></button>
-        </div>
-    </div>`).join('');
+    if (carrito.length === 0) { container.innerHTML = '<p style="text-align:center; padding:40px; opacity:0.4;">Carro vacío</p>'; return; }
+    container.innerHTML = carrito.map((item, index) => `<div class="cart-item"><div style="margin-bottom:10px;"><div style="font-weight:600; font-size:0.9rem; color:#fff;">${item.NOMBRE}</div><div style="color:var(--cian-pro); font-weight:700; font-size:0.85rem;">$${item.PRECIO.toLocaleString('es-CL')}</div></div><div class="cart-item-actions" style="display:flex; align-items:center; justify-content: space-between;"><div style="display:flex; align-items:center; gap:12px;"><button class="btn-qty" onclick="cambiarCantidad(${index}, -1)">-</button><span style="font-weight:bold; min-width:20px; text-align:center;">${item.cantidad}</span><button class="btn-qty" onclick="cambiarCantidad(${index}, 1)">+</button></div><button class="btn-del" onclick="eliminarDelCarrito(${index})"><i class="fas fa-trash-alt"></i></button></div></div>`).join('');
 }
-
-function cambiarCantidad(index, delta) {
-    carrito[index].cantidad += delta;
-    if (carrito[index].cantidad <= 0) eliminarDelCarrito(index);
-    else guardarCarrito();
-}
-
-function eliminarDelCarrito(index) {
-    carrito.splice(index, 1);
-    guardarCarrito();
-}
-
-function guardarCarrito() {
-    localStorage.setItem('carrito_rincon_v12', JSON.stringify(carrito));
-    actualizarUI();
-}
-
-function cargarCarritoPrevio() {
-    const storage = localStorage.getItem('carrito_rincon_v12');
-    if (storage) {
-        carrito = JSON.parse(storage);
-        actualizarUI();
-    }
-}
-
+function cambiarCantidad(i, d) { carrito[i].cantidad += d; if (carrito[i].cantidad <= 0) carrito.splice(i, 1); guardarCarrito(); }
+function eliminarDelCarrito(i) { carrito.splice(i, 1); guardarCarrito(); }
+function guardarCarrito() { localStorage.setItem('carrito', JSON.stringify(carrito)); actualizarUI(); }
+function cargarCarritoPrevio() { const s = localStorage.getItem('carrito'); if (s) { carrito = JSON.parse(s); actualizarUI(); } }
 function actualizarUI() {
-    const totalItems = carrito.reduce((sum, i) => sum + i.cantidad, 0);
-    const countTop = document.getElementById('cart-count');
-    if(countTop) countTop.innerText = "(" + totalItems + ")";
-    const countBubble = document.getElementById('cart-count-bubble');
-    if(countBubble) {
-        countBubble.innerText = totalItems;
-        countBubble.style.display = totalItems > 0 ? 'flex' : 'none';
-    }
-    renderCarrito();
-    actualizarTotalCarrito();
+    const t = carrito.reduce((sum, i) => sum + i.cantidad, 0);
+    const countTop = document.getElementById('cart-count'); if(countTop) countTop.innerText = "("+t+")";
+    const countBubble = document.getElementById('cart-count-bubble'); if(countBubble) { countBubble.innerText = t; countBubble.style.display = t > 0 ? 'flex' : 'none'; }
+    renderCarrito(); actualizarTotalCarrito();
 }
-
 function actualizarTotalCarrito() {
     const subtotal = carrito.reduce((sum, i) => sum + (i.PRECIO * i.cantidad), 0);
-    const chkEnvio = document.getElementById('chk-envio');
-    const necesitaEnvio = chkEnvio ? chkEnvio.checked : false;
+    const necesitaEnvio = document.getElementById('chk-envio').checked;
     const costoEnvio = necesitaEnvio ? (Number(configGlobal['COSTO_ENVIO']) || 3500) : 0;
-    const dirInput = document.getElementById('direccion-envio');
-    if(dirInput) dirInput.style.display = necesitaEnvio ? 'block' : 'none';
-    const total = subtotal + costoEnvio;
-    const totalVal = document.getElementById('cart-total-value');
-    if(totalVal) totalVal.innerText = '$' + total.toLocaleString('es-CL');
+    document.getElementById('direccion-envio').style.display = necesitaEnvio ? 'block' : 'none';
+    document.getElementById('cart-total-value').innerText = '$' + (subtotal + costoEnvio).toLocaleString('es-CL');
 }
 
-// ==========================================
-// 5. CHECKOUT Y WHATSAPP
-// ==========================================
 async function procesarCompra() {
     if (carrito.length === 0) return;
     const btn = document.querySelector('.btn-checkout');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
-    btn.disabled = true;
-
     const necesitaEnvio = document.getElementById('chk-envio').checked;
     const direccion = document.getElementById('direccion-envio').value.trim();
-
-    if (necesitaEnvio && direccion === "") {
-        mostrarToast("Por favor, ingresa tu dirección de envío");
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        return;
-    }
-
-    const idPedido = "RC-" + Math.floor(Math.random() * 1000000);
-    const total = carrito.reduce((sum, i) => sum + (i.PRECIO * i.cantidad), 0) + (necesitaEnvio ? (Number(configGlobal['COSTO_ENVIO']) || 3500) : 0);
-
-    let textoWA = `Hola, quiero confirmar el pedido *${idPedido}*:\n\n`;
-    carrito.forEach(i => { textoWA += `- ${i.cantidad}x ${i.NOMBRE} ($${i.PRECIO.toLocaleString('es-CL')})\n`; });
-    textoWA += `\n*Envío:* ${necesitaEnvio ? 'A domicilio (' + direccion + ')' : 'Retiro en tienda'}`;
-    textoWA += `\n*Total final:* $${total.toLocaleString('es-CL')}`;
-
-    const numeroWA = configGlobal['WHATSAPP'] || "56900000000"; 
-    const linkWA = `https://wa.me/${numeroWA}?text=${encodeURIComponent(textoWA)}`;
+    if (necesitaEnvio && !direccion) { mostrarToast("Ingresa dirección"); return; }
+    
+    btn.innerText = "PROCESANDO..."; btn.disabled = true;
+    const subtotal = carrito.reduce((sum, i) => sum + (i.PRECIO * i.cantidad), 0);
+    const costoEnvio = necesitaEnvio ? (Number(configGlobal['COSTO_ENVIO']) || 3500) : 0;
+    const total = subtotal + costoEnvio;
 
     const pedidoData = {
-        id: idPedido,
-        productos: carrito.map(i => `${i.cantidad}x ${i.NOMBRE}`).join(" | "),
-        total: total,
-        envio: necesitaEnvio ? direccion : "Retiro"
+        necesitaEnvio: necesitaEnvio,
+        direccion: necesitaEnvio ? direccion : "Retiro",
+        nombreCliente: "Web",
+        email: "N/A",
+        resumenProductos: carrito.map(i => `${i.cantidad}x ${i.NOMBRE}`).join(" | "),
+        subtotal: subtotal,
+        totalFinal: total
     };
 
     const res = await apiCall("guardarPedido", pedidoData);
-
-    if (res && !res.error) {
-        carrito = [];
-        guardarCarrito();
-        toggleCart();
-        window.open(linkWA, '_blank');
+    if (res && res.success) {
+        let num = (configGlobal['WHATSAPP_ADMIN'] || '569').toString().replace(/\D/g, '');
+        let msg = `🚀 *NUEVO PEDIDO*\n📌 *ID:* ${res.id}\n🛒 *Productos:* ${pedidoData.resumenProductos}\n💰 *Total:* $${total.toLocaleString('es-CL')}\n🚚 *Envío:* ${pedidoData.direccion}`;
+        carrito = []; guardarCarrito(); toggleCart();
+        window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
     } else {
-        mostrarToast("Hubo un error al registrar. Intenta nuevamente.");
+        mostrarToast("Error al registrar");
     }
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    btn.innerText = "FINALIZAR PEDIDO"; btn.disabled = false;
 }
 
-function irWhatsApp() {
-    const msj = "Hola, necesito soporte técnico...";
-    const linkWA = `https://wa.me/${configGlobal['WHATSAPP'] || "56900000000"}?text=${encodeURIComponent(msj)}`;
-    window.open(linkWA, '_blank');
-}
-
-// ==========================================
-// 6. MODALES Y SOPORTE TÉCNICO
-// ==========================================
-function mostrarToast(mensaje) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.innerText = mensaje;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
+// Modales y Soporte
 function abrirDetalle(sku) {
     const p = productosGlobal.find(x => x.SKU == sku);
-    if (!p) return;
+    if(!p) return;
     const desc = p.DESCRIPCION || "Sin descripción disponible.";
     const img = p.IMAGEN_URL || 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png';
     const link = p.LINK_YOUTUBE || "";
-    
-    let html = `
-    <div style="display:flex; flex-direction:column; gap:20px; text-align:center;">
-        <img src="${img}" style="width:100%; max-height:300px; object-fit:contain; border-radius:15px;" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'">
-        <h2 style="color:var(--cian-pro); font-family:var(--fuente-titulo);">${p.NOMBRE}</h2>
-        <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">${desc}</p>
-        <div style="font-size:1.8rem; font-weight:bold; color:#fff;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>`;
-    
+    let html = `<div style="display:flex; flex-direction:column; gap:20px; text-align:center;"><img src="${img}" style="width:100%; max-height:300px; object-fit:contain; border-radius:15px;" onerror="this.src='https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png'"><h2 style="color:var(--cian-pro); font-family:var(--fuente-titulo);">${p.NOMBRE}</h2><p style="color:#aaa; font-size:0.9rem; line-height:1.6;">${desc}</p><div style="font-size:1.8rem; font-weight:bold; color:#fff;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>`;
     if (p.VARIANTES && p.VARIANTES.trim() !== "") {
         const opciones = p.VARIANTES.split(',').map(o => o.trim());
-        html += `<select id="variante-producto" style="padding:10px; background:#111; color:white; border:1px solid #333; border-radius:8px; margin-top:10px;">
-            ${opciones.map(o => `<option value="${o}">${o}</option>`).join('')}
-        </select>`;
-        html += `<button class="btn-checkout" style="margin-top:20px;" onclick="agregarAlCarritoConOpcion('${p.SKU}')">AGREGAR AL CARRO</button>`;
+        html += `<select id="variante-producto" style="padding:10px; background:#111; color:white; border:1px solid #333; border-radius:8px; margin-top:10px;">${opciones.map(o => `<option value="${o}">${o}</option>`).join('')}</select><button class="btn-checkout" style="margin-top:20px;" onclick="agregarAlCarritoConOpcion('${p.SKU}')">AGREGAR AL CARRO</button>`;
     } else {
         html += `<button class="btn-checkout" style="margin-top:20px;" onclick="agregarAlCarrito('${p.SKU}'); cerrarModal();">AGREGAR AL CARRO</button>`;
     }
-    
-    if (link !== "") {
-        html += `<a href="${link}" target="_blank" style="color:#ff0000; margin-top:15px; font-weight:bold; text-decoration:none;"><i class="fab fa-youtube"></i> VER VIDEO DEMOSTRATIVO</a>`;
-    }
+    if (link !== "") html += `<a href="${link}" target="_blank" style="color:#ff0000; margin-top:15px; font-weight:bold; text-decoration:none;"><i class="fab fa-youtube"></i> VER VIDEO DEMOSTRATIVO</a>`;
     html += `</div>`;
-    
     document.getElementById('detalle-body').innerHTML = html;
     document.getElementById('modal-detalle').style.display = 'block';
 }
 
-function cerrarModal() { document.getElementById('modal-detalle').style.display = 'none'; }
+window.onclick = function(event) {
+    const modal = document.getElementById('modal-detalle');
+    const modalAdmin = document.getElementById('modal-admin');
+    if (event.target == modal) modal.style.display = "none";
+    if (event.target == modalAdmin) modalAdmin.style.display = "none";
+}
+function cerrarModal() { document.getElementById('modal-detalle').style.display = "none"; }
+function mostrarToast(m) { const t = document.getElementById('toast'); if(!t) return; t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
 function abrirSoporte() { document.getElementById('modal-soporte').style.display = 'block'; }
 function cerrarSoporte() { document.getElementById('modal-soporte').style.display = 'none'; }
 
-function enviarSolicitudSoporte() {
-    const msj = document.getElementById('soporte-mensaje').value.trim();
+async function enviarSolicitudSoporte() {
+    const msj = document.getElementById('soporte-mensaje').value;
     const fileInput = document.getElementById('soporte-adjunto');
     const btn = document.getElementById('btn-envio-soporte');
+    if (!msj.trim()) return mostrarToast("Escribe un mensaje");
+    btn.disabled = true; btn.innerText = "ENVIANDO...";
 
-    if (msj === "") { mostrarToast("Escribe un mensaje breve"); return; }
-
-    btn.innerText = "ENVIANDO...";
-    btn.disabled = true;
-
+    let payload = { mensaje: msj, base64Data: "", mimeType: "", nombreArchivo: "" };
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = async function(e) {
-            const base64 = e.target.result.split(',')[1];
-            const payload = { mensaje: msj, nombreArchivo: file.name, mimeType: file.type, base64Data: base64 };
-            await procesarEnvioSoporte(payload, btn);
+            payload.base64Data = e.target.result.split(',')[1];
+            payload.mimeType = file.type;
+            payload.nombreArchivo = file.name;
+            await enviarSoporteAPI(payload, btn);
         };
         reader.readAsDataURL(file);
     } else {
-        procesarEnvioSoporte({ mensaje: msj, nombreArchivo: "", mimeType: "", base64Data: "" }, btn);
+        await enviarSoporteAPI(payload, btn);
     }
 }
-
-async function procesarEnvioSoporte(payload, btn) {
+async function enviarSoporteAPI(payload, btn) {
     const res = await apiCall("guardarSoporte", payload);
-    if(res && !res.error) {
-        mostrarToast("SOLICITUD ENVIADA CORRECTAMENTE");
-        document.getElementById('soporte-mensaje').value = "";
-        document.getElementById('soporte-adjunto').value = "";
-        cerrarSoporte();
-    } else {
-        mostrarToast("ERROR AL ENVIAR SOLICITUD");
-    }
-    btn.innerText = "ENVIAR SOLICITUD";
-    btn.disabled = false;
+    if(res && res.success) { mostrarToast("Enviado con éxito"); cerrarSoporte(); document.getElementById('soporte-mensaje').value = ""; } 
+    else { mostrarToast("Error al enviar"); }
+    btn.disabled = false; btn.innerText = "ENVIAR SOLICITUD";
 }
 
-// ==========================================
-// 7. PANEL DE ADMINISTRACIÓN
-// ==========================================
-function abrirLoginAdmin() {
-    document.getElementById('admin-login-view').style.display = 'block';
-    document.getElementById('modal-admin').style.display = 'block';
-}
-
-function cerrarAdmin() {
-    document.getElementById('modal-admin').style.display = 'none';
-    resetVistasAdmin();
-}
+// Lógica de Admin
+function abrirLoginAdmin() { document.getElementById('admin-login-view').style.display = 'block'; document.getElementById('modal-admin').style.display = 'block'; }
+function cerrarAdmin() { document.getElementById('modal-admin').style.display = 'none'; resetVistasAdmin(); }
 
 async function verificarLogin() {
     const u = document.getElementById('admin-user').value;
     const p = document.getElementById('admin-pass').value;
-    
-    if (!u || !p) { mostrarToast("Ingresa tus datos"); return; }
-    
-    mostrarToast("CONECTANDO CON EL SHEET...");
-    
-    sessionUser = u;
-    sessionPass = p;
-
+    if (!u || !p) return mostrarToast("Ingresa datos");
+    mostrarToast("VERIFICANDO...");
+    sessionUser = u; sessionPass = p;
     const res = await apiCall("loginAdmin");
-    
     if (res && res.success) {
-        mostrarToast("¡ACCESO CONCEDIDO!");
+        mostrarToast("ACCESO CONCEDIDO");
         document.getElementById('admin-login-view').style.display = 'none';
         document.getElementById('admin-menu-view').style.display = 'block';
     } else {
-        sessionUser = "";
-        sessionPass = "";
-        mostrarToast("USUARIO O CLAVE INCORRECTOS");
+        sessionUser = ""; sessionPass = "";
+        mostrarToast("CREDENCIALES INVÁLIDAS");
     }
 }
 
@@ -867,7 +684,7 @@ function mostrarGestion(tipo) {
     tipoGestionActiva = tipo;
     document.getElementById('admin-menu-view').style.display = 'none';
     document.getElementById('admin-stock-view').style.display = 'block';
-    document.getElementById('titulo-gestion').innerText = tipo === 'VENTA' ? 'REGISTRAR VENTA' : 'INGRESAR STOCK';
+    document.getElementById('stock-view-title').innerText = tipo === 'VENTA' ? 'REGISTRAR VENTA' : 'INGRESAR STOCK';
     document.getElementById('input-sku-admin').value = '';
     document.getElementById('input-cant-admin').value = '';
 }
@@ -875,38 +692,25 @@ function mostrarGestion(tipo) {
 async function guardarRegistroAdmin() {
     const sku = document.getElementById('input-sku-admin').value.trim();
     let cant = Number(document.getElementById('input-cant-admin').value);
-
-    if (sku === "" || cant <= 0 || isNaN(cant)) { mostrarToast("Datos inválidos"); return; }
-    if (tipoGestionActiva === 'VENTA') cant = -cant;
-
-    mostrarToast("GUARDANDO...");
-    const res = await apiCall("ingresarStock", { sku: sku, cant: cant });
-    
-    if (res && res.success) {
-        mostrarToast("REGISTRO EXITOSO");
-        volverAlMenuAdmin();
-    } else {
-        mostrarToast(res.error || "Error al guardar");
-    }
+    if (sku === "" || cant <= 0) return mostrarToast("Datos inválidos");
+    mostrarToast("ACTUALIZANDO...");
+    const res = await apiCall("ingresarStock", { sku: sku, cant: cant, tipo: tipoGestionActiva });
+    if (res && res.success) { mostrarToast("INVENTARIO ACTUALIZADO"); volverAlMenuAdmin(); } 
+    else { mostrarToast(res.error || "Producto no encontrado"); }
 }
 
 async function mostrarMetricas() {
     document.getElementById('admin-menu-view').style.display = 'none';
     document.getElementById('admin-metrics-view').style.display = 'block';
-    cargarGrafico(1); 
+    cargarGrafico(3);
 }
 
 async function cargarGrafico(meses) {
     const chartDiv = document.getElementById('chart_div');
-    chartDiv.innerHTML = '<div style="color:#00e5ff; text-align:center; padding-top:100px;">AUDITANDO VENTAS...</div>';
-
+    chartDiv.innerHTML = '<div style="color:var(--cian-pro); text-align:center; padding-top:100px;">AUDITANDO VENTAS...</div>';
     const res = await apiCall("obtenerMetricas", { meses: meses });
-
-    if (!res || !res.datos || res.datos.length === 0) {
-        chartDiv.innerHTML = '<div style="color:#666; text-align:center; padding-top:100px;">SIN ACTIVIDAD EN ESTE PERIODO</div>';
-        return;
-    }
-
+    if (!res || !res.datos || res.datos.length === 0) { chartDiv.innerHTML = '<div style="color:#666; text-align:center; padding-top:100px;">SIN ACTIVIDAD</div>'; return; }
+    
     if(typeof google !== 'undefined' && google.charts) {
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(() => {
@@ -915,37 +719,22 @@ async function cargarGrafico(meses) {
             dataTable.addColumn('number', 'Pagadas ($)');
             dataTable.addColumn('number', 'Pendientes ($)');
             dataTable.addRows(res.datos);
-
-            const options = {
-                backgroundColor: 'transparent',
-                colors: ['#00e5ff', '#ffc107'],
-                curveType: 'function',
-                legend: { position: 'top', textStyle: { color: '#888', fontSize: 11 } },
-                hAxis: { textStyle: { color: '#555' }, gridlines: { color: 'transparent' } },
-                vAxis: { textStyle: { color: '#555' }, gridlines: { color: '#111' } },
-                chartArea: { width: '85%', height: '70%' },
-                lineWidth: 3, pointSize: 9
-            };
-
+            const options = { backgroundColor: 'transparent', colors: ['#00e5ff', '#ffc107'], curveType: 'function', legend: { position: 'top', textStyle: { color: '#888', fontSize: 11 } }, hAxis: { textStyle: { color: '#555' }, gridlines: { color: 'transparent' } }, vAxis: { textStyle: { color: '#555' }, gridlines: { color: '#111' } }, chartArea: { width: '85%', height: '70%' }, lineWidth: 3 };
             const chart = new google.visualization.LineChart(chartDiv);
             chart.draw(dataTable, options);
         });
     }
 }
 
-function abrirGestionEstados() {
+async function abrirGestionEstados() {
     document.getElementById('admin-menu-view').style.display = 'none';
     document.getElementById('admin-status-view').style.display = 'block';
     document.getElementById('search-pedidos').value = '';
-    cargarPedidosAdmin();
-}
-
-async function cargarPedidosAdmin() {
     const lista = document.getElementById('lista-pedidos-status');
-    lista.innerHTML = '<p style="text-align:center; color:#00e5ff; padding:20px;">CONSULTANDO BASE DE DATOS...</p>';
+    lista.innerHTML = '<p style="text-align:center; color:var(--cian-pro); padding:20px;">CONSULTANDO BÓVEDA...</p>';
     
     const res = await apiCall("obtenerVentasAdmin");
-    if(res && !res.error) {
+    if(res && res.datos) {
         pedidosAdminGlobal = res.datos;
         renderizarPedidosAdmin(res.datos);
     } else {
@@ -956,65 +745,19 @@ async function cargarPedidosAdmin() {
 function renderizarPedidosAdmin(pedidos) {
     const lista = document.getElementById('lista-pedidos-status');
     lista.innerHTML = '';
-    if(!pedidos || pedidos.length === 0) {
-        lista.innerHTML = '<p style="text-align:center; color:#555; padding:20px;">No hay registros.</p>';
-        return;
-    }
-
+    if(!pedidos || pedidos.length === 0) { lista.innerHTML = '<p style="text-align:center; color:#555; padding:20px;">Sin registros.</p>'; return; }
     pedidos.forEach(p => {
         const div = document.createElement('div');
         div.style = "background:#111; border:1px solid #222; padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;";
-        div.innerHTML = `
-            <div style="flex:1;">
-                <div style="color:#00e5ff; font-weight:bold; font-size:0.8rem;">${p.id}</div>
-                <div style="font-size:0.75rem; color:#888;">${p.fecha} - $${Number(p.total).toLocaleString('es-CL')}</div>
-            </div>
-            <div style="flex:1; text-align:right;">
-                <select onchange="cambiarEstadoPedido('${p.id}', this.value)" style="background:#000; color:#f1c40f; border:1px solid #333; padding:5px; border-radius:5px; font-size:0.7rem; outline:none;">
-                    <option value="Pendiente de Pago" ${p.estado === 'Pendiente de Pago' ? 'selected' : ''}>PENDIENTE</option>
-                    <option value="Pagado" ${p.estado === 'Pagado' ? 'selected' : ''}>PAGADO</option>
-                </select>
-            </div>
-        `;
+        div.innerHTML = `<div style="flex:1;"><div style="color:var(--cian-pro); font-weight:bold; font-size:0.8rem;">${p.id}</div><div style="font-size:0.75rem; color:#888;">${p.fecha} - $${p.total.toLocaleString()}</div></div><div style="flex:1; text-align:right;"><select onchange="cambiarEstadoPedido('${p.id}', this.value)" style="background:#000; color:var(--amber-premium); border:1px solid #333; padding:5px; border-radius:5px; font-size:0.7rem; outline:none;"><option value="Pendiente de Pago" ${p.estado === 'Pendiente de Pago' ? 'selected' : ''}>PENDIENTE</option><option value="Pagado" ${p.estado === 'Pagado' ? 'selected' : ''}>PAGADO</option></select></div>`;
         lista.appendChild(div);
     });
 }
-
-function filtrarPedidosAdmin() {
-    const texto = document.getElementById('search-pedidos').value.toLowerCase();
-    const filtrados = pedidosAdminGlobal.filter(p => p.id.toLowerCase().includes(texto));
-    renderizarPedidosAdmin(filtrados);
-}
-
-async function cambiarEstadoPedido(id, nuevoEstado) {
-    mostrarToast("ACTUALIZANDO ESTADO...");
-    const res = await apiCall("actualizarEstadoPedido", { id: id, nuevoEstado: nuevoEstado });
-    if(res && res.success) {
-        mostrarToast("ESTADO ACTUALIZADO CON ÉXITO");
-        cargarPedidosAdmin();
-    } else {
-        mostrarToast("ERROR AL ACTUALIZAR");
-    }
-}
-
-function volverAlMenuAdmin() {
-    document.getElementById('admin-stock-view').style.display = 'none';
-    document.getElementById('admin-metrics-view').style.display = 'none';
-    const statusView = document.getElementById('admin-status-view');
-    if (statusView) statusView.style.display = 'none';
-    document.getElementById('admin-menu-view').style.display = 'block';
-}
-
-function resetVistasAdmin() {
-    document.getElementById('admin-login-view').style.display = 'block';
-    document.getElementById('admin-menu-view').style.display = 'none';
-    document.getElementById('admin-stock-view').style.display = 'none';
-    document.getElementById('admin-metrics-view').style.display = 'none';
-    const statusView = document.getElementById('admin-status-view');
-    if (statusView) statusView.style.display = 'none';
-    document.getElementById('admin-user').value = '';
-    document.getElementById('admin-pass').value = '';
-}
-    </script>
+function filtrarPedidosAdmin() { const texto = document.getElementById('search-pedidos').value.toLowerCase(); const filtrados = pedidosAdminGlobal.filter(p => p.id.toLowerCase().includes(texto)); renderizarPedidosAdmin(filtrados); }
+async function cambiarEstadoPedido(id, nuevoEstado) { mostrarToast("ACTUALIZANDO ESTADO..."); const res = await apiCall("actualizarEstadoPedido", { id: id, nuevoEstado: nuevoEstado }); if(res && res.success) { mostrarToast("ACTUALIZADO"); abrirGestionEstados(); } }
+function volverAlMenuAdmin() { document.getElementById('admin-stock-view').style.display = 'none'; document.getElementById('admin-metrics-view').style.display = 'none'; document.getElementById('admin-status-view').style.display = 'none'; document.getElementById('admin-menu-view').style.display = 'block'; }
+function resetVistasAdmin() { volverAlMenuAdmin(); document.getElementById('admin-login-view').style.display = 'block'; document.getElementById('admin-menu-view').style.display = 'none'; document.getElementById('admin-user').value = ''; document.getElementById('admin-pass').value = ''; }
+</script>
+    
 </body>
 </html>
