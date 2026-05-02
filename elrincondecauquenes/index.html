@@ -1130,24 +1130,30 @@ var pedidosAdminGlobal = [];
 // ¡CRÍTICO! Pega aquí la URL de tu Google Apps Script (Debe terminar en /exec)
 const API_URL = "https://script.google.com/macros/s/AKfycbzJUS0wYpdA4F_un0-YD6p6NPenfSRyJmubhO4G6biV-jAbKV4RwjB7s90R5JpARxuayQ/exec";
 
-// TRADUCTOR UNIVERSAL: Envía y recibe datos de Google
+// Variables para guardar tu sesión en la memoria del navegador
+let sessionUser = "";
+let sessionPass = "";
+
 async function apiCall(action, payload = null) {
     let url = API_URL + "?action=" + action;
-    let options = { method: "GET" };
     
-    if (payload) {
-        options = {
-            method: "POST",
-            body: JSON.stringify(payload)
-        };
+    // Si la acción es de Admin, le pegamos tus credenciales al paquete
+    if (["ingresarStock", "obtenerMetricas", "obtenerVentasAdmin", "actualizarEstadoPedido", "loginAdmin"].includes(action)) {
+        payload = payload || {};
+        payload.userAdmin = sessionUser;
+        payload.passAdmin = sessionPass;
     }
+
+    let options = {
+        method: payload ? "POST" : "GET",
+        body: payload ? JSON.stringify(payload) : null
+    };
     
     try {
         const res = await fetch(url, options);
         return await res.json();
     } catch(e) {
-        console.error("API Error:", e);
-        return { error: e.message };
+        return { error: "Error de conexión con el servidor." };
     }
 }
 
@@ -1567,16 +1573,26 @@ function cerrarAdmin() {
 async function verificarLogin() {
     const u = document.getElementById('admin-user').value;
     const p = document.getElementById('admin-pass').value;
-    if (u === "" || p === "") { mostrarToast("Ingrese credenciales"); return; }
     
-    mostrarToast("VERIFICANDO...");
-    const res = await apiCall("loginAdmin", { u: u, p: p });
+    if (!u || !p) { mostrarToast("Ingresa tus datos"); return; }
+    
+    mostrarToast("CONECTANDO CON EL SHEET...");
+    
+    // Guardamos temporalmente para probar
+    sessionUser = u;
+    sessionPass = p;
+
+    const res = await apiCall("loginAdmin");
     
     if (res && res.success) {
+        mostrarToast("¡ACCESO CONCEDIDO!");
         document.getElementById('admin-login-view').style.display = 'none';
         document.getElementById('admin-menu-view').style.display = 'block';
     } else {
-        mostrarToast("ACCESO DENEGADO");
+        // Si falló, limpiamos la memoria por seguridad
+        sessionUser = "";
+        sessionPass = "";
+        mostrarToast("USUARIO O CLAVE INCORRECTOS");
     }
 }
 
