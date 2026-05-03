@@ -1097,6 +1097,88 @@ button {
         </button>
     </div>
 </div>
+
+<div id="modal-admin" class="modal">
+    <div class="modal-content admin-modal" style="max-width: 450px;">
+        <span class="close-modal" onclick="cerrarAdmin()">&times;</span>
+
+        <div id="admin-login-view">
+            <div style="text-align:center; margin-bottom:30px;">
+                <i class="fas fa-user-shield" style="font-size: 2.5rem; color: var(--cian-pro); margin-bottom:15px;"></i>
+                <h3 style="font-family: var(--fuente-titulo); letter-spacing: 2px; color:white;">CONTROL DE ACCESO</h3>
+            </div>
+            <input type="text" id="admin-user" placeholder="Usuario" class="admin-input">
+            <input type="password" id="admin-pass" placeholder="Contraseña" class="admin-input">
+            <button onclick="loginAdmin()" class="btn-checkout" style="margin-top:10px;">
+                VERIFICAR IDENTIDAD
+            </button>
+        </div>
+
+        <div id="admin-menu-view" style="display:none;">
+            <div style="text-align:center; margin-bottom:25px;">
+                <h3 style="font-family: var(--fuente-titulo); color: var(--cian-pro); font-size: 1.2rem; letter-spacing:1px;">GESTIÓN ESTRATÉGICA</h3>
+            </div>
+            
+            <div class="admin-grid-btns">
+              <button onclick="mostrarGestion('VENTA')" class="btn-admin">
+                <i class="fas fa-cash-register"></i> REGISTRAR VENTA
+              </button>
+              <button onclick="mostrarGestion('COMPRA')" class="btn-admin">
+                <i class="fas fa-boxes"></i> INGRESAR STOCK
+              </button>
+              <button onclick="mostrarMetricas()" class="btn-admin">
+                <i class="fas fa-chart-line"></i> RENDIMIENTO
+              </button>
+              <button onclick="abrirGestionEstados()" class="btn-admin">
+                <i class="fas fa-tasks"></i> ESTADO VENTAS
+              </button>
+            </div>
+
+            <button onclick="resetVistasAdmin()" class="btn-back" style="margin-top:25px; width:100%;">CERRAR SESIÓN</button>
+        </div>
+
+        <div id="admin-stock-view" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h4 id="stock-view-title" style="color:var(--amber-premium); margin:0; font-family:var(--fuente-titulo); font-size:0.9rem;">INVENTARIO</h4>
+                <button onclick="volverAlMenuAdmin()" class="btn-back">VOLVER</button>
+            </div>
+            <div id="lista-productos-admin" class="admin-list" style="max-height: 350px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222;">
+            </div>
+            <button onclick="ejecutarContabilizar()" class="btn-checkout" style="margin-top:20px;">
+                ACTUALIZAR SPREADSHEET <i class="fas fa-sync-alt" style="margin-left:10px;"></i>
+            </button>
+        </div>
+
+        <div id="admin-metrics-view" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="color:var(--cian-pro); margin:0; font-family:var(--fuente-titulo); font-size:0.9rem;">RENDIMIENTO</h3>
+                <button onclick="volverAlMenuAdmin()" class="btn-back">VOLVER</button>
+            </div>
+            <div class="period-selector" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:20px;">
+                <button onclick="cargarGrafico(1)" class="btn-period">1M</button>
+                <button onclick="cargarGrafico(3)" class="btn-period">3M</button>
+                <button onclick="cargarGrafico(6)" class="btn-period">6M</button>
+                <button onclick="cargarGrafico(12)" class="btn-period">1A</button>
+            </div>
+            <div id="chart_div" style="width: 100%; height: 300px; background: #000; border-radius:12px; border:1px solid #222; padding:10px;">
+            </div>
+        </div>
+
+        <div id="admin-status-view" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="color:var(--cian-pro); margin:0; font-family:var(--fuente-titulo); font-size:0.9rem;">ESTADO DE VENTAS</h3>
+            <button onclick="volverAlMenuAdmin()" class="btn-back">VOLVER</button>
+          </div>
+    
+          <input type="text" id="search-pedidos" placeholder="Buscar por ID_pedido..." class="admin-input" onkeyup="filtrarPedidosAdmin()">
+    
+          <div id="lista-pedidos-status" style="max-height: 400px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222;">
+            <p style="text-align:center; color:#555; padding:20px;">Cargando pedidos...</p>
+          </div>
+        </div>
+        
+    </div>
+</div>
     <script>
         
         const API_URL = "https://script.google.com/macros/s/AKfycbxPr3a8zgZcYwAIisYn8aFBvyJ_i2GdUvu3wz2HZmfN8QkhTFnY8ybCmH21yL-WUKJ32Q/exec";
