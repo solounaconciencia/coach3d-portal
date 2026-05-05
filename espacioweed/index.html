@@ -1549,97 +1549,86 @@ var slideIndex = 0;
 var sessionUser = null;
 let scriptUrl = ""; // <--- PIEZA CLAVE: Se llenará automáticamente
 
+const API_URL = "https://script.google.com/macros/s/AKfycbw0cHjH0zJVx4BqUHNfjXnZUbyIZHJfsCerUkufhG_MG763ai18VAKq-Dkne3IOHpzvZQ/exec";
+
+async function ejecutarEnServidor(action, data = null) {
+    const url = `${API_URL}?action=${action}`;
+    const options = {
+        method: data ? "POST" : "GET",
+        mode: "cors"
+    };
+    if (data) {
+        options.body = JSON.stringify(data);
+        // Usamos text/plain para evitar problemas de CORS en navegadores
+        options.headers = { "Content-Type": "text/plain;charset=utf-8" };
+    }
+    try {
+        const response = await fetch(url, options);
+        return await response.json();
+    } catch (error) {
+        console.error("Error en conexión con el servidor:", error);
+        throw error;
+    }
+}
 /**
  * INICIALIZACIÓN DEL SISTEMA
  */
-window.onload = function() {
-  console.log("Iniciando Secuencia de Despegue...");
-
-  // PASO 0: Obtener la URL de la App para el Panel Admin
-  google.script.run.withSuccessHandler(function(url) {
-    scriptUrl = url;
-    console.log("Coordenadas de navegación obtenidas.");
-  }).getScriptUrl();
-
-  // PASO 1: Cargar Configuración (Menú y Redes sociales)
-  google.script.run.withSuccessHandler(function(resConfig) {
-    configGlobal = resConfig;
-    renderSocials();
+window.onload = async function() {
+    console.log("Iniciando Secuencia de Despegue desde GitHub...");
     
-    // --- MANIOBRA FOCUS: ANUNCIO INMEDIATO ---
-    // ¡BAM! Disparamos el anuncio emergente justo ahora. 
-    // El cliente lo lee mientras todo lo de abajo se procesa de fondo.
-    verificarAnuncio();
-    
-    console.log("1. Menú, Redes y Anuncio listos.");
+    try {
+        // 1. CARGA MASIVA: Traemos Config, Auspiciadores, Destacados y Productos en 1 segundo.
+        const data = await ejecutarEnServidor("getInitialData");
 
-    // --- INTEGRACIÓN FOCUS: CARGA DE AUSPICIADORES ---
-    google.script.run.withSuccessHandler(function(dataAuspi) {
-      const section = document.getElementById('auspiciadores-section');
-      const content = document.getElementById('marquee-content');
-      
-      if (dataAuspi && dataAuspi.length > 0 && section && content) {
-        section.style.display = 'block';
-        let logosHtml = dataAuspi.map(function(a) {
-          return '<img src="' + a.logo + '" alt="' + a.nombre + '" title="' + a.nombre + '" onerror="this.style.display=\'none\'">';
-        }).join('');
+        // 2. CONFIGURACIÓN Y ANUNCIO
+        configGlobal = data.config;
+        renderSocials();
+        if (typeof verificarAnuncio === "function") verificarAnuncio(); 
 
-        if (dataAuspi.length > 5) {
-          content.innerHTML = logosHtml + logosHtml;
-          content.classList.add('scrolling');
-        } else {
-          content.innerHTML = logosHtml;
-          content.style.justifyContent = 'center';
-          content.style.width = '100%';
+        // 3. AUSPICIADORES
+        const sectionAuspi = document.getElementById('auspiciadores-section');
+        const contentAuspi = document.getElementById('marquee-content');
+        if (data.auspiciadores && data.auspiciadores.length > 0 && sectionAuspi && contentAuspi) {
+            sectionAuspi.style.display = 'block';
+            let logosHtml = data.auspiciadores.map(a => `<img src="${a.logo}" alt="${a.nombre}" title="${a.nombre}" onerror="this.style.display='none'">`).join('');
+            contentAuspi.innerHTML = (data.auspiciadores.length > 5) ? logosHtml + logosHtml : logosHtml;
+            if (data.auspiciadores.length > 5) contentAuspi.classList.add('scrolling');
         }
-        console.log("Barra de Auspiciadores sincronizada.");
-      }
-    }).getAuspiciadores();
 
-    // 2. Cargar Slider (Destacados)
-    google.script.run.withSuccessHandler(function(dataDestacados) {
-      const container = document.getElementById('hero-slider');
-      if (dataDestacados && dataDestacados.length > 0) {
-        container.innerHTML = dataDestacados.map(function(s, i) {
-          return '<div class="slide ' + (i === 0 ? 'active' : '') + '">' +
-                '<img src="' + s.img + '" class="img-slide" alt="' + s.nombre + '" onerror="this.src=\'https://i.postimg.cc/1RF0H6Ff/Logoew.png\'">' +
-                '<div class="slide-content">' +
-                '<h2 class="amber">' + s.titulo + '</h2>' +
-                '<h1>' + s.nombre + '</h1>' +
-                '<p>' + s.desc + '</p>' +
-                '<div class="price-display" style="color:var(--cian); font-weight:bold; font-size:1.3rem; margin-bottom:15px; font-family:var(--font-brand);">' +
-                '$' + Number(s.precio).toLocaleString('es-CL') +
-                '</div>' +
-                /* CAMBIO QUIRÚRGICO: Llamamos a abrirDetalle en lugar de agregarAlCarrito */
-                '<button class="btn-banner-buy" onclick="abrirDetalle(\'' + s.sku + '\')">' +
-                'VER DETALLES <i class="fas fa-eye"></i>' +
-                '</button>' +
-                '</div>' +
-                '</div>';
-        }).join('');
+        // 4. DESTACADOS (SLIDER)
+        const containerSlider = document.getElementById('hero-slider');
+        if (data.destacados && data.destacados.length > 0 && containerSlider) {
+            containerSlider.innerHTML = data.destacados.map((s, i) => `
+                <div class="slide ${i === 0 ? 'active' : ''}">
+                    <img src="${s.img}" class="img-slide" alt="${s.nombre}" onerror="this.src='https://i.postimg.cc/1RF0H6Ff/Logoew.png'">
+                    <div class="slide-content">
+                        <h2 class="amber">${s.titulo}</h2>
+                        <h1>${s.nombre}</h1>
+                        <p>${s.desc}</p>
+                        <div class="price-display" style="color:var(--cian); font-weight:bold; font-size:1.3rem; margin-bottom:15px;">
+                            $${Number(s.precio).toLocaleString('es-CL')}
+                        </div>
+                        <button class="btn-banner-buy" onclick="abrirDetalle('${s.sku}')">
+                            VER DETALLES <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('') + '<button class="slider-prev" onclick="cambiarSlide(-1)">&#10094;</button><button class="slider-next" onclick="cambiarSlide(1)">&#10095;</button>';
+            if (typeof iniciarAnimacionSlider === "function") iniciarAnimacionSlider();
+        }
 
-        container.innerHTML += '<button class="slider-prev" onclick="cambiarSlide(-1)">&#10094;</button>' +
-                              '<button class="slider-next" onclick="cambiarSlide(1)">&#10095;</button>';
-
-        iniciarAnimacionSlider();
-        console.log("2. Cápsulas Destacadas en órbita.");
-      } else if (container) {
-        container.style.display = 'none';
-      }
-
-      // PASO 3: Cargar productos
-      google.script.run.withSuccessHandler(function(resProductos) {
-        productosGlobal = resProductos;
+        // 5. VITRINA PRINCIPAL
+        productosGlobal = data.productos;
         const loadingMsg = document.getElementById('loading-msg');
         if(loadingMsg) loadingMsg.remove();
-        renderProductos(productosGlobal);
-        generarMenuCategorias(productosGlobal);
-        console.log("3. Vitrina completa.");
-      }).obtenerProductos();
+        if (typeof renderProductos === "function") renderProductos(productosGlobal);
+        if (typeof generarMenuCategorias === "function") generarMenuCategorias(productosGlobal);
 
-    }).getDestacados();
+        console.log("Nave 100% Desplegada y Operativa.");
 
-  }).getConfig();
+    } catch (error) {
+        console.error("Falla en la carga inicial:", error);
+    }
 };
 
 /**
@@ -1965,85 +1954,91 @@ function vaciarCarrito() {
 /**
  * CIERRE DE VENTA Y WHATSAPP
  */
-function procesarCompra() {
-    if (carrito.length === 0) return;
+async function procesarCompra() {
+  if (carrito.length === 0) return;
 
-    // 1. Identificar el método de pago seleccionado
-    const metodoInput = document.querySelector('input[name="metodo-pago"]:checked');
-    if (!metodoInput) {
-        mostrarToast("Por favor, selecciona un método de pago.");
-        return;
-    }
-    const metodo = metodoInput.value;
+  // 1. Identificar el método de pago seleccionado
+  const metodoInput = document.querySelector('input[name="metodo-pago"]:checked');
+  if (!metodoInput) {
+    mostrarToast("Por favor, selecciona un método de pago.");
+    return;
+  }
+  const metodo = metodoInput.value;
 
-    // 2. Bloqueo de seguridad para Mercado Pago (Requiere Sesión)
-    if (metodo === 'mercadopago' && !sessionUser) {
-        mostrarToast("Para pagar con tarjeta debes iniciar sesión.");
-        mostrarAcceso(); // Función que ya tenemos para abrir el login
-        return;
-    }
+  // 2. Bloqueo de seguridad para Mercado Pago
+  if (metodo === 'mercadopago' && !sessionUser) {
+    mostrarToast("Para pagar con tarjeta debes iniciar sesión.");
+    mostrarAcceso(); 
+    return;
+  }
 
-    const btn = document.querySelector('.btn-checkout');
-    const originalText = btn.innerHTML;
-    btn.innerText = "PROCESANDO...";
-    btn.disabled = true;
+  const btn = document.querySelector('.btn-checkout');
+  const originalText = btn.innerHTML;
+  btn.innerText = "PROCESANDO...";
+  btn.disabled = true;
 
-    const necesitaEnvio = document.getElementById('chk-envio').checked;
-    const subtotal = calcularSubtotal(); // Asegúrate de tener esta función o usa el cálculo directo
-    const envioVal = necesitaEnvio ? 3500 : 0;
-    const direccion = document.getElementById('direccion-envio').value;
+  const necesitaEnvio = document.getElementById('chk-envio').checked;
+  const subtotal = calcularSubtotal(); 
+  const envioVal = necesitaEnvio ? 3500 : 0;
+  const direccion = document.getElementById('direccion-envio').value;
 
-    if (necesitaEnvio && !direccion) {
-        alert("Por favor, ingresa tu dirección para el envío.");
+  if (necesitaEnvio && !direccion) {
+    alert("Por favor, ingresa tu dirección para el envío.");
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    return;
+  }
+
+  const pedido = {
+    nombreCliente: sessionUser ? sessionUser.nombre : "Cliente Web",
+    email: sessionUser ? sessionUser.email : "N/A",
+    resumenProductos: carrito.map(i => i.nombre + " (x" + i.cantidad + ")").join(', '),
+    items: carrito,
+    subtotal: subtotal,
+    necesitaEnvio: necesitaEnvio,
+    totalFinal: subtotal + envioVal,
+    direccion: necesitaEnvio ? direccion : "Retiro en Local",
+    metodoPago: metodo
+  };
+
+  // 3. RAMIFICACIÓN DE LÓGICA (EVOLUCIONADA PARA GITHUB)
+  if (metodo === 'mercadopago') {
+    try {
+      const res = await ejecutarEnServidor("pagar", pedido);
+      if(res.success) {
+        mostrarToast("Redirigiendo a pago seguro...");
+        window.location.href = res.init_point;
+      } else {
+        mostrarToast("Error: " + res.msg);
         btn.innerHTML = originalText;
         btn.disabled = false;
-        return;
+      }
+    } catch(err) {
+      mostrarToast("Falla de conexión.");
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
-    
-    const pedido = {
-        nombreCliente: sessionUser ? sessionUser.nombre : "Cliente Web",
-        email: sessionUser ? sessionUser.email : "N/A",
-        resumenProductos: carrito.map(i => i.nombre + " (x" + i.cantidad + ")").join(', '),
-        items: carrito,
-        subtotal: subtotal,
-        necesitaEnvio: necesitaEnvio,
-        totalFinal: subtotal + envioVal,
-        direccion: necesitaEnvio ? direccion : "Retiro en Local",
-        metodoPago: metodo
-    };
-
-    // 3. RAMIFICACIÓN DE LÓGICA
-    if (metodo === 'mercadopago') {
-        // FLUJO MERCADO PAGO
-        google.script.run.withSuccessHandler(function(res) {
-            if(res.success) {
-                mostrarToast("Redirigiendo a pago seguro...");
-                // Abrimos en la misma ventana para que el retorno funcione correctamente
-                window.location.href = res.init_point; 
-            } else {
-                mostrarToast("Error: " + res.msg);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }).generarPreferenciaPago(pedido);
-
-    } else {
-        // FLUJO TRANSFERENCIA -> WhatsApp
-        google.script.run.withSuccessHandler(function(res) {
-            if(res.success || res.id) {
-                const num = (configGlobal['WHATSAPP_ADMIN'] || '569').toString().replace(/\D/g, '');
-                const msg = `🚀 *NUEVO PEDIDO ESPACIO WEED*\n📌 *ID:* ${res.id}\n---\n🛒 *Productos:* ${pedido.resumenProductos}\n💰 *Total:* $${pedido.totalFinal.toLocaleString('es-CL')}\n🚚 *Envío:* ${pedido.direccion}\n💳 *Pago:* Transferencia/Efectivo\n\n*Por favor, confírmenme el stock.*`;
-                
-                window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
-                
-                // Limpiar y finalizar
-                vaciarCarrito(); // Asegúrate de tener esta función o limpia el array manualmente
-                toggleCart();
-                mostrarToast("¡Pedido registrado! Enviando WhatsApp...");
-                setTimeout(() => { location.reload(); }, 2000); // Recarga para limpiar estado
-            }
-        }).registrarPedido(pedido);
+  } else {
+    // FLUJO TRANSFERENCIA -> WhatsApp
+    try {
+      const res = await ejecutarEnServidor("registrarPedido", pedido);
+      if(res.success || res.id) {
+        const num = (configGlobal['WHATSAPP_ADMIN'] || '569').toString().replace(/\D/g, '');
+        const msg = `🚀 *NUEVO PEDIDO ESPACIO WEED*\n📌 *ID:* ${res.id}\n---\n🛒 *Productos:* ${pedido.resumenProductos}\n💰 *Total:* $${pedido.totalFinal.toLocaleString('es-CL')}\n🚚 *Envío:* ${pedido.direccion}\n💳 *Pago:* Transferencia/Efectivo\n\n*Por favor, confírmenme el stock.*`;
+        
+        window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+        
+        vaciarCarrito(); 
+        toggleCart();
+        mostrarToast("¡Pedido registrado! Enviando WhatsApp...");
+        setTimeout(() => { location.reload(); }, 2000); 
+      }
+    } catch(err) {
+      mostrarToast("Error de conexión al registrar.");
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
+  }
 }
 
 /**
@@ -2193,54 +2188,57 @@ function volverInicio(e) {
     mostrarToast("¡De vuelta a la base!");
 }
 
-function ejecutarLogin() {
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-pass').value;
-    
-    if (!email || !pass) return mostrarToast("Ingresa tus coordenadas de acceso.");
-    
-    mostrarToast("Verificando coordenadas...");
-    
-    google.script.run.withSuccessHandler(res => {
-        if(res.success) {
-            sessionUser = res.user;
-            // Guardamos en el navegador para persistencia
-            localStorage.setItem('weed_session', JSON.stringify(res.user));
-            cargarDashboard();
-        } else {
-            mostrarToast(res.msg);
-        }
-    }).login(email, pass);
+async function ejecutarLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+
+  if (!email || !pass) return mostrarToast("Ingresa tus coordenadas de acceso.");
+
+  mostrarToast("Verificando coordenadas...");
+
+  try {
+    const res = await ejecutarEnServidor("login", { email: email, pass: pass });
+    if(res.success) {
+      sessionUser = res.user;
+      localStorage.setItem('weed_session', JSON.stringify(res.user));
+      cargarDashboard();
+    } else {
+      mostrarToast(res.msg);
+    }
+  } catch(e) {
+    mostrarToast("Error de conexión al ingresar.");
+  }
 }
 
-function ejecutarRegistro() {
-    const datos = {
-        nombre: document.getElementById('reg-nombre').value,
-        email: document.getElementById('reg-email').value,
-        pass: document.getElementById('reg-pass').value,
-        passConf: document.getElementById('reg-pass-conf').value,
-        pregunta: document.getElementById('reg-pregunta').value,
-        respuesta: document.getElementById('reg-respuesta').value
-    };
+async function ejecutarRegistro() {
+  const datos = {
+    nombre: document.getElementById('reg-nombre').value,
+    email: document.getElementById('reg-email').value,
+    pass: document.getElementById('reg-pass').value,
+    passConf: document.getElementById('reg-pass-conf').value,
+    pregunta: document.getElementById('reg-pregunta').value,
+    respuesta: document.getElementById('reg-respuesta').value
+  };
 
-    // Validación básica antes de despegar
-    if (!datos.nombre || !datos.email || !datos.pass) {
-        return mostrarToast("Faltan datos en el radar.");
+  if (!datos.nombre || !datos.email || !datos.pass) {
+    return mostrarToast("Faltan datos en el radar.");
+  }
+
+  if(datos.pass !== datos.passConf) {
+    return mostrarToast("Las claves no coinciden.");
+  }
+
+  mostrarToast("Inyectando datos a la Comunidad...");
+
+  try {
+    const res = await ejecutarEnServidor("registrarUsuario", datos);
+    mostrarToast(res.msg);
+    if(res.success) {
+      cambiarVistaComunidad('login');
     }
-
-    if(datos.pass !== datos.passConf) {
-        return mostrarToast("Las claves no coinciden.");
-    }
-    
-    mostrarToast("Inyectando datos a la Comunidad...");
-
-    // Llamada al servidor (Código.gs)
-    google.script.run.withSuccessHandler(function(res) {
-        mostrarToast(res.msg);
-        if(res.success) {
-            cambiarVistaComunidad('login');
-        }
-    }).registrarUsuario(datos);
+  } catch(e) {
+    mostrarToast("Error de conexión al registrarte.");
+  }
 }
 
 var sugIndex = 0;
@@ -2682,24 +2680,29 @@ function cargarChat() {
   }).obtenerMensajes(sessionUser.email);
 }
 
-function ejecutarEnvioMensaje() {
-    const input = document.getElementById('msg-input');
-    const msg = input.value.trim();
-    
-    if (!msg) return;
-    
-    input.disabled = true;
-    google.script.run.withSuccessHandler(function(res) {
-        if (res.success) {
-            input.value = '';
-            input.disabled = false;
-            document.getElementById('char-count').innerText = "0/250";
-            cargarChat();
-        } else {
-            mostrarToast("Falla en la transmisión.");
-            input.disabled = false;
-        }
-    }).enviarMensaje({ emisor: sessionUser.email, mensaje: msg });
+async function ejecutarEnvioMensaje() {
+  const input = document.getElementById('msg-input');
+  const msg = input.value.trim();
+
+  if (!msg) return;
+
+  input.disabled = true;
+  
+  try {
+    const res = await ejecutarEnServidor("enviarMensaje", { emisor: sessionUser.email, mensaje: msg });
+    if (res.success) {
+      input.value = '';
+      input.disabled = false;
+      document.getElementById('char-count').innerText = "0/250";
+      cargarChat();
+    } else {
+      mostrarToast("Falla en la transmisión.");
+      input.disabled = false;
+    }
+  } catch(e) {
+    mostrarToast("Falla en la conexión de red.");
+    input.disabled = false;
+  }
 }
 
 function calcularSubtotal() {
