@@ -1511,14 +1511,18 @@ const API_URL = "https://script.google.com/macros/s/AKfycbw0cHjH0zJVx4BqUHNfjXnZ
 
 async function ejecutarEnServidor(action, data = null) {
     const url = `${API_URL}?action=${action}`;
-    const options = { method: data ? "POST" : "GET", mode: "cors" };
-    if (data) {
-        options.body = JSON.stringify(data);
-        options.headers = { "Content-Type": "text/plain;charset=utf-8" };
-    }
+    // FOCUS: Si no hay datos, creamos un objeto vacío para forzar la puerta POST
+    const payload = data || {}; 
+    const options = { 
+        method: "POST", 
+        mode: "cors",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+    };
     const response = await fetch(url, options);
     return await response.json();
 }
+        
 let globalStock = [];
 let promoSkuActive = "";
 let miGrafico = null;
