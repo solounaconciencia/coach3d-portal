@@ -2243,45 +2243,51 @@ async function ejecutarRegistro() {
 
 var sugIndex = 0;
 
-function cargarDashboard() {
-    cambiarVistaComunidad('dashboard');
-    
-    // Sincronización de Identidad
-    const linkAvatar = (sessionUser && sessionUser.avatar) ? sessionUser.avatar : 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Space1';
-    if (document.getElementById('user-avatar')) document.getElementById('user-avatar').src = linkAvatar;
-    document.getElementById('user-name-display').innerText = sessionUser.nombre;
+async function cargarDashboard() {
+  cambiarVistaComunidad('dashboard');
 
-    // --- ESCÁNER DE RANGO ---
-    const toolsGrid = document.querySelector('.tools-grid');
-    if (sessionUser && sessionUser.rol === "Admin") {
-        console.log("¡Rango Admin Detectado!");
-        let btnAdmin = document.getElementById('btn-admin-portal');
-        if(!btnAdmin) {
-            btnAdmin = document.createElement('button');
-            btnAdmin.id = 'btn-admin-portal';
-            btnAdmin.className = 'tool-btn';
-            btnAdmin.style.borderColor = 'var(--amber)'; 
-            btnAdmin.style.color = 'var(--amber)';
-            btnAdmin.innerHTML = '<i class="fas fa-user-shield"></i> PANEL ADMIN';
-            btnAdmin.onclick = function() {
-                // Abre el Admin.html que ya configuramos
-                window.open(scriptUrl + "?p=admin", "_blank");
-            };
-            toolsGrid.appendChild(btnAdmin);
-        }
+  // Sincronización de Identidad
+  const linkAvatar = (sessionUser && sessionUser.avatar) ? sessionUser.avatar : 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Space1';
+  if (document.getElementById('user-avatar')) document.getElementById('user-avatar').src = linkAvatar;
+  document.getElementById('user-name-display').innerText = sessionUser.nombre;
+
+  // --- ESCÁNER DE RANGO ---
+  const toolsGrid = document.querySelector('.tools-grid');
+  if (sessionUser && sessionUser.rol === "Admin") {
+    console.log("¡Rango Admin Detectado!");
+    let btnAdmin = document.getElementById('btn-admin-portal');
+    if(!btnAdmin) {
+      btnAdmin = document.createElement('button');
+      btnAdmin.id = 'btn-admin-portal';
+      btnAdmin.className = 'tool-btn';
+      btnAdmin.style.borderColor = 'var(--amber)';
+      btnAdmin.style.color = 'var(--amber)';
+      btnAdmin.innerHTML = '<i class="fas fa-user-shield"></i> PANEL ADMIN';
+      btnAdmin.onclick = function() {
+        // CORRECCIÓN GITHUB: Ahora abre tu archivo admin.html físico
+        window.open("admin.html", "_blank"); 
+      };
+      toolsGrid.appendChild(btnAdmin);
     }
+  }
 
-    // --- LÓGICA DE RADAR VS SUGERENCIAS (MANTENIDA) ---
-    const radarSkus = JSON.parse(localStorage.getItem('weed_radar') || '[]');
-    const titulo = document.getElementById('titulo-sugerencias');
+  // --- LÓGICA DE RADAR VS SUGERENCIAS (MANTENIDA) ---
+  const radarSkus = JSON.parse(localStorage.getItem('weed_radar') || '[]');
+  const titulo = document.getElementById('titulo-sugerencias');
 
+  try {
     if (radarSkus.length > 0) {
-        if(titulo) titulo.innerText = "CONTINUAR VIENDO...";
-        google.script.run.withSuccessHandler(renderRadar).obtenerProductosPorLista(radarSkus);
+      if(titulo) titulo.innerText = "CONTINUAR VIENDO...";
+      const productosRadar = await ejecutarEnServidor("obtenerProductosPorLista", { skus: radarSkus });
+      renderRadar(productosRadar);
     } else {
-        if(titulo) titulo.innerText = "SUGERENCIAS PARA TI";
-        google.script.run.withSuccessHandler(renderSugerenciasDinamicas).getDashboardData(sessionUser.email);
+      if(titulo) titulo.innerText = "SUGERENCIAS PARA TI";
+      const dataDash = await ejecutarEnServidor("getDashboardData", { email: sessionUser.email });
+      renderSugerenciasDinamicas(dataDash);
     }
+  } catch (err) {
+    console.error("Falla de radar/sugerencias:", err);
+  }
 }
 
 function iniciarAutoSugerencias(total) {
@@ -2333,14 +2339,6 @@ function generarListaAvatares() {
     container.innerHTML = html;
 }
 
-function seleccionarAvatar(url) {
-    google.script.run.withSuccessHandler(() => {
-        sessionUser.avatar = url;
-        document.getElementById('user-avatar').src = url;
-        cambiarVistaComunidad('dashboard');
-    }).actualizarAvatar(sessionUser.email, url);
-}
-
 function logout() {
     localStorage.removeItem('weed_session');
     sessionUser = null;
@@ -2351,52 +2349,57 @@ function logout() {
 /**
  * LÓGICA DE RECUPERACIÓN DE CONTRASEÑA
  */
-function buscarPregunta() {
-    const email = document.getElementById('recover-email').value;
-    if (!email) return mostrarToast("Ingresa un email para rastrear.");
+async function buscarPregunta() {
+  const email = document.getElementById('recover-email').value;
+  if (!email) return mostrarToast("Ingresa un email para rastrear.");
 
-    mostrarToast("Buscando explorador...");
-    
-    google.script.run.withSuccessHandler(function(res) {
-        if (res.success) {
-            // Mostramos la pregunta y pasamos al paso 2
-            document.getElementById('display-pregunta').innerText = "PREGUNTA: " + res.pregunta;
-            document.getElementById('recover-step-1').style.display = 'none';
-            document.getElementById('recover-step-2').style.display = 'block';
-            mostrarToast("Pregunta encontrada.");
-        } else {
-            mostrarToast(res.msg);
-        }
-    }).obtenerPreguntaSeguridad(email);
+  mostrarToast("Buscando explorador...");
+
+  try {
+    const res = await ejecutarEnServidor("obtenerPreguntaSeguridad", { email: email });
+    if (res.success) {
+      // Mostramos la pregunta y pasamos al paso 2
+      document.getElementById('display-pregunta').innerText = "PREGUNTA: " + res.pregunta;
+      document.getElementById('recover-step-1').style.display = 'none';
+      document.getElementById('recover-step-2').style.display = 'block';
+      mostrarToast("Pregunta encontrada.");
+    } else {
+      mostrarToast(res.msg);
+    }
+  } catch (err) {
+    mostrarToast("Falla de conexión con la base de datos.");
+  }
 }
 
-function validarRespuesta() {
-    const email = document.getElementById('recover-email').value;
-    const respuesta = document.getElementById('recover-respuesta').value;
+async function validarRespuesta() {
+  const email = document.getElementById('recover-email').value;
+  const respuesta = document.getElementById('recover-respuesta').value;
 
-    if (!respuesta) return mostrarToast("Escribe la respuesta.");
+  if (!respuesta) return mostrarToast("Escribe la respuesta.");
 
-    mostrarToast("Generando nuevas coordenadas...");
+  mostrarToast("Generando nuevas coordenadas...");
 
-    google.script.run.withSuccessHandler(function(res) {
-        if (res.success) {
-            // FEEDBACK MODERNO: Sin alerts feos
-            mostrarToast("🚀 ¡Clave enviada con éxito! Revisa tu correo.");
-            
-            // Esperamos 2 segundos para que lea el mensaje y volvemos al login
-            setTimeout(function() {
-                cambiarVistaComunidad('login');
-                // Limpiamos todo
-                document.getElementById('recover-step-1').style.display = 'block';
-                document.getElementById('recover-step-2').style.display = 'none';
-                document.getElementById('recover-email').value = '';
-                document.getElementById('recover-respuesta').value = '';
-            }, 3000);
-            
-        } else {
-            mostrarToast(res.msg);
-        }
-    }).validarRespuestaSeguridad(email, respuesta);
+  try {
+    const res = await ejecutarEnServidor("validarRespuestaSeguridad", { email: email, respuesta: respuesta });
+    if (res.success) {
+      // FEEDBACK MODERNO: Sin alerts feos
+      mostrarToast("🚀 ¡Clave enviada con éxito! Revisa tu correo.");
+
+      // Esperamos 3 segundos para que lea el mensaje y volvemos al login
+      setTimeout(function() {
+        cambiarVistaComunidad('login');
+        // Limpiamos todo
+        document.getElementById('recover-step-1').style.display = 'block';
+        document.getElementById('recover-step-2').style.display = 'none';
+        document.getElementById('recover-email').value = '';
+        document.getElementById('recover-respuesta').value = '';
+      }, 3000);
+    } else {
+      mostrarToast(res.msg);
+    }
+  } catch (err) {
+    mostrarToast("Falla de validación en red.");
+  }
 }
 
 /**
@@ -2441,45 +2444,48 @@ function seleccionarAvatar(url) {
 
 var avatarTemporal = "";
 
-function guardarCambiosPerfil() {
-    // Verificamos que tengamos al usuario en memoria
-    if (!sessionUser) return mostrarToast("Error: Sesión no encontrada.");
+async function guardarCambiosPerfil() {
+  // Verificamos que tengamos al usuario en memoria
+  if (!sessionUser) return mostrarToast("Error: Sesión no encontrada.");
 
-    const datos = {
-        email: sessionUser.email,
-        nombre: document.getElementById('edit-nombre').value,
-        pregunta: document.getElementById('edit-pregunta').value,
-        respuesta: document.getElementById('edit-respuesta').value,
-        avatar: avatarTemporal || sessionUser.avatar
-    };
+  const datos = {
+    email: sessionUser.email,
+    nombre: document.getElementById('edit-nombre').value,
+    pregunta: document.getElementById('edit-pregunta').value,
+    respuesta: document.getElementById('edit-respuesta').value,
+    avatar: avatarTemporal || sessionUser.avatar
+  };
 
-    mostrarToast("Sincronizando coordenadas...");
+  mostrarToast("Sincronizando coordenadas...");
 
-    google.script.run
-        .withSuccessHandler(function(res) {
-            if (res.success) {
-                // Actualizamos los datos en el navegador para que el cambio sea instantáneo
-                sessionUser.nombre = datos.nombre;
-                sessionUser.avatar = datos.avatar;
-                
-                mostrarToast("¡Perfil actualizado con éxito!");
-                
-                // Volvemos automáticamente al dashboard para ver el cambio
-                setTimeout(function() {
-                    cambiarVistaComunidad('dashboard');
-                    document.getElementById('user-avatar').src = sessionUser.avatar;
-                    document.getElementById('user-name-display').innerText = sessionUser.nombre;
-                }, 1500);
-            } else {
-                mostrarToast("Error en el servidor: " + res.msg);
-            }
-        })
-        .withFailureHandler(function(err) {
-            mostrarToast("Falla de conexión: " + err);
-        })
-        .actualizarDatosPerfil(datos); // <-- ESTA FUNCIÓN DEBE EXISTIR EN Código.gs
+  try {
+    // FOCUS: Reemplazo exacto del motor manteniendo tu objeto 'datos'
+    const res = await ejecutarEnServidor("actualizarDatosPerfil", datos);
+    
+    if (res.success) {
+      // Actualizamos los datos en el navegador para que el cambio sea instantáneo
+      sessionUser.nombre = datos.nombre;
+      sessionUser.avatar = datos.avatar;
+      
+      // Persistencia en memoria local
+      localStorage.setItem('weed_session', JSON.stringify(sessionUser));
+
+      mostrarToast("¡Perfil actualizado con éxito!");
+
+      // Volvemos automáticamente al dashboard para ver el cambio
+      setTimeout(function() {
+        cambiarVistaComunidad('dashboard');
+        document.getElementById('user-avatar').src = sessionUser.avatar;
+        document.getElementById('user-name-display').innerText = sessionUser.nombre;
+      }, 1500);
+    } else {
+      mostrarToast("Error en el servidor: " + res.msg);
+    }
+  } catch (err) {
+    mostrarToast("Falla de conexión: " + err);
+  }
 }
-
+    
 function mostrarPagos(e) {
   if (e && e.preventDefault) e.preventDefault();
   const modal = document.getElementById('modal-pagos-unique');
@@ -2547,69 +2553,41 @@ function actualizarInterfazSesion() {
  * MOTOR DE HISTORIAL DE EXPEDICIONES
  * Renderiza los últimos 10 carritos con lógica de estados y re-compra.
  */
-function mostrarHistorial() {
-    // 1. Cambiamos a la vista de historial
-    cambiarVistaComunidad('historial');
+async function mostrarHistorial() {
+  if (!sessionUser) return;
+  const container = document.getElementById('historial-lista');
+  if (!container) return;
+  
+  container.innerHTML = "<div class='loading-spinner-small'></div><p style='text-align:center; font-size:0.8rem;'>Rastreando registros pasados...</p>";
+
+  try {
+    // FOCUS: Solicitamos el historial a la base de datos de Google
+    const res = await ejecutarEnServidor("obtenerHistorial", { email: sessionUser.email });
     
-    const container = document.getElementById('lista-historial');
-    if (!container) return;
-
-    // 2. Estado de carga inicial
-    container.innerHTML = '<p class="cian" style="text-align:center; padding:20px;">Sincronizando bitácora de viaje...</p>';
-
-    // 3. Llamada al servidor
-    google.script.run.withSuccessHandler(function(datos) {
-        if (!datos || datos.length === 0) {
-            container.innerHTML = '<p style="opacity:0.5; padding:40px; text-align:center;">No hay expediciones previas en este sector.</p>';
-            return;
-        }
-
-        // 4. Mapeo y construcción de la interfaz
-        container.innerHTML = datos.map((c, i) => {
-            // Parseo de la "Receta" del Carrito
-            let items = [];
-            try { items = JSON.parse(c.receta); } catch(e) { items = []; }
-
-            // Construcción del resumen legible usando productosGlobal
-            const resumen = items.map(it => {
-                const p = productosGlobal.find(x => x.SKU == it.s);
-                return p ? `${p.NOMBRE} (x${it.q})` : "Objeto no identificado";
-            }).join(', ');
-
-            // LÓGICA DE COLORES POR ESTADO (Auditoría v9.5)
-            let colorEstado = '#444'; // Gris por defecto
-            if(c.estado === 'PAGADO') colorEstado = 'var(--neon-green)';
-            if(c.estado === 'POR PAGAR') colorEstado = 'var(--amber)';
-
-            return `
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass); padding:15px; border-radius:12px; width: 100%; text-align:left; border-left: 4px solid ${colorEstado}; transition: transform 0.3s;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-family:var(--font-brand); font-size:0.65rem; color:var(--cian); letter-spacing:1px;">${c.skuMaestro}</span>
-                    <span style="font-size:0.6rem; opacity:0.5;">${c.fecha}</span>
-                </div>
-                
-                <div style="font-size:0.75rem; color:#eee; line-height:1.4; margin-bottom:15px; padding-left: 5px;">${resumen}</div>
-                
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-weight:bold; color:var(--amber); font-size:1rem;">$${Number(c.total).toLocaleString('es-CL')}</span>
-                    
-                    <div style="display:flex; gap:10px; align-items:center;">
-                         <span style="font-size:0.55rem; padding:4px 8px; border-radius:4px; background:${colorEstado}; color:black; font-weight:bold; text-transform:uppercase;">
-                            ${c.estado}
-                         </span>
-                         
-                         <button onclick='recomprarDesdeSKUMaestro(${c.receta})' 
-                                 style="background:none; border:1px solid var(--cian); color:var(--cian); padding:5px 12px; border-radius:5px; font-size:0.6rem; font-weight:bold; cursor:pointer; transition: 0.3s;"
-                                 onmouseover="this.style.background='var(--cian)'; this.style.color='black';"
-                                 onmouseout="this.style.background='none'; this.style.color='var(--cian)';">
-                            RE-COMPRAR
-                         </button>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-
-    }).obtenerHistorial(sessionUser.email);
+    if (res && res.length > 0) {
+      container.innerHTML = res.map(v => `
+        <div class="historial-item">
+          <div class="h-info">
+            <span class="h-id">${v.ID_PEDIDO}</span>
+            <span class="h-date">${v.FECHA}</span>
+          </div>
+          <div class="h-details">
+            <div class="h-total">$${Number(v.TOTAL_A_PAGAR).toLocaleString('es-CL')}</div>
+            <div class="h-status status-${v.ESTADO.toLowerCase()}">${v.ESTADO}</div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      container.innerHTML = `
+        <div style="text-align:center; padding:30px; color:#555;">
+          <i class="fas fa-box-open" style="font-size:2rem; margin-bottom:10px; opacity:0.3;"></i>
+          <p>Aún no has realizado compras en esta dimensión.</p>
+        </div>`;
+    }
+  } catch (e) {
+    console.error("Falla en el historial:", e);
+    container.innerHTML = "<p style='color:var(--amber); text-align:center;'>Error al conectar con la base de datos.</p>";
+  }
 }
 
 // LA FUNCIÓN MÁGICA: Desglosa el SKU Maestro y llena el carrito real
@@ -2641,43 +2619,29 @@ function mostrarBuzon() {
     };
 }
 
-function cargarChat() {
-  const chatBox = document.getElementById('chat-box');
-  
-  google.script.run.withSuccessHandler(function(mensajes) {
-    if (!mensajes || mensajes.length === 0) {
-      chatBox.innerHTML = `
-        <div style="text-align:center; color:#666; margin-top:100px;">
-          <i class="fas fa-ghost" style="font-size:2.5rem; opacity:0.2; margin-bottom:10px;"></i>
-          <p>No hay mensajes en el historial.</p>
-          <p style="font-size:0.7rem; opacity:0.7;">Escribe abajo para iniciar contacto con el Admin.</p>
-        </div>`;
-      return;
-    }
+async function cargarChat() {
+  if (!sessionUser) return;
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
 
-    // Renderizado tipo WhatsApp
-    chatBox.innerHTML = mensajes.reverse().map(m => {
-      // Verificamos si el mensaje lo envió el cliente logueado
-      const esMio = (m.emisor === sessionUser.email.toLowerCase().trim());
-      
-      // Lógica de estilos condicionales
-      const align = esMio ? 'flex-end' : 'flex-start';
-      const bg = esMio ? 'var(--neon-green)' : '#1a1a1a';
-      const color = esMio ? 'black' : 'white';
-      const radius = esMio ? 'border-bottom-right-radius: 2px;' : 'border-bottom-left-radius: 2px;';
-      const border = esMio ? 'none' : '1px solid #333';
-
-      return `
-      <div style="align-self: ${align}; background: ${bg}; color: ${color}; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 0.85rem; line-height: 1.4; word-wrap: break-word; border: ${border}; ${radius}">
-        ${m.mensaje}
-        <div style="font-size: 0.55rem; opacity: ${esMio ? '0.6' : '0.4'}; margin-top: 4px; text-align: right;">${m.fecha}</div>
-      </div>
-      `;
-    }).join('');
+  try {
+    // FOCUS: Petición al servidor mediante el nuevo motor fetch
+    const res = await ejecutarEnServidor("obtenerMensajes", { email: sessionUser.email });
     
-    // Auto-scroll al final del chat
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }).obtenerMensajes(sessionUser.email);
+    if (res && res.length > 0) {
+      container.innerHTML = res.map(m => `
+        <div class="message ${m.EMISOR === 'ADMIN' ? 'admin' : 'user'}">
+          <div class="msg-bubble">${m.MENSAJE}</div>
+          <div class="msg-time">${m.FECHA}</div>
+        </div>
+      `).join('');
+      container.scrollTop = container.scrollHeight;
+    } else {
+      container.innerHTML = '<p style="text-align:center; color:#666; font-size:0.8rem; margin-top:20px;">No hay transmisiones aún. ¡Inicia el contacto!</p>';
+    }
+  } catch (e) {
+    console.error("Error en el sensor de mensajes:", e);
+  }
 }
 
 async function ejecutarEnvioMensaje() {
@@ -2777,15 +2741,20 @@ function enviarSolicitudSoporte() {
   }
 }
 
-function ejecutarEnvioFinal(msg, adjunto) {
-  google.script.run.withSuccessHandler(() => {
+async function ejecutarEnvioFinal(msg, adjunto) {
+  try {
+    const res = await ejecutarEnServidor("enviarCorreoSoporte", { msg: msg, adjunto: adjunto });
     mostrarToast("🚀 Solicitud enviada al Centro de Mando.");
     cerrarSoporte();
     document.getElementById('soporte-mensaje').value = "";
     document.getElementById('soporte-adjunto').value = "";
     document.getElementById('btn-envio-soporte').disabled = false;
     document.getElementById('btn-envio-soporte').innerText = "ENVIAR SOLICITUD";
-  }).enviarCorreoSoporte(msg, adjunto);
+  } catch (err) {
+    mostrarToast("Falla de conexión al enviar la solicitud.");
+    document.getElementById('btn-envio-soporte').disabled = false;
+    document.getElementById('btn-envio-soporte').innerText = "ENVIAR SOLICITUD";
+  }
 }
 
 function renderRadar(productos) {
