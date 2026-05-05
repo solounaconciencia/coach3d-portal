@@ -1174,14 +1174,8 @@ select.nave-input {
   transform: rotate(90deg) scale(1.1); /* Efecto visual dinámico */
 }
 </style>    
-</head>
-<body>
 
-    <!DOCTYPE html>
-<html>
-<head>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <base target="_top">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
   
@@ -1327,8 +1321,7 @@ select.nave-input {
   to { transform: translateX(0); opacity: 1; }
 }
   </style>
-</head>
-<body>
+
   <div class="admin-nav">
     <button class="tab-btn active" onclick="showSection('dash', this)"><i class="fas fa-chart-line"></i> MÉTRICAS</button>
     <button class="tab-btn" onclick="showSection('stock', this)"><i class="fas fa-boxes"></i> INVENTARIO</button>
@@ -1510,20 +1503,47 @@ select.nave-input {
 </body>
 </html>
     <script>
+
+// ==========================================
+// MOTOR API GITHUB -> GOOGLE (FOCUS)
+// ==========================================
+const API_URL = "https://script.google.com/macros/s/AKfycbw0cHjH0zJVx4BqUHNfjXnZUbyIZHJfsCerUkufhG_MG763ai18VAKq-Dkne3IOHpzvZQ/exec";
+
+async function ejecutarEnServidor(action, data = null) {
+    const url = `${API_URL}?action=${action}`;
+    const options = { method: data ? "POST" : "GET", mode: "cors" };
+    if (data) {
+        options.body = JSON.stringify(data);
+        options.headers = { "Content-Type": "text/plain;charset=utf-8" };
+    }
+    const response = await fetch(url, options);
+    return await response.json();
+}
 let globalStock = [];
 let promoSkuActive = "";
 let miGrafico = null;
 
 // INICIO DE LA NAVE
-window.onload = function() {
-  google.script.run.withSuccessHandler(inicializarAdmin).getAdminDashboardData();
+document.addEventListener('DOMContentLoaded', async function() {  // Blindaje de Seguridad Local
+  const session = JSON.parse(localStorage.getItem('weed_session'));
+  if (!session || session.rol !== 'Admin') {
+      document.body.innerHTML = "<h1 style='color:var(--cian); text-align:center; margin-top:100px; font-family:Orbitron;'>ACCESO DENEGADO</h1>";
+      return;
+  }
+
+  try {
+      const res = await ejecutarEnServidor("getAdminDashboardData");
+      inicializarAdmin(res);
+  } catch(e) { 
+      alert("Error de conexión al Iniciar Mando Central."); 
+  }
   
-  // Sensores de cálculo automático (Venta Manual)
+  // Sensores de cálculo automático (Venta Manual) - INTACTOS
   const sel = document.getElementById('manual-prod-select');
   const can = document.getElementById('manual-cantidad');
   if(sel) sel.addEventListener('change', actualizarPreviewManual);
   if(can) can.addEventListener('input', actualizarPreviewManual);
-};
+});
 
 function inicializarAdmin(res) {
   globalStock = res.productos;
@@ -1564,14 +1584,17 @@ function filtrarStock() {
   renderStock(filtrados);
 }
 
-function saveQuick(sku) {
+async function saveQuick(sku) {
   const precio = document.getElementById('pr-' + sku).value;
   const stock = document.getElementById('st-' + sku).value;
-  google.script.run.withSuccessHandler(() => {
+  try {
+    await ejecutarEnServidor("actualizarProductoAdmin", {sku: sku, precio: precio, stock: stock});
     alert("SISTEMA: Producto " + sku + " actualizado.");
     const idx = globalStock.findIndex(it => it.SKU === sku);
     if(idx !== -1) { globalStock[idx].PRECIO = precio; globalStock[idx].STOCK = stock; }
-  }).actualizarProductoAdmin(sku, precio, stock);
+  } catch(e) {
+    alert("Error de red al guardar producto.");
+  }
 }
 
 // --- SECCIÓN PROMOCIONES ---
@@ -1581,13 +1604,16 @@ function openPromo(sku, nombre) {
   document.getElementById('modal-promo').style.display = 'flex';
 }
 
-function aplicarPromo() {
+async function aplicarPromo() {
   const tipo = document.getElementById('tipo-promo-select').value;
   const detalle = document.getElementById('detalle-promo-input').value;
-  google.script.run.withSuccessHandler(() => {
+  try {
+    await ejecutarEnServidor("guardarPromoAdmin", {sku: promoSkuActive, tipo: tipo, detalle: detalle});
     alert("SISTEMA: Promoción aplicada.");
     cerrarPromo();
-  }).guardarPromoAdmin(promoSkuActive, tipo, detalle);
+  } catch(e) {
+    alert("Error al aplicar la promoción.");
+  }
 }
 
 function cerrarPromo() { document.getElementById('modal-promo').style.display = 'none'; }
@@ -1611,22 +1637,31 @@ function actualizarPreviewManual() {
   document.getElementById('manual-total-preview').innerText = "$" + (precio * cant).toLocaleString();
 }
 
-function procesarVentaManual() {
+async function procesarVentaManual() {
   const sku = document.getElementById('manual-prod-select').value;
   const cant = document.getElementById('manual-cantidad').value;
   if(!sku) return alert("Selecciona un producto.");
   
-  google.script.run.withSuccessHandler(() => {
+  try {
+    await ejecutarEnServidor("registrarVentaManualServidor", {sku: sku, cant: cant});
     alert("VENTA EXITOSA");
     cerrarVentaManual();
-    google.script.run.withSuccessHandler(inicializarAdmin).getAdminDashboardData();
-  }).registrarVentaManualServidor(sku, cant);
+    const res = await ejecutarEnServidor("getAdminDashboardData");
+    inicializarAdmin(res);
+  } catch(e) {
+    alert("Error de conexión al registrar venta.");
+  }
 }
 
 // --- SECCIÓN GRÁFICO (RADAR) ---
-function actualizarGrafico() {
+async function actualizarGrafico() {
   const meses = document.getElementById('periodo-selector').value;
-  google.script.run.withSuccessHandler(renderizarGrafico).getHistoricalData(meses);
+  try {
+    const data = await ejecutarEnServidor("getHistoricalData", {meses: meses});
+    renderizarGrafico(data);
+  } catch(e) { 
+    console.error("Error al cargar gráfico", e); 
+  }
 }
 
 function showSection(id, btn) {
@@ -1724,15 +1759,22 @@ let currentChatEmail = "";
 let dataBuzonGlobal = [];
 
 // CARGA INICIAL Y REFRESCO CADA 60 SEG
-setInterval(() => {
+// CARGA INICIAL Y REFRESCO CADA 60 SEG
+setInterval(async () => {
   if (document.getElementById('buzon').classList.contains('active')) {
-    google.script.run.withSuccessHandler(renderizarListaUsuarios).obtenerResumenBuzon();
+    try {
+      const usuarios = await ejecutarEnServidor("obtenerResumenBuzon");
+      renderizarListaUsuarios(usuarios);
+    } catch(e) { console.error("Error al auto-refrescar buzón", e); }
   }
 }, 60000);
 
 // Esta función debe llamarse al hacer clic en la pestaña BUZON
-function cargarBuzon() {
-  google.script.run.withSuccessHandler(renderizarListaUsuarios).obtenerResumenBuzon();
+async function cargarBuzon() {
+  try {
+    const usuarios = await ejecutarEnServidor("obtenerResumenBuzon");
+    renderizarListaUsuarios(usuarios);
+  } catch(e) { console.error("Error al cargar buzón", e); }
 }
 
 function renderizarListaUsuarios(usuarios) {
@@ -1753,7 +1795,7 @@ function renderizarListaUsuarios(usuarios) {
   `).join('');
 }
 
-function abrirChat(email) {
+async function abrirChat(email) {
   currentChatEmail = email;
   document.getElementById('chat-header').innerText = "CONVERSACIÓN: " + email;
   document.getElementById('chat-input-area').style.display = 'flex';
@@ -1761,8 +1803,12 @@ function abrirChat(email) {
   
   renderizarListaUsuarios(dataBuzonGlobal);
   
-  // Aquí SÍ se usa 'google' (porque estamos en el navegador)
-  google.script.run.withSuccessHandler(renderizarChat).obtenerChatUsuario(email);
+  try {
+    const mensajes = await ejecutarEnServidor("obtenerChatUsuario", {email: email});
+    renderizarChat(mensajes);
+  } catch(e) { 
+    document.getElementById('chat-mensajes').innerHTML = '<p style="color:var(--amber); text-align:center;">Error de conexión con el buzón.</p>';
+  }
 }
 
 function renderizarChat(mensajes) {
@@ -1788,16 +1834,21 @@ function renderizarChat(mensajes) {
   contenedor.scrollTop = contenedor.scrollHeight;
 }
 
-function enviarMensajeBuzon() {
+async function enviarMensajeBuzon() {
   const input = document.getElementById('msj-admin-input');
   const msj = input.value.trim();
   if (!msj || !currentChatEmail) return;
 
   input.value = "Enviando...";
-  google.script.run.withSuccessHandler(() => {
+  try {
+    await ejecutarEnServidor("enviarRespuestaAdmin", {email: currentChatEmail, msj: msj});
     input.value = "";
-    google.script.run.withSuccessHandler(renderizarChat).obtenerChatUsuario(currentChatEmail);
-  }).enviarRespuestaAdmin(currentChatEmail, msj);
+    const mensajes = await ejecutarEnServidor("obtenerChatUsuario", {email: currentChatEmail});
+    renderizarChat(mensajes);
+  } catch(e) { 
+    alert("Error al enviar mensaje"); 
+    input.value = msj; 
+  }
 }
 
 // ESTA ES LA FUNCIÓN QUE TE FALTABA
@@ -1818,8 +1869,10 @@ function mostrarNotificacion(msj) {
 }
 
 // --- FUNCIONES DEL PANEL DE AJUSTES ---
-function cargarAjustesPanel() {
-  google.script.run.withSuccessHandler(ajustes => {
+async function cargarAjustesPanel() {
+  try {
+    // FOCUS: Motor API
+    const ajustes = await ejecutarEnServidor("getConfig");
     document.getElementById('aj_estado').value = ajustes['ESTADO_TIENDA'] || 'ABIERTO';
     document.getElementById('aj_anuncio_texto').value = ajustes['ANUNCIO_TEXTO'] || '';
     document.getElementById('aj_anuncio_imagen').value = ajustes['ANUNCIO_IMAGEN'] || '';
@@ -1838,10 +1891,10 @@ function cargarAjustesPanel() {
     document.getElementById('aj_banco_rut').value = ajustes['BANCO_RUT'] || '';
     document.getElementById('aj_banco_numero').value = ajustes['BANCO_NUMERO'] || '';
     document.getElementById('aj_banco_correo').value = ajustes['BANCO_CORREO'] || '';
-  }).getConfig(); // Usamos getConfig para aprovechar la función ya creada
+  } catch(e) { console.error("Error al cargar ajustes", e); }
 }
 
-function guardarAjustesPanel(btn) {
+async function guardarAjustesPanel(btn) {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
   btn.disabled = true;
 
@@ -1866,14 +1919,20 @@ function guardarAjustesPanel(btn) {
     'BANCO_CORREO': document.getElementById('aj_banco_correo').value
   };
 
-  google.script.run.withSuccessHandler(res => {
+  try {
+    await ejecutarEnServidor("guardarAjustes", nuevos);
     btn.innerHTML = '<i class="fas fa-check"></i> GUARDADO EXITOSO';
     setTimeout(() => {
       btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CONFIGURACIÓN MAESTRA';
       btn.disabled = false;
     }, 2000);
-  }).guardarAjustes(nuevos);
+  } catch(e) {
+    alert("Error de red al guardar ajustes.");
+    btn.innerHTML = '<i class="fas fa-save"></i> REINTENTAR';
+    btn.disabled = false;
+  }
 }
+        
 </script>
 
 </body>
