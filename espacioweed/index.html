@@ -2757,28 +2757,35 @@ async function ejecutarEnvioFinal(msg, adjunto) {
   }
 }
 
-function renderRadar(productos) {
+async function renderRadar(productos) {
   const wrapper = document.getElementById('wrapper-sugerencias');
   if (!wrapper) return;
-  
-  // Si no hay productos en el radar, cargamos las sugerencias generales de siempre
+
+  // Si no hay productos en el radar, cargamos las sugerencias generales
   if (!productos || productos.length === 0) {
-    return google.script.run.withSuccessHandler(renderSugerenciasDinamicas).getDashboardData(sessionUser.email);
+    try {
+      // CORRECCIÓN FOCUS: Cambio a ejecutarEnServidor
+      const dataDash = await ejecutarEnServidor("getDashboardData", { email: sessionUser.email });
+      renderSugerenciasDinamicas(dataDash);
+    } catch (err) {
+      console.error("Error al cargar sugerencias:", err);
+    }
+    return;
   }
 
   document.getElementById('titulo-sugerencias').innerText = "CONTINUAR VIENDO...";
 
   wrapper.innerHTML = productos.map((p, i) => `
-    <div class="sugerencia-item ${i === 0 ? 'active' : ''}" id="sug-${i}">
-        <img src="${p.IMAGEN_URL}" class="img-sug">
-        <div class="info-sug">
-            <span class="badge-desc">VISTO RECIENTEMENTE</span>
-            <div style="font-size:0.8rem; font-weight:bold; color:white; margin:5px 0;">${p.NOMBRE}</div>
-            <div class="cian" style="font-weight:bold; margin-top:5px;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>
-            <button class="btn-buy-now" style="font-size:0.5rem; padding:5px 10px; margin-top:5px;" 
-                    onclick="agregarAlCarrito('${p.SKU}')">AÑADIR</button>
-        </div>
+  <div class="sugerencia-item ${i === 0 ? 'active' : ''}" id="sug-${i}">
+    <img src="${p.IMAGEN_URL}" class="img-sug">
+    <div class="info-sug">
+      <span class="badge-desc">VISTO RECIENTEMENTE</span>
+      <div style="font-size:0.8rem; font-weight:bold; color:white; margin:5px 0;">${p.NOMBRE}</div>
+      <div class="cian" style="font-weight:bold; margin-top:5px;">$${Number(p.PRECIO).toLocaleString('es-CL')}</div>
+      <button class="btn-buy-now" style="font-size:0.5rem; padding:5px 10px; margin-top:5px;"
+      onclick="agregarAlCarrito('${p.SKU}')">AÑADIR</button>
     </div>
+  </div>
   `).join('');
 }
 
@@ -2786,19 +2793,26 @@ function renderRadar(productos) {
  * FUNCIÓN: cargarChatAdmin
  * Esta función es solo para Diego. Carga TODOS los mensajes de la hoja BUZON.
  */
-function cargarChatAdmin() {
-    google.script.run.withSuccessHandler(function(todosLosMensajes) {
-        const chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML = todosLosMensajes.map(m => `
-            <div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">
-                <small style="color:var(--amber);">${m.emisor} -> ${m.receptor}</small>
-                <p style="font-size:0.75rem; margin:2px 0;">${m.mensaje}</p>
-                <button onclick="prepararRespuesta('${m.emisor}')" style="font-size:0.5rem; background:var(--cian); border:none; padding:2px 5px; cursor:pointer;">RESPONDER</button>
-            </div>
-        `).join('');
-    }).obtenerTodosLosMensajes(); // Debes crear esta función en el GS
-}
+async function cargarChatAdmin() {
+  try {
+    // CORRECCIÓN FOCUS: Cambio a ejecutarEnServidor
+    const todosLosMensajes = await ejecutarEnServidor("obtenerTodosLosMensajes");
+    
+    const chatBox = document.getElementById('chat-box');
+    if(!chatBox) return;
 
+    chatBox.innerHTML = todosLosMensajes.map(m => `
+    <div style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">
+      <small style="color:var(--amber);">${m.emisor} -> ${m.receptor}</small>
+      <p style="font-size:0.75rem; margin:2px 0;">${m.mensaje}</p>
+      <button onclick="prepararRespuesta('${m.emisor}')" style="font-size:0.5rem; background:var(--cian); border:none; padding:2px 5px; cursor:pointer;">RESPONDER</button>
+    </div>
+    `).join('');
+  } catch (err) {
+    console.error("Error al cargar chat admin", err);
+  }
+}
+    
 function prepararRespuesta(clienteEmail) {
     document.getElementById('msg-input').value = "@" + clienteEmail + " ";
     document.getElementById('msg-input').focus();
