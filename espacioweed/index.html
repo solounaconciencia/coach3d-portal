@@ -1577,63 +1577,66 @@ async function ejecutarEnServidor(action, data = null) {
 /**
  * INICIALIZACIÓN DEL SISTEMA
  */
-window.onload = async function() {
-    console.log("Iniciando Secuencia de Despegue desde GitHub...");
-    
-    try {
-        // 1. CARGA MASIVA: Traemos Config, Auspiciadores, Destacados y Productos en 1 segundo.
-        const data = await ejecutarEnServidor("getInitialData");
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log("Iniciando Secuencia de Despegue Escalonado...");
 
-        // 2. CONFIGURACIÓN Y ANUNCIO
-        configGlobal = data.config;
-        renderSocials();
-        if (typeof verificarAnuncio === "function") verificarAnuncio(); 
+  try {
+    // 1. CARGA MASIVA AL SERVIDOR
+    const data = await ejecutarEnServidor("getInitialData");
 
-        // 3. AUSPICIADORES
-        const sectionAuspi = document.getElementById('auspiciadores-section');
-        const contentAuspi = document.getElementById('marquee-content');
-        if (data.auspiciadores && data.auspiciadores.length > 0 && sectionAuspi && contentAuspi) {
-            sectionAuspi.style.display = 'block';
-            let logosHtml = data.auspiciadores.map(a => `<img src="${a.logo}" alt="${a.nombre}" title="${a.nombre}" onerror="this.style.display='none'">`).join('');
-            contentAuspi.innerHTML = (data.auspiciadores.length > 5) ? logosHtml + logosHtml : logosHtml;
-            if (data.auspiciadores.length > 5) contentAuspi.classList.add('scrolling');
-        }
+    // 2. PRIORIDAD 1 (0 ms): Configuración, Anuncio y Redes
+    configGlobal = data.config;
+    renderSocials();
+    if (typeof verificarAnuncio === "function") verificarAnuncio();
 
-        // 4. DESTACADOS (SLIDER)
-        const containerSlider = document.getElementById('hero-slider');
-        if (data.destacados && data.destacados.length > 0 && containerSlider) {
-            containerSlider.innerHTML = data.destacados.map((s, i) => `
-                <div class="slide ${i === 0 ? 'active' : ''}">
-                    <img src="${s.img}" class="img-slide" alt="${s.nombre}" onerror="this.src='https://i.postimg.cc/1RF0H6Ff/Logoew.png'">
-                    <div class="slide-content">
-                        <h2 class="amber">${s.titulo}</h2>
-                        <h1>${s.nombre}</h1>
-                        <p>${s.desc}</p>
-                        <div class="price-display" style="color:var(--cian); font-weight:bold; font-size:1.3rem; margin-bottom:15px;">
-                            $${Number(s.precio).toLocaleString('es-CL')}
-                        </div>
-                        <button class="btn-banner-buy" onclick="abrirDetalle('${s.sku}')">
-                            VER DETALLES <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('') + '<button class="slider-prev" onclick="cambiarSlide(-1)">&#10094;</button><button class="slider-next" onclick="cambiarSlide(1)">&#10095;</button>';
-            if (typeof iniciarAnimacionSlider === "function") iniciarAnimacionSlider();
-        }
+    // 3. PRIORIDAD 2 (400 ms): Slider y Auspiciadores (Estética)
+    setTimeout(() => {
+      const sectionAuspi = document.getElementById('auspiciadores-section');
+      const contentAuspi = document.getElementById('marquee-content');
+      if (data.auspiciadores && data.auspiciadores.length > 0 && sectionAuspi && contentAuspi) {
+        sectionAuspi.style.display = 'block';
+        let logosHtml = data.auspiciadores.map(a => `<img src="${a.logo}" alt="${a.nombre}" title="${a.nombre}" onerror="this.style.display='none'">`).join('');
+        contentAuspi.innerHTML = (data.auspiciadores.length > 5) ? logosHtml + logosHtml : logosHtml;
+        if (data.auspiciadores.length > 5) contentAuspi.classList.add('scrolling');
+      }
 
-        // 5. VITRINA PRINCIPAL
-        productosGlobal = data.productos;
-        const loadingMsg = document.getElementById('loading-msg');
-        if(loadingMsg) loadingMsg.remove();
-        if (typeof renderProductos === "function") renderProductos(productosGlobal);
-        if (typeof generarMenuCategorias === "function") generarMenuCategorias(productosGlobal);
+      const containerSlider = document.getElementById('hero-slider');
+      if (data.destacados && data.destacados.length > 0 && containerSlider) {
+        containerSlider.innerHTML = data.destacados.map((s, i) => `
+          <div class="slide ${i === 0 ? 'active' : ''}">
+            <img src="${s.img}" class="img-slide" alt="${s.nombre}" onerror="this.src='https://i.postimg.cc/1RF0H6Ff/Logoew.png'">
+            <div class="slide-content">
+              <h2 class="amber">${s.titulo}</h2>
+              <h1>${s.nombre}</h1>
+              <p>${s.desc}</p>
+              <div class="price-display" style="color:var(--cian); font-weight:bold; font-size:1.3rem; margin-bottom:15px;">
+                $${Number(s.precio).toLocaleString('es-CL')}
+              </div>
+              <button class="btn-banner-buy" onclick="abrirDetalle('${s.sku}')">
+                VER DETALLES <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        `).join('') + '<button class="slider-prev" onclick="cambiarSlide(-1)">&#10094;</button><button class="slider-next" onclick="cambiarSlide(1)">&#10095;</button>';
+        if (typeof iniciarAnimacionSlider === "function") iniciarAnimacionSlider();
+      }
+    }, 400);
 
-        console.log("Nave 100% Desplegada y Operativa.");
+    // 4. PRIORIDAD 3 (800 ms): Catálogo Completo y Filtros
+    setTimeout(() => {
+      productosGlobal = data.productos;
+      const loadingMsg = document.getElementById('loading-msg');
+      if(loadingMsg) loadingMsg.remove();
+      if (typeof renderProductos === "function") renderProductos(productosGlobal);
+      if (typeof generarMenuCategorias === "function") generarMenuCategorias(productosGlobal);
+      
+      console.log("Nave 100% Desplegada y Operativa.");
+    }, 800);
 
-    } catch (error) {
-        console.error("Falla en la carga inicial:", error);
-    }
-};
+  } catch (error) {
+    console.error("Falla en la carga inicial:", error);
+  }
+});
 
 /**
  * MOTOR DE BÚSQUEDA Y FILTRADO DINÁMICO
