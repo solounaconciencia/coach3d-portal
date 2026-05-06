@@ -489,32 +489,6 @@ body {
 }
 
 .cart-header h3 { font-family: var(--font-brand); margin: 0; letter-spacing: 2px; }
-.close-cart {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 45px;         /* Área de clic ampliada para pulgares */
-  height: 45px;
-  display: flex;       /* Centrado perfecto */
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;     /* 'X' más grande y clara */
-  cursor: pointer;
-  color: var(--neon-green); /* Color de marca activo */
-  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para resaltar sobre cualquier imagen */
-  border: 1px solid rgba(46, 204, 113, 0.3);
-  border-radius: 50%;  /* Botón circular */
-  transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 2000;       /* Siempre por encima de todo */
-  line-height: 1;
-  user-select: none;   /* Evita seleccionar el texto por error */
-}
-.close-cart:hover {
-  background: var(--neon-green);
-  color: #000 !important;
-  box-shadow: 0 0 20px var(--neon-green);
-  transform: rotate(90deg) scale(1.1); /* Efecto visual dinámico */
-}
 
 .cart-items-container {
   flex: 1;
@@ -782,32 +756,7 @@ body {
 /* 3. Textos informativos */
 .nave-text { font-size: 0.8rem; color: #ccc; margin-bottom: 20px; }
 
-.close-nave {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 45px;         /* Área de clic ampliada para pulgares */
-  height: 45px;
-  display: flex;       /* Centrado perfecto */
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;     /* 'X' más grande y clara */
-  cursor: pointer;
-  color: var(--neon-green); /* Color de marca activo */
-  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para resaltar sobre cualquier imagen */
-  border: 1px solid rgba(46, 204, 113, 0.3);
-  border-radius: 50%;  /* Botón circular */
-  transition: 0.3s all cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 2000;       /* Siempre por encima de todo */
-  line-height: 1;
-  user-select: none;   /* Evita seleccionar el texto por error */
-}
-.close-nave:hover { 
-  background: var(--neon-green);
-  color: #000 !important;
-  box-shadow: 0 0 20px var(--neon-green);
-  transform: rotate(90deg) scale(1.1); /* Efecto visual dinámico */
-}
+
 .nave-input {
     width: 100%;
     align-self: stretch;
@@ -876,13 +825,14 @@ body {
         grid-template-columns: 1fr 1fr; /* 2 botones por fila en lugar de 3 si es muy angosto */
     }
 
-    /* Ajuste táctil para los botones de cierre (Protocolo FOCUS) */
-    .close-nave, .close-cart {
+    /* Ajuste táctil unificado para los botones de cierre en móviles */
+    .close, .close-nave, .close-cart, .modal-close {
         top: 10px;
         right: 10px;
-        width: 50px;       /* Área generosa para el pulgar */
+        width: 50px;
         height: 50px;
-        background: rgba(0, 0, 0, 0.8); /* Mayor contraste en exteriores */
+        font-size: 35px; /* X más grande para el pulgar */
+        background: rgba(0, 0, 0, 0.9);
         border: 2px solid var(--neon-green);
     }
 }
@@ -1165,17 +1115,43 @@ select.nave-input {
 .nav-btn:hover { background: var(--cian); color: black; }
 .prev { left: 10px; }
 .next { right: 10px; }
-.close-nave:active {
-  background: var(--neon-green);
-    color: #000 !important;
-    box-shadow: 0 0 20px var(--neon-green);
-    transform: rotate(90deg) scale(1.1); /* Efecto visual dinámico */
+/* ==========================================
+   ESTÉTICA UNIVERSAL: BOTONES DE CIERRE (X) 
+   ========================================== */
+.close, .close-nave, .close-cart, .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-family: var(--font-brand);
+    color: var(--neon-green);
+    background: rgba(2, 2, 4, 0.95); /* Fondo espacial oscuro */
+    border: 1px solid rgba(46, 204, 113, 0.4);
+    border-radius: 8px; /* Look tecnológico (cuadrado con bordes suaves) */
+    cursor: pointer;
+    transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 100000;
+    line-height: 1;
+    user-select: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
-.close-cart:active {
-  background: var(--neon-green);
-  color: #000 !important;
-  box-shadow: 0 0 20px var(--neon-green);
-  transform: rotate(90deg) scale(1.1); /* Efecto visual dinámico */
+
+.close:hover, .close-nave:hover, .close-cart:hover, .modal-close:hover {
+    background: var(--neon-green);
+    color: black !important;
+    box-shadow: 0 0 15px var(--neon-green);
+    transform: rotate(90deg) scale(1.1); /* Giro mecánico al pasar el dedo/mouse */
+    border-color: var(--neon-green);
+}
+
+.close:active, .close-nave:active, .close-cart:active, .modal-close:active {
+    transform: scale(0.95); /* Hundimiento al hacer clic */
+    box-shadow: none;
 }
 </style>    
 </head>
