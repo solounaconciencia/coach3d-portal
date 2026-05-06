@@ -1317,12 +1317,14 @@ select.nave-input {
 }
 
 @keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+from { transform: translateX(100%); opacity: 0; }
+to { transform: translateX(0); opacity: 1; }
 }
-  </style>
+</style>
+</head>
+<body>
 
-  <div class="admin-nav">
+<div class="admin-nav">
     <button class="tab-btn active" onclick="showSection('dash', this)"><i class="fas fa-chart-line"></i> MÉTRICAS</button>
     <button class="tab-btn" onclick="showSection('stock', this)"><i class="fas fa-boxes"></i> INVENTARIO</button>
     <button class="tab-btn" onclick="showSection('buzon', this)"><i class="fas fa-envelope"></i> BUZÓN</button>
@@ -1500,9 +1502,7 @@ select.nave-input {
   </div>
 </div>
 
-</body>
-</html>
-    <script>
+<script>
 
 // ==========================================
 // MOTOR API GITHUB -> GOOGLE (FOCUS)
@@ -1511,7 +1511,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwpzm-n0UUwvEgYOCtPDE6Z
 
 async function ejecutarEnServidor(action, data = null) {
     const url = `${API_URL}?action=${action}`;
-    // FOCUS: Si no hay datos, creamos un objeto vacío para forzar la puerta POST
     const payload = data || {}; 
     const options = { 
         method: "POST", 
@@ -1519,8 +1518,13 @@ async function ejecutarEnServidor(action, data = null) {
         body: JSON.stringify(payload),
         headers: { "Content-Type": "text/plain;charset=utf-8" }
     };
-    const response = await fetch(url, options);
-    return await response.json();
+    try {
+        const response = await fetch(url, options);
+        return await response.json();
+    } catch (e) {
+        console.error("Falla de API en acción: " + action, e);
+        throw e;
+    }
 }
         
 let globalStock = [];
