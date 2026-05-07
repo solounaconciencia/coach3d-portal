@@ -1702,10 +1702,17 @@ function renderProductos(lista) {
   grid.innerHTML = lista.map(function(p) {
     const stockBajo = (Number(p.STOCK) < 5);
     const imgUrl = p.IMAGEN_URL || 'https://i.postimg.cc/1RF0H6Ff/Logoew.png';
-    
+    // FOCUS: Lógica de etiquetas de promoción
+    let promoLabel = '';
+    if (p.TIPO_PROMO === 'Descuento') {
+        promoLabel = `<div class="scarcity-label" style="background:var(--amber); color:black; top:45px;">OFERTA</div>`;
+    } else if (p.TIPO_PROMO === 'Regalo') {
+        promoLabel = `<div class="scarcity-label" style="background:var(--cian); color:black; top:45px;">+ REGALO</div>`;
+    }
     return `
       <div class="product-card" onclick="abrirDetalle('${p.SKU}')">
         ${stockBajo ? '<div class="scarcity-label">STOCK CRÍTICO</div>' : ''}
+        ${promoLabel}
         <img src="${imgUrl}" loading="lazy" alt="${p.NOMBRE}" onerror="this.src='https://i.postimg.cc/1RF0H6Ff/Logoew.png'">
         <div class="more-info-btn">MÁS INFO</div>
         <div style="padding:15px; text-align:center;">
@@ -1744,9 +1751,14 @@ function abrirDetalle(sku) {
         </div>
 
         <h2 class="cian" style="margin-bottom:5px;">${p.NOMBRE}</h2>
-        <p style="color:var(--amber); font-weight:bold; font-size:1.2rem; margin-bottom:15px;">
-            $${Number(p.PRECIO).toLocaleString('es-CL')}
-        </p>
+<p style="color:var(--amber); font-weight:bold; font-size:1.2rem; margin-bottom:15px;">
+${(p.TIPO_PROMO === 'Descuento' && p.DETALLE_PROMO) ? 
+    `<span class="precio-old" style="text-decoration:line-through; color:#888; font-size:0.9rem; margin-right:10px;">$${Number(p.PRECIO).toLocaleString('es-CL')}</span>
+     <span class="precio-promo">$${(Number(p.PRECIO) - Number(p.DETALLE_PROMO)).toLocaleString('es-CL')}</span>` : 
+    `<span class="precio-promo">$${Number(p.PRECIO).toLocaleString('es-CL')}</span>`
+}
+</p>
+${p.TIPO_PROMO === 'Regalo' ? `<p style="color:var(--cian); font-size:0.8rem; margin-top:-10px; margin-bottom:15px;"><i class="fas fa-gift"></i> Incluye regalo por tu compra</p>` : ''}
 
         <div class="variantes-container" style="margin-bottom:20px;">
             ${crearSelectorVariante('SABOR', p.SABOR)}
@@ -1837,6 +1849,9 @@ function toggleCart(e) {
 function agregarAlCarrito(sku, variantes = "") {
   const p = productosGlobal.find(function(x) { return x.SKU == sku; });
   
+  // Seguro FOCUS: si no encuentra el producto, aborta para no romper la web
+  if (!p) return;
+
   // FOCUS: Buscamos si ya existe el mismo producto CON LA MISMA VARIANTE exacta
   const itemExistente = carrito.find(function(item) { 
       return item.sku === sku && item.variantes === variantes; 
@@ -1845,14 +1860,34 @@ function agregarAlCarrito(sku, variantes = "") {
   if (itemExistente) {
     itemExistente.cantidad++;
   } else {
+    // Cálculo de precio real
+    let precioFinal = (p.PRECIO_PROMO && Number(p.PRECIO_PROMO) > 0) ? Number(p.PRECIO_PROMO) : Number(p.PRECIO);
+    if (p.TIPO_PROMO === 'Descuento' && p.DETALLE_PROMO) {
+        precioFinal = Number(p.PRECIO) - Number(p.DETALLE_PROMO);
+    }
+    
     carrito.push({
       sku: p.SKU,
-      // Le pegamos la variante al nombre para que viaje a WhatsApp y a Mercado Pago
       nombre: p.NOMBRE + (variantes ? " [" + variantes + "]" : ""),
-      variantes: variantes, // Guardamos la variante en la memoria
-      precio: (p.PRECIO_PROMO && Number(p.PRECIO_PROMO) > 0) ? Number(p.PRECIO_PROMO) : Number(p.PRECIO),
+      variantes: variantes, 
+      precio: precioFinal,
       cantidad: 1
     });
+
+    // LÓGICA DE REGALO (Faltaba en tu función)
+    // Busca el producto regalado y lo añade a precio $0
+    if (p.TIPO_PROMO === 'Regalo' && p.DETALLE_PROMO) {
+      const regalo = productosGlobal.find(function(it) { return it.SKU === p.DETALLE_PROMO; });
+      if (regalo) {
+        carrito.push({
+          sku: regalo.SKU + "-REGALO",
+          nombre: "REGALO: " + regalo.NOMBRE,
+          variantes: "",
+          precio: 0,
+          cantidad: 1
+        });
+      }
+    }
   }
 
   actualizarUI();
