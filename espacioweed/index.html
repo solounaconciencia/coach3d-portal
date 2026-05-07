@@ -1562,7 +1562,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 2. PRIORIDAD 1 (0 ms): Configuración, Anuncio y Redes
     configGlobal = data.config;
-    renderSocials();
+    renderSocialIcons(); // FOCUS: Conectamos la función evolucionada correcta
     if (typeof verificarAnuncio === "function") verificarAnuncio();
 
     // 3. PRIORIDAD 2 (400 ms): Slider y Auspiciadores (Estética)
@@ -2057,21 +2057,6 @@ async function procesarCompra() {
       btn.disabled = false;
     }
   }
-}
-
-/**
- * FUNCIONES AUXILIARES Y ANIMACIONES
- */
-function renderSocials() {
-  const box = document.getElementById('social-box');
-  if (!box) return;
-  const links = [
-    {key: 'LINK_INSTAGRAM', icon: 'fa-instagram'}, 
-    {key: 'LINK_FACEBOOK', icon: 'fa-facebook'}
-  ];
-  box.innerHTML = links.map(function(l) {
-    return configGlobal[l.key] ? `<a href="${configGlobal[l.key]}" target="_blank" style="color:white; margin-left:15px; font-size:1.1rem;"><i class="fab ${l.icon}"></i></a>` : '';
-  }).join('');
 }
 
 function irWhatsApp() {
@@ -2573,25 +2558,30 @@ function actualizarInterfazSesion() {
  */
 async function mostrarHistorial() {
   if (!sessionUser) return;
-  const container = document.getElementById('historial-lista');
-  if (!container) return;
   
+  // 1. CORRECCIÓN FOCUS: Cambiamos la vista para que el cliente VEA la pantalla
+  cambiarVistaComunidad('historial');
+  
+  // 2. CORRECCIÓN FOCUS: El ID exacto que tienes en tu HTML (Línea 1267)
+  const container = document.getElementById('lista-historial');
+  if (!container) return;
+
   container.innerHTML = "<div class='loading-spinner-small'></div><p style='text-align:center; font-size:0.8rem;'>Rastreando registros pasados...</p>";
 
   try {
-    // FOCUS: Solicitamos el historial a la base de datos de Google
     const res = await ejecutarEnServidor("obtenerHistorial", { email: sessionUser.email });
-    
+
     if (res && res.length > 0) {
+      // 3. CORRECCIÓN FOCUS: Usar las variables exactas que devuelve tu Codigo.gs (Líneas 4824-4828)
       container.innerHTML = res.map(v => `
-        <div class="historial-item">
-          <div class="h-info">
-            <span class="h-id">${v.ID_PEDIDO}</span>
-            <span class="h-date">${v.FECHA}</span>
+        <div class="historial-item" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border: 1px solid var(--glass);">
+          <div class="h-info" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span class="h-id" style="color:var(--cian); font-weight:bold; font-size: 0.85rem;">${v.skuMaestro}</span>
+            <span class="h-date" style="color:#888; font-size: 0.7rem;">${v.fecha}</span>
           </div>
-          <div class="h-details">
-            <div class="h-total">$${Number(v.TOTAL_A_PAGAR).toLocaleString('es-CL')}</div>
-            <div class="h-status status-${v.ESTADO.toLowerCase()}">${v.ESTADO}</div>
+          <div class="h-details" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="h-total" style="font-family:var(--font-brand); font-size: 1.1rem; color:var(--amber);">$${Number(v.total).toLocaleString('es-CL')}</div>
+            <div class="h-status" style="font-size: 0.75rem; font-weight: bold; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px;">${v.estado}</div>
           </div>
         </div>
       `).join('');
@@ -2628,13 +2618,18 @@ function recomprarDesdeSKUMaestro(receta) {
 
 function mostrarBuzon() {
     cambiarVistaComunidad('buzon');
+    // FOCUS: Cargamos los mensajes inmediatamente al entrar
     cargarChat();
     
-    // Contador de caracteres dinámico
-    const input = document.getElementById('msg-input');
-    input.oninput = function() {
-        document.getElementById('char-count').innerText = this.value.length + "/250";
-    };
+    // Contador de caracteres dinámico (Línea 2262)
+    setTimeout(() => {
+        const input = document.getElementById('msg-input');
+        if(input) {
+            input.oninput = function() {
+                document.getElementById('char-count').innerText = this.value.length + "/250";
+            };
+        }
+    }, 50);
 }
 
 async function cargarChat() {
@@ -2653,7 +2648,8 @@ async function cargarChat() {
           <div class="msg-time">${m.FECHA}</div>
         </div>
       `).join('');
-      container.scrollTop = container.scrollHeight;
+      // FOCUS: Micro-pausa para asegurar que el HTML se dibujó antes de bajar
+      setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
     } else {
       container.innerHTML = '<p style="text-align:center; color:#666; font-size:0.8rem; margin-top:20px;">No hay transmisiones aún. ¡Inicia el contacto!</p>';
     }
@@ -2664,26 +2660,28 @@ async function cargarChat() {
 
 async function ejecutarEnvioMensaje() {
   const input = document.getElementById('msg-input');
+  if(!input) return;
   const msg = input.value.trim();
+  if(!msg || !sessionUser) return;
 
-  if (!msg) return;
-
+  // FOCUS: Bloqueo visual para evitar doble envío
   input.disabled = true;
-  
+  input.placeholder = "Transmitiendo...";
+
   try {
     const res = await ejecutarEnServidor("enviarMensaje", { emisor: sessionUser.email, mensaje: msg });
-    if (res.success) {
+    if(res.success) {
       input.value = '';
       input.disabled = false;
+      input.placeholder = "Escribe tu mensaje...";
       document.getElementById('char-count').innerText = "0/250";
+      // FOCUS: Recargamos el chat para ver nuestro propio mensaje enviado
       cargarChat();
-    } else {
-      mostrarToast("Falla en la transmisión.");
-      input.disabled = false;
     }
   } catch(e) {
-    mostrarToast("Falla en la conexión de red.");
+    console.error("Error al enviar msj:", e);
     input.disabled = false;
+    input.placeholder = "Error. Intenta de nuevo.";
   }
 }
 
