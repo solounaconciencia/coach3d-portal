@@ -2364,7 +2364,204 @@ async function cargarMenuDinamico(esPrecarga = false) {
         contenedor.innerHTML = '<p style="color:#ff4444; text-align:center;">Error de sincronización.</p>';
     }
 }
-      
+
+// =========================================================================
+// MOTOR DE DIAGNÓSTICO TRIDIMENSIONAL - KAIRO v.5.2
+// =========================================================================
+
+let preguntasDiag = [];
+let slideDiag = 0;
+let respuestasDiag = new Array(27).fill(0);
+
+async function prepararDiagnostico() {
+    console.log("🛡️ Kairo: Verificando permisos para Diagnóstico 3D...");
+    
+    if (!sessionUser || !sessionUser.email) {
+        const ancla = localStorage.getItem('kairo_session');
+        if (ancla) {
+            sessionUser = JSON.parse(ancla);
+        } else {
+            notify("Tu sesión expiró. Por favor, recarga la página o inicia sesión de nuevo.");
+            salirDelModulo();
+            return;
+        }
+    }
+
+    slideDiag = 0;
+    respuestasDiag = new Array(27).fill(0);
+
+    const cuerpo = document.getElementById('cuerpo-diagnostico');
+    cuerpo.innerHTML = '<div class="spinner"></div><p class="amber" style="text-align:center; margin-top:15px;">SINCRONIZANDO PERMISOS...</p>';
+
+    const res = await apiCall("obtenerTodoDiagnostico", { email: sessionUser.email });
+
+    if (res && res.intentos !== undefined) {
+        if (res.intentos >= 2) {
+            mostrarAvisoLimite();
+            return;
+        }
+        console.log("✅ Acceso concedido. Cargando Matrix...");
+        preguntasDiag = res.preguntas;
+        document.getElementById('footer-diagnostico').style.display = 'block';
+        renderizarPreguntaDiag();
+    } else {
+        console.error("❌ Error Crítico:", res ? res.msg : "Sin respuesta");
+        notify("Error de conexión con el servidor Coach 3D.");
+        salirDelModulo();
+    }
+}
+
+function renderizarPreguntaDiag() {
+    const cuerpo = document.getElementById('cuerpo-diagnostico');
+    if (!cuerpo) return;
+
+    if (slideDiag >= 27) return finalizarDiagnostico();
+
+    const p = preguntasDiag[slideDiag];
+    const barra = document.getElementById('barra-diagnostico');
+    if (barra) barra.style.width = ((slideDiag / 27) * 100) + "%";
+
+    const urlImagen = p[8] || "https://i.postimg.cc/wjNJr54L/imagen3.png"; 
+    const textoSlide = p[9] || "Visualiza tu progreso...";
+
+    let alternativas = [
+        { texto: p[3], puntos: 1 },
+        { texto: p[4], puntos: 2 },
+        { texto: p[5], puntos: 3 },
+        { texto: p[6], puntos: 4 },
+        { texto: p[7], puntos: 5 }
+    ];
+
+    alternativas = alternativas.sort(() => Math.random() - 0.5);
+
+    cuerpo.innerHTML = `
+        <div class="libro-wrapper">
+            <div class="col-media">
+                <p class="texto-slide">${textoSlide}</p>
+                <img src="${urlImagen}" class="img-diagnostico" onerror="this.src='https://i.postimg.cc/wjNJr54L/imagen3.png'">
+            </div>
+            <div class="col-quiz">
+                <small style="color: var(--neon-n); letter-spacing: 2px; font-weight: bold; font-size: 0.7em;">
+                    ${p[1]} | AVANCE: ${slideDiag + 1}/27
+                </small>
+                <h3 class="titulo-pregunta">${p[2]}</h3>
+                <div class="alternativas-container">
+                    ${alternativas.map(opt => `
+                        <button class="opt-btn" onclick="nextDiag(${opt.puntos})">
+                            ${opt.texto}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function nextDiag(puntos) {
+    if (typeof resetearVigilante === 'function') resetearVigilante();
+    respuestasDiag[slideDiag] = puntos;
+    slideDiag++;
+    renderizarPreguntaDiag();
+}
+
+async function finalizarDiagnostico() {
+    if (!sessionUser || !sessionUser.email) {
+        const ancla = localStorage.getItem('kairo_session');
+        if (ancla) sessionUser = JSON.parse(ancla);
+    }
+
+    const cuerpo = document.getElementById('cuerpo-diagnostico');
+    cuerpo.innerHTML = `
+        <div class="spinner"></div>
+        <h3 class="amber" style="font-family: 'Orbitron', sans-serif; text-align:center; letter-spacing: 2px;">
+            PROCESANDO ALQUIMIA...
+        </h3>
+        <p style="text-align:center;">Generando Reporte 3D y enviando PDF por correo.</p>
+    `;
+
+    const payload = {
+        nombre: sessionUser.seudónimo || sessionUser.nombre,
+        email: sessionUser.email,
+        pais: sessionUser.pais,
+        respuestas: respuestasDiag
+    };
+
+    const res = await apiCall("finalizarEvaluacionComunidad", payload);
+
+    if (res && res.success) {
+        const tarjetaHTML = `
+            <div style="text-align: center; width: 100%;">
+                <p style="font-size: 0.85em; color: var(--neon-n); margin-bottom: 20px; font-weight: bold; text-transform: uppercase;">
+                    📩 Reporte PDF enviado a tu correo
+                </p>
+                <div style="background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                    <h4 style="color: white; margin-bottom: 10px; font-size: 1.3em; font-family: 'Orbitron', sans-serif;">
+                        NIVEL: <span style="color: var(--neon-f); text-shadow: 0 0 8px var(--neon-f);">${res.nivel}</span>
+                    </h4>
+                    <p style="font-size: 0.9em; font-style: italic; color: #ddd; line-height: 1.4;">
+                        "${res.mensaje}"
+                    </p>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid rgba(34, 211, 238, 0.3);">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.6em; color: var(--neon-m); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Mentalidad</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreM} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
+                    </div>
+                    <div style="flex: 1; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.6em; color: var(--neon-n); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Nutrición</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreN} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.6em; color: var(--neon-f); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Finanzas</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreF} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        await kairoMessage({ mensaje: tarjetaHTML, icon: "🏆" });
+        salirDelModulo();
+        if (typeof loadDashboard === 'function') loadDashboard();
+    } else {
+        notify("Atención: " + (res ? res.msg : "Fallo de conexión al cerrar diagnóstico."));
+        salirDelModulo();
+    }
+}
+
+function mostrarAvisoLimite() {
+    const cuerpo = document.getElementById('cuerpo-diagnostico');
+    if (!cuerpo) return;
+    cuerpo.innerHTML = `
+        <div style="text-align: center; padding: 20px; animation: fadeIn 0.8s;">
+            <div style="font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--neon-n));">🛡️</div>
+            <h3 class="amber" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">LÍMITE ALCANZADO</h3>
+            <p style="opacity: 0.8;">Kairo detecta que ya has realizado tus 2 diagnósticos permitidos este mes.</p>
+            <br>
+            <button class="opt-btn" style="width: 100%; border: 1px solid var(--neon-n); background: rgba(34, 211, 238, 0.1);" 
+                    onclick="salirDelModulo()"> 
+                ENTENDIDO / VOLVER AL DASHBOARD
+            </button>
+        </div>
+    `;
+}
+
+/**
+ * LIBERAR PANTALLA: Cierre estético del módulo
+ */
+function salirDelModulo() {
+    // 1. Ocultamos el módulo y mostramos el dashboard
+    document.getElementById('contenido-modulo-diagnostico').classList.add('hidden');
+    document.getElementById('view-dashboard').classList.remove('hidden');
+    if (typeof loadDashboard === 'function') loadDashboard();
+    
+    // 2. Reseteamos el cuerpo del diagnóstico para la próxima vez
+    document.getElementById('cuerpo-diagnostico').innerHTML = '<div class="spinner"></div>';
+    
+    // 3. SEGURO FOCUS: Forzamos el cierre de cualquier alerta global o blur
+    if (typeof closeAlert === 'function') closeAlert();
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
 (function protocoloAuditoria() {
     console.log("🧬 Módulo Diagnóstico 3D: Estructura montada en pantalla.");
     
