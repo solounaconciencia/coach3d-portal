@@ -934,10 +934,65 @@
        [ ABORTAR_DIAGNÓSTICO ]
      </button>
   </div>
-
 </div>
-
   </div>
+
+<div id="modulo-perfil-bienestar" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; background-image: url('https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; position: relative; overflow: hidden; border: 2px solid var(--neon-n);">
+        
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(10, 15, 30, 0.85); z-index: 0;"></div>
+        
+        <div style="position: relative; z-index: 1; padding: 10px;">
+            <div style="text-align: center;">
+                <img id="kairoImgPerfil" src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 120px; border-radius: 50%; margin-bottom: 15px; border: 2px solid var(--neon-n); box-shadow: 0 0 15px var(--neon-n);">
+            </div>
+            
+            <div id="bubblePerfil" style="background: rgba(255,255,255,0.05); padding: 18px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--neon-n); backdrop-filter: blur(5px); font-size: 0.9em; line-height: 1.5; color: white;">
+                Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.
+            </div>
+
+            <div id="form-perfil-bienestar">
+                <h3 style="color: var(--neon-n); text-align: left; margin-bottom: 10px; font-size: 1em; text-transform: uppercase;">Datos Necesarios</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <input type="number" id="pb-peso" placeholder="Peso (kg) *" required style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-estatura" placeholder="Estatura (cm) *" required style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-edad" placeholder="Edad *" required style="background: rgba(0,0,0,0.6);">
+                    <select id="pb-sexo" required style="background: rgba(0,0,0,0.6);">
+                        <option value="">Sexo metabólico *</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                    </select>
+                    <input type="number" id="pb-cintura" placeholder="Cintura (cm) *" required style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-cuello" placeholder="Cuello (cm) *" required style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-cadera" placeholder="Cadera (cm)" style="background: rgba(0,0,0,0.6);">
+                </div>
+
+                <h3 style="color: var(--neon-m); text-align: left; margin-bottom: 10px; font-size: 1em; text-transform: uppercase;">Datos Complementarios</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <input type="number" id="pb-grasa" placeholder="Grasa (%)" style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-musculo" placeholder="Músculo (%)" style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-agua" placeholder="Agua (%)" style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-masaOsea" placeholder="Masa ósea (kg)" style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="pb-grasaVisceral" placeholder="Visceral (1-15)" style="background: rgba(0,0,0,0.6);">
+                </div>
+
+                <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 15px;" onclick="prepararCalculoPerfil()">CALCULAR PERFIL DE BIENESTAR</button>
+                <button class="btn" style="width: 100%; margin-top: 10px;" onclick="salirDelModulo()">CANCELAR</button>
+            </div>
+            
+            <div id="resultado-perfil-bienestar" class="hidden">
+                 <div id="pb-resultados-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                    </div>
+                 <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--neon-f);">
+                    <p style="color: var(--white); font-weight: bold;">Tus resultados técnicos fueron enviados a tu correo.</p>
+                    <p style="font-size: 0.85em; color: #ccc; margin-bottom: 20px;">Si deseas agendar una sesión GRATUITA para que un Coach te lo explique, contáctanos:</p>
+                    <button class="btn btn-f" style="width: 100%; margin-bottom: 10px;" onclick="window.open('https://wa.me/56976003214?text=Me%20hice%20el%20Perfil%20de%20Bienestar%20y%20quisiera%20agendar%20una%20sesion%20gratuita', '_blank')">HABLAR CON COACH MARIA</button>
+                    <button class="btn btn-n" style="width: 100%; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=Me%20hice%20el%20Perfil%20de%20Bienestar%20y%20quisiera%20agendar%20una%20sesion%20gratuita', '_blank')">HABLAR CON COACH DIEGO</button>
+                    <button class="btn" style="width: 100%;" onclick="salirDelModulo()">VOLVER AL INICIO</button>
+                 </div>
+            </div>
+        </div>
+    </div>
+
   <div id="modal-perfil" class="hidden glass-panel">
     <h3 style="color: var(--neon-n); text-align: center;">Editar Perfil</h3>
     <div style="text-align: center; margin-bottom: 15px;">
@@ -2135,6 +2190,87 @@ function iniciarDiagnosticoModular() {
     }
 }
 
+// --- NUEVA INTEGRACIÓN FOCUS: PERFIL DE BIENESTAR ---
+function iniciarPerfilBienestar() {
+    console.log("🚀 Kairo: Abriendo Perfil de Bienestar...");
+    closeAlert();
+
+    document.getElementById('view-welcome').classList.add('hidden');
+    document.getElementById('view-dashboard').classList.add('hidden');
+    const herramientas = document.getElementById('seccion-herramientas');
+    if (herramientas) herramientas.classList.add('hidden');
+    const panelDiag = document.getElementById('contenido-modulo-diagnostico');
+    if (panelDiag) panelDiag.classList.add('hidden');
+
+    const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+    if (moduloPerfil) {
+        moduloPerfil.classList.remove('hidden');
+        document.getElementById('form-perfil-bienestar').classList.remove('hidden');
+        document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
+        document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
+    }
+}
+
+async function prepararCalculoPerfil() {
+    const peso = document.getElementById('pb-peso').value;
+    const estatura = document.getElementById('pb-estatura').value;
+    const edad = document.getElementById('pb-edad').value;
+    const sexo = document.getElementById('pb-sexo').value;
+    const cintura = document.getElementById('pb-cintura').value;
+    
+    if (!peso || !estatura || !edad || !sexo || !cintura) {
+        return notify("Peso, Estatura, Edad, Sexo y Cintura son obligatorios.");
+    }
+
+    const payload = {
+        peso: peso, estatura: estatura, edad: edad, sexo: sexo, cintura: cintura,
+        cuello: document.getElementById('pb-cuello').value || 0,
+        cadera: document.getElementById('pb-cadera').value || 0,
+        grasa: document.getElementById('pb-grasa').value || "",
+        musculo: document.getElementById('pb-musculo').value || "",
+        agua: document.getElementById('pb-agua').value || "",
+        masaOsea: document.getElementById('pb-masaOsea').value || "",
+        grasaVisceral: document.getElementById('pb-grasaVisceral').value || ""
+    };
+
+    // FOCUS: Si NO hay sesión, guardamos datos y pedimos Login
+    if (!sessionUser || !sessionUser.email) {
+        notify("⚠️ Kairo necesita saber a qué correo enviarte el resultado. Inicia sesión o regístrate para continuar.");
+        sessionStorage.setItem('kairo_perfil_pendiente', JSON.stringify(payload));
+        
+        document.getElementById('modulo-perfil-bienestar').classList.add('hidden');
+        document.getElementById('view-welcome').classList.remove('hidden');
+        return; 
+    }
+
+    payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+    payload.email = sessionUser.email;
+    ejecutarEnvioPerfilAlServidor(payload);
+}
+
+async function ejecutarEnvioPerfilAlServidor(payload) {
+    document.getElementById('form-perfil-bienestar').classList.add('hidden');
+    document.getElementById('bubblePerfil').innerHTML = '<div class="spinner"></div><br>Analizando tus datos y generando informe PDF...';
+    
+    const res = await apiCall("procesarEvaluacionBienestar", payload);
+    
+    if (res && res.success) {
+        document.getElementById('bubblePerfil').innerHTML = "<b>¡Análisis terminado!</b> He enviado tu informe técnico PDF a tu correo.";
+        document.getElementById('resultado-perfil-bienestar').classList.remove('hidden');
+        
+        const grid = document.getElementById('pb-resultados-grid');
+        grid.innerHTML = `
+            <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; color: black; font-size: 13px;"><b>Grasa:</b><br>${res.metricas.grasaCorporal || 0}%</div>
+            <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; color: black; font-size: 13px;"><b>Metabólica:</b><br>${res.metricas.edadMetabolica || 0} años</div>
+            <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; color: black; font-size: 13px;"><b>Score 3D:</b><br>${res.metricas.scoreMetabolico || 0}/100</div>
+        `;
+    } else {
+        notify("Error al calcular: " + (res ? res.msg : "Sin respuesta del servidor"));
+        document.getElementById('form-perfil-bienestar').classList.remove('hidden');
+        document.getElementById('bubblePerfil').innerHTML = "Ocurrió un error. Verifica tus datos e intenta de nuevo.";
+    }
+}
+
 function procesarNuevaFoto(input) {
     if (!input.files || !input.files[0]) return;
     
@@ -2692,7 +2828,28 @@ function filtrarUrlImagen(url) {
   // B. VISTA: Limpiar pantallas y mostrar Dashboard
   document.getElementById('view-welcome').classList.add('hidden');
   document.getElementById('modal-login').classList.add('hidden');
-  document.getElementById('view-dashboard').classList.remove('hidden');
+  
+  // FOCUS: Lógica Post-Login para el Perfil
+  const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
+  const urlParams = new URLSearchParams(window.location.search);
+
+  if (perfilPendiente) {
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const payload = JSON.parse(perfilPendiente);
+      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+      payload.email = sessionUser.email;
+      
+      sessionStorage.removeItem('kairo_perfil_pendiente');
+      
+      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
+      
+      ejecutarEnvioPerfilAlServidor(payload);
+  } else if (urlParams.get('modulo') === 'perfil') {
+      iniciarPerfilBienestar();
+  } else {
+      document.getElementById('view-dashboard').classList.remove('hidden');
+  }
   
   // Aseguramos que el contenedor del diagnóstico esté oculto al recargar el dashboard
   const panelDiag = document.getElementById('contenido-modulo-diagnostico');
@@ -3342,10 +3499,14 @@ function resetearVigilante() {
 
 // --- PROTOCOLO DE PERSISTENCIA FOCUS ---
 window.onload = function() {
-    // 1. Iniciamos el vigilante normal
     resetearVigilante();
 
-    // 2. ¿Hay alguien ya logueado en este navegador?
+    // FOCUS: Interceptor de URL para prospectos
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('modulo') === 'perfil') {
+        iniciarPerfilBienestar();
+    }
+
     const dataGuardada = localStorage.getItem('kairo_session');
     
     if (dataGuardada) {
