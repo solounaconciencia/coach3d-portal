@@ -1193,7 +1193,8 @@ function ejecutarLogin() {
     .login(email, pass); 
 }
 
-  function ejecutarRegistro() {
+// --- CIRUGÍA FOCUS: REGISTRO DESACOPLADO (GITHUB) ---
+async function ejecutarRegistro() {
     const form = document.getElementById('regForm');
     const formData = Object.fromEntries(new FormData(form));
 
@@ -1201,7 +1202,7 @@ function ejecutarLogin() {
     if (formData.pass !== formData.confirmPass) return notify("Las contraseñas no coinciden.");
 
     // Validar peso de imagen si existe (Máximo 2MB para evitar Error de Servidor)
-    const fotoInput = form.querySelector('input[name="foto"]'); // Asegúrate que el input se llame 'foto'
+    const fotoInput = form.querySelector('input[name="foto"]'); 
     if (fotoInput && fotoInput.files[0] && fotoInput.files[0].size > 2 * 1024 * 1024) {
         return notify("La foto es demasiado pesada. Máximo 2MB.");
     }
@@ -1222,22 +1223,21 @@ function ejecutarLogin() {
     btnReg.innerText = "PROCESANDO...";
     btnReg.disabled = true;
 
-    google.script.run
-      .withSuccessHandler(res => {
-        btnReg.innerText = textoOriginal;
-        btnReg.disabled = false;
-        if(res.success && res.kairo) { 
-            iniciarKairo(); 
-        } else {
-            notify(res.msg);
-        }
-      })
-      .withFailureHandler(err => {
-        btnReg.innerText = textoOriginal;
-        btnReg.disabled = false;
-        notify("Error de conexión: El archivo podría ser muy pesado o no tienes permisos.");
-      })
-      .registrarUsuario(formData);
+    console.log("Conectando con la Matrix API para Registro...");
+
+    // FOCUS: Usamos await apiCall en lugar de google.script.run
+    const res = await apiCall("registrarUsuario", formData);
+
+    btnReg.innerText = textoOriginal;
+    btnReg.disabled = false;
+
+    if (res.success && res.kairo) { 
+        iniciarKairo(); 
+    } else if (!res.success) {
+        notify(res.msg || "Error de conexión: El archivo podría ser muy pesado o no tienes permisos.");
+    } else {
+        notify(res.msg);
+    }
 }
 
 // Convierte links de Drive en imágenes directas
@@ -1260,27 +1260,22 @@ function filtrarUrlImagen(url) {
   return id ? "https://lh3.googleusercontent.com/d/" + id + "=s400" : url;
 }
 
-    function loadDashboard() {
+// --- CIRUGÍA FOCUS: CARGA DE DASHBOARD ---
+async function loadDashboard() {
   closeAlert();
-
-  // A. SEGURIDAD: Primero confirmamos que el usuario existe en la memoria
   if (!sessionUser) {
     return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
   }
 
-  // B. VISTA: Limpiar pantallas y mostrar Dashboard
   document.getElementById('view-welcome').classList.add('hidden');
   document.getElementById('modal-login').classList.add('hidden');
   document.getElementById('view-dashboard').classList.remove('hidden');
   
-  // Aseguramos que el contenedor del diagnóstico esté oculto al recargar el dashboard
   const panelDiag = document.getElementById('contenido-modulo-diagnostico');
   if (panelDiag) panelDiag.classList.add('hidden');
-
   const herramientas = document.getElementById('seccion-herramientas');
-  if (herramientas) { herramientas.classList.remove('hidden'); }
+  if (herramientas) herramientas.classList.remove('hidden');
 
-  // C. IDENTIDAD: Pintar nombre y país
   document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
   document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
 
@@ -1288,79 +1283,68 @@ function filtrarUrlImagen(url) {
   if (fotoCirculo) {
     fotoCirculo.referrerPolicy = "no-referrer";
     const tieneFoto = (sessionUser.foto && sessionUser.foto.trim().length > 10);
-    
-    // FOCUS: Aplicamos el filtro para asegurar que sea un link directo de imagen
-    fotoCirculo.src = tieneFoto 
-        ? filtrarUrlImagen(sessionUser.foto) 
-        : "https://ui-avatars.com/api/?name=" + (sessionUser.nombre || "U") + "&background=0a0f1e&color=22d3ee";
+    fotoCirculo.src = tieneFoto ? filtrarUrlImagen(sessionUser.foto) : "https://ui-avatars.com/api/?name=" + (sessionUser.nombre || "U") + "&background=0a0f1e&color=22d3ee";
   }
 
-  // E. RANGO: Panel Admin
   if(sessionUser.rango === "Admin") {
     document.getElementById('admin-panel').style.display = 'block';
   } else {
     document.getElementById('admin-panel').style.display = 'none';
   }
 
-  // F. DATOS VIVOS Y DISPONIBILIDAD (Fusión Matrix)
-  // Pedimos métricas y disponibilidad en paralelo para máxima eficiencia
-  google.script.run.withSuccessHandler(data => {
-    if (data && data.metrics) {
-      document.getElementById('metric-f').innerText = data.metrics.f || 0;
-      document.getElementById('metric-n').innerText = data.metrics.n || 0;
-      document.getElementById('metric-m').innerText = data.metrics.m || 0;
-      document.getElementById('metric-nivel').innerHTML = data.metrics.nivel || "Iniciante";
-      
-      if (typeof cargarSeccionHerramientas === 'function') cargarSeccionHerramientas();
-    }
-  }).getDashboardData(sessionUser.email);
+  // API CALL 1: Métricas de Pilares
+  const data = await apiCall("getDashboardData", { email: sessionUser.email });
+  if (data && data.metrics) {
+    document.getElementById('metric-f').innerText = data.metrics.f || 0;
+    document.getElementById('metric-n').innerText = data.metrics.n || 0;
+    document.getElementById('metric-m').innerText = data.metrics.m || 0;
+    document.getElementById('metric-nivel').innerHTML = data.metrics.nivel || "Iniciante";
+    if (typeof cargarSeccionHerramientas === 'function') cargarSeccionHerramientas();
+  }
 
-  // NUEVA LÓGICA: Consultar cuántos diagnósticos le quedan este mes
-  google.script.run.withSuccessHandler(res => {
+  // API CALL 2: Disponibilidad de Diagnóstico
+  const res = await apiCall("consultarDisponibilidadDiagnostico", { email: sessionUser.email });
+  if (res) {
     const spanNum = document.getElementById('num-disponible');
     if (spanNum) spanNum.innerText = res.disponibles;
-    
-    // Si agotó sus 2 intentos, bloqueamos el botón con estética Kairo
     const btnDiag = document.querySelector('#container-btn-diagnostico .btn');
     if (res.disponibles <= 0 && btnDiag) {
         btnDiag.classList.add('bloqueado');
         btnDiag.style.opacity = "0.5";
         btnDiag.onclick = () => notify("🛡️ KAIRO: Has agotado tus 2 diagnósticos de este mes.");
     }
-  }).consultarDisponibilidadDiagnostico(sessionUser.email);
-  // FOCUS: Ordenamos la precarga silenciosa del menú
+  }
+
   if (!menuAppCargado && typeof cargarMenuDinamico === 'function') {
       cargarMenuDinamico(true); 
   }
-  }
-
+}
 
     function recuperarPass() {
       document.getElementById('view-welcome').classList.add('hidden');
       document.getElementById('modal-recover').classList.remove('hidden');
     }
 
-    function buscarPregunta() {
-      const email = document.getElementById('recover-email').value;
-      google.script.run.withSuccessHandler(res => {
-        if(res.success) {
-          document.getElementById('step-1-recover').classList.add('hidden');
-          document.getElementById('display-question').innerText = res.pregunta;
-          document.getElementById('step-2-recover').classList.remove('hidden');
-        } else { notify(res.msg); }
-      }).obtenerPreguntaSeguridad(email);
-    }
+// --- CIRUGÍA FOCUS: RECUPERAR CONTRASEÑA ---
+async function buscarPregunta() {
+    const email = document.getElementById('recover-email').value;
+    const res = await apiCall("obtenerPreguntaSeguridad", { email: email });
+    if(res && res.success) {
+        document.getElementById('step-1-recover').classList.add('hidden');
+        document.getElementById('display-question').innerText = res.pregunta;
+        document.getElementById('step-2-recover').classList.remove('hidden');
+    } else { notify(res ? res.msg : "Error al conectar."); }
+}
 
-    function validarAcceso() {
-      const email = document.getElementById('recover-email').value;
-      const respuesta = document.getElementById('recover-answer').value;
-      google.script.run.withSuccessHandler(res => {
-        if(res.success) {
-          notify("Validado. Clave temporal: " + res.tempPass);
-          cancelarRegistro();
-        } else { notify(res.msg); }
-      }).validarRespuestaSeguridad(email, respuesta);
-    }
+async function validarAcceso() {
+    const email = document.getElementById('recover-email').value;
+    const respuesta = document.getElementById('recover-answer').value;
+    const res = await apiCall("validarRespuestaSeguridad", { email: email, respuesta: respuesta });
+    if(res && res.success) {
+        notify("Validado. Clave temporal: " + res.tempPass);
+        cancelarRegistro();
+    } else { notify(res ? res.msg : "Respuesta incorrecta."); }
+}
 
 function logout() {
   sessionStorage.clear();
@@ -1637,13 +1621,13 @@ function iniciarKairo() {
     }, 1000);
 }
 
-function validarCodigoKairo() {
+// --- CIRUGÍA FOCUS: VALIDAR PIN KAIRO ---
+async function validarCodigoKairo() {
     const btnValidar = document.querySelector('#modal-verificacion .btn-f');
     const inputCodigo = document.getElementById('input-codigo');
     const emailInput = document.getElementById('reg-email');
 
-    // 1. Validaciones de seguridad inicial
-    if (!inputCodigo || !emailInput) return console.error("Error: No se encuentran los elementos de entrada.");
+    if (!inputCodigo || !emailInput) return console.error("Error: Elementos no encontrados.");
     
     const codigoIngresado = inputCodigo.value.trim();
     const email = emailInput.value.trim();
@@ -1652,63 +1636,41 @@ function validarCodigoKairo() {
         return notify("Por favor, ingresa los 5 dígitos del código.");
     }
 
-    // 2. Bloqueo visual (Neuro-Diseño) para evitar doble envío
     if (btnValidar) {
         btnValidar.innerText = "⚡ VERIFICANDO...";
         btnValidar.disabled = true;
         btnValidar.style.opacity = "0.6";
     }
 
-    // 3. Conexión con el Servidor (Código.gs)
-    google.script.run
-        .withSuccessHandler(res => {
-            // Restauramos el botón
-            if (btnValidar) {
-                btnValidar.innerText = "ACTIVAR CUENTA";
-                btnValidar.disabled = false;
-                btnValidar.style.opacity = "1";
-            }
+    const res = await apiCall("verificarPInKairo", { email: email, pin: codigoIngresado });
 
-            if (res.success) {
-                // A. Detenemos el cronómetro global de Kairo
-                if (typeof cuentaRegresiva !== 'undefined') {
-                    clearInterval(cuentaRegresiva);
-                }
-                
-                // B. Cerramos el modal usando tu función de la Parte 3 (limpia el blur y oculta el modal)
-                if (typeof cerrarKairo === "function") {
-                    cerrarKairo();
-                } else {
-                    document.getElementById('modal-verificacion').classList.add('hidden');
-                    document.getElementById('modal-verificacion').style.display = 'none';
-                    document.getElementById('main-content').classList.remove('blur-effect');
-                }
-                
-                // C. Feedback positivo al usuario
-                notify("¡Cuenta activada por Kairo! Ya puedes iniciar sesión.");
-                
-                // D. Limpieza total y retorno al inicio
-                const form = document.getElementById('regForm');
-                if (form) form.reset();
-                
-                if (typeof cancelarRegistro === "function") {
-                    cancelarRegistro();
-                }
-            } else {
-                notify(res.msg || "Código incorrecto o expirado.");
-                if (inputCodigo) inputCodigo.value = ""; // Limpiamos el PIN para que reintente
-            }
-        })
-        .withFailureHandler(err => {
-            if (btnValidar) {
-                btnValidar.innerText = "ACTIVAR CUENTA";
-                btnValidar.disabled = false;
-                btnValidar.style.opacity = "1";
-            }
-            notify("Error de conexión: Kairo está fuera de alcance.");
-            console.error("Fallo de red en Apps Script:", err);
-        })
-        .verificarPInKairo(email, codigoIngresado);
+    if (btnValidar) {
+        btnValidar.innerText = "ACTIVAR CUENTA";
+        btnValidar.disabled = false;
+        btnValidar.style.opacity = "1";
+    }
+
+    if (res && res.success) {
+        if (typeof cuentaRegresiva !== 'undefined') clearInterval(cuentaRegresiva);
+        
+        if (typeof cerrarKairo === "function") {
+            cerrarKairo();
+        } else {
+            document.getElementById('modal-verificacion').classList.add('hidden');
+            document.getElementById('modal-verificacion').style.display = 'none';
+            document.getElementById('main-content').classList.remove('blur-effect');
+        }
+        
+        notify("¡Cuenta activada por Kairo! Ya puedes iniciar sesión.");
+        
+        const form = document.getElementById('regForm');
+        if (form) form.reset();
+        
+        if (typeof cancelarRegistro === "function") cancelarRegistro();
+    } else {
+        notify(res ? res.msg : "Código incorrecto o expirado.");
+        if (inputCodigo) inputCodigo.value = ""; 
+    }
 }
             
 function cerrarKairo() {
@@ -1722,27 +1684,32 @@ function cerrarKairo() {
         modal.style.display = 'none';
     }
 }
-function verificarEmailExistente(email) {
-  if (!email.includes('@')) return; // No buscamos si no es un email válido
 
-  google.script.run.withSuccessHandler(res => {
-    if (res.success) {
-      notify("¡Kairo te recuerda! Rellenando tus datos guardados...");
-      
-      // Rellenamos los campos del formulario de registro automáticamente
-      document.querySelector('[name="nombre"]').value = res.datos.nombre;
-      document.querySelector('[name="apellido"]').value = res.datos.apellido;
-      document.querySelector('[name="whatsapp"]').value = res.datos.whatsapp;
-      document.querySelector('[name="pais"]').value = res.datos.pais;
-      document.querySelector('[name="edad"]').value = res.datos.edad;
-      document.querySelector('[name="pregunta"]').value = res.datos.pregunta;
-      document.querySelector('[name="respuesta"]').value = res.datos.respuesta;
-      
-      // Aplicamos un efecto visual para que note el cambio
-      document.getElementById('regForm').style.border = "1px solid var(--neon-n)";
+// --- CIRUGÍA FOCUS: VERIFICAR EMAIL ---
+async function verificarEmailExistente(email) {
+    if (!email.includes('@')) return; 
+
+    // Aquí usamos un truco: no tenemos una acción específica para esto en el doPost,
+    // pero si lo tuvieras, sería así. Si no lo usas, el catch lo maneja suavemente.
+    // Solo lo dejo preparado por si añades 'buscarDatosPendientes' al doPost de Google Script.
+    const res = await apiCall("buscarDatosPendientes", { email: email });
+    
+    if (res && res.success) {
+        notify("¡Kairo te recuerda! Rellenando tus datos guardados...");
+        
+        document.querySelector('[name="nombre"]').value = res.datos.nombre || "";
+        document.querySelector('[name="apellido"]').value = res.datos.apellido || "";
+        document.querySelector('[name="whatsapp"]').value = res.datos.whatsapp || "";
+        document.querySelector('[name="pais"]').value = res.datos.pais || "";
+        document.querySelector('[name="edad"]').value = res.datos.edad || "";
+        document.querySelector('[name="pregunta"]').value = res.datos.pregunta || "";
+        document.querySelector('[name="respuesta"]').value = res.datos.respuesta || "";
+        
+        document.getElementById('regForm').style.border = "1px solid var(--neon-n)";
     }
-  }).buscarDatosPendientes(email);
 }
+
+      
 // A. Motor del Recortador (Unificado a variable 'cropper')
 let fotoBase64 = ""; 
 let cropper = null; // Usaremos 'cropper' en todo el código para que no se confunda
@@ -1981,52 +1948,48 @@ async function dispararAlertaCierre() {
 }
 
 
-function cargarSeccionHerramientas() {
-  google.script.run.withSuccessHandler(res => {
-    if (!res.success) return console.error("Error de Kairo:", res.msg);
-    
-    const contenedores = {
-      'FINANZAS': 'contenedor-herramientas-f',
-      'NUTRICION': 'contenedor-herramientas-n',
-      'MENTALIDAD': 'contenedor-herramientas-m'
-    };
+// --- CIRUGÍA FOCUS: HERRAMIENTAS ---
+async function cargarSeccionHerramientas() {
+  const res = await apiCall("obtenerHerramientasDashboard");
+  
+  if (!res || !res.success) return console.error("Error de Kairo:", res ? res.msg : "Sin respuesta");
+  
+  const contenedores = {
+    'FINANZAS': 'contenedor-herramientas-f',
+    'NUTRICION': 'contenedor-herramientas-n',
+    'MENTALIDAD': 'contenedor-herramientas-m'
+  };
 
-    // Limpiar antes de llenar
-    Object.values(contenedores).forEach(id => {
-      const el = document.getElementById(id);
-      if(el) el.innerHTML = "";
-    });
+  Object.values(contenedores).forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = "";
+  });
 
-    for (let pilar in res.data) {
-      const divPadre = document.getElementById(contenedores[pilar]);
-      if (divPadre && res.data[pilar].length > 0) {
-        res.data[pilar].forEach(h => {
-          const btn = document.createElement('div');
-          
-          // Aplicamos clases. 'herramienta-bloqueada' ahora permitirá clic gracias al CSS nuevo
-          btn.className = `boton-herramienta ${h.bloqueado ? 'herramienta-bloqueada' : ''}`;
-          
-          // Lógica de click mejorada
-          btn.onclick = () => {
-            if (h.bloqueado) {
-              mostrarVentanaSuscripcion(h.nombre); 
-            } else if (h.url && h.url !== "#") {
-              window.open(h.url, '_blank');
-            }
-          };
+  for (let pilar in res.data) {
+    const divPadre = document.getElementById(contenedores[pilar]);
+    if (divPadre && res.data[pilar].length > 0) {
+      res.data[pilar].forEach(h => {
+        const btn = document.createElement('div');
+        btn.className = `boton-herramienta ${h.bloqueado ? 'herramienta-bloqueada' : ''}`;
+        
+        btn.onclick = () => {
+          if (h.bloqueado) {
+            mostrarVentanaSuscripcion(h.nombre); 
+          } else if (h.url && h.url !== "#") {
+            window.open(h.url, '_blank');
+          }
+        };
 
-          btn.innerHTML = `
-            <img src="${h.icono || 'https://img.icons8.com/ios-glyphs/30/ffffff/external-link.png'}" style="width:22px; height:22px; flex-shrink: 0;">
-            <span style="font-size:0.85em; color:white; font-weight:500; line-height: 1.2;">${h.nombre}</span>
-          `;
-          
-          divPadre.appendChild(btn);
-        });
-      } else if (divPadre) {
-        divPadre.innerHTML = "<p style='font-size:0.75em; color:rgba(255,255,255,0.3); text-align:center; margin-top:10px;'>Próximamente...</p>";
-      }
+        btn.innerHTML = `
+          <img src="${h.icono || 'https://img.icons8.com/ios-glyphs/30/ffffff/external-link.png'}" style="width:22px; height:22px; flex-shrink: 0;">
+          <span style="font-size:0.85em; color:white; font-weight:500; line-height: 1.2;">${h.nombre}</span>
+        `;
+        divPadre.appendChild(btn);
+      });
+    } else if (divPadre) {
+      divPadre.innerHTML = "<p style='font-size:0.75em; color:rgba(255,255,255,0.3); text-align:center; margin-top:10px;'>Próximamente...</p>";
     }
-  }).obtenerHerramientasDashboard();
+  }
 }
 
 // Función para mostrar el modal con el mensaje personalizado
@@ -2225,47 +2188,47 @@ function toggleMenuApp() {
     }
 }
 
-function cargarMenuDinamico(esPrecarga = false) {
+// --- CIRUGÍA FOCUS: MENÚ DINÁMICO ---
+async function cargarMenuDinamico(esPrecarga = false) {
     const contenedor = document.getElementById('contenedor-items-menu');
     
-    // Solo muestra "Sincronizando" si el usuario lo abrió manualmente y aún no cargaba
     if (!esPrecarga) {
         contenedor.innerHTML = '<p style="text-align:center; color:var(--neon-n);">Sincronizando...</p>';
     }
 
-    google.script.run.withSuccessHandler(res => {
-        if (res.success) {
-            contenedor.innerHTML = '';
-            res.items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'sidebar-item';
+    const res = await apiCall("obtenerMenuApp");
 
-                div.innerHTML = `<img src="${item.icono}" onerror="this.src='https://img.icons8.com/fluency/48/star.png'" style="width:24px; height:24px; flex-shrink: 0;">
-                                 <span style="font-weight:bold; font-size:0.9em;">${item.titulo}</span>`;
+    if (res && res.success) {
+        contenedor.innerHTML = '';
+        res.items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'sidebar-item';
 
-                div.onclick = () => {
-                    toggleMenuApp(); // Cerramos el menú
-                    
-                    if (item.tipo === 'URL') {
-                        window.open(item.accion, '_blank');
-                    } else if (item.tipo === 'SISTEMA') {
-                        const funcionEjecutar = window[item.accion];
-                        if (typeof funcionEjecutar === 'function') {
-                            funcionEjecutar(); 
-                        } else {
-                            notify("Kairo: Función '" + item.accion + "' no integrada todavía.");
-                        }
+            div.innerHTML = `<img src="${item.icono}" onerror="this.src='https://img.icons8.com/fluency/48/star.png'" style="width:24px; height:24px; flex-shrink: 0;">
+                             <span style="font-weight:bold; font-size:0.9em;">${item.titulo}</span>`;
+
+            div.onclick = () => {
+                toggleMenuApp(); 
+                
+                if (item.tipo === 'URL') {
+                    window.open(item.accion, '_blank');
+                } else if (item.tipo === 'SISTEMA') {
+                    const funcionEjecutar = window[item.accion];
+                    if (typeof funcionEjecutar === 'function') {
+                        funcionEjecutar(); 
+                    } else {
+                        notify("Kairo: Función '" + item.accion + "' no integrada todavía.");
                     }
-                };
-                contenedor.appendChild(div);
-            });
-            // FOCUS: Sellamos la memoria. Ya no volverá a consultar al servidor en esta sesión.
-            menuAppCargado = true;
-        } else if (!esPrecarga) {
-            contenedor.innerHTML = '<p style="color:#ff4444; text-align:center;">Error de sincronización.</p>';
-        }
-    }).obtenerMenuApp();
+                }
+            };
+            contenedor.appendChild(div);
+        });
+        menuAppCargado = true;
+    } else if (!esPrecarga) {
+        contenedor.innerHTML = '<p style="color:#ff4444; text-align:center;">Error de sincronización.</p>';
+    }
 }
+      
 (function protocoloAuditoria() {
     console.log("🧬 Módulo Diagnóstico 3D: Estructura montada en pantalla.");
     
@@ -2445,24 +2408,22 @@ min-width: 320px; box-shadow: 0 0 50px rgba(0,0,0,0.9);">
         let sessionUser = null;
         let menuAppCargado = false;
 
-        async function apiCall(action, payload = {}) {
-            try {
-                // Preparamos el paquete de datos
-                const data = { action, ...payload };
-                
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Necesario para evitar errores de seguridad de Google
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                return { success: true }; 
-            } catch (error) {
-                console.error("Error en la Matrix API:", error);
-                return { success: false, msg: error.toString() };
-            }
-        }
+// --- MOTOR CORS BYPASS (EL CEREBRO DEFINITIVO) ---
+async function apiCall(action, payload = {}) {
+    try {
+        const data = { action: action, ...payload };
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            // FOCUS: Al usar text/plain, Google no bloquea la lectura de datos
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(data)
+        });
+        return await response.json(); // Leemos la respuesta real de la Matrix
+    } catch (error) {
+        console.error("Error API:", error);
+        return { success: false, msg: error.toString() };
+    }
+}
 
         // EL MOTOR DE VENTANAS DE KAIRO - EVOLUCIONADO
 function kairoMessage({ mensaje, tipo = 'alerta', icon = '🛡️' }) {
@@ -2964,13 +2925,10 @@ function cerrarPerfil() {
   if(btnPerfil) btnPerfil.style.display = "block";
 }
 
-/**
- * GUARDAR CAMBIOS - Perfil (Blindado)
- */
+// --- CIRUGÍA FOCUS: GUARDAR PERFIL DESACOPLADO ---
 async function guardarCambiosPerfil() {
   console.log("--- INICIANDO GUARDADO DE PERFIL (Protocolo Focus) ---");
 
-  // 1. CORRECCIÓN FOCUS: Buscar en localStorage con el nombre correcto
   if (!sessionUser) {
     const backup = localStorage.getItem('kairo_session');
     if (backup) sessionUser = JSON.parse(backup);
@@ -2980,7 +2938,6 @@ async function guardarCambiosPerfil() {
     return notify("Error: Sesión no detectada.");
   }
 
-  // 2. Control visual de carga
   const loader = document.getElementById('loading-perfil');
   const btnGuardar = document.getElementById('btn-guardar-perfil');
   if (loader && btnGuardar) {
@@ -2988,7 +2945,6 @@ async function guardarCambiosPerfil() {
     loader.classList.remove('hidden');
   }
 
-  // 3. Validar Contraseña
   const pass = document.getElementById('edit-pass').value;
   if (pass !== "") {
     if (pass !== document.getElementById('edit-pass-confirm').value || !validarSeguridadPass(pass)) {
@@ -2997,7 +2953,6 @@ async function guardarCambiosPerfil() {
     }
   }
 
-  // 4. Lógica de Identificación de Imagen
   let fotoParaEnviar;
   if (typeof fotoBase64 !== 'undefined' && fotoBase64 !== "" && fotoBase64 !== null) {
     fotoParaEnviar = fotoBase64;
@@ -3020,44 +2975,44 @@ async function guardarCambiosPerfil() {
     foto: fotoParaEnviar
   };
 
-  console.log("📡 Sincronizando datos con la Matrix...");
+  console.log("📡 Sincronizando datos con la Matrix API...");
   
-  google.script.run
-    .withSuccessHandler(async (res) => {
-      if (res.success) {
-        if (res.requiereSubidaFoto === true) {
-          google.script.run.procesoExportadoSubirFoto(fotoParaEnviar, datos.email, datos.nombreReal, res.fila);
-        }
+  // FOCUS: Enviamos datos al servidor
+  const res = await apiCall("actualizarDatosPerfil", datos);
 
-        // CORRECCIÓN FOCUS: Guardar correctamente en localStorage
-        sessionUser = Object.assign(sesionActiva, datos);
-        sessionUser.foto = fotoParaEnviar; 
-        localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
-        
-        await kairoMessage({ 
-            mensaje: res.msg, 
-            icon: res.requiereSubidaFoto ? '⏳' : '✅' 
-        });
+  if (res && res.success) {
+    // Si la API dice que hay que subir foto al Drive, disparamos en segundo plano
+    if (res.requiereSubidaFoto === true) {
+      apiCall("procesoExportadoSubirFoto", {
+          fotoBase64: fotoParaEnviar,
+          email: datos.email,
+          nombreReal: datos.nombreReal,
+          fila: res.fila
+      });
+    }
 
-        if (typeof restaurarBotonPerfil === "function") restaurarBotonPerfil();
-        if (typeof cerrarPerfil === "function") cerrarPerfil();
-        
-        setTimeout(() => { 
-          if (typeof loadDashboard === "function") loadDashboard(); 
-        }, 200);
+    sessionUser = Object.assign(sesionActiva, datos);
+    sessionUser.foto = fotoParaEnviar; 
+    localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+    
+    await kairoMessage({ 
+        mensaje: res.msg, 
+        icon: res.requiereSubidaFoto ? '⏳' : '✅' 
+    });
 
-      } else {
-        if (typeof restaurarBotonPerfil === "function") restaurarBotonPerfil();
-        notify("Error Kairo: " + res.msg);
-      }
-    })
-    .withFailureHandler(err => {
-      if (typeof restaurarBotonPerfil === "function") restaurarBotonPerfil();
-      notify("Se perdió la conexión con la Matrix.");
-    })
-    .actualizarDatosPerfil(datos);
+    if (typeof restaurarBotonPerfil === "function") restaurarBotonPerfil();
+    if (typeof cerrarPerfil === "function") cerrarPerfil();
+    
+    setTimeout(() => { 
+      if (typeof loadDashboard === "function") loadDashboard(); 
+    }, 200);
+
+  } else {
+    if (typeof restaurarBotonPerfil === "function") restaurarBotonPerfil();
+    notify("Error Kairo: " + (res ? res.msg : "Sin respuesta de la Matrix"));
+  }
 }
-
+        
 // Función auxiliar para resetear el estado si hay error
 function restaurarBotonPerfil() {
   const loader = document.getElementById('loading-perfil');
@@ -3542,13 +3497,12 @@ function tabAlquimia(tabId) {
   document.getElementById('tab-' + tabId).classList.remove('hidden');
 }
 
-// Función que el sobrino usará para guardar
-function guardarConfiguracion() {
+// --- CIRUGÍA FOCUS: GUARDAR ALQUIMIA ADMIN ---
+async function guardarConfiguracion() {
   const btnGuardar = event.target;
   btnGuardar.innerText = "⚡ SINCRONIZANDO...";
   btnGuardar.disabled = true;
 
-  // Recopilamos los nuevos valores del panel
   const config = {
     titulo: document.getElementById('conf-titulo').value,
     fondo: document.getElementById('conf-fondo').value,
@@ -3556,7 +3510,6 @@ function guardarConfiguracion() {
     colorM: document.getElementById('conf-color-m').value
   };
 
-  // --- EL EFECTO MÁGICO (Inyección de CSS instantánea) ---
   const root = document.documentElement;
   root.style.setProperty('--neon-n', config.colorN);
   root.style.setProperty('--neon-m', config.colorM);
@@ -3565,46 +3518,57 @@ function guardarConfiguracion() {
   document.body.style.backgroundSize = "cover";
   document.body.style.backgroundAttachment = "fixed";
 
-  // --- GUARDADO PERMANENTE EN GOOGLE SHEETS ---
-  google.script.run.withSuccessHandler(res => {
+  // FOCUS: Enviar la estética al servidor
+  const res = await apiCall("actualizarConfiguracionGeneral", { config: config, email: sessionUser.email });
+  
+  if (res && res.success) {
     btnGuardar.innerText = "✅ CAMBIOS EN LA MATRIX GUARDADOS";
-    btnGuardar.disabled = false;
-    setTimeout(() => { 
-      btnGuardar.innerText = "GUARDAR CAMBIOS EN LA MATRIX";
-      cerrarAlquimia();
-    }, 2000);
-  }).actualizarConfiguracionGeneral(config, sessionUser.email);
+  } else {
+    btnGuardar.innerText = "❌ ERROR AL GUARDAR";
+    notify("Error de la Matrix: " + (res ? res.msg : "Falló conexión"));
+  }
+  
+  btnGuardar.disabled = false;
+  setTimeout(() => { 
+    btnGuardar.innerText = "GUARDAR CAMBIOS EN LA MATRIX";
+    cerrarAlquimia();
+  }, 2000);
 }
-function ejecutarCrearHerramienta() {
-  // 1. Capturamos los elementos del formulario
+        
+// --- CIRUGÍA FOCUS: INYECTAR NUEVA HERRAMIENTA ---
+async function ejecutarCrearHerramienta() {
   const nombre = document.getElementById('new-h-nombre').value;
   const url = document.getElementById('new-h-url').value;
   const color = document.getElementById('new-h-color').value;
   const pilar = document.getElementById('new-h-pilar').value;
 
-  // 2. Validación básica para novatos (Evita enviar campos vacíos)
   if (!nombre || !url) {
-    mostrarAlert("⚠️ Error: Debes poner un nombre y una URL válida.");
+    notify("⚠️ Error: Debes poner un nombre y una URL válida.");
     return;
   }
 
-  mostrarAlert("🚀 Inyectando herramienta en " + pilar + "...");
+  notify("🚀 Inyectando herramienta en " + pilar + "...");
 
-  // 3. Enviamos los datos al servidor (codigo.gs)
-  google.script.run.withSuccessHandler(res => {
-    if (res.success) {
-      mostrarAlert("✅ ¡Éxito! Herramienta inyectada correctamente.");
-      
-      // Limpiamos los campos para la siguiente herramienta
-      document.getElementById('new-h-nombre').value = "";
-      document.getElementById('new-h-url').value = "";
-      
-      // Recargamos la sección para que el Admin vea el cambio (opcional)
-      cargarSeccionHerramientas();
-    } else {
-      mostrarAlert("❌ Error de la Matrix: " + res.msg);
+  const res = await apiCall("registrarNuevaHerramientaEnSheet", { 
+      nombre: nombre, 
+      url: url, 
+      color: color, 
+      pilar: pilar, 
+      email: sessionUser.email 
+  });
+  
+  if (res && res.success) {
+    notify("✅ ¡Éxito! Herramienta inyectada correctamente.");
+    
+    document.getElementById('new-h-nombre').value = "";
+    document.getElementById('new-h-url').value = "";
+    
+    if (typeof cargarSeccionHerramientas === 'function') {
+        cargarSeccionHerramientas();
     }
-  }).registrarNuevaHerramientaEnSheet(nombre, url, color, pilar, sessionUser.email);
+  } else {
+    notify("❌ Error de la Matrix: " + (res ? res.msg : "Fallo desconocido"));
+  }
 }
 
 // --- FUNCIÓN DE ACTIVACIÓN MODULAR (CORREGIDA) ---
@@ -3632,37 +3596,39 @@ function iniciarDiagnosticoModular() {
     }
 }
 
-function procesarNuevaFoto(input) {
+// --- CIRUGÍA FOCUS: PROCESAR NUEVA FOTO ---
+async function procesarNuevaFoto(input) {
     if (!input.files || !input.files[0]) return;
     
     const file = input.files[0];
     const reader = new FileReader();
     
-    // Feedback visual inmediato
     const imgPerfil = document.getElementById('user-photo');
     const oldSrc = imgPerfil.src;
     imgPerfil.style.opacity = "0.5";
     notify("Iniciando Protocolo de Subida...");
 
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         const base64Data = e.target.result;
         
-        google.script.run
-            .withSuccessHandler(res => {
-                if (res.success) {
-                    imgPerfil.src = res.newUrl;
-                    imgPerfil.style.opacity = "1";
-                    // Actualizamos la sesión local para que al refrescar no se pierda
-                    sessionUser.foto = res.newUrl;
-                    localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
-                    notify("Matrix Actualizada: Foto de perfil guardada.");
-                } else {
-                    imgPerfil.src = oldSrc;
-                    imgPerfil.style.opacity = "1";
-                    alert("Error en subida: " + res.msg);
-                }
-            })
-            .actualizarFotoPerfilKairo(base64Data, file.name);
+        // FOCUS: Usamos la Matrix API
+        const res = await apiCall("actualizarFotoPerfilKairo", { 
+            fotoBase64: base64Data, 
+            nombreArchivo: file.name,
+            email: sessionUser.email // Enviamos el email por seguridad en el backend
+        });
+
+        if (res && res.success) {
+            imgPerfil.src = res.newUrl;
+            imgPerfil.style.opacity = "1";
+            sessionUser.foto = res.newUrl;
+            localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+            notify("Matrix Actualizada: Foto de perfil guardada.");
+        } else {
+            imgPerfil.src = oldSrc;
+            imgPerfil.style.opacity = "1";
+            alert("Error en subida: " + (res ? res.msg : "Fallo de conexión."));
+        }
     };
     reader.readAsDataURL(file);
 }
@@ -3736,13 +3702,10 @@ let preguntasDiag = [];
 let slideDiag = 0;
 let respuestasDiag = new Array(27).fill(0);
 
-/**
- * FUNCIÓN PRINCIPAL: Despertar el sistema (BLINDADO)
- */
-function prepararDiagnostico() {
+// --- CIRUGÍA FOCUS: PREPARAR DIAGNÓSTICO ---
+async function prepararDiagnostico() {
     console.log("🛡️ Kairo: Verificando permisos...");
     
-    // --- SALVAVIDAS DE MEMORIA FOCUS (ANTI-CRASH) ---
     if (!sessionUser || !sessionUser.email) {
         const ancla = localStorage.getItem('kairo_session');
         if (ancla) {
@@ -3753,37 +3716,32 @@ function prepararDiagnostico() {
             return;
         }
     }
-    // ------------------------------------------------
 
-    // Reset de estado para nueva sesión
     slideDiag = 0;
     respuestasDiag = new Array(27).fill(0);
 
     const cuerpo = document.getElementById('cuerpo-diagnostico');
     cuerpo.innerHTML = '<div class="spinner"></div><p class="amber" style="text-align:center; margin-top:15px;">SINCRONIZANDO PERMISOS...</p>';
 
-    google.script.run
-        .withSuccessHandler(res => {
-            if (res.intentos >= 2) {
-                mostrarAvisoLimite();
-                return;
-            }
-            console.log("✅ Acceso concedido. Cargando Matrix...");
-            preguntasDiag = res.preguntas;
-            document.getElementById('footer-diagnostico').style.display = 'block';
-            renderizarPreguntaDiag();
-        })
-        .withFailureHandler(err => {
-            console.error("❌ Error Crítico:", err);
-            notify("Error de conexión con el servidor Coach 3D.");
-            salirDelModulo();
-        })
-        .obtenerTodoDiagnostico(sessionUser.email);
+    // FOCUS: Conexión con la API
+    const res = await apiCall("obtenerTodoDiagnostico", { email: sessionUser.email });
+
+    if (res && res.intentos !== undefined) {
+        if (res.intentos >= 2) {
+            mostrarAvisoLimite();
+            return;
+        }
+        console.log("✅ Acceso concedido. Cargando Matrix...");
+        preguntasDiag = res.preguntas;
+        document.getElementById('footer-diagnostico').style.display = 'block';
+        renderizarPreguntaDiag();
+    } else {
+        console.error("❌ Error Crítico:", res ? res.msg : "Sin respuesta");
+        notify("Error de conexión con el servidor Coach 3D.");
+        salirDelModulo();
+    }
 }
 
-/**
- * RENDERIZADO DINÁMICO: Dibuja las preguntas una por una
- */
 /**
  * RENDERIZADO ESTILO LIBRO Y ORDEN ALEATORIO
  */
@@ -3848,11 +3806,8 @@ function nextDiag(puntos) {
     renderizarPreguntaDiag();
 }
 
-/**
- * CIERRE Y EXPORTACIÓN: Muestra Tarjeta Neón
- */
+// --- CIRUGÍA FOCUS: FINALIZAR DIAGNÓSTICO ---
 async function finalizarDiagnostico() {
-    // Escudo de Memoria antes de guardar
     if (!sessionUser || !sessionUser.email) {
         const ancla = localStorage.getItem('kairo_session');
         if (ancla) sessionUser = JSON.parse(ancla);
@@ -3874,62 +3829,51 @@ async function finalizarDiagnostico() {
         respuestas: respuestasDiag
     };
 
-    google.script.run
-        .withSuccessHandler(async (res) => {
-            if (res.success) {
-                // 1. DISEÑO DE LA TARJETA DE RESULTADOS (Responsive)
-                const tarjetaHTML = `
-                    <div style="text-align: center; width: 100%;">
-                        <p style="font-size: 0.85em; color: var(--neon-n); margin-bottom: 20px; font-weight: bold; text-transform: uppercase;">
-                            📩 Reporte PDF enviado a tu correo
-                        </p>
-                        
-                        <div style="background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
-                            <h4 style="color: white; margin-bottom: 10px; font-size: 1.3em; font-family: 'Orbitron', sans-serif;">
-                                NIVEL: <span style="color: var(--neon-f); text-shadow: 0 0 8px var(--neon-f);">${res.nivel}</span>
-                            </h4>
-                            <p style="font-size: 0.9em; font-style: italic; color: #ddd; line-height: 1.4;">
-                                "${res.mensaje}"
-                            </p>
-                        </div>
+    // FOCUS: Enviamos todas las respuestas al servidor
+    const res = await apiCall("finalizarEvaluacionComunidad", payload);
 
-                        <div style="display: flex; justify-content: space-between; gap: 10px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid rgba(34, 211, 238, 0.3);">
-                            <div style="flex: 1; text-align: center;">
-                                <div style="font-size: 0.6em; color: var(--neon-m); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Mentalidad</div>
-                                <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreM} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
-                            </div>
-                            <div style="flex: 1; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
-                                <div style="font-size: 0.6em; color: var(--neon-n); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Nutrición</div>
-                                <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreN} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
-                            </div>
-                            <div style="flex: 1; text-align: center;">
-                                <div style="font-size: 0.6em; color: var(--neon-f); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Finanzas</div>
-                                <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreF} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
-                            </div>
-                        </div>
+    if (res && res.success) {
+        const tarjetaHTML = `
+            <div style="text-align: center; width: 100%;">
+                <p style="font-size: 0.85em; color: var(--neon-n); margin-bottom: 20px; font-weight: bold; text-transform: uppercase;">
+                    📩 Reporte PDF enviado a tu correo
+                </p>
+                
+                <div style="background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 10px rgba(0,0,0,0.8);">
+                    <h4 style="color: white; margin-bottom: 10px; font-size: 1.3em; font-family: 'Orbitron', sans-serif;">
+                        NIVEL: <span style="color: var(--neon-f); text-shadow: 0 0 8px var(--neon-f);">${res.nivel}</span>
+                    </h4>
+                    <p style="font-size: 0.9em; font-style: italic; color: #ddd; line-height: 1.4;">
+                        "${res.mensaje}"
+                    </p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; gap: 10px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; border: 1px solid rgba(34, 211, 238, 0.3);">
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.6em; color: var(--neon-m); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Mentalidad</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreM} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
                     </div>
-                `;
+                    <div style="flex: 1; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.6em; color: var(--neon-n); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Nutrición</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreN} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <div style="font-size: 0.6em; color: var(--neon-f); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Finanzas</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: white;">${res.scoreF} <span style="font-size: 0.5em; color: #666;">/ 45</span></div>
+                    </div>
+                </div>
+            </div>
+        `;
 
-                // 2. MOSTRAR TARJETA 
-                await kairoMessage({ 
-                    mensaje: tarjetaHTML, 
-                    icon: "🏆" 
-                });
-                
-                // 3. CERRAR Y REFRESCAR
-                salirDelModulo();
-                if (typeof loadDashboard === 'function') loadDashboard();
-                
-            } else {
-                notify("Atención: " + res.msg);
-                salirDelModulo();
-            }
-        })
-        .withFailureHandler(err => {
-            notify("Fallo de conexión al cerrar diagnóstico.");
-            salirDelModulo();
-        })
-        .finalizarEvaluacionComunidad(payload);
+        await kairoMessage({ mensaje: tarjetaHTML, icon: "🏆" });
+        
+        salirDelModulo();
+        if (typeof loadDashboard === 'function') loadDashboard();
+        
+    } else {
+        notify("Atención: " + (res ? res.msg : "Fallo de conexión al cerrar diagnóstico."));
+        salirDelModulo();
+    }
 }
 
 /**
