@@ -1803,27 +1803,26 @@ function cerrarKairo() {
         modal.style.display = 'none';
     }
 }
-function verificarEmailExistente(email) {
-  if (!email.includes('@')) return; // No buscamos si no es un email válido
-
-  google.script.run.withSuccessHandler(res => {
-    if (res.success) {
-      notify("¡Kairo te recuerda! Rellenando tus datos guardados...");
-      
-      // Rellenamos los campos del formulario de registro automáticamente
-      document.querySelector('[name="nombre"]').value = res.datos.nombre;
-      document.querySelector('[name="apellido"]').value = res.datos.apellido;
-      document.querySelector('[name="whatsapp"]').value = res.datos.whatsapp;
-      document.querySelector('[name="pais"]').value = res.datos.pais;
-      document.querySelector('[name="edad"]').value = res.datos.edad;
-      document.querySelector('[name="pregunta"]').value = res.datos.pregunta;
-      document.querySelector('[name="respuesta"]').value = res.datos.respuesta;
-      
-      // Aplicamos un efecto visual para que note el cambio
-      document.getElementById('regForm').style.border = "1px solid var(--neon-n)";
+        
+async function verificarEmailExistente(email) {
+    if (!email.includes('@')) return; 
+    
+    const res = await apiCall("buscarDatosPendientes", { email: email });
+    
+    if (res && res.success) {
+        notify("¡Kairo te recuerda! Rellenando tus datos guardados...");
+        document.querySelector('[name="nombre"]').value = res.datos.nombre || "";
+        document.querySelector('[name="apellido"]').value = res.datos.apellido || "";
+        document.querySelector('[name="whatsapp"]').value = res.datos.whatsapp || "";
+        document.querySelector('[name="pais"]').value = res.datos.pais || "";
+        document.querySelector('[name="edad"]').value = res.datos.edad || "";
+        document.querySelector('[name="pregunta"]').value = res.datos.pregunta || "";
+        document.querySelector('[name="respuesta"]').value = res.datos.respuesta || "";
+        document.getElementById('regForm').style.border = "1px solid var(--neon-n)";
     }
-  }).buscarDatosPendientes(email);
 }
+
+        
 // A. Motor del Recortador (Unificado a variable 'cropper')
 let fotoBase64 = ""; 
 let cropper = null; // Usaremos 'cropper' en todo el código para que no se confunda
@@ -2066,17 +2065,17 @@ async function dispararAlertaCierre() {
 }
 
 
-function cargarSeccionHerramientas() {
-  google.script.run.withSuccessHandler(res => {
-    if (!res.success) return console.error("Error de Kairo:", res.msg);
-    
+async function cargarSeccionHerramientas() {
+    const res = await apiCall("obtenerHerramientasDashboard");
+  
+    if (!res || !res.success) return console.error("Error de Kairo:", res ? res.msg : "Sin respuesta");
+  
     const contenedores = {
       'FINANZAS': 'contenedor-herramientas-f',
       'NUTRICION': 'contenedor-herramientas-n',
       'MENTALIDAD': 'contenedor-herramientas-m'
     };
 
-    // Limpiar antes de llenar
     Object.values(contenedores).forEach(id => {
       const el = document.getElementById(id);
       if(el) el.innerHTML = "";
@@ -2087,11 +2086,7 @@ function cargarSeccionHerramientas() {
       if (divPadre && res.data[pilar].length > 0) {
         res.data[pilar].forEach(h => {
           const btn = document.createElement('div');
-          
-          // Aplicamos clases. 'herramienta-bloqueada' ahora permitirá clic gracias al CSS nuevo
           btn.className = `boton-herramienta ${h.bloqueado ? 'herramienta-bloqueada' : ''}`;
-          
-          // Lógica de click mejorada
           btn.onclick = () => {
             if (h.bloqueado) {
               mostrarVentanaSuscripcion(h.nombre); 
@@ -2099,19 +2094,14 @@ function cargarSeccionHerramientas() {
               window.open(h.url, '_blank');
             }
           };
-
-          btn.innerHTML = `
-            <img src="${h.icono || 'https://img.icons8.com/ios-glyphs/30/ffffff/external-link.png'}" style="width:22px; height:22px; flex-shrink: 0;">
-            <span style="font-size:0.85em; color:white; font-weight:500; line-height: 1.2;">${h.nombre}</span>
-          `;
-          
+          btn.innerHTML = `<img src="${h.icono || 'https://img.icons8.com/ios-glyphs/30/ffffff/external-link.png'}" style="width:22px; height:22px; flex-shrink: 0;">
+                           <span style="font-size:0.85em; color:white; font-weight:500; line-height: 1.2;">${h.nombre}</span>`;
           divPadre.appendChild(btn);
         });
       } else if (divPadre) {
         divPadre.innerHTML = "<p style='font-size:0.75em; color:rgba(255,255,255,0.3); text-align:center; margin-top:10px;'>Próximamente...</p>";
       }
     }
-  }).obtenerHerramientasDashboard();
 }
 
 // Función para mostrar el modal con el mensaje personalizado
@@ -2321,46 +2311,44 @@ function toggleMenuApp() {
     }
 }
 
-function cargarMenuDinamico(esPrecarga = false) {
+async function cargarMenuDinamico(esPrecarga = false) {
     const contenedor = document.getElementById('contenedor-items-menu');
     
-    // Solo muestra "Sincronizando" si el usuario lo abrió manualmente y aún no cargaba
     if (!esPrecarga) {
         contenedor.innerHTML = '<p style="text-align:center; color:var(--neon-n);">Sincronizando...</p>';
     }
 
-    google.script.run.withSuccessHandler(res => {
-        if (res.success) {
-            contenedor.innerHTML = '';
-            res.items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'sidebar-item';
+    const res = await apiCall("obtenerMenuApp");
 
-                div.innerHTML = `<img src="${item.icono}" onerror="this.src='https://img.icons8.com/fluency/48/star.png'" style="width:24px; height:24px; flex-shrink: 0;">
-                                 <span style="font-weight:bold; font-size:0.9em;">${item.titulo}</span>`;
+    if (res && res.success) {
+        contenedor.innerHTML = '';
+        res.items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'sidebar-item';
 
-                div.onclick = () => {
-                    toggleMenuApp(); // Cerramos el menú
-                    
-                    if (item.tipo === 'URL') {
-                        window.open(item.accion, '_blank');
-                    } else if (item.tipo === 'SISTEMA') {
-                        const funcionEjecutar = window[item.accion];
-                        if (typeof funcionEjecutar === 'function') {
-                            funcionEjecutar(); 
-                        } else {
-                            notify("Kairo: Función '" + item.accion + "' no integrada todavía.");
-                        }
+            div.innerHTML = `<img src="${item.icono}" onerror="this.src='https://img.icons8.com/fluency/48/star.png'" style="width:24px; height:24px; flex-shrink: 0;">
+                             <span style="font-weight:bold; font-size:0.9em;">${item.titulo}</span>`;
+
+            div.onclick = () => {
+                toggleMenuApp(); 
+                
+                if (item.tipo === 'URL') {
+                    window.open(item.accion, '_blank');
+                } else if (item.tipo === 'SISTEMA') {
+                    const funcionEjecutar = window[item.accion];
+                    if (typeof funcionEjecutar === 'function') {
+                        funcionEjecutar(); 
+                    } else {
+                        notify("Kairo: Función '" + item.accion + "' no integrada todavía.");
                     }
-                };
-                contenedor.appendChild(div);
-            });
-            // FOCUS: Sellamos la memoria. Ya no volverá a consultar al servidor en esta sesión.
-            menuAppCargado = true;
-        } else if (!esPrecarga) {
-            contenedor.innerHTML = '<p style="color:#ff4444; text-align:center;">Error de sincronización.</p>';
-        }
-    }).obtenerMenuApp();
+                }
+            };
+            contenedor.appendChild(div);
+        });
+        menuAppCargado = true;
+    } else if (!esPrecarga) {
+        contenedor.innerHTML = '<p style="color:#ff4444; text-align:center;">Error de sincronización.</p>';
+    }
 }
 
     /**
