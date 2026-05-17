@@ -1246,133 +1246,81 @@ function notify(msg) {
       document.getElementById('step-2-recover').classList.add('hidden');
     }
 
-function ejecutarLogin() {
-  console.log("Iniciando proceso de login..."); 
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  
-  const bannerError = document.getElementById('kairo-error-login');
-  
-  // 1. VALIDACIÓN INICIAL CON BANNER
-  if(!email || !pass) {
-    if(bannerError) {
-      bannerError.innerText = "Completa todos los campos.";
-      bannerError.style.display = "block";
-    }
-    return;
-  } else if(bannerError) {
-    bannerError.style.display = "none"; 
-  }
-  
-  const btnLogin = document.querySelector('#modal-login .btn-n');
-  if(btnLogin) {
-    btnLogin.innerText = "CARGANDO...";
-    btnLogin.style.opacity = "0.5";
-    btnLogin.disabled = true;
-  }
-  
-  google.script.run
-    .withSuccessHandler(res => {
-      console.log("Servidor respondió:", res);
-      
-      if(res && res.success) {
-        // --- SELLO DE TIEMPO KAIRO (CRONÓMETRO 10 MIN) ---
-        res.user.timestamp = new Date().getTime(); 
-        
-        // --- ANCLA PERMANENTE ---
-        sessionUser = res.user;
-        sessionStorage.setItem('kairo_session', JSON.stringify(res.user));
-        
-        console.log("✅ SESIÓN ANCLADA CON TIEMPO: ", res.user.nombre);
-
-        const fotoPrincipal = document.getElementById('user-photo');
-        if(fotoPrincipal) {
-          fotoPrincipal.referrerPolicy = "no-referrer";
-          fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
-        }
-        
-        setTimeout(() => {
-          if(btnLogin) {
-            btnLogin.innerText = "ENTRAR";
-            btnLogin.style.opacity = "1";
-            btnLogin.disabled = false;
-          }
-          loadDashboard();
-        }, 200);
-
-      } else { 
-        if(btnLogin) {
-          btnLogin.innerText = "ENTRAR";
-          btnLogin.style.opacity = "1";
-          btnLogin.disabled = false;
-        }
-        // MOSTRAR ERROR EN BANNER EN LUGAR DE NOTIFY
-        if(bannerError) {
-          bannerError.innerText = res && res.msg ? res.msg : "Credenciales incorrectas.";
-          bannerError.style.display = "block";
-        }
-      }
-    })
-    .withFailureHandler(err => {
-       console.error("Fallo total del servidor:", err);
-       if(btnLogin) {
-         btnLogin.innerText = "ENTRAR";
-         btnLogin.style.opacity = "1";
-         btnLogin.disabled = false;
-       }
-       if(bannerError) {
-         bannerError.innerText = "Kairo no responde.";
-         bannerError.style.display = "block";
-       }
-    })
-    .login(email, pass); 
+async function ejecutarLogin() {
+  console.log("Iniciando proceso de login..."); 
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  
+  const bannerError = document.getElementById('kairo-error-login');
+  
+  if(!email || !pass) {
+    if(bannerError) { bannerError.innerText = "Completa todos los campos."; bannerError.style.display = "block"; }
+    return;
+  } else if(bannerError) { bannerError.style.display = "none"; }
+  
+  const btnLogin = document.querySelector('#modal-login .btn-n');
+  if(btnLogin) { btnLogin.innerText = "CARGANDO..."; btnLogin.style.opacity = "0.5"; btnLogin.disabled = true; }
+  
+  const res = await apiCall("login", { email: email, pass: pass });
+  
+  if(res && res.success) {
+    res.user.timestamp = new Date().getTime(); 
+    sessionUser = res.user;
+    sessionStorage.setItem('kairo_session', JSON.stringify(res.user));
+    
+    const fotoPrincipal = document.getElementById('user-photo');
+    if(fotoPrincipal) {
+      fotoPrincipal.referrerPolicy = "no-referrer";
+      fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
+    }
+    
+    setTimeout(() => {
+      if(btnLogin) { btnLogin.innerText = "ENTRAR"; btnLogin.style.opacity = "1"; btnLogin.disabled = false; }
+      loadDashboard();
+    }, 200);
+  } else { 
+    if(btnLogin) { btnLogin.innerText = "ENTRAR"; btnLogin.style.opacity = "1"; btnLogin.disabled = false; }
+    if(bannerError) { bannerError.innerText = res && res.msg ? res.msg : "Credenciales incorrectas."; bannerError.style.display = "block"; }
+  }
 }
 
-  function ejecutarRegistro() {
-    const form = document.getElementById('regForm');
-    const formData = Object.fromEntries(new FormData(form));
+  async function ejecutarRegistro() {
+    const form = document.getElementById('regForm');
+    const formData = Object.fromEntries(new FormData(form));
 
-    // --- PROTOCOLO FOCUS: VALIDACIONES PREVIAS ---
-    if (formData.pass !== formData.confirmPass) return notify("Las contraseñas no coinciden.");
+    if (formData.pass !== formData.confirmPass) return notify("Las contraseñas no coinciden.");
 
-    // Validar peso de imagen si existe (Máximo 2MB para evitar Error de Servidor)
-    const fotoInput = form.querySelector('input[name="foto"]'); // Asegúrate que el input se llame 'foto'
-    if (fotoInput && fotoInput.files[0] && fotoInput.files[0].size > 2 * 1024 * 1024) {
-        return notify("La foto es demasiado pesada. Máximo 2MB.");
-    }
+    const fotoInput = form.querySelector('input[name="foto"]');
+    if (fotoInput && fotoInput.files[0] && fotoInput.files[0].size > 2 * 1024 * 1024) {
+        return notify("La foto es demasiado pesada. Máximo 2MB.");
+    }
 
-    // Ajuste de invitador
-    if (formData.origen === 'Internet') {
-        formData.invitador_nombre = "ORIGEN_INTERNET";
-        formData.invitador_email = "no-reply@coach3d.app";
-    } else if (formData.origen === 'Invitado') {
-        if (!formData.invitador_nombre || !formData.invitador_email) {
-            return notify("Por favor, completa los datos de quien te invitó.");
-        }
-    }
+    if (formData.origen === 'Internet') {
+        formData.invitador_nombre = "ORIGEN_INTERNET";
+        formData.invitador_email = "no-reply@coach3d.app";
+    } else if (formData.origen === 'Invitado') {
+        if (!formData.invitador_nombre || !formData.invitador_email) {
+            return notify("Por favor, completa los datos de quien te invitó.");
+        }
+    }
 
-    // Feedback visual
-    const btnReg = document.querySelector('#regForm .btn-f');
-    const textoOriginal = btnReg.innerText;
-    btnReg.innerText = "PROCESANDO...";
-    btnReg.disabled = true;
+    const btnReg = document.querySelector('#regForm .btn-f');
+    const textoOriginal = btnReg.innerText;
+    btnReg.innerText = "PROCESANDO...";
+    btnReg.disabled = true;
 
-    google.script.run
-      .withSuccessHandler(res => {
-        btnReg.innerText = textoOriginal;
-        btnReg.disabled = false;
-        if(res.success && res.kairo) { 
-            iniciarKairo(); 
-        } else {
-            notify(res.msg);
-        }
-      })
-      .withFailureHandler(err => {
-        btnReg.innerText = textoOriginal;
-        btnReg.disabled = false;
-        notify("Error de conexión: El archivo podría ser muy pesado o no tienes permisos.");
-      })
-      .registrarUsuario(formData);
+    const res = await apiCall("registrarUsuario", formData);
+
+    btnReg.innerText = textoOriginal;
+    btnReg.disabled = false;
+
+    if (res && res.success && res.kairo) { 
+        iniciarKairo(); 
+    } else if (res && !res.success) {
+        notify(res.msg || "Error de conexión.");
+    } else {
+        notify("Error desconocido al registrar.");
+    }
 }
 
 // Convierte links de Drive en imágenes directas
@@ -1395,101 +1343,84 @@ function filtrarUrlImagen(url) {
   return id ? "https://lh3.googleusercontent.com/d/" + id + "=s400" : url;
 }
 
-    function loadDashboard() {
-  closeAlert();
+async function loadDashboard() {
+  closeAlert();
 
-  // A. SEGURIDAD: Primero confirmamos que el usuario existe en la memoria
-  if (!sessionUser) {
-    return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
-  }
+  if (!sessionUser) {
+    return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
+  }
 
-  // B. VISTA: Limpiar pantallas y mostrar Dashboard
-  document.getElementById('view-welcome').classList.add('hidden');
-  document.getElementById('modal-login').classList.add('hidden');
-  
-  // FOCUS: Lógica Post-Login para el Perfil
-  const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
-  const urlParams = new URLSearchParams(window.location.search);
+  document.getElementById('view-welcome').classList.add('hidden');
+  document.getElementById('modal-login').classList.add('hidden');
+  
+  const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
+  const urlParams = new URLSearchParams(window.location.search);
 
-  if (perfilPendiente) {
-      document.getElementById('view-dashboard').classList.add('hidden');
-      const payload = JSON.parse(perfilPendiente);
-      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
-      payload.email = sessionUser.email;
-      
-      sessionStorage.removeItem('kairo_perfil_pendiente');
-      
-      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
-      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
-      
-      ejecutarEnvioPerfilAlServidor(payload);
-  } else if (urlParams.get('modulo') === 'perfil') {
-      iniciarPerfilBienestar();
-  } else {
-      document.getElementById('view-dashboard').classList.remove('hidden');
-  }
-  
-  // Aseguramos que el contenedor del diagnóstico esté oculto al recargar el dashboard
-  const panelDiag = document.getElementById('contenido-modulo-diagnostico');
-  if (panelDiag) panelDiag.classList.add('hidden');
+  if (perfilPendiente) {
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const payload = JSON.parse(perfilPendiente);
+      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+      payload.email = sessionUser.email;
+      
+      sessionStorage.removeItem('kairo_perfil_pendiente');
+      
+      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
+      
+      ejecutarEnvioPerfilAlServidor(payload);
+  } else if (urlParams.get('modulo') === 'perfil') {
+      iniciarPerfilBienestar();
+  } else {
+      document.getElementById('view-dashboard').classList.remove('hidden');
+  }
+  
+  const panelDiag = document.getElementById('contenido-modulo-diagnostico');
+  if (panelDiag) panelDiag.classList.add('hidden');
 
-  const herramientas = document.getElementById('seccion-herramientas');
-  if (herramientas) { herramientas.classList.remove('hidden'); }
+  const herramientas = document.getElementById('seccion-herramientas');
+  if (herramientas) { herramientas.classList.remove('hidden'); }
 
-  // C. IDENTIDAD: Pintar nombre y país
-  document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
-  document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
+  document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
+  document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
 
-  const fotoCirculo = document.getElementById('user-photo');
-  if (fotoCirculo) {
-    fotoCirculo.referrerPolicy = "no-referrer";
-    const tieneFoto = (sessionUser.foto && sessionUser.foto.trim().length > 10);
-    
-    // FOCUS: Aplicamos el filtro para asegurar que sea un link directo de imagen
-    fotoCirculo.src = tieneFoto 
-        ? filtrarUrlImagen(sessionUser.foto) 
-        : "https://ui-avatars.com/api/?name=" + (sessionUser.nombre || "U") + "&background=0a0f1e&color=22d3ee";
-  }
+  const fotoCirculo = document.getElementById('user-photo');
+  if (fotoCirculo) {
+    fotoCirculo.referrerPolicy = "no-referrer";
+    const tieneFoto = (sessionUser.foto && sessionUser.foto.trim().length > 10);
+    fotoCirculo.src = tieneFoto ? filtrarUrlImagen(sessionUser.foto) : "https://ui-avatars.com/api/?name=" + (sessionUser.nombre || "U") + "&background=0a0f1e&color=22d3ee";
+  }
 
-  // E. RANGO: Panel Admin
-  if(sessionUser.rango === "Admin") {
-    document.getElementById('admin-panel').style.display = 'block';
-  } else {
-    document.getElementById('admin-panel').style.display = 'none';
-  }
+  if(sessionUser.rango === "Admin") {
+    document.getElementById('admin-panel').style.display = 'block';
+  } else {
+    document.getElementById('admin-panel').style.display = 'none';
+  }
 
-  // F. DATOS VIVOS Y DISPONIBILIDAD (Fusión Matrix)
-  // Pedimos métricas y disponibilidad en paralelo para máxima eficiencia
-  google.script.run.withSuccessHandler(data => {
-    if (data && data.metrics) {
-      document.getElementById('metric-f').innerText = data.metrics.f || 0;
-      document.getElementById('metric-n').innerText = data.metrics.n || 0;
-      document.getElementById('metric-m').innerText = data.metrics.m || 0;
-      document.getElementById('metric-nivel').innerHTML = data.metrics.nivel || "Iniciante";
-      
-      if (typeof cargarSeccionHerramientas === 'function') cargarSeccionHerramientas();
-    }
-  }).getDashboardData(sessionUser.email);
+  const data = await apiCall("getDashboardData", { email: sessionUser.email });
+  if (data && data.metrics) {
+    document.getElementById('metric-f').innerText = data.metrics.f || 0;
+    document.getElementById('metric-n').innerText = data.metrics.n || 0;
+    document.getElementById('metric-m').innerText = data.metrics.m || 0;
+    document.getElementById('metric-nivel').innerHTML = data.metrics.nivel || "Iniciante";
+    if (typeof cargarSeccionHerramientas === 'function') cargarSeccionHerramientas();
+  }
 
-  // NUEVA LÓGICA: Consultar cuántos diagnósticos le quedan este mes
-  google.script.run.withSuccessHandler(res => {
-    const spanNum = document.getElementById('num-disponible');
-    if (spanNum) spanNum.innerText = res.disponibles;
-    
-    // Si agotó sus 2 intentos, bloqueamos el botón con estética Kairo
-    const btnDiag = document.querySelector('#container-btn-diagnostico .btn');
-    if (res.disponibles <= 0 && btnDiag) {
-        btnDiag.classList.add('bloqueado');
-        btnDiag.style.opacity = "0.5";
-        btnDiag.onclick = () => notify("🛡️ KAIRO: Has agotado tus 2 diagnósticos de este mes.");
-    }
-  }).consultarDisponibilidadDiagnostico(sessionUser.email);
-  // FOCUS: Ordenamos la precarga silenciosa del menú
-  if (!menuAppCargado && typeof cargarMenuDinamico === 'function') {
-      cargarMenuDinamico(true); 
-  }
-  }
+  const res = await apiCall("consultarDisponibilidadDiagnostico", { email: sessionUser.email });
+  if (res && res.success !== false) {
+    const spanNum = document.getElementById('num-disponible');
+    if (spanNum) spanNum.innerText = res.disponibles;
+    const btnDiag = document.querySelector('#container-btn-diagnostico .btn');
+    if (res.disponibles <= 0 && btnDiag) {
+        btnDiag.classList.add('bloqueado');
+        btnDiag.style.opacity = "0.5";
+        btnDiag.onclick = () => notify("🛡️ KAIRO: Has agotado tus 2 diagnósticos de este mes.");
+    }
+  }
 
+  if (!menuAppCargado && typeof cargarMenuDinamico === 'function') {
+      cargarMenuDinamico(true); 
+  }
+}
 
     function recuperarPass() {
       document.getElementById('view-welcome').classList.add('hidden');
