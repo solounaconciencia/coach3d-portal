@@ -1427,27 +1427,25 @@ async function loadDashboard() {
       document.getElementById('modal-recover').classList.remove('hidden');
     }
 
-    function buscarPregunta() {
-      const email = document.getElementById('recover-email').value;
-      google.script.run.withSuccessHandler(res => {
-        if(res.success) {
-          document.getElementById('step-1-recover').classList.add('hidden');
-          document.getElementById('display-question').innerText = res.pregunta;
-          document.getElementById('step-2-recover').classList.remove('hidden');
-        } else { notify(res.msg); }
-      }).obtenerPreguntaSeguridad(email);
-    }
+    async function buscarPregunta() {
+  const email = document.getElementById('recover-email').value;
+  const res = await apiCall("obtenerPreguntaSeguridad", { email: email });
+  if(res && res.success) {
+    document.getElementById('step-1-recover').classList.add('hidden');
+    document.getElementById('display-question').innerText = res.pregunta;
+    document.getElementById('step-2-recover').classList.remove('hidden');
+  } else { notify(res ? res.msg : "Error al conectar."); }
+}
 
-    function validarAcceso() {
-      const email = document.getElementById('recover-email').value;
-      const respuesta = document.getElementById('recover-answer').value;
-      google.script.run.withSuccessHandler(res => {
-        if(res.success) {
-          notify("Validado. Clave temporal: " + res.tempPass);
-          cancelarRegistro();
-        } else { notify(res.msg); }
-      }).validarRespuestaSeguridad(email, respuesta);
-    }
+async function validarAcceso() {
+  const email = document.getElementById('recover-email').value;
+  const respuesta = document.getElementById('recover-answer').value;
+  const res = await apiCall("validarRespuestaSeguridad", { email: email, respuesta: respuesta });
+  if(res && res.success) {
+    notify("Validado. Clave temporal: " + res.tempPass);
+    cancelarRegistro();
+  } else { notify(res ? res.msg : "Respuesta incorrecta."); }
+}
 
 function logout() {
   sessionStorage.clear();
@@ -1718,13 +1716,12 @@ function iniciarKairo() {
     }, 1000);
 }
 
-function validarCodigoKairo() {
+async function validarCodigoKairo() {
     const btnValidar = document.querySelector('#modal-verificacion .btn-f');
     const inputCodigo = document.getElementById('input-codigo');
     const emailInput = document.getElementById('reg-email');
 
-    // 1. Validaciones de seguridad inicial
-    if (!inputCodigo || !emailInput) return console.error("Error: No se encuentran los elementos de entrada.");
+    if (!inputCodigo || !emailInput) return console.error("Error: Elementos no encontrados.");
     
     const codigoIngresado = inputCodigo.value.trim();
     const email = emailInput.value.trim();
@@ -1733,63 +1730,67 @@ function validarCodigoKairo() {
         return notify("Por favor, ingresa los 5 dígitos del código.");
     }
 
-    // 2. Bloqueo visual (Neuro-Diseño) para evitar doble envío
     if (btnValidar) {
         btnValidar.innerText = "⚡ VERIFICANDO...";
         btnValidar.disabled = true;
         btnValidar.style.opacity = "0.6";
     }
 
-    // 3. Conexión con el Servidor (Código.gs)
-    google.script.run
-        .withSuccessHandler(res => {
-            // Restauramos el botón
-            if (btnValidar) {
-                btnValidar.innerText = "ACTIVAR CUENTA";
-                btnValidar.disabled = false;
-                btnValidar.style.opacity = "1";
-            }
+    const res = await apiCall("verificarPInKairo", { email: email, pin: codigoIngresado });
 
-            if (res.success) {
-                // A. Detenemos el cronómetro global de Kairo
-                if (typeof cuentaRegresiva !== 'undefined') {
-                    clearInterval(cuentaRegresiva);
-                }
-                
-                // B. Cerramos el modal usando tu función de la Parte 3 (limpia el blur y oculta el modal)
-                if (typeof cerrarKairo === "function") {
-                    cerrarKairo();
-                } else {
-                    document.getElementById('modal-verificacion').classList.add('hidden');
-                    document.getElementById('modal-verificacion').style.display = 'none';
-                    document.getElementById('main-content').classList.remove('blur-effect');
-                }
-                
-                // C. Feedback positivo al usuario
-                notify("¡Cuenta activada por Kairo! Ya puedes iniciar sesión.");
-                
-                // D. Limpieza total y retorno al inicio
-                const form = document.getElementById('regForm');
-                if (form) form.reset();
-                
-                if (typeof cancelarRegistro === "function") {
-                    cancelarRegistro();
-                }
-            } else {
-                notify(res.msg || "Código incorrecto o expirado.");
-                if (inputCodigo) inputCodigo.value = ""; // Limpiamos el PIN para que reintente
+    if (btnValidar) {
+        btnValidar.innerText = "ACTIVAR CUENTA";
+        btnValidar.disabled = false;
+        btnValidar.style.opacity = "1";
+    }
+
+    if (res && res.success) {
+        if (typeof cuentaRegresiva !== 'undefined') clearInterval(cuentaRegresiva);
+        
+        if (typeof cerrarKairo === "function") {
+            cerrarKairo();
+        } else {
+            document.getElementById('modal-verificacion').classList.add('hidden');
+            document.getElementById('modal-verificacion').style.display = 'none';
+            document.getElementById('main-content').classList.remove('blur-effect');
+        }
+
+        // --- PROTOCOLO FOCUS: AUTO-LOGIN ---
+        if (res.user) {
+            // 1. Guardar la sesión en memoria
+            res.user.timestamp = new Date().getTime(); 
+            sessionUser = res.user;
+            sessionStorage.setItem('kairo_session', JSON.stringify(res.user));
+            
+            // 2. Colocar la foto de perfil en el Dashboard
+            const fotoPrincipal = document.getElementById('user-photo');
+            if(fotoPrincipal) {
+                fotoPrincipal.referrerPolicy = "no-referrer";
+                fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
             }
-        })
-        .withFailureHandler(err => {
-            if (btnValidar) {
-                btnValidar.innerText = "ACTIVAR CUENTA";
-                btnValidar.disabled = false;
-                btnValidar.style.opacity = "1";
-            }
-            notify("Error de conexión: Kairo está fuera de alcance.");
-            console.error("Fallo de red en Apps Script:", err);
-        })
-        .verificarPInKairo(email, codigoIngresado);
+            
+            // 3. Limpiar formulario
+            const form = document.getElementById('regForm');
+            if (form) form.reset();
+
+            // 4. Mensaje y redirección directa al Dashboard
+            notify("¡Cuenta activada! Entrando a la Matrix...");
+            setTimeout(() => {
+                loadDashboard();
+            }, 800);
+            
+        } else {
+            // Respaldo por si falla la carga de datos
+            notify("¡Cuenta activada por Kairo! Ya puedes iniciar sesión.");
+            const form = document.getElementById('regForm');
+            if (form) form.reset();
+            if (typeof cancelarRegistro === "function") cancelarRegistro();
+        }
+
+    } else {
+        notify(res ? res.msg : "Código incorrecto o expirado.");
+        if (inputCodigo) inputCodigo.value = ""; 
+    }
 }
             
 function cerrarKairo() {
