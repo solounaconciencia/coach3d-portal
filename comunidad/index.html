@@ -1478,20 +1478,23 @@ async function loadDashboard() {
   }
 
   if (!menuAppCargado && typeof cargarMenuDinamico === 'function') {
-      cargarMenuDinamico(true); 
-  }
-}
-// Disparar Alerta de Clave Vulnerable si Kairo la detecta
+      cargarMenuDinamico(true); 
+  }
+
+  // 🛡️ PROTOCOLO FOCUS: Disparar Alerta de Clave Vulnerable dentro del Dashboard
   if (sessionUser && sessionUser.alertaClave) {
       setTimeout(() => {
           document.getElementById('main-content').classList.add('blur-effect');
           const modalAlerta = document.getElementById('modal-alerta-clave');
-          modalAlerta.classList.remove('hidden');
-          modalAlerta.style.display = 'block';
-      }, 1500); // Aparece 1.5 seg después de cargar el dashboard
+          if (modalAlerta) {
+              modalAlerta.classList.remove('hidden');
+              modalAlerta.style.setProperty('display', 'block', 'important');
+              modalAlerta.style.setProperty('visibility', 'visible', 'important');
+              modalAlerta.style.setProperty('opacity', '1', 'important');
+          }
+      }, 1500);
   }
 }
-
 
     function recuperarPass() {
       document.getElementById('view-welcome').classList.add('hidden');
@@ -1519,16 +1522,14 @@ async function validarAcceso() {
 }
 
 function logout() {
+  // Limpieza absoluta de la Matrix en el cliente
   sessionStorage.clear();
+  localStorage.clear();
   sessionUser = null;
-  const urlApp = "https://script.google.com/macros/s/AKfycbzMt9vykciK_Hybkf6oQLEBVCGn2VaVcBMHbj5PcLi1LGeGsm3WR4UqYc7SRqLPmBMeyw/exec";
+  const urlApp = "https://coach3dlatam.app";
   window.top.location.href = urlApp;
 }
 
-/**
- * PROTOCOLO FOCUS: SISTEMA DE PERSISTENCIA Y AUDITORÍA DE TIEMPO
- * Evolución: Fusión de Escudo Anti-Undefined + Auto-Rehidratación
- */
 function checkSession() {
   console.log("🛡️ Kairo: Iniciando escaneo de sesión...");
   try {
@@ -2084,35 +2085,15 @@ function resetearVigilante() {
 
 // --- PROTOCOLO DE PERSISTENCIA FOCUS ---
 window.onload = function() {
-    resetearVigilante();
+    if (typeof resetearVigilante === 'function') resetearVigilante();
 
     // FOCUS: Interceptor de URL para prospectos
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('modulo') === 'perfil') {
         iniciarPerfilBienestar();
     }
-
-    const dataGuardada = localStorage.getItem('kairo_session');
     
-    if (dataGuardada) {
-        const user = JSON.parse(dataGuardada);
-        const ahora = new Date().getTime();
-        const diezMinutos = 600000;
-
-        // Si la sesión tiene menos de 10 minutos desde el último movimiento
-        if (user.timestamp && (ahora - user.timestamp < diezMinutos)) {
-            console.log("🛡️ Kairo: Sesión recuperada. Saltando login...");
-            sessionUser = user;
-            
-            // Función que oculta el login y muestra el dashboard automáticamente
-            if (typeof loadDashboard === 'function') {
-                loadDashboard();
-            }
-        } else {
-            console.log("🛡️ Kairo: Sesión antigua detectada. Limpiando...");
-            localStorage.removeItem('kairo_session');
-        }
-    }
+    // Al remover el localStorage duplicado, checkSession() del body se encarga de rehidratar limpiamente mediante sessionStorage.
 };
 
 document.onmousemove = resetearVigilante;
