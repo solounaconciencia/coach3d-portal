@@ -1054,8 +1054,8 @@
     </div>
 </div>
 
-<div id="modal-alerta-clave" class="hidden glass-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000000; width: 90%; max-width: 400px; text-align: center; border: 2px solid #ff4444; padding: 30px; background: rgba(20, 5, 5, 0.95); box-shadow: 0 0 40px rgba(255, 68, 68, 0.4);">
-    <img src="https://i.postimg.cc/wjNJr54L/imagen3.png" style="width: 80px; border-radius: 50%; margin-bottom: 10px; border: 2px solid #ff4444; box-shadow: 0 0 20px #ff4444;">
+<div id="modal-alerta-clave" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 90% !important; max-width: 400px !important; text-align: center !important; border: 2px solid #ff4444 !important; padding: 30px !important; background: rgba(10, 15, 30, 0.98) !important; box-shadow: 0 0 50px rgba(255, 68, 68, 0.8) !important;">
+    <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid #ff4444; box-shadow: 0 0 20px #ff4444; margin-bottom: 15px; object-fit: cover;">
     <h3 style="color: #ff4444; margin-top: 0; letter-spacing: 2px;">ALERTA DE SEGURIDAD</h3>
     <p style="font-size: 0.9em; line-height: 1.5; margin-bottom: 20px; color: #e2e8f0;">Hola, soy Kairo. He detectado que tu contraseña actual no cumple con los nuevos protocolos de encriptación de <b>Coach 3D LATAM</b>. Te sugiero actualizarla para proteger tus datos.</p>
     <button class="btn" style="background: #ff4444; color: white; width: 100%; border: none; font-size: 1.1em;" onclick="cerrarAlertaClaveYAbrirPerfil()">MODIFICAR AHORA</button>
@@ -1481,7 +1481,7 @@ async function loadDashboard() {
       cargarMenuDinamico(true); 
   }
 
-  // 🛡️ PROTOCOLO FOCUS: Disparar Alerta de Clave Vulnerable dentro del Dashboard
+  // 🛡️ PROTOCOLO FOCUS: Disparar Alerta de Clave Vulnerable CORRECTAMENTE dentro de la función
   if (sessionUser && sessionUser.alertaClave) {
       setTimeout(() => {
           document.getElementById('main-content').classList.add('blur-effect');
@@ -1522,12 +1522,13 @@ async function validarAcceso() {
 }
 
 function logout() {
-  // Limpieza absoluta de la Matrix en el cliente
+  // 🛡️ CAPA 4: Limpieza absoluta de ambas memorias (Evita el auto-login eterno)
   sessionStorage.clear();
   localStorage.clear();
   sessionUser = null;
-  const urlApp = "https://coach3dlatam.app";
-  window.top.location.href = urlApp;
+  
+  // Redirección limpia a tu misma página de GitHub Pages, no a Google Scripts externos
+  window.top.location.href = window.location.origin + window.location.pathname;
 }
 
 function checkSession() {
