@@ -1054,6 +1054,14 @@
     </div>
 </div>
 
+<div id="modal-alerta-clave" class="hidden glass-panel" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000000; width: 90%; max-width: 400px; text-align: center; border: 2px solid #ff4444; padding: 30px; background: rgba(20, 5, 5, 0.95); box-shadow: 0 0 40px rgba(255, 68, 68, 0.4);">
+    <img src="https://i.postimg.cc/wjNJr54L/imagen3.png" style="width: 80px; border-radius: 50%; margin-bottom: 10px; border: 2px solid #ff4444; box-shadow: 0 0 20px #ff4444;">
+    <h3 style="color: #ff4444; margin-top: 0; letter-spacing: 2px;">ALERTA DE SEGURIDAD</h3>
+    <p style="font-size: 0.9em; line-height: 1.5; margin-bottom: 20px; color: #e2e8f0;">Hola, soy Kairo. He detectado que tu contraseña actual no cumple con los nuevos protocolos de encriptación de <b>Coach 3D LATAM</b>. Te sugiero actualizarla para proteger tus datos.</p>
+    <button class="btn" style="background: #ff4444; color: white; width: 100%; border: none; font-size: 1.1em;" onclick="cerrarAlertaClaveYAbrirPerfil()">MODIFICAR AHORA</button>
+    <p style="font-size: 0.75em; opacity: 0.7; margin-top: 15px; cursor: pointer; text-decoration: underline;" onclick="document.getElementById('modal-alerta-clave').classList.add('hidden'); document.getElementById('modal-alerta-clave').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Recordarme más tarde</p>
+</div>
+        
 <div id="modal-alquimia" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
     <div class="glass-panel" style="width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; border: 2px solid var(--neon-admin);">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">
@@ -1115,15 +1123,67 @@
 </div>
 
     <script>
-        // CONFIGURACIÓN GLOBAL
-        const API_URL = "https://script.google.com/macros/s/AKfycbx0P7lLzRvfq-H2YueMV8y5KznAO0qZziGfPm2tcrvDYkc7-Tx0vhsscxm4NbfxgVD4MQ/exec";
-        
-        // La variable sessionUser se mantiene igual
-        let sessionUser = null;
-        let menuAppCargado = false;
+        // CONFIGURACIÓN GLOBAL
+        const API_URL = "https://script.google.com/macros/s/AKfycbx0P7lLzRvfq-H2YueMV8y5KznAO0qZziGfPm2tcrvDYkc7-Tx0vhsscxm4NbfxgVD4MQ/exec";
+        
+        // La variable sessionUser se mantiene igual
+        let sessionUser = null;
+        let menuAppCargado = false;
+
+        // ==========================================
+        // 🛡️ CAPA 4: INTERCEPTOR CRIPTOGRÁFICO (GHOST SCRIPT)
+        // ==========================================
+        (function() {
+            const KAIRO_KEY = "c3d_matrix_2026"; // Llave maestra
+            const originalSetItem = Storage.prototype.setItem;
+            const originalGetItem = Storage.prototype.getItem;
+            const originalRemoveItem = Storage.prototype.removeItem;
+
+            // 1. Intercepta el Guardado (Lo encripta en el aire)
+            Storage.prototype.setItem = function(key, value) {
+                if (key === 'kairo_session') {
+                    let encoded = "";
+                    for (let i = 0; i < value.length; i++) {
+                        encoded += String.fromCharCode(value.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
+                    }
+                    originalSetItem.call(this, 'kairo_token', btoa(encoded));
+                    // Borramos el rastro en texto plano para los curiosos
+                    originalSetItem.call(this, 'kairo_session', "ENCRIPTADO_POR_KAIRO"); 
+                } else {
+                    originalSetItem.call(this, key, value);
+                }
+            };
+
+            // 2. Intercepta la Lectura (Lo desencripta antes de entregarlo)
+            Storage.prototype.getItem = function(key) {
+                if (key === 'kairo_session') {
+                    let token = originalGetItem.call(this, 'kairo_token');
+                    if (!token) return null;
+                    try {
+                        let decoded = atob(token);
+                        let str = "";
+                        for (let i = 0; i < decoded.length; i++) {
+                            str += String.fromCharCode(decoded.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
+                        }
+                        return str;
+                    } catch(e) { return null; }
+                }
+                return originalGetItem.call(this, key);
+            };
+
+            // 3. Intercepta el Borrado al cerrar sesión (Limpia los rastros)
+            Storage.prototype.removeItem = function(key) {
+                if (key === 'kairo_session') {
+                    originalRemoveItem.call(this, 'kairo_token');
+                    originalRemoveItem.call(this, 'kairo_session');
+                } else {
+                    originalRemoveItem.call(this, key);
+                }
+            };
+        })();
 
 // --- MOTOR CORS BYPASS (EL CEREBRO DEFINITIVO) ---
-async function apiCall(action, payload = {}) {
+        async function apiCall(action, payload = {}) {
     try {
         const data = { action: action, ...payload };
         const response = await fetch(API_URL, {
@@ -1421,6 +1481,17 @@ async function loadDashboard() {
       cargarMenuDinamico(true); 
   }
 }
+// Disparar Alerta de Clave Vulnerable si Kairo la detecta
+  if (sessionUser && sessionUser.alertaClave) {
+      setTimeout(() => {
+          document.getElementById('main-content').classList.add('blur-effect');
+          const modalAlerta = document.getElementById('modal-alerta-clave');
+          modalAlerta.classList.remove('hidden');
+          modalAlerta.style.display = 'block';
+      }, 1500); // Aparece 1.5 seg después de cargar el dashboard
+  }
+}
+
 
     function recuperarPass() {
       document.getElementById('view-welcome').classList.add('hidden');
@@ -1645,7 +1716,6 @@ async function guardarCambiosPerfil() {
   const res = await apiCall("actualizarDatosPerfil", datos);
 
   if (res && res.success) {
-    // Si la API dice que hay que subir foto al Drive, disparamos en segundo plano
     if (res.requiereSubidaFoto === true) {
       apiCall("procesoExportadoSubirFoto", {
           fotoBase64: fotoParaEnviar,
@@ -1657,6 +1727,12 @@ async function guardarCambiosPerfil() {
 
     sessionUser = Object.assign(sesionActiva, datos);
     sessionUser.foto = fotoParaEnviar; 
+    
+    // 🛡️ Si el usuario actualizó la contraseña, desactivamos la alerta
+    if (pass !== "") {
+        sessionUser.alertaClave = false;
+    }
+
     localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
     
     await kairoMessage({ 
@@ -2589,6 +2665,12 @@ function salirDelModulo() {
     document.getElementById('main-content').classList.remove('blur-effect');
 }
 
+function cerrarAlertaClaveYAbrirPerfil() {
+    document.getElementById('modal-alerta-clave').classList.add('hidden');
+    document.getElementById('modal-alerta-clave').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+    abrirPerfil(); // Llama a la ventana de editar perfil
+}
     
     </script>
 </body>
