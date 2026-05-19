@@ -2657,6 +2657,109 @@ function cerrarAlertaClaveYAbrirPerfil() {
     abrirPerfil(); // Llama a la ventana de editar perfil
 }
     
+// =========================================================================
+// 🍏 MÓDULO: PERFIL DE BIENESTAR - CONTROLADOR FRONTEND
+// =========================================================================
+
+function iniciarPerfilBienestar() {
+    closeAlert();
+    const dash = document.getElementById('view-dashboard');
+    const herramientas = document.getElementById('seccion-herramientas');
+    const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+
+    if (dash) dash.classList.add('hidden');
+    if (herramientas) herramientas.classList.add('hidden');
+    if (moduloPerfil) {
+        moduloPerfil.classList.remove('hidden');
+        // Aseguramos que muestre el formulario limpio y oculte resultados previos
+        document.getElementById('form-perfil-bienestar').classList.remove('hidden');
+        document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
+        document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
+    }
+}
+
+async function prepararCalculoPerfil() {
+    const peso = document.getElementById('pb-peso').value;
+    const estatura = document.getElementById('pb-estatura').value;
+    const edad = document.getElementById('pb-edad').value;
+    const sexo = document.getElementById('pb-sexo').value;
+    const cintura = document.getElementById('pb-cintura').value;
+    const cuello = document.getElementById('pb-cuello').value;
+    const cadera = document.getElementById('pb-cadera').value;
+    const grasa = document.getElementById('pb-grasa').value;
+    const musculo = document.getElementById('pb-musculo').value;
+    const agua = document.getElementById('pb-agua').value;
+    const osea = document.getElementById('pb-masaOsea').value;
+    const visceral = document.getElementById('pb-grasaVisceral').value;
+
+    if (!peso || !estatura || !edad || !sexo || !cintura || !cuello) {
+        return notify("Por favor, completa todos los campos obligatorios (*).");
+    }
+
+    const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
+    const txtOriginal = btnCalcular.innerText;
+    btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
+    btnCalcular.disabled = true;
+
+    const payload = {
+        nombre: sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Usuario",
+        email: sessionUser ? sessionUser.email : "",
+        peso: peso,
+        estatura: estatura,
+        edad: edad,
+        sexo: sexo,
+        cintura: cintura,
+        cuello: cuello,
+        cadera: cadera,
+        grasa: grasa,
+        musculo: musculo,
+        agua: agua,
+        masaOsea: osea,
+        grasaVisceral: visceral
+    };
+
+    await ejecutarEnvioPerfilAlServidor(payload);
+    
+    btnCalcular.innerText = txtOriginal;
+    btnCalcular.disabled = false;
+}
+
+async function ejecutarEnvioPerfilAlServidor(payload) {
+    const res = await apiCall("procesarEvaluacionBienestar", payload);
+
+    if (res && res.success) {
+        document.getElementById('form-perfil-bienestar').classList.add('hidden');
+        const contenedorResultados = document.getElementById('pb-resultados-grid');
+        contenedorResultados.innerHTML = "";
+
+        const m = res.metricas;
+        
+        // Estructura de visualización limpia para las tarjetas neón del usuario
+        const tarjetas = [
+            { titulo: "IMC", valor: m.imc, desc: m.clasificacionIMC },
+            { titulo: "WHtR (Cintura/Est.)", valor: m.whtr, desc: m.clasificacionWHtR },
+            { titulo: "Grasa Corporal", valor: m.grasaCorporal ? m.grasaCorporal + "%" : "-", desc: "Ecuación Navy" },
+            { titulo: "Edad Metabólica", valor: m.edadMetabolica ? m.edadMetabolica + " años" : "-", desc: "Cálculo Base" },
+            { titulo: "Metabolismo Basal", valor: m.tmb ? m.tmb + " kcal" : "-", desc: "Gasto en reposo" },
+            { titulo: "Score Bienestar", valor: m.scoreMetabolico + " pts", desc: "Índice General" }
+        ];
+
+        tarjetas.forEach(t => {
+            const card = document.createElement('div');
+            card.style = "background: rgba(0,0,0,0.6); padding: 12px; border-radius: 12px; border: 1px solid var(--neon-n); text-align: center;";
+            card.innerHTML = `<h5 style='margin:0; font-size:0.7em; color:var(--neon-admin); text-transform:uppercase; letter-spacing:1px;'>${t.titulo}</h5>
+                              <h2 style='margin:6px 0; color:white; font-size:1.3em; font-family: "Orbitron", sans-serif;'>${t.valor}</h2>
+                              <small style='color:var(--neon-n); font-size:0.75em;'>${t.desc}</small>`;
+            contenedorResultados.appendChild(card);
+        });
+
+        document.getElementById('bubblePerfil').innerHTML = `<b>Kairo informa:</b> Análisis completado con éxito. Tu Score de Bienestar actual es de <b>${m.scoreMetabolico} puntos</b>. He enviado el reporte PDF avanzado directamente a tu correo electrónico.`;
+        document.getElementById('resultado-perfil-bienestar').classList.remove('hidden');
+    } else {
+        notify("Error en los sistemas de Kairo: " + (res ? res.msg : "Sin respuesta del servidor."));
+    }
+}
+    
     </script>
 </body>
 </html>
