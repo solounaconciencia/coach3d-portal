@@ -967,7 +967,7 @@
              
              <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--neon-f); margin-bottom: 15px;">
                 <p id="pb-mensaje-final" style="color: var(--white); font-size: 1em; line-height: 1.5; margin-bottom: 15px; font-style: italic;"></p>
-                <button id="btn-ver-pdf-bienestar" class="btn btn-n" style="width: 100%; font-weight: bold;">📄 VER REPORTE PDF ADVANCED</button>
+                <button id="btn-ver-pdf-bienestar" class="btn btn-n" style="width: 100%; font-weight: bold; padding: 15px;">📄 VER REPORTE PDF ADVANCED</button>
              </div>
 
              <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
@@ -1065,6 +1065,14 @@
     <p style="font-size: 0.95em; line-height: 1.5; margin-bottom: 25px; color: #e2e8f0;">Hola, soy Kairo. He detectado que tu contraseña actual <b>no está encriptada</b> y es vulnerable en la Matrix. Te sugiero modificarla ahora mismo para proteger tu perfil.</p>
     <button class="btn" style="background: #ff4444; color: white; width: 100%; border: 1px solid #ff4444; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; padding: 15px;" onclick="cerrarAlertaClaveYAbrirPerfil()">MODIFICAR AHORA</button>
     <p style="font-size: 0.8em; opacity: 0.7; margin-top: 20px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-alerta-clave').classList.add('hidden'); document.getElementById('modal-alerta-clave').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Recordarme más tarde</p>
+</div>
+
+<div id="modal-registro-bienestar" class="hidden glass-panel">
+    <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 20px var(--neon-n); margin-bottom: 15px; object-fit: cover;">
+    <h3 style="color: var(--neon-n); margin-top: 0; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">REGISTRO REQUERIDO</h3>
+    <p style="font-size: 0.95em; line-height: 1.5; margin-bottom: 25px; color: #e2e8f0;">¡Excelente progreso! Para poder procesar tus parámetros, generar tus gráficos metabólicos y enviarte el reporte avanzado en PDF, necesitas formar parte de la comunidad.</p>
+    <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 15px; font-weight: bold;" onclick="redirigirAAccesoBienestar()">CREAR CUENTA / INICIAR SESIÓN</button>
+    <p style="font-size: 0.8em; opacity: 0.5; margin-top: 15px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-registro-bienestar').classList.add('hidden'); document.getElementById('modal-registro-bienestar').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Cancelar</p>
 </div>
 
 <div id="modal-registro-bienestar" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 90% !important; max-width: 400px !important; text-align: center !important; border: 2px solid var(--neon-n) !important; padding: 30px !important; background: rgba(10, 15, 30, 0.98) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.5) !important;">
@@ -1417,31 +1425,35 @@ function filtrarUrlImagen(url) {
 }
 
 async function loadDashboard() {
-  closeAlert();
+  closeAlert();
 
-  if (!sessionUser) {
-    return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
-  }
+  if (!sessionUser) {
+    return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
+  }
 
-  document.getElementById('view-welcome').classList.add('hidden');
-  document.getElementById('modal-login').classList.add('hidden');
-  
-  const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
-  const urlParams = new URLSearchParams(window.location.search);
+  document.getElementById('view-welcome').classList.add('hidden');
+  document.getElementById('modal-login').classList.add('hidden');
+  
+  const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
+  const urlParams = new URLSearchParams(window.location.search);
 
-  if (perfilPendiente) {
-      document.getElementById('view-dashboard').classList.add('hidden');
-      const payload = JSON.parse(perfilPendiente);
-      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
-      payload.email = sessionUser.email;
-      
-      sessionStorage.removeItem('kairo_perfil_pendiente');
-      
-      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
-      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
-      
-      ejecutarEnvioPerfilAlServidor(payload);
-  } else if (urlParams.get('modulo') === 'perfil') {
+  if (perfilPendiente) {
+      // 🛡️ PROTOCOLO REHIDRATACIÓN: Se ejecuta el cálculo automático tras loguearse
+      const payload = JSON.parse(perfilPendiente);
+      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+      payload.email = sessionUser.email;
+      
+      sessionStorage.removeItem('kairo_perfil_pendiente');
+      
+      // Saltamos directo al módulo del perfil de bienestar
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
+      
+      // Seteamos el texto de carga de Kairo en la burbuja
+      document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando alquimia metabólica...";
+      ejecutarEnvioPerfilAlServidor(payload);
+  } else if (urlParams.get('modulo') === 'perfil') {
       iniciarPerfilBienestar();
   } else {
       document.getElementById('view-dashboard').classList.remove('hidden');
@@ -2630,35 +2642,26 @@ function mostrarAvisoLimite() {
     `;
 }
 
-/**
- * LIBERAR PANTALLA: Cierre estético del módulo (CORREGIDO FOCUS)
- */
 function salirDelModulo() {
-    // 1. Ocultamos los módulos
     const diagModulo = document.getElementById('contenido-modulo-diagnostico');
     if (diagModulo) diagModulo.classList.add('hidden');
     
     const perfilModulo = document.getElementById('modulo-perfil-bienestar');
     if (perfilModulo) {
         perfilModulo.classList.add('hidden');
-        // Reseteamos las vistas internas del perfil para que la próxima vez no muestre resultados viejos
         document.getElementById('form-perfil-bienestar').classList.remove('hidden');
         document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
-        // Reseteamos el mensaje de la burbuja
         document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
     }
 
-    // 2. Mostramos dashboard y recargamos si hay sesión
     document.getElementById('view-dashboard').classList.remove('hidden');
     if (typeof loadDashboard === 'function' && sessionUser) {
         loadDashboard();
     }
     
-    // 3. Reseteamos el cuerpo del diagnóstico
     const cuerpoDiag = document.getElementById('cuerpo-diagnostico');
     if (cuerpoDiag) cuerpoDiag.innerHTML = '<div class="spinner"></div>';
     
-    // 4. Apagamos alertas y blur
     if (typeof closeAlert === 'function') closeAlert();
     document.getElementById('main-content').classList.remove('blur-effect');
 }
@@ -2667,11 +2670,11 @@ function cerrarAlertaClaveYAbrirPerfil() {
     document.getElementById('modal-alerta-clave').classList.add('hidden');
     document.getElementById('modal-alerta-clave').style.display = 'none';
     document.getElementById('main-content').classList.remove('blur-effect');
-    abrirPerfil(); // Llama a la ventana de editar perfil
+    abrirPerfil();
 }
-    
+
 // =========================================================================
-// 🍏 MÓDULO EVOLUCIONADO: PERFIL DE BIENESTAR FRONTIER
+// 🍏 MÓDULO INTEGRADO: PERFIL DE BIENESTAR FRONTIER V2
 // =========================================================================
 
 function iniciarPerfilBienestar() {
@@ -2687,31 +2690,6 @@ function iniciarPerfilBienestar() {
         document.getElementById('form-perfil-bienestar').classList.remove('hidden');
         document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
         document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
-    }
-    
-    // Verificamos si hay un cálculo automático pendiente tras haber iniciado sesión
-    const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
-    if (pendingData && sessionUser) {
-        sessionStorage.removeItem('kairo_perfil_pendiente');
-        const payload = JSON.parse(pendingData);
-        payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
-        payload.email = sessionUser.email;
-        
-        // Rellenamos visualmente los campos del formulario para que no queden vacíos
-        document.getElementById('pb-peso').value = payload.peso;
-        document.getElementById('pb-estatura').value = payload.estatura;
-        document.getElementById('pb-edad').value = payload.edad;
-        document.getElementById('pb-sexo').value = payload.sexo;
-        document.getElementById('pb-cintura').value = payload.cintura;
-        document.getElementById('pb-cuello').value = payload.cuello;
-        document.getElementById('pb-cadera').value = payload.cadera;
-        document.getElementById('pb-grasa').value = payload.grasa;
-        document.getElementById('pb-musculo').value = payload.musculo;
-        document.getElementById('pb-agua').value = payload.agua;
-        
-        const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
-        if (btnCalcular) btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
-        ejecutarEnvioPerfilAlServidor(payload);
     }
 }
 
@@ -2735,25 +2713,27 @@ function prepararCalculoPerfil() {
         peso, estatura, edad, sexo, cintura, cuello, cadera, grasa, musculo, agua
     };
 
-    // 🛡️ CONTROL DE SEGURIDAD BANK: Verificamos la sesión
+    // 🛡️ CHECKPOINT BANCARIO: Si el usuario es un invitado, congelamos inputs y forzamos registro
     if (!sessionUser) {
-        // Encriptamos los inputs en memoria temporal para que el usuario no los pierda al registrarse
         sessionStorage.setItem('kairo_perfil_pendiente', JSON.stringify(payload));
-        
         document.getElementById('main-content').classList.add('blur-effect');
         const modalReg = document.getElementById('modal-registro-bienestar');
-        modalReg.classList.remove('hidden');
-        modalReg.style.setProperty('display', 'block', 'important');
+        if (modalReg) {
+            modalReg.classList.remove('hidden');
+            modalReg.style.setProperty('display', 'block', 'important');
+        }
         return;
     }
 
-    // Si hay sesión activa, anexamos la identidad del usuario y disparamos
+    // Si tiene sesión activa, anexamos identidad y disparamos
     payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
     payload.email = sessionUser.email;
 
     const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
-    btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
-    btnCalcular.disabled = true;
+    if (btnCalcular) {
+        btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
+        btnCalcular.disabled = true;
+    }
 
     ejecutarEnvioPerfilAlServidor(payload);
 }
@@ -2763,9 +2743,8 @@ function redirigirAAccesoBienestar() {
     document.getElementById('modal-registro-bienestar').style.display = 'none';
     document.getElementById('main-content').classList.remove('blur-effect');
     
-    // Ocultamos la vista del módulo y abrimos el formulario de Registro directo
     document.getElementById('modulo-perfil-bienestar').classList.add('hidden');
-    showForm('register');
+    showForm('register'); // Desplegamos el formulario de registro directo
 }
 
 async function ejecutarEnvioPerfilAlServidor(payload) {
@@ -2784,7 +2763,7 @@ async function ejecutarEnvioPerfilAlServidor(payload) {
 
         const m = res.metricas;
         
-        // Estructura de visualización limpia para las tarjetas neón del usuario
+        // Estructura limpia y compacta (IMC, % Grasa y Edad Metabólica)
         const tarjetas = [
             { titulo: "IMC", valor: m.imc, desc: m.clasificacionIMC },
             { titulo: "Grasa Corporal", valor: m.grasaCorporal ? m.grasaCorporal + "%" : "-", desc: "Ecuación Navy" },
@@ -2801,20 +2780,28 @@ async function ejecutarEnvioPerfilAlServidor(payload) {
             contenedorResultados.appendChild(card);
         });
 
-        // Cargamos el mensaje dinámico del servidor y el enlace al botón del PDF
+        // Cargamos el mensaje definitivo y acoplamos la URL al botón del PDF
         document.getElementById('pb-mensaje-final').innerText = res.mensajeFinal;
         document.getElementById('btn-ver-pdf-bienestar').onclick = () => {
             if (m.pdf) window.open(m.pdf, '_blank');
-            else notify("El PDF se está procesando en Drive. Reintenta en unos segundos.");
+            else notify("El informe PDF se está terminando de procesar. Intenta de nuevo en unos segundos.");
         };
 
-        document.getElementById('bubblePerfil').innerHTML = `<b>Kairo informa:</b> Análisis completado con éxito. Tu Score de Bienestar actual ha sido procesado de forma segura.`;
+        document.getElementById('bubblePerfil').innerHTML = `<b>Kairo informa:</b> Análisis completado con éxito. He depositado el informe avanzado en tu correo electrónico de forma segura.`;
         document.getElementById('resultado-perfil-bienestar').classList.remove('hidden');
     } else {
-        notify("Error en los sistemas de Kairo: " + (res ? res.msg : "Sin respuesta del servidor."));
+        notify("Fallo en la Matrix de Kairo: " + (res ? res.msg : "Sin respuesta del servidor."));
     }
 }
     
     </script>
+
+
+
+
+
+
+    
+    
 </body>
 </html>
