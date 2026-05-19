@@ -1067,14 +1067,6 @@
     <p style="font-size: 0.8em; opacity: 0.7; margin-top: 20px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-alerta-clave').classList.add('hidden'); document.getElementById('modal-alerta-clave').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Recordarme más tarde</p>
 </div>
 
-<div id="modal-registro-bienestar" class="hidden glass-panel">
-    <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 20px var(--neon-n); margin-bottom: 15px; object-fit: cover;">
-    <h3 style="color: var(--neon-n); margin-top: 0; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">REGISTRO REQUERIDO</h3>
-    <p style="font-size: 0.95em; line-height: 1.5; margin-bottom: 25px; color: #e2e8f0;">¡Excelente progreso! Para poder procesar tus parámetros, generar tus gráficos metabólicos y enviarte el reporte avanzado en PDF, necesitas formar parte de la comunidad.</p>
-    <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 15px; font-weight: bold;" onclick="redirigirAAccesoBienestar()">CREAR CUENTA / INICIAR SESIÓN</button>
-    <p style="font-size: 0.8em; opacity: 0.5; margin-top: 15px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-registro-bienestar').classList.add('hidden'); document.getElementById('modal-registro-bienestar').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Cancelar</p>
-</div>
-
 <div id="modal-registro-bienestar" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 90% !important; max-width: 400px !important; text-align: center !important; border: 2px solid var(--neon-n) !important; padding: 30px !important; background: rgba(10, 15, 30, 0.98) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.5) !important;">
     <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 20px var(--neon-n); margin-bottom: 15px; object-fit: cover;">
     <h3 style="color: var(--neon-n); margin-top: 0; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">REGISTRO REQUERIDO</h3>
@@ -1451,7 +1443,7 @@ async function loadDashboard() {
       if(moduloPerfil) moduloPerfil.classList.remove('hidden');
       
       // Seteamos el texto de carga de Kairo en la burbuja
-      document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando alquimia metabólica...";
+      document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando información metabólica...";
       ejecutarEnvioPerfilAlServidor(payload);
   } else if (urlParams.get('modulo') === 'perfil') {
       iniciarPerfilBienestar();
@@ -2562,7 +2554,7 @@ async function finalizarDiagnostico() {
     cuerpo.innerHTML = `
         <div class="spinner"></div>
         <h3 class="amber" style="font-family: 'Orbitron', sans-serif; text-align:center; letter-spacing: 2px;">
-            PROCESANDO ALQUIMIA...
+            PROCESANDO INFORMACIÓN...
         </h3>
         <p style="text-align:center;">Generando Reporte 3D y enviando PDF por correo.</p>
     `;
@@ -2731,7 +2723,7 @@ function prepararCalculoPerfil() {
 
     const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
     if (btnCalcular) {
-        btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
+        btnCalcular.innerText = "⚡ PROCESANDO INFORMACIÓN...";
         btnCalcular.disabled = true;
     }
 
