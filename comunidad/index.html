@@ -283,7 +283,7 @@
 
 
 /* REGLA MAESTRA PARA MODALES: Perfil, Kairo y Alertas - AJUSTE DINÁMICO */
-#modal-perfil, #modal-verificacion, #modal-alerta-clave {    
+#modal-perfil, #modal-verificacion, #modal-alerta-clave, #modal-registro-bienestar {
     position: fixed !important;
     top: 50% !important;
     left: 50% !important;
@@ -964,8 +964,13 @@
         </div>
         <div id="resultado-perfil-bienestar" class="hidden">
              <div id="pb-resultados-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;"></div>
-             <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--neon-f);">
-                <p style="color: var(--white); font-weight: bold;">Tus resultados técnicos fueron enviados a tu correo.</p>
+             
+             <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--neon-f); margin-bottom: 15px;">
+                <p id="pb-mensaje-final" style="color: var(--white); font-size: 1em; line-height: 1.5; margin-bottom: 15px; font-style: italic;"></p>
+                <button id="btn-ver-pdf-bienestar" class="btn btn-n" style="width: 100%; font-weight: bold;">📄 VER REPORTE PDF ADVANCED</button>
+             </div>
+
+             <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
                 <p style="font-size: 0.85em; color: #ccc; margin-bottom: 20px;">Si deseas agendar una sesión GRATUITA para que un Coach te lo explique, contáctanos:</p>
                 <button class="btn btn-f" style="width: 100%; margin-bottom: 10px;" onclick="window.open('https://wa.me/56976003214?text=Me%20hice%20el%20Perfil%20de%20Bienestar%20y%20quisiera%20agendar%20una%20sesion%20gratuita', '_blank')">HABLAR CON COACH MARIA</button>
                 <button class="btn btn-n" style="width: 100%; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=Me%20hice%20el%20Perfil%20de%20Bienestar%20y%20quisiera%20agendar%20una%20sesion%20gratuita', '_blank')">HABLAR CON COACH DIEGO</button>
@@ -1060,6 +1065,14 @@
     <p style="font-size: 0.95em; line-height: 1.5; margin-bottom: 25px; color: #e2e8f0;">Hola, soy Kairo. He detectado que tu contraseña actual <b>no está encriptada</b> y es vulnerable en la Matrix. Te sugiero modificarla ahora mismo para proteger tu perfil.</p>
     <button class="btn" style="background: #ff4444; color: white; width: 100%; border: 1px solid #ff4444; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; padding: 15px;" onclick="cerrarAlertaClaveYAbrirPerfil()">MODIFICAR AHORA</button>
     <p style="font-size: 0.8em; opacity: 0.7; margin-top: 20px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-alerta-clave').classList.add('hidden'); document.getElementById('modal-alerta-clave').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Recordarme más tarde</p>
+</div>
+
+<div id="modal-registro-bienestar" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 90% !important; max-width: 400px !important; text-align: center !important; border: 2px solid var(--neon-n) !important; padding: 30px !important; background: rgba(10, 15, 30, 0.98) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.5) !important;">
+    <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 20px var(--neon-n); margin-bottom: 15px; object-fit: cover;">
+    <h3 style="color: var(--neon-n); margin-top: 0; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">REGISTRO REQUERIDO</h3>
+    <p style="font-size: 0.95em; line-height: 1.5; margin-bottom: 25px; color: #e2e8f0;">¡Excelente progreso! Para poder procesar tus parámetros, generar tus gráficos metabólicos y enviarte el reporte avanzado en PDF, necesitas formar parte de la comunidad.</p>
+    <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 15px; font-weight: bold;" onclick="redirigirAAccesoBienestar()">CREAR CUENTA / INICIAR SESIÓN</button>
+    <p style="font-size: 0.8em; opacity: 0.5; margin-top: 15px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-registro-bienestar').classList.add('hidden'); document.getElementById('modal-registro-bienestar').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Cancelar</p>
 </div>
         
 <div id="modal-alquimia" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
@@ -2658,7 +2671,7 @@ function cerrarAlertaClaveYAbrirPerfil() {
 }
     
 // =========================================================================
-// 🍏 MÓDULO: PERFIL DE BIENESTAR - CONTROLADOR FRONTEND
+// 🍏 MÓDULO EVOLUCIONADO: PERFIL DE BIENESTAR FRONTIER
 // =========================================================================
 
 function iniciarPerfilBienestar() {
@@ -2671,14 +2684,38 @@ function iniciarPerfilBienestar() {
     if (herramientas) herramientas.classList.add('hidden');
     if (moduloPerfil) {
         moduloPerfil.classList.remove('hidden');
-        // Aseguramos que muestre el formulario limpio y oculte resultados previos
         document.getElementById('form-perfil-bienestar').classList.remove('hidden');
         document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
         document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
     }
+    
+    // Verificamos si hay un cálculo automático pendiente tras haber iniciado sesión
+    const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
+    if (pendingData && sessionUser) {
+        sessionStorage.removeItem('kairo_perfil_pendiente');
+        const payload = JSON.parse(pendingData);
+        payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+        payload.email = sessionUser.email;
+        
+        // Rellenamos visualmente los campos del formulario para que no queden vacíos
+        document.getElementById('pb-peso').value = payload.peso;
+        document.getElementById('pb-estatura').value = payload.estatura;
+        document.getElementById('pb-edad').value = payload.edad;
+        document.getElementById('pb-sexo').value = payload.sexo;
+        document.getElementById('pb-cintura').value = payload.cintura;
+        document.getElementById('pb-cuello').value = payload.cuello;
+        document.getElementById('pb-cadera').value = payload.cadera;
+        document.getElementById('pb-grasa').value = payload.grasa;
+        document.getElementById('pb-musculo').value = payload.musculo;
+        document.getElementById('pb-agua').value = payload.agua;
+        
+        const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
+        if (btnCalcular) btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
+        ejecutarEnvioPerfilAlServidor(payload);
+    }
 }
 
-async function prepararCalculoPerfil() {
+function prepararCalculoPerfil() {
     const peso = document.getElementById('pb-peso').value;
     const estatura = document.getElementById('pb-estatura').value;
     const edad = document.getElementById('pb-edad').value;
@@ -2689,43 +2726,56 @@ async function prepararCalculoPerfil() {
     const grasa = document.getElementById('pb-grasa').value;
     const musculo = document.getElementById('pb-musculo').value;
     const agua = document.getElementById('pb-agua').value;
-    const osea = document.getElementById('pb-masaOsea').value;
-    const visceral = document.getElementById('pb-grasaVisceral').value;
 
     if (!peso || !estatura || !edad || !sexo || !cintura || !cuello) {
         return notify("Por favor, completa todos los campos obligatorios (*).");
     }
 
+    const payload = {
+        peso, estatura, edad, sexo, cintura, cuello, cadera, grasa, musculo, agua
+    };
+
+    // 🛡️ CONTROL DE SEGURIDAD BANK: Verificamos la sesión
+    if (!sessionUser) {
+        // Encriptamos los inputs en memoria temporal para que el usuario no los pierda al registrarse
+        sessionStorage.setItem('kairo_perfil_pendiente', JSON.stringify(payload));
+        
+        document.getElementById('main-content').classList.add('blur-effect');
+        const modalReg = document.getElementById('modal-registro-bienestar');
+        modalReg.classList.remove('hidden');
+        modalReg.style.setProperty('display', 'block', 'important');
+        return;
+    }
+
+    // Si hay sesión activa, anexamos la identidad del usuario y disparamos
+    payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+    payload.email = sessionUser.email;
+
     const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
-    const txtOriginal = btnCalcular.innerText;
     btnCalcular.innerText = "⚡ PROCESANDO ALQUIMIA...";
     btnCalcular.disabled = true;
 
-    const payload = {
-        nombre: sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Usuario",
-        email: sessionUser ? sessionUser.email : "",
-        peso: peso,
-        estatura: estatura,
-        edad: edad,
-        sexo: sexo,
-        cintura: cintura,
-        cuello: cuello,
-        cadera: cadera,
-        grasa: grasa,
-        musculo: musculo,
-        agua: agua,
-        masaOsea: osea,
-        grasaVisceral: visceral
-    };
+    ejecutarEnvioPerfilAlServidor(payload);
+}
 
-    await ejecutarEnvioPerfilAlServidor(payload);
+function redirigirAAccesoBienestar() {
+    document.getElementById('modal-registro-bienestar').classList.add('hidden');
+    document.getElementById('modal-registro-bienestar').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
     
-    btnCalcular.innerText = txtOriginal;
-    btnCalcular.disabled = false;
+    // Ocultamos la vista del módulo y abrimos el formulario de Registro directo
+    document.getElementById('modulo-perfil-bienestar').classList.add('hidden');
+    showForm('register');
 }
 
 async function ejecutarEnvioPerfilAlServidor(payload) {
     const res = await apiCall("procesarEvaluacionBienestar", payload);
+    const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
+    
+    if (btnCalcular) {
+        btnCalcular.innerText = "CALCULAR PERFIL DE BIENESTAR";
+        btnCalcular.disabled = false;
+    }
 
     if (res && res.success) {
         document.getElementById('form-perfil-bienestar').classList.add('hidden');
@@ -2737,23 +2787,28 @@ async function ejecutarEnvioPerfilAlServidor(payload) {
         // Estructura de visualización limpia para las tarjetas neón del usuario
         const tarjetas = [
             { titulo: "IMC", valor: m.imc, desc: m.clasificacionIMC },
-            { titulo: "WHtR (Cintura/Est.)", valor: m.whtr, desc: m.clasificacionWHtR },
             { titulo: "Grasa Corporal", valor: m.grasaCorporal ? m.grasaCorporal + "%" : "-", desc: "Ecuación Navy" },
-            { titulo: "Edad Metabólica", valor: m.edadMetabolica ? m.edadMetabolica + " años" : "-", desc: "Cálculo Base" },
-            { titulo: "Metabolismo Basal", valor: m.tmb ? m.tmb + " kcal" : "-", desc: "Gasto en reposo" },
-            { titulo: "Score Bienestar", valor: m.scoreMetabolico + " pts", desc: "Índice General" }
+            { titulo: "Edad Metabólica", valor: m.edadMetabolica ? m.edadMetabolica + " años" : "-", desc: "Cálculo Base" }
         ];
 
         tarjetas.forEach(t => {
             const card = document.createElement('div');
-            card.style = "background: rgba(0,0,0,0.6); padding: 12px; border-radius: 12px; border: 1px solid var(--neon-n); text-align: center;";
-            card.innerHTML = `<h5 style='margin:0; font-size:0.7em; color:var(--neon-admin); text-transform:uppercase; letter-spacing:1px;'>${t.titulo}</h5>
-                              <h2 style='margin:6px 0; color:white; font-size:1.3em; font-family: "Orbitron", sans-serif;'>${t.valor}</h2>
+            card.className = "pillar-card";
+            card.style.borderColor = "var(--neon-n)";
+            card.innerHTML = `<h4>${t.titulo}</h4>
+                              <h1>${t.valor}</h1>
                               <small style='color:var(--neon-n); font-size:0.75em;'>${t.desc}</small>`;
             contenedorResultados.appendChild(card);
         });
 
-        document.getElementById('bubblePerfil').innerHTML = `<b>Kairo informa:</b> Análisis completado con éxito. Tu Score de Bienestar actual es de <b>${m.scoreMetabolico} puntos</b>. He enviado el reporte PDF avanzado directamente a tu correo electrónico.`;
+        // Cargamos el mensaje dinámico del servidor y el enlace al botón del PDF
+        document.getElementById('pb-mensaje-final').innerText = res.mensajeFinal;
+        document.getElementById('btn-ver-pdf-bienestar').onclick = () => {
+            if (m.pdf) window.open(m.pdf, '_blank');
+            else notify("El PDF se está procesando en Drive. Reintenta en unos segundos.");
+        };
+
+        document.getElementById('bubblePerfil').innerHTML = `<b>Kairo informa:</b> Análisis completado con éxito. Tu Score de Bienestar actual ha sido procesado de forma segura.`;
         document.getElementById('resultado-perfil-bienestar').classList.remove('hidden');
     } else {
         notify("Error en los sistemas de Kairo: " + (res ? res.msg : "Sin respuesta del servidor."));
