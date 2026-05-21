@@ -1555,12 +1555,18 @@ function checkSession() {
     const ahora = new Date().getTime();
     const anclaRaw = sessionStorage.getItem('kairo_session');
     
-    // 1. ESCUDO ANTI-CORRUPCIÓN
+    // 1. ESCUDO ANTI-CORRUPCIÓN (Blindado para acceso directo de invitados)
     if (!anclaRaw || anclaRaw === "undefined" || anclaRaw === "null") {
       console.log("⚠️ Kairo: Sin sesión activa.");
       sessionStorage.removeItem('kairo_session');
       sessionUser = null;
-      document.getElementById('view-welcome').classList.remove('hidden');
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('modulo') === 'perfil') {
+          iniciarPerfilBienestar(); // Mantiene el formulario abierto en limpio
+      } else {
+          document.getElementById('view-welcome').classList.remove('hidden'); // Solo muestra bienvenida si no es enlace directo
+      }
       return; 
     }
 
@@ -2107,13 +2113,8 @@ function resetearVigilante() {
 // --- PROTOCOLO DE PERSISTENCIA FOCUS ---
 window.onload = function() {
     if (typeof resetearVigilante === 'function') resetearVigilante();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('modulo') === 'perfil') {
-        iniciarPerfilBienestar();
-    }
     
-    // 🛡️ Forzamos la ejecución limpia del validador de sesión en el arranque
+    // 🛡️ Dejamos que checkSession orqueste la pantalla de inicio limpia sin duplicar vistas
     checkSession();
 };
         
