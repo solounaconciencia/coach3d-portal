@@ -2668,14 +2668,15 @@ function cerrarAlertaClaveYAbrirPerfil() {
 
 // =========================================================================
 // 🍏 MÓDULO INTEGRADO: PERFIL DE BIENESTAR FRONTIER V2
-// =========================================================================
-
+// ========================================================================
 function iniciarPerfilBienestar() {
     closeAlert();
+    const welcome = document.getElementById('view-welcome'); // 🛡️ CAPA CORRECCIÓN: Capturamos la pantalla inicial
     const dash = document.getElementById('view-dashboard');
     const herramientas = document.getElementById('seccion-herramientas');
     const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
 
+    if (welcome) welcome.classList.add('hidden'); // 🛡️ Quirúrgico: Apagamos la bienvenida para dejar espacio limpio
     if (dash) dash.classList.add('hidden');
     if (herramientas) herramientas.classList.add('hidden');
     if (moduloPerfil) {
