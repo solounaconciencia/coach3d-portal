@@ -1067,12 +1067,59 @@
     <p style="font-size: 0.8em; opacity: 0.7; margin-top: 20px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-alerta-clave').classList.add('hidden'); document.getElementById('modal-alerta-clave').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Recordarme más tarde</p>
 </div>
 
-<div id="modal-registro-bienestar" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 90% !important; max-width: 400px !important; text-align: center !important; border: 2px solid var(--neon-n) !important; padding: 30px !important; background: rgba(10, 15, 30, 0.98) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.5) !important;">
-    <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 20px var(--neon-n); margin-bottom: 15px; object-fit: cover;">
-    <h3 style="color: var(--neon-n); margin-top: 0; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">REGISTRO REQUERIDO</h3>
-    <p style="font-size: 0.95em; line-height: 1.5; margin-bottom: 25px; color: #e2e8f0;">¡Excelente progreso! Para poder procesar tus parámetros, generar tus gráficos metabólicos y enviarte el reporte avanzado en PDF, necesitas formar parte de la comunidad.</p>
-    <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 15px; font-weight: bold;" onclick="redirigirAAccesoBienestar()">CREAR CUENTA / INICIAR SESIÓN</button>
-    <p style="font-size: 0.8em; opacity: 0.5; margin-top: 15px; cursor: pointer; text-decoration: underline; color: #ccc;" onclick="document.getElementById('modal-registro-bienestar').classList.add('hidden'); document.getElementById('modal-registro-bienestar').style.display='none'; document.getElementById('main-content').classList.remove('blur-effect');">Cancelar</p>
+<div id="modal-registro-bienestar" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 92% !important; max-width: 420px !important; padding: 25px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.5) !important; text-align: center !important;">
+    <div style="margin-bottom: 15px;">
+        <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 15px var(--neon-n); object-fit: cover;">
+        <h4 style="color: var(--neon-n); margin: 10px 0 5px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;">AUTENTICACIÓN REQUERIDA</h4>
+        <p style="font-size: 0.85em; color: #ccc; line-height: 1.4; margin: 0;">Para procesar tus parámetros y activar tu reporte avanzado en PDF, accede o regístrate de forma gratuita. Tu progreso actual está resguardado en la Matrix.</p>
+    </div>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="btn-tab-login-inline" class="btn btn-n" style="flex:1; padding: 10px; font-size: 0.8em;" onclick="cambiarTabAuthInline('login')">INICIAR SESIÓN</button>
+        <button id="btn-tab-reg-inline" class="btn" style="flex:1; padding: 10px; font-size: 0.8em; background: rgba(255,255,255,0.05); color: white; border: 1px solid #444;" onclick="cambiarTabAuthInline('registro')">REGISTRARSE</button>
+    </div>
+
+    <div id="auth-inline-login">
+        <input type="email" id="inline-login-email" placeholder="Correo Electrónico">
+        <input type="password" id="inline-login-pass" placeholder="Contraseña">
+        <button class="btn btn-n" style="width: 100%; margin-top: 10px; padding: 14px;" onclick="ejecutarLoginInline()">ENTRAR Y CALCULAR</button>
+    </div>
+
+    <div id="auth-inline-registro" class="hidden">
+        <form id="inlineRegForm" onsubmit="event.preventDefault(); ejecutarRegistroInline();">
+            <input type="text" id="inline-reg-nombre" placeholder="Nombre" required>
+            <input type="text" id="inline-reg-apellido" placeholder="Apellido" required>
+            <input type="email" id="inline-reg-email" placeholder="Email para recibir informe PDF" required>
+            <input type="password" id="inline-reg-pass" placeholder="Contraseña" required>
+            <input type="password" id="inline-reg-confirmPass" placeholder="Confirmar Contraseña" required>
+            <input type="text" id="inline-reg-whatsapp" placeholder="WhatsApp" required>
+            <input type="text" id="inline-reg-pais" placeholder="País" required>
+            <input type="number" id="inline-reg-edad" placeholder="Edad" required min="15" max="120">
+            
+            <select id="inline-reg-pregunta" required>
+                <option value="">Selecciona Pregunta de Seguridad</option>
+                <option>¿Nombre de tu primera mascota?</option>
+                <option>¿Ciudad donde naciste?</option>
+                <option>¿Libro favorito?</option>
+            </select>
+            <input type="text" id="inline-reg-respuesta" placeholder="Respuesta de Seguridad" required>
+            
+            <select id="inline-reg-origen" onchange="toggleInvitadorInline()" required>
+                <option value="">¿Cómo nos conociste?</option>
+                <option value="Internet">Llegué por Internet</option>
+                <option value="Invitado">Me invitó alguien</option>
+            </select>
+
+            <div id="inline-campos-invitado" class="hidden" style="border-left: 2px solid var(--neon-n); padding-left: 10px; margin-top: 5px;">
+                <input type="text" id="inline-reg-invitador-nombre" placeholder="Nombre de quien te invitó">
+                <input type="email" id="inline-reg-invitador-email" placeholder="Email de quien te invitó">
+            </div>
+            
+            <button type="submit" class="btn btn-f" style="width: 100%; margin-top: 15px; padding: 14px;">UNIRSE Y CALCULAR</button>
+        </form>
+    </div>
+
+    <button class="btn" style="width: 100%; margin-top: 12px; font-size: 0.8em; opacity: 0.6;" onclick="document.getElementById('modal-registro-bienestar').classList.add('hidden'); document.getElementById('modal-registro-bienestar').style.setProperty('display', 'none', 'important'); document.getElementById('main-content').classList.remove('blur-effect');">CANCELAR</button>
 </div>
         
 <div id="modal-alquimia" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
@@ -2787,7 +2834,139 @@ async function ejecutarEnvioPerfilAlServidor(payload) {
         notify("Fallo en la Matrix de Kairo: " + (res ? res.msg : "Sin respuesta del servidor."));
     }
 }
+
+// =========================================================================
+// 🛡️ MOTOR INDEPENDIENTE: CONTROLADOR AUTH INLINE REUSABLE ("ventanaregistro")
+// =========================================================================
+
+function cambiarTabAuthInline(pestana) {
+    const loginForm = document.getElementById('auth-inline-login');
+    const regForm = document.getElementById('auth-inline-registro');
+    const btnLogin = document.getElementById('btn-tab-login-inline');
+    const btnReg = document.getElementById('btn-tab-reg-inline');
+
+    if (pestana === 'login') {
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+        btnLogin.className = "btn btn-n";
+        btnReg.className = "btn";
+        btnReg.style.backgroundColor = "rgba(255,255,255,0.05)";
+        btnReg.style.color = "white";
+        btnReg.style.border = "1px solid #444";
+    } else {
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        btnReg.className = "btn btn-f";
+        btnLogin.className = "btn";
+        btnLogin.style.backgroundColor = "rgba(255,255,255,0.05)";
+        btnLogin.style.color = "white";
+        btnLogin.style.border = "1px solid #444";
+    }
+}
+
+function toggleInvitadorInline() {
+    const origen = document.getElementById('inline-reg-origen').value;
+    const camposExtra = document.getElementById('inline-campos-invitado');
+    if (origen === 'Invitado') camposExtra.classList.remove('hidden');
+    else camposExtra.classList.add('hidden');
+}
+
+async function ejecutarLoginInline() {
+    const email = document.getElementById('inline-login-email').value.trim();
+    const pass = document.getElementById('inline-login-pass').value;
     
+    if(!email || !pass) return notify("Por favor, rellena todos los campos.");
+
+    const btn = document.querySelector('#auth-inline-login .btn-n');
+    btn.innerText = "VERIFICANDO..."; btn.disabled = true;
+
+    const res = await apiCall("login", { email: email, pass: pass });
+
+    if(res && res.success) {
+        res.user.timestamp = new Date().getTime(); 
+        sessionUser = res.user;
+        sessionStorage.setItem('kairo_session', JSON.stringify(res.user));
+        
+        // Cerramos el modal inline limpiamente
+        document.getElementById('modal-registro-bienestar').classList.add('hidden');
+        document.getElementById('modal-registro-bienestar').style.display = 'none';
+        document.getElementById('main-content').classList.remove('blur-effect');
+
+        // Sincronizamos la foto de perfil en el header
+        const fotoPrincipal = document.getElementById('user-photo');
+        if(fotoPrincipal) fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
+
+        // 🛡️ REANUDACIÓN EN CALIENTE: Lee la caché y continúa el cálculo de inmediato
+        btn.innerText = "ENTRAR Y CALCULAR"; btn.disabled = false;
+        const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
+        if (pendingData) {
+            sessionStorage.removeItem('kairo_perfil_pendiente');
+            const payload = JSON.parse(pendingData);
+            payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+            payload.email = sessionUser.email;
+            
+            const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
+            if (btnCalcular) btnCalcular.innerText = "⚡ PROCESANDO INFORMACIÓN...";
+            ejecutarEnvioPerfilAlServidor(payload);
+        }
+    } else {
+        btn.innerText = "ENTRAR Y CALCULAR"; btn.disabled = false;
+        notify(res && res.msg ? res.msg : "Credenciales incorrectas.");
+    }
+}
+
+async function ejecutarRegistroInline() {
+    const pass = document.getElementById('inline-reg-pass').value;
+    const confirmPass = document.getElementById('inline-reg-confirmPass').value;
+
+    if (pass !== confirmPass) return notify("Las contraseñas no coinciden.");
+    if (!validarSeguridadPass(pass)) return notify("Tu contraseña debe tener entre 6 y 12 caracteres, incluir una MAYÚSCULA y un NÚMERO.");
+
+    const origen = document.getElementById('inline-reg-origen').value;
+    let invNombre = "ORIGEN_INTERNET", invEmail = "no-reply@coach3d.app";
+
+    if (origen === 'Invitado') {
+        invNombre = document.getElementById('inline-reg-invitador-nombre').value.trim();
+        invEmail = document.getElementById('inline-reg-invitador-email').value.trim();
+        if (!invNombre || !invEmail) return notify("Por favor, completa los datos de quien te invitó.");
+    }
+
+    const formData = {
+        nombre: document.getElementById('inline-reg-nombre').value.trim(),
+        apellido: document.getElementById('inline-reg-apellido').value.trim(),
+        email: document.getElementById('inline-reg-email').value.trim(),
+        pass: pass,
+        whatsapp: document.getElementById('inline-reg-whatsapp').value.trim(),
+        pais: document.getElementById('inline-reg-pais').value.trim(),
+        edad: document.getElementById('inline-reg-edad').value,
+        pregunta: document.getElementById('inline-reg-pregunta').value,
+        respuesta: document.getElementById('inline-reg-respuesta').value.trim(),
+        origen: origen,
+        invitador_nombre: invNombre,
+        invitador_email: invEmail
+    };
+
+    const btn = document.querySelector('#inlineRegForm .btn-f');
+    btn.innerText = "PROCESANDO..."; btn.disabled = true;
+
+    const res = await apiCall("registrarUsuario", formData);
+    btn.innerText = "UNIRSE Y CALCULAR"; btn.disabled = false;
+
+    if (res && res.success && res.kairo) {
+        // Enlazamos el email al input global para que validarCodigoKairo complete la activación
+        const regEmailInput = document.getElementById('reg-email');
+        if (regEmailInput) regEmailInput.value = formData.email;
+        
+        // Cerramos la ventana inline y abrimos de inmediato el PIN de 5 dígitos de Kairo
+        document.getElementById('modal-registro-bienestar').classList.add('hidden');
+        document.getElementById('modal-registro-bienestar').style.display = 'none';
+        
+        iniciarKairo(); // Llama al modal de verificación nativo
+    } else {
+        notify(res && res.msg ? res.msg : "Error al registrar la cuenta.");
+    }
+}
+        
     </script>
 
 
