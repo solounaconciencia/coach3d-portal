@@ -1079,11 +1079,13 @@
         <button id="btn-tab-reg-inline" class="btn" style="flex:1; padding: 10px; font-size: 0.8em; background: rgba(255,255,255,0.05); color: white; border: 1px solid #444;" onclick="cambiarTabAuthInline('registro')">REGISTRARSE</button>
     </div>
 
-    <div id="auth-inline-login">
-        <input type="email" id="inline-login-email" placeholder="Correo Electrónico">
-        <input type="password" id="inline-login-pass" placeholder="Contraseña">
-        <button class="btn btn-n" style="width: 100%; margin-top: 10px; padding: 14px;" onclick="ejecutarLoginInline()">ENTRAR Y CALCULAR</button>
-    </div>
+    <form id="inlineLoginForm" onsubmit="event.preventDefault(); ejecutarLoginInline();">
+        <div id="auth-inline-login">
+            <input type="email" id="inline-login-email" placeholder="Correo Electrónico" required>
+            <input type="password" id="inline-login-pass" placeholder="Contraseña" required>
+            <button type="submit" class="btn btn-n" style="width: 100%; margin-top: 15px; padding: 15px; font-weight: bold;">CONTINUAR CON EL CÁLCULO DEL PERFIL</button>
+        </div>
+    </form>
 
     <div id="auth-inline-registro" class="hidden">
         <form id="inlineRegForm" onsubmit="event.preventDefault(); ejecutarRegistroInline();">
@@ -1115,10 +1117,9 @@
                 <input type="email" id="inline-reg-invitador-email" placeholder="Email de quien te invitó">
             </div>
             
-            <button type="submit" class="btn btn-f" style="width: 100%; margin-top: 15px; padding: 14px;">UNIRSE Y CALCULAR</button>
+            <button type="submit" class="btn btn-f" style="width: 100%; margin-top: 15px; padding: 15px; font-weight: bold;">CONTINUAR CON EL CÁLCULO DEL PERFIL</button>
         </form>
     </div>
-
     <button class="btn" style="width: 100%; margin-top: 12px; font-size: 0.8em; opacity: 0.6;" onclick="document.getElementById('modal-registro-bienestar').classList.add('hidden'); document.getElementById('modal-registro-bienestar').style.setProperty('display', 'none', 'important'); document.getElementById('main-content').classList.remove('blur-effect');">CANCELAR</button>
 </div>
         
@@ -2877,7 +2878,7 @@ async function ejecutarLoginInline() {
     
     if(!email || !pass) return notify("Por favor, rellena todos los campos.");
 
-    const btn = document.querySelector('#auth-inline-login .btn-n');
+    const btn = document.querySelector('#inlineLoginForm .btn-n');
     btn.innerText = "VERIFICANDO..."; btn.disabled = true;
 
     const res = await apiCall("login", { email: email, pass: pass });
@@ -2887,17 +2888,14 @@ async function ejecutarLoginInline() {
         sessionUser = res.user;
         sessionStorage.setItem('kairo_session', JSON.stringify(res.user));
         
-        // Cerramos el modal inline limpiamente
         document.getElementById('modal-registro-bienestar').classList.add('hidden');
         document.getElementById('modal-registro-bienestar').style.display = 'none';
         document.getElementById('main-content').classList.remove('blur-effect');
 
-        // Sincronizamos la foto de perfil en el header
         const fotoPrincipal = document.getElementById('user-photo');
         if(fotoPrincipal) fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
 
-        // 🛡️ REANUDACIÓN EN CALIENTE: Lee la caché y continúa el cálculo de inmediato
-        btn.innerText = "ENTRAR Y CALCULAR"; btn.disabled = false;
+        btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
         const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
         if (pendingData) {
             sessionStorage.removeItem('kairo_perfil_pendiente');
@@ -2910,8 +2908,9 @@ async function ejecutarLoginInline() {
             ejecutarEnvioPerfilAlServidor(payload);
         }
     } else {
-        btn.innerText = "ENTRAR Y CALCULAR"; btn.disabled = false;
-        notify(res && res.msg ? res.msg : "Credenciales incorrectas.");
+        // 🛑 MURO DE CONTENCIÓN ESTRICTO: Si falla, frena en seco y no altera la caché
+        btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
+        return notify(res && res.msg ? res.msg : "Credenciales incorrectas en la Matrix.");
     }
 }
 
@@ -2950,23 +2949,21 @@ async function ejecutarRegistroInline() {
     btn.innerText = "PROCESANDO..."; btn.disabled = true;
 
     const res = await apiCall("registrarUsuario", formData);
-    btn.innerText = "UNIRSE Y CALCULAR"; btn.disabled = false;
+    btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
 
     if (res && res.success && res.kairo) {
-        // Enlazamos el email al input global para que validarCodigoKairo complete la activación
         const regEmailInput = document.getElementById('reg-email');
         if (regEmailInput) regEmailInput.value = formData.email;
         
-        // Cerramos la ventana inline y abrimos de inmediato el PIN de 5 dígitos de Kairo
         document.getElementById('modal-registro-bienestar').classList.add('hidden');
         document.getElementById('modal-registro-bienestar').style.display = 'none';
         
-        iniciarKairo(); // Llama al modal de verificación nativo
+        iniciarKairo(); 
     } else {
-        notify(res && res.msg ? res.msg : "Error al registrar la cuenta.");
+        // 🛑 MURO DE CONTENCIÓN ESTRICTO
+        return notify(res && res.msg ? res.msg : "Error al registrar la cuenta.");
     }
-}
-        
+}        
     </script>
 
 
