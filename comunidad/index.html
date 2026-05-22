@@ -1806,9 +1806,10 @@ async function guardarCambiosPerfil() {
         sessionUser.alertaClave = false;
     }
 
-    localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+    // 🛡️ FOCUS: Sincronizado a sessionStorage para evitar la "Doble Personalidad" al recargar
+    sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
     
-    await kairoMessage({ 
+    await kairoMessage({
         mensaje: res.msg, 
         icon: res.requiereSubidaFoto ? '⏳' : '✅' 
     });
@@ -1957,8 +1958,9 @@ function cerrarKairo() {
 async function verificarEmailExistente(email) {
     if (!email.includes('@')) return; 
     
-    // 🛡️ Si el campo se llenó solo y el usuario no está posicionado en él, abortamos la ejecución
-    if (document.activeElement !== document.getElementById('reg-email')) return;
+    // 🛡️ FOCUS: Si el email está vacío o la ventana acaba de cargar (autorrelleno fantasma), abortamos.
+    // Al quitar el activeElement, permitimos que el usuario cambie de casilla libremente.
+    if (document.readyState !== "complete") return;
     
     const res = await apiCall("buscarDatosPendientes", { email: email });
     
@@ -2382,43 +2384,6 @@ function iniciarDiagnosticoModular() {
             notify("Kairo: Error de sincronización de archivos.");
         }
     }
-}
-
-// --- CIRUGÍA FOCUS: PROCESAR NUEVA FOTO ---
-async function procesarNuevaFoto(input) {
-    if (!input.files || !input.files[0]) return;
-    
-    const file = input.files[0];
-    const reader = new FileReader();
-    
-    const imgPerfil = document.getElementById('user-photo');
-    const oldSrc = imgPerfil.src;
-    imgPerfil.style.opacity = "0.5";
-    notify("Iniciando Protocolo de Subida...");
-
-    reader.onload = async function(e) {
-        const base64Data = e.target.result;
-        
-        // FOCUS: Usamos la Matrix API
-        const res = await apiCall("actualizarFotoPerfilKairo", { 
-            fotoBase64: base64Data, 
-            nombreArchivo: file.name,
-            email: sessionUser.email // Enviamos el email por seguridad en el backend
-        });
-
-        if (res && res.success) {
-            imgPerfil.src = res.newUrl;
-            imgPerfil.style.opacity = "1";
-            sessionUser.foto = res.newUrl;
-            localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
-            notify("Matrix Actualizada: Foto de perfil guardada.");
-        } else {
-            imgPerfil.src = oldSrc;
-            imgPerfil.style.opacity = "1";
-            alert("Error en subida: " + (res ? res.msg : "Fallo de conexión."));
-        }
-    };
-    reader.readAsDataURL(file);
 }
 
 function toggleMenuApp() {
