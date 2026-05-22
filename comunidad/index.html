@@ -2754,6 +2754,11 @@ function prepararCalculoPerfil() {
         return notify("Por favor, completa todos los campos obligatorios (*).");
     }
 
+    // 🛡️ REGLA RESTAURADA: Obligatorio para la Ecuación Navy femenina
+    if (sexo === "Femenino" && !cadera) {
+        return notify("Para mujeres, el dato de Cadera es obligatorio para un cálculo preciso.");
+    }
+
     const payload = {
         peso, estatura, edad, sexo, cintura, cuello, cadera, grasa, musculo, agua, masaOsea, grasaVisceral
     };
