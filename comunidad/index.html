@@ -1958,9 +1958,10 @@ function cerrarKairo() {
 async function verificarEmailExistente(email) {
     if (!email.includes('@')) return; 
     
-    // 🛡️ FOCUS: Si el email está vacío o la ventana acaba de cargar (autorrelleno fantasma), abortamos.
-    // Al quitar el activeElement, permitimos que el usuario cambie de casilla libremente.
-    if (document.readyState !== "complete") return;
+    // 🛡️ FOCUS: Detectamos si el navegador está autorrellenando el formulario en la sombra.
+    // Solo ejecutamos la llamada si el formulario de registro está realmente visible en pantalla.
+    const modalAntiguo = document.getElementById('modal-register');
+    if (modalAntiguo && modalAntiguo.classList.contains('hidden')) return;
     
     const res = await apiCall("buscarDatosPendientes", { email: email });
     
