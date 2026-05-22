@@ -2746,15 +2746,17 @@ function prepararCalculoPerfil() {
     const grasa = document.getElementById('pb-grasa').value;
     const musculo = document.getElementById('pb-musculo').value;
     const agua = document.getElementById('pb-agua').value;
+    // 🛡️ CAPA CORRECCIÓN: Capturamos los campos complementarios omitidos
+    const masaOsea = document.getElementById('pb-masaOsea').value;
+    const grasaVisceral = document.getElementById('pb-grasaVisceral').value;
 
     if (!peso || !estatura || !edad || !sexo || !cintura || !cuello) {
         return notify("Por favor, completa todos los campos obligatorios (*).");
     }
 
     const payload = {
-        peso, estatura, edad, sexo, cintura, cuello, cadera, grasa, musculo, agua
+        peso, estatura, edad, sexo, cintura, cuello, cadera, grasa, musculo, agua, masaOsea, grasaVisceral
     };
-
     // 🛡️ CHECKPOINT BANCARIO: Si el usuario es un invitado, congelamos inputs y forzamos registro
     if (!sessionUser) {
         sessionStorage.setItem('kairo_perfil_pendiente', JSON.stringify(payload));
