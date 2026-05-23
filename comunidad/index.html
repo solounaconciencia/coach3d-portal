@@ -1534,7 +1534,7 @@
 
     <div id="kairo-loader-global" style="position: fixed; inset: 0; background: #0a0f1e; z-index: 2147483647; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
         <div class="spinner" style="border-left-color: var(--neon-n); width: 50px; height: 50px;"></div>
-        <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-n); margin-top: 20px; letter-spacing: 3px; font-size: 0.9em; text-shadow: 0 0 10px var(--neon-n);">INICIANDO KAIRO MATRIX...</p>
+        <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-n); margin-top: 20px; letter-spacing: 3px; font-size: 0.9em; text-shadow: 0 0 10px var(--neon-n);">Iniciando su viaje de autoconocimiento...</p>
     </div>
 
     <div id="main-container">
@@ -3089,35 +3089,42 @@ async function loadDashboard() {
       const payload = JSON.parse(perfilPendiente);
       payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
       payload.email = sessionUser.email;
+      
       sessionStorage.removeItem('kairo_perfil_pendiente');
+      
       document.getElementById('view-dashboard').classList.add('hidden');
       const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
       if(moduloPerfil) moduloPerfil.classList.remove('hidden');
+      
       document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando información metabólica...";
       ejecutarEnvioPerfilAlServidor(payload);
   } else if (d3dPendiente) {
       sessionStorage.removeItem('kairo_d3d_pendiente');
       const dataD3D = JSON.parse(d3dPendiente);
       respuestasDiag = dataD3D.respuestas;
+      
       document.getElementById('view-dashboard').classList.add('hidden');
       const moduloDiag = document.getElementById('contenido-modulo-diagnostico');
       if (moduloDiag) moduloDiag.classList.remove('hidden');
+      
       finalizarDiagnostico();
   } else if (urlParams.get('modulo') === 'perfil') {
       iniciarPerfilBienestar();
   } else if (urlParams.get('modulo') === 'd3d') {
       iniciarDiagnosticoModular();
   } else {
+      // 🛡️ ESCUDO FOCUS: Estas instrucciones se ejecutan ÚNICAMENTE en el dashboard estándar ordinario
       document.getElementById('view-dashboard').classList.remove('hidden');
+      
+      const panelDiag = document.getElementById('contenido-modulo-diagnostico');
+      if (panelDiag) panelDiag.classList.add('hidden');
+
+      const herramientas = document.getElementById('seccion-herramientas');
+      if (herramientas) { herramientas.classList.remove('hidden'); }
   }
   
+  // Apagamos de forma universal el protector de carga una vez definido el escenario
   document.getElementById('kairo-loader-global').style.display = 'none';
-  
-  const panelDiag = document.getElementById('contenido-modulo-diagnostico');
-  if (panelDiag && !d3dPendiente) panelDiag.classList.add('hidden');
-
-  const herramientas = document.getElementById('seccion-herramientas');
-  if (herramientas) { herramientas.classList.remove('hidden'); }
 
   document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
   document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
