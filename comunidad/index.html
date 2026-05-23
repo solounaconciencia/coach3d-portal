@@ -1069,7 +1069,7 @@
 
 <div id="modal-registro-bienestar" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 92% !important; max-width: 420px !important; padding: 25px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.5) !important; text-align: center !important;">
     <div style="margin-bottom: 15px;">
-        <img src="https://i.postimg.cc/59KH5S5Z/Kairo-Saluda.png" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 15px var(--neon-n); object-fit: contain; padding: 8px; box-sizing: border-box; background: rgba(10, 15, 30, 0.5);">
+        <img src="https://i.postimg.cc/133svk9j/Kairo-Saluda.png" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 15px var(--neon-n); object-fit: contain; padding: 8px; box-sizing: border-box; background: rgba(10, 15, 30, 0.5);">
         <h4 style="color: var(--neon-n); margin: 10px 0 5px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;">AUTENTICACIÓN REQUERIDA</h4>
         <p style="font-size: 0.85em; color: #ccc; line-height: 1.4; margin: 0;">Para procesar tus parámetros y activar tu reporte avanzado en PDF, accede o regístrate de forma gratuita. Tu progreso actual está resguardado en la Matrix.</p>
     </div>
@@ -1475,9 +1475,32 @@ async function loadDashboard() {
   document.getElementById('modal-login').classList.add('hidden');
   
   const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
+  const d3dPendiente = sessionStorage.getItem('kairo_d3d_pendiente'); // 🛡️ FOCUS
   const urlParams = new URLSearchParams(window.location.search);
 
   if (perfilPendiente) {
+      // (Mantener lógica del perfil intacta...)
+      const payload = JSON.parse(perfilPendiente);
+      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+      payload.email = sessionUser.email;
+      sessionStorage.removeItem('kairo_perfil_pendiente');
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
+      document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando información metabólica...";
+      ejecutarEnvioPerfilAlServidor(payload);
+  } else if (d3dPendiente) {
+      // 🛡️ FOCUS: Si viene de completar el test, limpia memoria, muestra el módulo y calcula el PDF
+      sessionStorage.removeItem('kairo_d3d_pendiente');
+      const dataD3D = JSON.parse(d3dPendiente);
+      respuestasDiag = dataD3D.respuestas;
+      
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const moduloDiag = document.getElementById('contenido-modulo-diagnostico');
+      if (moduloDiag) moduloDiag.classList.remove('hidden');
+      
+      finalizarDiagnostico();
+  } else if (urlParams.get('modulo') === 'perfil') {
       // 🛡️ PROTOCOLO REHIDRATACIÓN: Se ejecuta el cálculo automático tras loguearse
       const payload = JSON.parse(perfilPendiente);
       payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
@@ -1611,9 +1634,12 @@ function checkSession() {
       
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('modulo') === 'perfil') {
-          iniciarPerfilBienestar(); // Mantiene el formulario abierto en limpio
+          iniciarPerfilBienestar(); 
+      } else if (urlParams.get('modulo') === 'd3d') {
+          // 🛡️ FOCUS: Si acceden por coach3dlatam.app?modulo=d3d arranca el cuestionario directo como invitado
+          iniciarDiagnosticoModular();
       } else {
-          document.getElementById('view-welcome').classList.remove('hidden'); // Solo muestra bienvenida si no es enlace directo
+          document.getElementById('view-welcome').classList.remove('hidden'); 
       }
       return; 
     }
@@ -2456,18 +2482,10 @@ let respuestasDiag = new Array(27).fill(0);
 
 // --- CIRUGÍA FOCUS: PREPARAR DIAGNÓSTICO ---
 async function prepararDiagnostico() {
-    console.log("🛡️ Kairo: Verificando permisos...");
+    console.log("🛡️ Kairo: Verificando permisos de acceso...");
     
-    if (!sessionUser || !sessionUser.email) {
-        const ancla = localStorage.getItem('kairo_session');
-        if (ancla) {
-            sessionUser = JSON.parse(ancla);
-        } else {
-            notify("Tu sesión expiró. Por favor, recarga la página o inicia sesión de nuevo.");
-            salirDelModulo();
-            return;
-        }
-    }
+    // 🛡️ FOCUS: Captura el email si existe, de lo contrario lo deja en blanco para modo invitado
+    const emailParaConsulta = (sessionUser && sessionUser.email) ? sessionUser.email : "";
 
     slideDiag = 0;
     respuestasDiag = new Array(27).fill(0);
@@ -2475,11 +2493,12 @@ async function prepararDiagnostico() {
     const cuerpo = document.getElementById('cuerpo-diagnostico');
     cuerpo.innerHTML = '<div class="spinner"></div><p class="amber" style="text-align:center; margin-top:15px;">SINCRONIZANDO PERMISOS...</p>';
 
-    // FOCUS: Conexión con la API
-    const res = await apiCall("obtenerTodoDiagnostico", { email: sessionUser.email });
+    // FOCUS: Conexión con la API mandando el parámetro dinámico
+    const res = await apiCall("obtenerTodoDiagnostico", { email: emailParaConsulta });
 
-    if (res && res.intentos !== undefined) {
-        if (res.intentos >= 2) {
+    if (res && res.preguntas) {
+        // 🛡️ Solo aplicamos bloqueo de límite de intentos si el usuario ya está registrado
+        if (emailParaConsulta !== "" && res.intentos >= 2) {
             mostrarAvisoLimite();
             return;
         }
@@ -2488,11 +2507,6 @@ async function prepararDiagnostico() {
         document.getElementById('footer-diagnostico').style.display = 'block';
         renderizarPreguntaDiag();
     } else {
-        console.error("❌ Error Crítico:", res ? res.msg : "Sin respuesta");
-        notify("Error de conexión con el servidor Coach 3D.");
-        salirDelModulo();
-    }
-}
 
 /**
  * RENDERIZADO ESTILO LIBRO Y ORDEN ALEATORIO
@@ -2561,8 +2575,27 @@ function nextDiag(puntos) {
 // --- CIRUGÍA FOCUS: FINALIZAR DIAGNÓSTICO ---
 async function finalizarDiagnostico() {
     if (!sessionUser || !sessionUser.email) {
-        const ancla = localStorage.getItem('kairo_session');
+        const ancla = sessionStorage.getItem('kairo_session');
         if (ancla) sessionUser = JSON.parse(ancla);
+    }
+
+    // 🛡️ CHECKPOINT INLINE DIAGNÓSTICO: Si es invitado, congelamos respuestas y abrimos pasarela auth
+    if (!sessionUser) {
+        sessionStorage.setItem('kairo_d3d_pendiente', JSON.stringify({ respuestas: respuestasDiag }));
+        
+        // Regulamos el texto de los botones del modal de forma neuro-dinámica
+        const btnLoginInline = document.querySelector('#inlineLoginForm button[type="submit"]');
+        const btnRegInline = document.querySelector('#inlineRegForm button[type="submit"]');
+        if (btnLoginInline) btnLoginInline.innerText = "CONTINUAR CON EL CÁLCULO DEL DIAGNÓSTICO";
+        if (btnRegInline) btnRegInline.innerText = "CONTINUAR CON EL CÁLCULO DEL DIAGNÓSTICO";
+        
+        document.getElementById('main-content').classList.add('blur-effect');
+        const modalReg = document.getElementById('modal-registro-bienestar');
+        if (modalReg) {
+            modalReg.classList.remove('hidden');
+            modalReg.style.setProperty('display', 'block', 'important');
+        }
+        return;
     }
 
     const cuerpo = document.getElementById('cuerpo-diagnostico');
@@ -2868,18 +2901,26 @@ async function ejecutarLoginInline() {
         const fotoPrincipal = document.getElementById('user-photo');
         if(fotoPrincipal) fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
 
-        btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
-        const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
-        if (pendingData) {
-            sessionStorage.removeItem('kairo_perfil_pendiente');
-            const payload = JSON.parse(pendingData);
-            payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
-            payload.email = sessionUser.email;
-            
-            const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
-            if (btnCalcular) btnCalcular.innerText = "⚡ PROCESANDO INFORMACIÓN...";
-            ejecutarEnvioPerfilAlServidor(payload);
-        }
+        btn.innerText = "CONTINUAR"; btn.disabled = false;
+                const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
+                const pendingD3D = sessionStorage.getItem('kairo_d3d_pendiente');
+                
+                if (pendingData) {
+                    sessionStorage.removeItem('kairo_perfil_pendiente');
+                    const payload = JSON.parse(pendingData);
+                    payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+                    payload.email = sessionUser.email;
+                    
+                    const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
+                    if (btnCalcular) btnCalcular.innerText = "⚡ PROCESANDO INFORMACIÓN...";
+                    ejecutarEnvioPerfilAlServidor(payload);
+                } else if (pendingD3D) {
+                    // 🛡️ FOCUS: Si lo pendiente es el test, rehidratamos las respuestas globales y disparamos el cierre
+                    sessionStorage.removeItem('kairo_d3d_pendiente');
+                    const dataD3D = JSON.parse(pendingD3D);
+                    respuestasDiag = dataD3D.respuestas;
+                    finalizarDiagnostico();
+                }
     } else {
         // 🛑 MURO DE CONTENCIÓN ESTRICTO: Si falla, frena en seco y no altera la caché
         btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
