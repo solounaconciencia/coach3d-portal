@@ -1,73 +1,39 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Coach 3D LATAM - Comunidad</title>
-
     <link rel="icon" href="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
-
-    
-
     <style>
 
     :root {
-
       --primary-bg: #0a0f1e;
-
       --glass: rgba(15, 25, 45, 0.85);
-
       --neon-m: #a855f7;
-
       --neon-n: #22d3ee;
-
       --neon-f: #10b981;
-
       --neon-admin: #94a3b8;
-
       --white: #e2e8f0;
-
     }
-
-
 
     body {
 
       margin: 0; padding: 0;
-
       background: var(--primary-bg);
-
       background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80'); 
-
       background-size: cover; background-attachment: fixed;
-
       font-family: 'Segoe UI', sans-serif; color: var(--white);
-
       overflow-x: hidden;
-
     }
 
-
-
     .glass-panel {
-
     background: var(--glass);
-
     backdrop-filter: blur(10px);
-
     border: 1px solid rgba(255,255,255,0.1);
-
     border-radius: 20px;
-
     padding: 20px; /* Reducido de 30px para ganar espacio en móvil */
-
     box-shadow: 0 8px 32px 0 rgba(0,0,0,0.8);
-
     /* LÍNEAS CRÍTICAS PARA EL 98% */
 
     width: 100%; 
@@ -1564,37 +1530,27 @@
 
 
 </head>
-
 <body onload="checkSession()">
 
-
+    <div id="kairo-loader-global" style="position: fixed; inset: 0; background: #0a0f1e; z-index: 2147483647; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <div class="spinner" style="border-left-color: var(--neon-n); width: 50px; height: 50px;"></div>
+        <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-n); margin-top: 20px; letter-spacing: 3px; font-size: 0.9em; text-shadow: 0 0 10px var(--neon-n);">INICIANDO KAIRO MATRIX...</p>
+    </div>
 
     <div id="main-container">
-
         <div class="container" id="main-content">
-
-    
-
     <div id="view-welcome" class="grid-welcome glass-panel">
 
       <div>
-
         <h1>Coach 3D LATAM</h1>
-
         <p>Bienvenido a la única comunidad de Coaching en FINANZAS, NUTRICIÓN Y MENTALIDAD.</p>
-
         <button class="btn btn-n" onclick="showForm('login')">Iniciar Sesión</button>
-
         <button class="btn btn-m" onclick="showForm('register')">Registrarse</button>
-
         <p style="margin-top:20px; font-size: 0.9em; cursor:pointer; color: var(--neon-n);" onclick="recuperarPass()">¿Olvidaste tu contraseña? Recuperar Aquí</p>
-
       </div>
 
       <div class="video-container">
-
         <iframe src="https://www.youtube.com/embed/VABG6r9Ghlc" frameborder="0" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
       </div>
 
     </div>
@@ -3067,201 +3023,156 @@ function filtrarUrlImagen(url) {
 
 }
 
-
-
 async function loadDashboard() {
-
   closeAlert();
 
-
-
   if (!sessionUser) {
-
     return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
-
   }
-
-
 
   document.getElementById('view-welcome').classList.add('hidden');
-
   document.getElementById('modal-login').classList.add('hidden');
-
   
-
   const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
-
+  const d3dPendiente = sessionStorage.getItem('kairo_d3d_pendiente');
   const urlParams = new URLSearchParams(window.location.search);
 
-
-
-  if (perfilPendiente) {
-
-      // 🛡️ PROTOCOLO REHIDRATACIÓN: Se ejecuta el cálculo automático tras loguearse
-
-      const payload = JSON.parse(perfilPendiente);
-
-      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
-
-      payload.email = sessionUser.email;
-
+  // 🛡️ CORRECCIÓN CRÍTICA FOCUS: CAPTURA Y VERIFICACIÓN REAL DE MERCADOPAGO
+  if (urlParams.get('modulo') === 'retorno_pago') {
+      console.log("💳 Kairo: Retorno detectado. Validando transacciones...");
       
+      const loaderTexto = document.querySelector('#kairo-loader-global p');
+      if (loaderTexto) loaderTexto.innerText = "CONFIRMANDO TU ACCESO EN LA MATRIX...";
 
-      sessionStorage.removeItem('kairo_perfil_pendiente');
+      const backupPlanId = localStorage.getItem('kairo_prospecto_plan');
+      const backupPlanNombre = localStorage.getItem('kairo_prospecto_nombre_plan');
+      const backupRespuestas = localStorage.getItem('kairo_prospecto_respuestas');
+      const backupHerramienta = localStorage.getItem('kairo_prospecto_herramienta');
 
-      
+      if (backupPlanId && backupRespuestas) {
+          // 1. Ascendemos el rango del usuario en la base de datos a "Suscriptor"
+          const resRango = await apiCall("activarRangoSuscriptor", { email: sessionUser.email, plan: backupPlanId });
+          
+          if (resRango && resRango.success) {
+              // 2. Disparamos la mensajería espectacular de bienvenida de neuroventa
+              await apiCall("dispararCorreosSuscripcion", { usuario: sessionUser, nombrePlan: backupPlanNombre });
+              
+              // 3. Sincronizamos el rango en la memoria de la sesión actual
+              sessionUser.rango = "Suscriptor";
+              sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+              
+              // 4. Rehidratamos la matriz de respuestas del Quiz y limpiamos el disco
+              respuestasDiag = JSON.parse(backupRespuestas);
+              
+              localStorage.removeItem('kairo_prospecto_plan');
+              localStorage.removeItem('kairo_prospecto_nombre_plan');
+              localStorage.removeItem('kairo_prospecto_respuestas');
+              localStorage.removeItem('kairo_prospecto_herramienta');
 
-      // Saltamos directo al módulo del perfil de bienestar
+              // Apagamos la pantalla de carga global
+              document.getElementById('kairo-loader-global').style.display = 'none';
 
-      document.getElementById('view-dashboard').classList.add('hidden');
-
-      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
-
-      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
-
-      
-
-      // Seteamos el texto de carga de Kairo en la burbuja
-
-      document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando información metabólica...";
-
-      ejecutarEnvioPerfilAlServidor(payload);
-
-  } else if (urlParams.get('modulo') === 'perfil') {
-
-      iniciarPerfilBienestar();
-
-  } else {
-
-      document.getElementById('view-dashboard').classList.remove('hidden');
-
+              // 5. Ejecutamos el procesador del PDF y mostramos resultados
+              if (backupHerramienta === "D3D") {
+                  document.getElementById('view-dashboard').classList.add('hidden');
+                  const moduloDiag = document.getElementById('contenido-modulo-diagnostico');
+                  if (moduloDiag) moduloDiag.classList.remove('hidden');
+                  finalizarDiagnostico();
+                  return;
+              }
+          }
+      }
   }
 
+  // Flujo ordinario si no viene de pagar
+  if (perfilPendiente) {
+      const payload = JSON.parse(perfilPendiente);
+      payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
+      payload.email = sessionUser.email;
+      sessionStorage.removeItem('kairo_perfil_pendiente');
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
+      if(moduloPerfil) moduloPerfil.classList.remove('hidden');
+      document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando información metabólica...";
+      ejecutarEnvioPerfilAlServidor(payload);
+  } else if (d3dPendiente) {
+      sessionStorage.removeItem('kairo_d3d_pendiente');
+      const dataD3D = JSON.parse(d3dPendiente);
+      respuestasDiag = dataD3D.respuestas;
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const moduloDiag = document.getElementById('contenido-modulo-diagnostico');
+      if (moduloDiag) moduloDiag.classList.remove('hidden');
+      finalizarDiagnostico();
+  } else if (urlParams.get('modulo') === 'perfil') {
+      iniciarPerfilBienestar();
+  } else if (urlParams.get('modulo') === 'd3d') {
+      iniciarDiagnosticoModular();
+  } else {
+      document.getElementById('view-dashboard').classList.remove('hidden');
+  }
   
-
+  document.getElementById('kairo-loader-global').style.display = 'none';
+  
   const panelDiag = document.getElementById('contenido-modulo-diagnostico');
-
-  if (panelDiag) panelDiag.classList.add('hidden');
-
-
+  if (panelDiag && !d3dPendiente) panelDiag.classList.add('hidden');
 
   const herramientas = document.getElementById('seccion-herramientas');
-
   if (herramientas) { herramientas.classList.remove('hidden'); }
 
-
-
   document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
-
   document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
 
-
-
   const fotoCirculo = document.getElementById('user-photo');
-
   if (fotoCirculo) {
-
     fotoCirculo.referrerPolicy = "no-referrer";
-
     const tieneFoto = (sessionUser.foto && sessionUser.foto.trim().length > 10);
-
     fotoCirculo.src = tieneFoto ? filtrarUrlImagen(sessionUser.foto) : "https://ui-avatars.com/api/?name=" + (sessionUser.nombre || "U") + "&background=0a0f1e&color=22d3ee";
-
   }
-
-
 
   if(sessionUser.rango === "Admin") {
-
     document.getElementById('admin-panel').style.display = 'block';
-
   } else {
-
     document.getElementById('admin-panel').style.display = 'none';
-
   }
-
-
 
   const data = await apiCall("getDashboardData", { email: sessionUser.email });
-
   if (data && data.metrics) {
-
     document.getElementById('metric-f').innerText = data.metrics.f || 0;
-
     document.getElementById('metric-n').innerText = data.metrics.n || 0;
-
     document.getElementById('metric-m').innerText = data.metrics.m || 0;
-
     document.getElementById('metric-nivel').innerHTML = data.metrics.nivel || "Iniciante";
-
     if (typeof cargarSeccionHerramientas === 'function') cargarSeccionHerramientas();
-
   }
-
-
 
   const res = await apiCall("consultarDisponibilidadDiagnostico", { email: sessionUser.email });
-
   if (res && res.success !== false) {
-
     const spanNum = document.getElementById('num-disponible');
-
     if (spanNum) spanNum.innerText = res.disponibles;
-
     const btnDiag = document.querySelector('#container-btn-diagnostico .btn');
-
     if (res.disponibles <= 0 && btnDiag) {
-
         btnDiag.classList.add('bloqueado');
-
         btnDiag.style.opacity = "0.5";
-
         btnDiag.onclick = () => notify("🛡️ KAIRO: Has agotado tus 2 diagnósticos de este mes.");
-
     }
-
   }
-
-
 
   if (!menuAppCargado && typeof cargarMenuDinamico === 'function') {
-
       cargarMenuDinamico(true); 
-
   }
-
-
-
-  // 🛡️ PROTOCOLO FOCUS: Disparar Alerta de Clave Vulnerable CORRECTAMENTE dentro de la función
 
   if (sessionUser && sessionUser.alertaClave) {
-
       setTimeout(() => {
-
           document.getElementById('main-content').classList.add('blur-effect');
-
           const modalAlerta = document.getElementById('modal-alerta-clave');
-
           if (modalAlerta) {
-
               modalAlerta.classList.remove('hidden');
-
               modalAlerta.style.setProperty('display', 'block', 'important');
-
               modalAlerta.style.setProperty('visibility', 'visible', 'important');
-
               modalAlerta.style.setProperty('opacity', '1', 'important');
-
           }
-
       }, 1500);
-
   }
-
 }
-
-
 
     function recuperarPass() {
 
@@ -3314,155 +3225,98 @@ async function validarAcceso() {
 
 
 function logout() {
-
   // 🛡️ CAPA 4: Limpieza absoluta de ambas memorias (Evita el auto-login eterno)
-
   sessionStorage.clear();
-
   localStorage.clear();
-
   sessionUser = null;
-
-  
-
   // Redirección limpia a tu misma página de GitHub Pages, no a Google Scripts externos
-
   window.top.location.href = window.location.origin + window.location.pathname;
-
 }
 
-
-
 function checkSession() {
-
   console.log("🛡️ Kairo: Iniciando escaneo de sesión...");
-
   try {
-
-    // FOCUS: Cambiamos a sessionStorage para que se borre al cerrar la pestaña/ventana
-
     const ahora = new Date().getTime();
+    let anclaRaw = sessionStorage.getItem('kairo_session');
+    const urlParams = new URLSearchParams(window.location.search);
 
-    const anclaRaw = sessionStorage.getItem('kairo_session');
-
+    // 1. ESCUDO EMERGENCIA MERCADOPAGO: Si viene de pagar y la sesión caducó, la rehidratamos del disco duro
+    if (urlParams.get('modulo') === 'retorno_pago' && (!anclaRaw || anclaRaw === "null")) {
+        const backupUser = localStorage.getItem('kairo_prospecto_user_backup');
+        if (backupUser) {
+            sessionStorage.setItem('kairo_session', backupUser);
+            anclaRaw = backupUser;
+            localStorage.removeItem('kairo_prospecto_user_backup');
+        }
+    }
     
-
-    // 1. ESCUDO ANTI-CORRUPCIÓN (Blindado para acceso directo de invitados)
-
     if (!anclaRaw || anclaRaw === "undefined" || anclaRaw === "null") {
-
       console.log("⚠️ Kairo: Sin sesión activa.");
-
       sessionStorage.removeItem('kairo_session');
-
       sessionUser = null;
-
       
-
-      const urlParams = new URLSearchParams(window.location.search);
-
       if (urlParams.get('modulo') === 'perfil') {
-
-          iniciarPerfilBienestar(); // Mantiene el formulario abierto en limpio
-
+          iniciarPerfilBienestar(); 
+      } else if (urlParams.get('modulo') === 'd3d') {
+          iniciarDiagnosticoModular();
       } else {
-
-          document.getElementById('view-welcome').classList.remove('hidden'); // Solo muestra bienvenida si no es enlace directo
-
+          document.getElementById('view-welcome').classList.remove('hidden'); 
       }
-
+      
+      document.getElementById('kairo-loader-global').style.display = 'none';
       return; 
-
     }
 
-
-
     const datosRecuperados = JSON.parse(anclaRaw);
+    
+    // 🛡️ FOCUS: Si viene del retorno de pago, reseteamos el timestamp al tiempo actual
+    // Esto evita de forma síncrona que el verdugo de inactividad de 10 minutos lo bote al login tradicional
+    if (urlParams.get('modulo') === 'retorno_pago') {
+        datosRecuperados.timestamp = ahora;
+        sessionStorage.setItem('kairo_session', JSON.stringify(datosRecuperados));
+    }
 
     const diferenciaMs = ahora - datosRecuperados.timestamp;
 
-
-
     // 2. LÓGICA DE TIEMPOS (10 minutos de inactividad)
-
     if (datosRecuperados.timestamp && diferenciaMs > 600000) {
-
       console.log("⏰ Kairo: Tiempo agotado.");
-
       logout();
-
       return;
-
     }
 
-
-
     // 3. RE-HIDRATACIÓN
-
     sessionUser = datosRecuperados;
-
     console.log("🚀 Kairo: Sesión recuperada para " + sessionUser.nombre);
-
     
-
-    // Iniciamos el temporizador de inactividad
-
     if (typeof resetearVigilante === 'function') resetearVigilante();
-
     
-
-    // Cargamos el Dashboard
-
     loadDashboard();
 
-
-
   } catch (error) {
-
     console.error("❌ Fallo Matrix:", error);
-
     sessionStorage.removeItem('kairo_session');
-
     document.getElementById('view-welcome').classList.remove('hidden');
-
+    document.getElementById('kairo-loader-global').style.display = 'none';
   }
-
 }
 
-
-
-
-
+        
     // URLs de tus 5 avatares predefinidos
-
 const misAvatares = [
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Hugo",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Bella",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Charlie",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Daisy",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Ezra",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Flora",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Gus",
-
   "https://api.dicebear.com/7.x/notionists/svg?seed=Hazel"
-
 ];
-
-
 
 let avatarSeleccionado = "";
 
-
-
 // Función que se activa al tocar el lápiz
-
 function abrirPerfil() {
 
   // 1. Ponemos borroso el fondo
@@ -4863,55 +4717,34 @@ async function ejecutarCrearHerramienta() {
 
 }
 
-
-
-// --- FUNCIÓN DE ACTIVACIÓN MODULAR (CORREGIDA) ---
-
 function iniciarDiagnosticoModular() {
-
     console.log("🚀 Kairo: Iniciando Motor de Diagnóstico...");
-
-    
-
     closeAlert();
 
-
+    // 🛡️ FOCUS: Apagamos la bienvenida de inmediato para evitar que parpadee o se encime
+    const welcome = document.getElementById('view-welcome');
+    if (welcome) welcome.classList.add('hidden');
 
     const dash = document.getElementById('view-dashboard');
-
     const herramientas = document.getElementById('seccion-herramientas');
-
     const modulo = document.getElementById('contenido-modulo-diagnostico');
 
-
-
     if (dash) dash.classList.add('hidden');
-
     if (herramientas) herramientas.classList.add('hidden');
-
     
-
     if (modulo) {
-
         modulo.classList.remove('hidden');
-
         // Este es el llamado al archivo DiagnosticoJS
-
         if (typeof prepararDiagnostico === 'function') {
-
             prepararDiagnostico();
-
         } else {
-
             console.error("❌ Error: La función prepararDiagnostico no existe.");
-
             notify("Kairo: Error de sincronización de archivos.");
-
         }
-
     }
-
 }
+
+
 
 
 
@@ -6196,25 +6029,32 @@ function ejecutarContinuidadExitoso(usuario) {
     const fotoPrincipal = document.getElementById('user-photo');
     if(fotoPrincipal) fotoPrincipal.src = usuario.foto || "https://ui-avatars.com/api/?name=Usuario";
     
-    // 🛡️ ACCIÓN MERCADOPAGO: Extraemos el link y nombre del plan directamente de la tarjeta seleccionada
+    // Extraemos los datos del plan desde la tarjeta seleccionada
     const tarjetaSeleccionada = document.getElementById(`card-plan-${planSeleccionadoId}`);
     const linkPagoMercadoPago = tarjetaSeleccionada ? tarjetaSeleccionada.getAttribute('data-link') : "";
     const nombrePlanComercial = tarjetaSeleccionada ? tarjetaSeleccionada.getAttribute('data-nombre') : "Plan Comunidad";
 
-    // Disparamos el despachador de correos asíncrono en el backend de Google Scripts
-    apiCall("dispararCorreosSuscripcion", { usuario: usuario, nombrePlan: nombrePlanComercial });
-
-    // Si el plan requiere pago (tiene un link asignado), abrimos MercadoPago en una nueva pestaña
+    // 🛡️ FOCUS: FLUJO CONDICIONAL DE COBRO (GRATIS VS PAGO)
     if (linkPagoMercadoPago && linkPagoMercadoPago !== "" && linkPagoMercadoPago !== "#") {
-        window.open(linkPagoMercadoPago, '_blank');
+        // CASO PLAN DE PAGO: Congelamos todo el progreso y credenciales en LocalStorage para resistir la redirección
+        localStorage.setItem('kairo_prospecto_plan', planSeleccionadoId);
+        localStorage.setItem('kairo_prospecto_nombre_plan', nombrePlanComercial);
+        localStorage.setItem('kairo_prospecto_respuestas', JSON.stringify(respuestasDiag));
+        localStorage.setItem('kairo_prospecto_herramienta', identificadorHerramientaPendiente);
+        localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(usuario)); // Resguardo de sesión
+        
+        // Redirigimos la pestaña actual para forzar el retorno controlado
+        window.location.href = linkPagoMercadoPago;
+        return;
     }
     
-    // Apagar ventanas e hilos visuales del modal de prospectos
+    // CASO PLAN GRATUITO: Correos y cálculos inmediatos en rango Usuario ordinario
+    apiCall("dispararCorreosSuscripcion", { usuario: usuario, nombrePlan: nombrePlanComercial });
+    
     document.getElementById('modal-nuevo-prospecto').classList.add('hidden');
     document.getElementById('modal-nuevo-prospecto').style.display = 'none';
     document.getElementById('main-content').classList.remove('blur-effect');
     
-    // --- DISPARADOR DE CONTINUIDAD POR HILOS (Sigue calculando de fondo) ---
     if (identificadorHerramientaPendiente === "D3D") {
         finalizarDiagnostico();
     } else {
