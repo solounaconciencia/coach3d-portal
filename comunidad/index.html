@@ -1472,6 +1472,87 @@
 
   .contenedor-diagnostico::-webkit-scrollbar-thumb { background: var(--neon-n); border-radius: 10px; }
 
+/* --- UNIVERSAL PROSPECT MODAL STYLES --- */
+.prospect-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+.plan-card-neuro {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  position: relative;
+}
+.plan-card-neuro:hover {
+  transform: translateY(-5px);
+  border-color: var(--neon-n);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
+  background: rgba(34, 211, 238, 0.02);
+}
+.plan-card-neuro.selected {
+  border-color: var(--neon-f) !important;
+  background: rgba(16, 185, 129, 0.04) !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.2) !important;
+}
+.plan-card-neuro.selected::after {
+  content: "✓ SELECCIONADO";
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 0.65em;
+  color: var(--neon-f);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.plan-card-neuro h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.1em;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+}
+.plan-card-neuro .price-tag {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 10px 0;
+}
+.plan-card-neuro ul {
+  padding-left: 15px;
+  margin: 10px 0 0 0;
+  font-size: 0.8em;
+  color: #ccc;
+  line-height: 1.4;
+}
+.plan-card-neuro ul li { margin-bottom: 6px; }
+
+.coupon-container {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+  background: rgba(0,0,0,0.3);
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.coupon-container input { margin: 0; padding: 10px; }
+.coupon-container button { margin: 0; width: auto; padding: 0 20px; font-size: 0.85em; }
+
+@media (max-width: 768px) {
+  .plans-grid { grid-template-columns: 1fr !important; }
+}
   </style>
 
     
@@ -2246,7 +2327,65 @@
 
 </div>
 
+<div id="modal-nuevo-prospecto" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2147483647 !important; width: 95% !important; max-width: 850px !important; padding: 25px !important; max-height: 90vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.4) !important;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="https://i.postimg.cc/59KH5S5Z/Kairo-Saluda.png" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--neon-n); background: rgba(10, 15, 30, 0.5); padding: 5px; box-sizing: border-box; object-fit: contain;">
+        <h3 style="color: var(--neon-n); margin: 10px 0 5px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; text-transform: uppercase;">Configuración de Membresía e Identidad</h3>
+        <p style="font-size: 0.85em; color: #ccc; max-width: 600px; margin: 0 auto; line-height: 1.4;">Para guardar tus parámetros de forma inalterable y procesar tu reporte avanzado en alta definición, selecciona un plan comunitario y sincroniza tus accesos.</p>
+    </div>
+
+    <div id="prospecto-paso-planes">
+        <h4 style="text-align: left; color: var(--white); margin: 0; font-size: 0.9em; letter-spacing: 1px;">1. SELECCIONA TU MODELO DE ACCESO:</h4>
+        <div id="grid-planes-dinamicos" class="plans-grid">
+            <p style="color: var(--neon-n); text-align: center; grid-column: 1/-1;">Sincronizando pasarela comercial...</p>
+        </div>
         
+        <div class="coupon-container">
+            <input type="text" id="prospecto-input-cupon" placeholder="¿Tienes un código de descuento? Escríbelo aquí" style="text-transform: uppercase;">
+            <button class="btn btn-n" onclick="aplicarCuponProspecto()">Validar</button>
+        </div>
+        <p id="prospecto-cupon-status" style="font-size: 0.8em; margin: -5px 0 15px 5px; text-align: left; display: none; font-weight: bold;"></p>
+
+        <button class="btn btn-f" style="width: 100%; padding: 15px; font-size: 1.1em;" onclick="avanzarFormularioProspecto()">CONFIRMAR PLAN Y CONTINUAR</button>
+    </div>
+
+    <div id="prospecto-paso-auth" class="hidden" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button id="btn-prospecto-tab-login" class="btn btn-n" style="flex:1; padding: 10px; font-size: 0.8em;" onclick="alternarAuthProspecto('login')">TENGU CUENTA (LOGIN)</button>
+            <button id="btn-prospecto-tab-reg" class="btn" style="flex:1; padding: 10px; font-size: 0.8em; background: rgba(255,255,255,0.05); color: white; border: 1px solid #444;" onclick="alternarAuthProspecto('registro')">SOY NUEVO (REGISTRO GRATIS)</button>
+        </div>
+
+        <form id="form-prospecto-login" onsubmit="event.preventDefault(); procesarLoginProspecto();">
+            <input type="email" id="p-login-email" placeholder="Introduce tu Correo Electrónico" required>
+            <input type="password" id="p-login-pass" placeholder="Introduce tu Contraseña" required>
+            <button type="submit" class="btn btn-n" style="width: 100%; margin-top: 10px; padding: 15px;">SINCRONIZAR IDENTIDAD Y EJECUTAR</button>
+        </form>
+
+        <form id="form-prospecto-reg" class="hidden" onsubmit="event.preventDefault(); procesarRegistroProspecto();" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left;">
+            <input type="text" id="p-reg-nombre" placeholder="Nombre" required style="grid-column: span 1;">
+            <input type="text" id="p-reg-apellido" placeholder="Apellido" required style="grid-column: span 1;">
+            <input type="email" id="p-reg-email" placeholder="Email para el reporte PDF" required style="grid-column: span 2;">
+            <input type="password" id="p-reg-pass" placeholder="Contraseña de acceso" required style="grid-column: span 1;">
+            <input type="password" id="p-reg-confirm" placeholder="Confirmar Contraseña" required style="grid-column: span 1;">
+            <input type="text" id="p-reg-whatsapp" placeholder="WhatsApp" required style="grid-column: span 1;">
+            <input type="text" id="p-reg-pais" placeholder="País" required style="grid-column: span 1;">
+            <input type="number" id="p-reg-edad" placeholder="Edad" required min="15" max="120" style="grid-column: span 2;">
+            
+            <select id="p-reg-pregunta" required style="grid-column: span 2;">
+                <option value="">Pregunta Secreta de Recuperación</option>
+                <option>¿Nombre de tu primera mascota?</option>
+                <option>¿Ciudad donde naciste?</option>
+                <option>¿Libro favorito?</option>
+            </select>
+            <input type="text" id="p-reg-respuesta" placeholder="Respuesta Secreta" required style="grid-column: span 2;">
+            
+            <input type="hidden" id="p-reg-origen" value="Internet">
+            <button type="submit" class="btn btn-f" style="grid-column: span 2; padding: 15px; margin-top: 10px;">CREAR PERFIL EN LA MATRIX Y EJECUTAR</button>
+        </form>
+    </div>
+
+    <button class="btn" style="width: 100%; margin-top: 15px; font-size: 0.8em; opacity: 0.6;" onclick="cerrarModalProspecto()">CANCELAR OPERACIÓN</button>
+</div>        
 
 <div id="modal-alquimia" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);">
 
@@ -5121,16 +5260,16 @@ function nextDiag(puntos) {
 // --- CIRUGÍA FOCUS: FINALIZAR DIAGNÓSTICO ---
 
 async function finalizarDiagnostico() {
-
     if (!sessionUser || !sessionUser.email) {
-
-        const ancla = localStorage.getItem('kairo_session');
-
+        const ancla = sessionStorage.getItem('kairo_session');
         if (ancla) sessionUser = JSON.parse(ancla);
-
     }
 
-
+    // 🛡️ INTERCEPCIÓN UNIVERSAL: Si es desconocido, congela hilos y despliega la pasarela de planes
+    if (!sessionUser) {
+        dispararMuroProspecto("D3D", null);
+        return;
+    }
 
     const cuerpo = document.getElementById('cuerpo-diagnostico');
 
@@ -5876,6 +6015,205 @@ async function ejecutarRegistroInline() {
 
 }        
 
+
+// --- MOTOR CORE: UNIVERSAL PROSPECT CONTROL ENGINE ---
+let planSeleccionadoId = "";
+let descuentoValidadoPorcentaje = 0;
+let identificadorHerramientaPendiente = "";
+let paqueteDatosHerramientaPendiente = null;
+
+/**
+ * ORQUESTADOR UNIVERSAL DE INTERCEPCIÓN ANÓNIMA
+ */
+function dispararMuroProspecto(herramientaId, payload) {
+    identificadorHerramientaPendiente = herramientaId;
+    paqueteDatosHerramientaPendiente = payload;
+    planSeleccionadoId = "";
+    descuentoValidadoPorcentaje = 0;
+    
+    // Resetear campos visuales
+    document.getElementById('prospecto-input-cupon').value = "";
+    const statusTxt = document.getElementById('prospecto-cupon-status');
+    statusTxt.style.display = 'none';
+    statusTxt.innerText = "";
+
+    // Activar desenfoque e interfaz base
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('prospecto-paso-planes').classList.remove('hidden');
+    document.getElementById('prospecto-paso-auth').classList.add('hidden');
+    
+    const modal = document.getElementById('modal-nuevo-prospecto');
+    modal.classList.remove('hidden');
+    modal.style.setProperty('display', 'block', 'important');
+    
+    // Cargar catálogos dinámicos desde la base de datos
+    cargarPlanesComercialesDinamicos();
+}
+
+async function cargarPlanesComercialesDinamicos() {
+    const contenedor = document.getElementById('grid-planes-dinamicos');
+    contenedor.innerHTML = '<p style="color:var(--neon-n); text-align:center; grid-column:1/-1;">Sincronizando con base de datos Matrix...</p>';
+    
+    const res = await apiCall("obtenerPlanesSuscripcion");
+    if (res && res.success) {
+        contenedor.innerHTML = "";
+        res.planes.forEach(plan => {
+            const card = document.createElement('div');
+            card.className = "plan-card-neuro";
+            card.id = `card-plan-${plan.id}`;
+            card.onclick = () => seleccionarPlanProspecto(plan.id);
+            
+            card.innerHTML = `
+                <div>
+                    <h3>${plan.nombre}</h3>
+                    <div class="price-tag" id="price-display-${plan.id}">${plan.precio}</div>
+                    <ul>
+                        ${plan.descripcion.map(li => `<li>${li}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            contenedor.appendChild(card);
+        });
+    } else {
+        contenedor.innerHTML = '<p style="color:#ff4444; grid-column:1/-1;">Error de conexión comercial.</p>';
+    }
+}
+
+function seleccionarPlanProspecto(planId) {
+    planSeleccionadoId = planId;
+    document.querySelectorAll('.plan-card-neuro').forEach(c => c.classList.remove('selected'));
+    const tarjetaElegida = document.getElementById(`card-plan-${planId}`);
+    if (tarjetaElegida) tarjetaElegida.classList.add('selected');
+}
+
+async function aplicarCuponProspecto() {
+    const input = document.getElementById('prospecto-input-cupon');
+    const statusTxt = document.getElementById('prospecto-cupon-status');
+    const codigo = input.value.trim();
+    
+    if (!codigo) return;
+    
+    statusTxt.style.display = 'block';
+    statusTxt.style.color = 'var(--neon-n)';
+    statusTxt.innerText = "Consultando validez...";
+    
+    const res = await apiCall("validarCuponDescuento", { codigo: codigo });
+    if (res && res.success) {
+        descuentoValidadoPorcentaje = res.porcentaje;
+        statusTxt.style.color = 'var(--neon-f)';
+        statusTxt.innerText = res.msg;
+    } else {
+        descuentoValidadoPorcentaje = 0;
+        statusTxt.style.color = '#ff4444';
+        statusTxt.innerText = res ? res.msg : "Error al validar.";
+    }
+}
+
+function avanzarFormularioProspecto() {
+    if (!planSeleccionadoId) return notify("Por favor, selecciona un modelo de acceso para continuar.");
+    document.getElementById('prospecto-paso-planes').classList.add('hidden');
+    document.getElementById('prospecto-paso-auth').classList.remove('hidden');
+}
+
+function alternarAuthProspecto(pestana) {
+    const fLogin = document.getElementById('form-prospecto-login');
+    const fReg = document.getElementById('form-prospecto-reg');
+    const tLogin = document.getElementById('btn-prospecto-tab-login');
+    const tReg = document.getElementById('btn-prospecto-tab-reg');
+    
+    if (pestana === 'login') {
+        fLogin.classList.remove('hidden'); fReg.classList.add('hidden');
+        tLogin.className = "btn btn-n"; tReg.className = "btn";
+        tReg.style.backgroundColor = "rgba(255,255,255,0.05)"; tReg.style.border = "1px solid #444";
+    } else {
+        fLogin.classList.add('hidden'); fReg.remove('hidden');
+        tReg.className = "btn btn-f"; tLogin.className = "btn";
+        tLogin.style.backgroundColor = "rgba(255,255,255,0.05)"; tLogin.style.border = "1px solid #444";
+    }
+}
+
+async function procesarLoginProspecto() {
+    const email = document.getElementById('p-login-email').value.trim();
+    const pass = document.getElementById('p-login-pass').value;
+    const btn = document.querySelector('#form-prospecto-login button');
+    
+    btn.innerText = "VERIFICANDO..."; btn.disabled = true;
+    const res = await apiCall("login", { email: email, pass: pass });
+    btn.innerText = "SINCRONIZAR IDENTIDAD Y EJECUTAR"; btn.disabled = false;
+    
+    if (res && res.success) {
+        ejecutarContinuidadExitoso(res.user);
+    } else {
+        return notify(res && res.msg ? res.msg : "Acceso fallido.");
+    }
+}
+
+async function procesarRegistroProspecto() {
+    const pass = document.getElementById('p-reg-pass').value;
+    if (pass !== document.getElementById('p-reg-confirm').value) return notify("Las contraseñas no coinciden.");
+    if (!validarSeguridadPass(pass)) return notify("Clave inválida (6-12 caracteres, Mayús y Núm).");
+
+    const formData = {
+        nombre: document.getElementById('p-reg-nombre').value.trim(),
+        apellido: document.getElementById('p-reg-apellido').value.trim(),
+        email: document.getElementById('p-reg-email').value.trim(),
+        pass: pass,
+        whatsapp: document.getElementById('p-reg-whatsapp').value.trim(),
+        pais: document.getElementById('p-reg-pais').value.trim(),
+        edad: document.getElementById('p-reg-edad').value,
+        pregunta: document.getElementById('p-reg-pregunta').value,
+        respuesta: document.getElementById('p-reg-respuesta').value.trim(),
+        origen: document.getElementById('p-reg-origen').value,
+        invitador_nombre: "ORIGEN_HERRAMIENTA",
+        invitador_email: "no-reply@coach3d.app"
+    };
+
+    const btn = document.querySelector('#form-prospecto-reg button');
+    btn.innerText = "INYECTANDO REGISTRO..."; btn.disabled = true;
+    const res = await apiCall("registrarUsuario", formData);
+    btn.innerText = "CREAR PERFIL EN LA MATRIX Y EJECUTAR"; btn.disabled = false;
+
+    if (res && res.success && res.kairo) {
+        // Al venir de herramienta, guardamos sesión y puenteamos directo para no romper el test
+        const fakeUser = {
+            nombre: formData.nombre, email: formData.email, pais: formData.pais, edad: formData.edad,
+            seudónimo: formData.nombre, rango: "Usuario", foto: ""
+        };
+        ejecutarContinuidadExitoso(fakeUser);
+    } else {
+        return notify(res && res.msg ? res.msg : "Fallo al registrar.");
+    }
+}
+
+function ejecutarContinuidadExitoso(usuario) {
+    usuario.timestamp = new Date().getTime();
+    sessionUser = usuario;
+    sessionStorage.setItem('kairo_session', JSON.stringify(usuario));
+    
+    const fotoPrincipal = document.getElementById('user-photo');
+    if(fotoPrincipal) fotoPrincipal.src = usuario.foto || "https://ui-avatars.com/api/?name=Usuario";
+    
+    // Apagar ventanas e hilos visuales
+    document.getElementById('modal-nuevo-prospecto').classList.add('hidden');
+    document.getElementById('modal-nuevo-prospecto').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+    
+    // --- DISPARADOR DE CONTINUIDAD POR HILOS ---
+    if (identificadorHerramientaPendiente === "D3D") {
+        finalizarDiagnostico();
+    } else {
+        // Reservado para futuras herramientas del sistema
+        if (typeof loadDashboard === 'function') loadDashboard();
+    }
+}
+
+function cerrarModalProspecto() {
+    document.getElementById('modal-nuevo-prospecto').classList.add('hidden');
+    document.getElementById('modal-nuevo-prospecto').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+    salirDelModulo();
+}
+        
     </script>
 
 
