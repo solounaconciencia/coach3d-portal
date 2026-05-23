@@ -6061,6 +6061,9 @@ async function cargarPlanesComercialesDinamicos() {
             const card = document.createElement('div');
             card.className = "plan-card-neuro";
             card.id = `card-plan-${plan.id}`;
+            // 🛡️ FOCUS: Almacenamos el link de MercadoPago de la base de datos en la tarjeta
+            card.setAttribute('data-link', plan.link_pago || "");
+            card.setAttribute('data-nombre', plan.nombre || "");
             card.onclick = () => seleccionarPlanProspecto(plan.id);
             
             card.innerHTML = `
@@ -6193,16 +6196,28 @@ function ejecutarContinuidadExitoso(usuario) {
     const fotoPrincipal = document.getElementById('user-photo');
     if(fotoPrincipal) fotoPrincipal.src = usuario.foto || "https://ui-avatars.com/api/?name=Usuario";
     
-    // Apagar ventanas e hilos visuales
+    // 🛡️ ACCIÓN MERCADOPAGO: Extraemos el link y nombre del plan directamente de la tarjeta seleccionada
+    const tarjetaSeleccionada = document.getElementById(`card-plan-${planSeleccionadoId}`);
+    const linkPagoMercadoPago = tarjetaSeleccionada ? tarjetaSeleccionada.getAttribute('data-link') : "";
+    const nombrePlanComercial = tarjetaSeleccionada ? tarjetaSeleccionada.getAttribute('data-nombre') : "Plan Comunidad";
+
+    // Disparamos el despachador de correos asíncrono en el backend de Google Scripts
+    apiCall("dispararCorreosSuscripcion", { usuario: usuario, nombrePlan: nombrePlanComercial });
+
+    // Si el plan requiere pago (tiene un link asignado), abrimos MercadoPago en una nueva pestaña
+    if (linkPagoMercadoPago && linkPagoMercadoPago !== "" && linkPagoMercadoPago !== "#") {
+        window.open(linkPagoMercadoPago, '_blank');
+    }
+    
+    // Apagar ventanas e hilos visuales del modal de prospectos
     document.getElementById('modal-nuevo-prospecto').classList.add('hidden');
     document.getElementById('modal-nuevo-prospecto').style.display = 'none';
     document.getElementById('main-content').classList.remove('blur-effect');
     
-    // --- DISPARADOR DE CONTINUIDAD POR HILOS ---
+    // --- DISPARADOR DE CONTINUIDAD POR HILOS (Sigue calculando de fondo) ---
     if (identificadorHerramientaPendiente === "D3D") {
         finalizarDiagnostico();
     } else {
-        // Reservado para futuras herramientas del sistema
         if (typeof loadDashboard === 'function') loadDashboard();
     }
 }
