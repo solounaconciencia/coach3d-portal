@@ -3983,108 +3983,70 @@ function renderizarBotonesKairo(botones) {
 
 
 
-// --- VIGILANTE DE INACTIVIDAD KAIRO (BLINDADO) ---
-
+// --- VIGILANTE DE INACTIVIDAD KAIRO (BLINDADO CON CUENTA REGRESIVA) ---
 let timerInactividad;
-
-let timerVerdugo; // El segundo reloj que cierra la sesión a la fuerza
-
-
+let timerVerdugo; // Controlará el intervalo síncrono del cronómetro visual
 
 function resetearVigilante() {
-
   clearTimeout(timerInactividad);
-
-  clearTimeout(timerVerdugo);
-
+  clearInterval(timerVerdugo); // 🛡️ FOCUS: Limpieza preventiva usando clearInterval
   
-
-  // 1. Configura el reloj: 10 minutos (600000 ms) para avisar
-
+  // 1. Configura el reloj: 10 minutos (600000 ms) para avisar de la inactividad
   timerInactividad = setTimeout(dispararAlertaCierre, 600000); 
-
   
-
   // 2. Persistencia en memoria
-
   if(sessionUser && sessionUser.email) {
-
     sessionUser.timestamp = new Date().getTime();
-
     localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
-
   }
-
 }
-
-
 
 // --- PROTOCOLO DE PERSISTENCIA FOCUS ---
-
 window.onload = function() {
-
     if (typeof resetearVigilante === 'function') resetearVigilante();
-
-    
-
-    // 🛡️ Dejamos que checkSession orqueste la pantalla de inicio limpia sin duplicar vistas
-
     checkSession();
-
 };
-
         
-
 document.onmousemove = resetearVigilante;
-
 document.onkeypress = resetearVigilante;
 
-
-
 async function dispararAlertaCierre() {
-
-    // Si el usuario no responde en 60 segundos (60000 ms), ejecutamos el verdugo
-
-    timerVerdugo = setTimeout(() => {
-
-        cerrarKairoMsg();
-
-        logout();
-
-    }, 60000); 
-
-
-
-    const seguir = await kairoMessage({ 
-
-        mensaje: "Kairo detecta inactividad. Si no respondes, la sesión se cerrará por seguridad.", 
-
-        tipo: 'confirmar',
-
-        icon: '⏳'
-
-    });
-
+    let tiempoRestante = 58; // El primer segundo nacerá mostrando 59s en la llamada base
     
+    clearInterval(timerVerdugo); // Aseguramos que no existan hilos duplicados
+    
+    // 🛡️ MOTOR DEL CRONÓMETRO: Actualiza el texto neón del modal segundo a segundo
+    timerVerdugo = setInterval(() => {
+        const msgElemento = document.getElementById('alert-message');
+        if (msgElemento) {
+            msgElemento.innerHTML = `Kairo detecta inactividad en la Matrix. Tu sesión se cerrará automáticamente por seguridad en:<br><b style="color: #ff4444; font-size: 2.3rem; display: block; margin-top: 15px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(255, 68, 68, 0.6);">${tiempoRestante}s</b>`;
+        }
+        
+        // Si el cronómetro llega a cero, el verdugo ejecuta el cierre forzado de sesión
+        if (tiempoRestante <= 0) {
+            clearInterval(timerVerdugo);
+            cerrarKairoMsg();
+            logout();
+        }
+        tiempoRestante--;
+    }, 1000);
 
-    // Si el usuario hace clic en mantener conexión
-
+    // Lanzamos el modal con el segundo inicial renderizado de forma premium
+    const seguir = await kairoMessage({ 
+        mensaje: `Kairo detecta inactividad en la Matrix. Tu sesión se cerrará automáticamente por seguridad en:<br><b style="color: #ff4444; font-size: 2.3rem; display: block; margin-top: 15px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(255, 68, 68, 0.6);">59s</b>`, 
+        tipo: 'confirmar',
+        icon: '⏳'
+    });
+    
+    // 🛡️ Si el usuario presiona un botón antes de que termine el tiempo, apagamos el cronómetro de inmediato
+    clearInterval(timerVerdugo); 
+    
     if (seguir) {
-
-        clearTimeout(timerVerdugo); // Salvado por el botón
-
-        resetearVigilante();
-
+        resetearVigilante(); // Conexión salvada, reinicia el ciclo de 10 minutos
     } else {
-
-        clearTimeout(timerVerdugo);
-
-        logout();
-
+        logout(); // El usuario decide salir manualmente
     }
-
 }
-
 
 
 
