@@ -4068,15 +4068,13 @@ function renderizarBotonesKairo(botones) {
 
 }
 
-
-
 // --- VIGILANTE DE INACTIVIDAD KAIRO (BLINDADO CON CUENTA REGRESIVA) ---
 let timerInactividad;
 let timerVerdugo; // Controlará el intervalo síncrono del cronómetro visual
 
 function resetearVigilante() {
   clearTimeout(timerInactividad);
-  clearInterval(timerVerdugo); // 🛡️ FOCUS: Limpieza preventiva usando clearInterval
+  clearInterval(timerVerdugo); // Limpieza preventiva usando clearInterval
   
   // 1. Configura el reloj: 10 minutos (600000 ms) para avisar de la inactividad
   timerInactividad = setTimeout(dispararAlertaCierre, 600000); 
@@ -4098,11 +4096,15 @@ document.onmousemove = resetearVigilante;
 document.onkeypress = resetearVigilante;
 
 async function dispararAlertaCierre() {
+    // 🛡️ ESCUDO FOCUS CRÍTICO: Apagamos temporalmente los rastreadores del mouse y teclado
+    // para que mover el puntero hacia los botones NO mate el intervalo del reloj antes de tiempo
+    document.onmousemove = null;
+    document.onkeypress = null;
+
     let tiempoRestante = 58; // El primer segundo nacerá mostrando 59s en la llamada base
-    
     clearInterval(timerVerdugo); // Aseguramos que no existan hilos duplicados
     
-    // 🛡️ MOTOR DEL CRONÓMETRO: Actualiza el texto neón del modal segundo a segundo
+    // MOTOR DEL CRONÓMETRO: Actualiza el texto neón del modal segundo a segundo
     timerVerdugo = setInterval(() => {
         const msgElemento = document.getElementById('alert-message');
         if (msgElemento) {
@@ -4125,99 +4127,59 @@ async function dispararAlertaCierre() {
         icon: '⏳'
     });
     
-    // 🛡️ Si el usuario presiona un botón antes de que termine el tiempo, apagamos el cronómetro de inmediato
+    // Apagamos el cronómetro de inmediato al recibir una respuesta de los botones
     clearInterval(timerVerdugo); 
     
     if (seguir) {
+        // 🛡️ RESTAURAMOS los escuchas del mouse y teclado únicamente si decide quedarse conectado
+        document.onmousemove = resetearVigilante;
+        document.onkeypress = resetearVigilante;
         resetearVigilante(); // Conexión salvada, reinicia el ciclo de 10 minutos
     } else {
         logout(); // El usuario decide salir manualmente
     }
 }
 
-
-
-
 async function cargarSeccionHerramientas() {
 
     const res = await apiCall("obtenerHerramientasDashboard");
-
-  
-
     if (!res || !res.success) return console.error("Error de Kairo:", res ? res.msg : "Sin respuesta");
-
-  
-
     const contenedores = {
-
       'FINANZAS': 'contenedor-herramientas-f',
-
       'NUTRICION': 'contenedor-herramientas-n',
-
       'MENTALIDAD': 'contenedor-herramientas-m'
-
     };
 
-
-
     Object.values(contenedores).forEach(id => {
-
       const el = document.getElementById(id);
-
       if(el) el.innerHTML = "";
-
     });
 
-
-
     for (let pilar in res.data) {
-
       const divPadre = document.getElementById(contenedores[pilar]);
-
       if (divPadre && res.data[pilar].length > 0) {
-
         res.data[pilar].forEach(h => {
-
           const btn = document.createElement('div');
-
           btn.className = `boton-herramienta ${h.bloqueado ? 'herramienta-bloqueada' : ''}`;
-
           btn.onclick = () => {
-
             if (h.bloqueado) {
-
               mostrarVentanaSuscripcion(h.nombre); 
-
             } else if (h.url && h.url !== "#") {
-
               window.open(h.url, '_blank');
-
             }
-
           };
-
           btn.innerHTML = `<img src="${h.icono || 'https://img.icons8.com/ios-glyphs/30/ffffff/external-link.png'}" style="width:22px; height:22px; flex-shrink: 0;">
-
                            <span style="font-size:0.85em; color:white; font-weight:500; line-height: 1.2;">${h.nombre}</span>`;
 
           divPadre.appendChild(btn);
-
         });
-
       } else if (divPadre) {
-
         divPadre.innerHTML = "<p style='font-size:0.75em; color:rgba(255,255,255,0.3); text-align:center; margin-top:10px;'>Próximamente...</p>";
-
       }
-
     }
-
 }
 
-
-
 // Función para mostrar el modal con el mensaje personalizado
-
 function mostrarVentanaSuscripcion(nombreHerramienta) {
 
   const modal = document.getElementById('modal-suscripcion');
