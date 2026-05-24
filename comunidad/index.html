@@ -919,65 +919,34 @@
 }
 
 /* REGLA MAESTRA: Nada puede mostrarse si tiene esta clase */
-
 .hidden { 
-
   display: none !important; 
-
   visibility: hidden !important;
-
   opacity: 0 !important;
-
   height: 0 !important;
-
   margin: 0 !important;
-
   padding: 0 !important;
-
   overflow: hidden !important;
-
 }
 
-
-
-
-
-./* Estilo de los Botones */
-
+/* Estilo de los Botones */
 .boton-herramienta {
-
   display: flex; 
-
   align-items: center; 
-
   gap: 12px; 
-
   background: rgba(255,255,255,0.05); 
-
   padding: 12px; 
-
   border-radius: 10px; 
-
   cursor: pointer; 
-
   border: 1px solid rgba(255,255,255,0.1); 
-
   transition: 0.3s;
-
   width: 100%;
-
   box-sizing: border-box;
-
 }
-
-
 
 .boton-herramienta:hover {
-
   background: rgba(255, 255, 255, 0.1);
-
   transform: translateX(5px);
-
 }
 
 
@@ -1638,11 +1607,7 @@
         </div>
 
         <button class="btn" onclick="cancelarRegistro()" style="margin-top: 10px; font-size: 0.8em;">Volver</button>
-
-    </div>
-
-
-
+   
     <div id="view-dashboard" class="hidden">
 
       <button class="btn-hamburguesa" onclick="toggleMenuApp()">☰</button>
@@ -2082,7 +2047,7 @@
     <button class="btn" style="width: 100%; margin-top: 8px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarDetalleServicio()">CERRAR WINDOWS</button>
 </div>
             
-</div> <div id="modal-perfil" class="hidden glass-panel">
+<div id="modal-perfil" class="hidden glass-panel">
     <h3 style="color: var(--neon-n); text-align: center;">Editar Perfil</h3>
     <div style="text-align: center; margin-bottom: 15px;">
         <div id="avatar-selector" style="display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 15px;"></div>
@@ -3291,6 +3256,9 @@ function checkSession() {
           iniciarDiagnosticoModular();
       } else if (urlParams.get('modulo') === 'calculadora') {
           iniciarcalculadorafinanciera();
+      } else if (urlParams.get('modulo') === 'servicios') {
+          // 🛡️ FOCUS: Abre de forma síncrona el catálogo comercial si entran deslogueados
+          iniciarservicios();
       } else {
           document.getElementById('view-welcome').classList.remove('hidden'); 
       }
