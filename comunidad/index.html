@@ -1958,12 +1958,10 @@
 </div>
 
 <div id="modulo-calculadora-financiera" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-m); position: relative; overflow: hidden; padding: 25px;">
-    
     <div style="text-align: center; margin-bottom: 25px;">
         <h2 style="color: var(--neon-m); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase; font-size: 1.4em; text-shadow: 0 0 10px var(--neon-m);">Calculadora Financiera C3D</h2>
         <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Descifra tu flujo de caja y genera tu Reporte de Libertad</p>
     </div>
-
     <div id="app-content-calc">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px;">
             <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid var(--neon-f); padding: 20px; border-radius: 15px;">
@@ -1972,7 +1970,6 @@
                 <input type="number" id="ing-val" placeholder="Monto $" style="background: rgba(0,0,0,0.6);">
                 <button class="btn btn-f" onclick="addIngreso()" style="width: 100%; margin-top: 5px;">AGREGAR A HABER</button>
             </div>
-
             <div style="background: rgba(168, 85, 247, 0.03); border: 1px solid var(--neon-m); padding: 20px; border-radius: 15px;">
                 <h3 style="color: var(--neon-m); margin-top:0; font-family:'Orbitron', sans-serif; font-size: 1em; letter-spacing: 1px;">- DEBE (GASTOS)</h3>
                 <input type="text" id="gas-desc" placeholder="Concepto (Ej. Arriendo o Tarjeta)" style="background: rgba(0,0,0,0.6);">
@@ -1980,7 +1977,6 @@
                 <button class="btn btn-m" onclick="addGasto()" style="width: 100%; margin-top: 5px;">AGREGAR A DEBE</button>
             </div>
         </div>
-
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.4); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; min-height: 120px;">
             <div style="border-right: 1px solid rgba(255,255,255,0.05); padding: 15px;">
                 <div style="color: var(--neon-f); font-weight: bold; border-bottom: 2px solid var(--neon-f); padding-bottom: 5px; font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 10px;">Ingresos Registrados</div>
@@ -1991,16 +1987,13 @@
                 <div id="list-gas" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; font-size: 0.9em;"></div>
             </div>
         </div>
-
         <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 16px; font-family: 'Orbitron', sans-serif;" onclick="processFinance()">GENERAR REPORTE DE LIBERTAD</button>
         <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6;" onclick="salirDelModulo()">CANCELAR</button>
     </div>
-
     <div id="loader-calc" style="display:none; text-align: center; padding: 40px 10px;">
         <div class="spinner" style="border-left-color: var(--neon-m);"></div>
         <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-m); letter-spacing: 2px; margin-top: 20px; font-size: 0.9em;">DESCIFRANDO TU ADN FINANCIERO...</p>
     </div>
-
     <div id="results-calc" style="display:none; animation: fadeIn 0.5s ease-out;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px;">
             
@@ -2012,24 +2005,83 @@
                 <div style="border-top:1px dashed rgba(255,255,255,0.1); margin: 10px 0; padding-top: 8px;"></div>
                 <p style="margin: 0; font-size: 0.8em; color: #ccc; line-height: 1.3;">Sugerencia (Aho/Inv/Pre): <br><span id="res-dist" style="color: var(--neon-n); font-weight: bold;"></span></p>
             </div>
-
             <div class="glass-panel" style="border-left: 4px solid var(--neon-f); padding: 15px; text-align: left;">
                 <h3 style="color: var(--neon-f); margin: 0 0 10px 0; font-size: 0.9em; font-family: 'Orbitron', sans-serif;">META NEURO-FINANCIERA</h3>
                 <p style="margin: 6px 0; font-size: 0.9em;">Ingreso Objetivo: <span id="id-ing" style="color:#fff; font-weight:bold;"></span></p>
                 <p style="margin: 6px 0; font-size: 0.9em;">Tu 10% de Oro: <span id="id-dist" style="color: var(--neon-f); font-weight:bold;"></span></p>
             </div>
-
             <div class="glass-panel" style="border-left: 4px solid var(--neon-m); padding: 15px; text-align: left; grid-column: span 1;">
                 <h2 id="status-name" style="color: var(--neon-m); margin: 0 0 5px 0; font-size: 1.1em; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;"></h2>
                 <p id="status-msg" style="margin: 0; font-size: 0.85em; color: #cbd5e1; line-height: 1.4;"></p>
             </div>
         </div>
-
         <button id="wa-link-calc" class="btn btn-f" style="width: 100%; padding: 15px; font-weight: bold; margin-bottom: 15px;" onclick="window.open(this.getAttribute('data-href'), '_blank')">🚀 SOLICITAR ASESORÍA FINANCIERA GRATUITA</button>
         <button class="btn btn-n" style="width: 100%;" onclick="reiniciarCalculadoraLocal()">NUEVO ANÁLISIS</button>
     </div>
 </div>
 
+<div id="modulo-servicios-comunidad" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase; font-size: 1.4em; text-shadow: 0 0 10px var(--neon-n);">Servicios & Mentorías Premium</h2>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Soluciones avanzadas de Coaching y Terapias Integrales</p>
+    </div>
+
+    <div class="grid-herramientas" style="margin-bottom: 15px;">
+        <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid var(--neon-f); border-radius: 15px; padding: 15px;">
+            <h3 style="color: var(--neon-f); text-align: center; font-size: 0.8em; font-family:'Orbitron', sans-serif; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Coaching Financiero</h3>
+            <div id="lista-servicios-f" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+        <div style="background: rgba(34, 211, 238, 0.03); border: 1px solid var(--neon-n); border-radius: 15px; padding: 15px;">
+            <h3 style="color: var(--neon-n); text-align: center; font-size: 0.8em; font-family:'Orbitron', sans-serif; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Metabolismo & Nutrición</h3>
+            <div id="lista-servicios-n" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+        <div style="background: rgba(168, 85, 247, 0.03); border: 1px solid var(--neon-m); border-radius: 15px; padding: 15px;">
+            <h3 style="color: var(--neon-m); text-align: center; font-size: 0.8em; font-family:'Orbitron', sans-serif; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Mentalidad & Alquimia</h3>
+            <div id="lista-servicios-m" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+    </div>
+    <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.7;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+</div>
+
+<div id="modal-detalle-servicio" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 92% !important; max-width: 480px !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
+    <div style="text-align: center; margin-bottom: 15px;">
+        <img id="ser-modal-img" src="" style="width: 55px; height: 55px; filter: drop-shadow(0 0 8px var(--neon-n)); margin-bottom: 10px;">
+        <h3 id="ser-modal-nombre" style="color: #fff; font-family: 'Orbitron', sans-serif; margin: 0 0 5px 0; font-size: 1.2em; letter-spacing: 1px;"></h3>
+        <small id="ser-modal-sku" style="color: var(--neon-admin); font-size: 0.7em; letter-spacing: 2px;"></small>
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 3px solid var(--neon-n); text-align: left; font-size: 0.9em; line-height: 1.5; color: #cbd5e1;" id="ser-modal-desc"></div>
+
+    <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; display: flex; justify-content: space-around; align-items: center;">
+        <div>
+            <span style="font-size: 0.65em; display:block; color: #94a3b8; letter-spacing: 1px;">PRECIO LISTA</span>
+            <span id="ser-modal-precio-normal" style="font-size: 1.1em; font-weight: bold; color: #f87171;"></span>
+        </div>
+        <div style="border-left: 1px solid rgba(255,255,255,0.1); height: 30px;"></div>
+        <div>
+            <span style="font-size: 0.65em; display:block; color: var(--neon-f); letter-spacing: 1px;">PRECIO SUSCRIPTOR</span>
+            <span id="ser-modal-precio-vip" style="font-size: 1.4em; font-weight: 800; color: var(--neon-f); text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);"></span>
+        </div>
+    </div>
+
+    <div id="ser-contenedor-varios" class="hidden" style="margin-bottom: 15px; background: rgba(168, 85, 247, 0.03); padding: 12px; border: 1px dashed var(--neon-m); border-radius: 10px; text-align: left;">
+        <label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 8px;">🎁 SELECCIONA TU COMPLEMENTO DE REGALO OBLIGATORIO:</label>
+        <select id="ser-select-regalo" style="margin: 0; background: #000; border-color: var(--neon-m); font-size: 0.85em;">
+            <option value="Té Energizante">🍵 Té Energizante de Cortesía</option>
+            <option value="Multivitamínico">💊 Multivitamínico de Cortesía</option>
+            <option value="Muffin de Chocolate">🧁 Muffin de Chocolate Saludable</option>
+            <option value="Batido Nutricional">🥤 Batido Nutricional Premium</option>
+        </select>
+        <p style="font-size: 0.65em; color: #94a3b8; margin: 8px 0 0 0; line-height: 1.3;">
+            <b>🔒 Cláusula de Consumo:</b> Regalo exclusivo para consumo personal. No vincula a redes de distribución corporativas (Herbalife). Consulta a tu Coach para activar tu 25% de descuento por 12 meses como Cliente Preferente.
+        </p>
+    </div>
+
+    <button id="ser-btn-accion" class="btn btn-n" style="width: 100%; padding: 14px; font-family: 'Orbitron', sans-serif;" onclick="ejecutarAccionComercialServicio()">ADQUIRIR ACCESO DIRECTO</button>
+    <button class="btn" style="width: 100%; margin-top: 8px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarDetalleServicio()">CERRAR WINDOWS</button>
+</div>
+            
 </div> <div id="modal-perfil" class="hidden glass-panel">
     <h3 style="color: var(--neon-n); text-align: center;">Editar Perfil</h3>
     <div style="text-align: center; margin-bottom: 15px;">
@@ -3065,6 +3117,10 @@ async function loadDashboard() {
       // 🛡️ Si entran por link directo a la calculadora financiera
       iniciarcalculadorafinanciera();
   } 
+  else if (urlParams.get('modulo') === 'servicios') {
+      // 🛡️ Si entran por link directo al catálogo de servicios de coaching
+      iniciarservicios();
+  }
   else {
       // Dashboard normal de la comunidad
       document.getElementById('view-dashboard').classList.remove('hidden');
@@ -5736,6 +5792,164 @@ function reiniciarCalculadoraLocal() {
     document.getElementById('app-content-calc').style.display = 'block';
     document.getElementById('results-calc').style.display = 'none';
     document.getElementById('loader-calc').style.display = 'none';
+}
+
+// =========================================================================
+// 🛍️ MOTOR COMERCIAL: CATÁLOGO DE SERVICIOS C3D UNI-FLOW
+// =========================================================================
+let catalogoServiciosCache = null;
+let servicioSeleccionadoActivo = null;
+
+async function iniciarservicios() {
+    closeAlert();
+    document.getElementById('view-welcome').classList.add('hidden');
+    document.getElementById('view-dashboard').classList.add('hidden');
+    document.getElementById('seccion-herramientas').classList.add('hidden');
+    
+    const contenedorModulo = document.getElementById('modulo-servicios-comunidad');
+    contenedorModulo.classList.remove('hidden');
+
+    document.getElementById('lista-servicios-f').innerHTML = "<p style='font-size:0.8em; color:var(--neon-f); text-align:center;'>Cargando Matrix...</p>";
+    document.getElementById('lista-servicios-n').innerHTML = "<p style='font-size:0.8em; color:var(--neon-n); text-align:center;'>Cargando Matrix...</p>";
+    document.getElementById('lista-servicios-m').innerHTML = "<p style='font-size:0.8em; color:var(--neon-m); text-align:center;'>Cargando Matrix...</p>";
+
+    // Descargamos de forma asíncrona la base de datos de Sheets
+    const res = await apiCall("obtenerServiciosDinamicos");
+    if (res && res.success) {
+        catalogoServiciosCache = res.data;
+        renderizarTarjetasServicios(res.data);
+    } else {
+        notify("Error al conectar con la pasarela de servicios.");
+        salirDelModulo();
+    }
+}
+
+function renderizarTarjetasServicios(data) {
+    const contenedores = { FINANZAS: 'lista-servicios-f', NUTRICION: 'lista-servicios-n', MENTALIDAD: 'lista-servicios-m' };
+    
+    Object.keys(contenedores).forEach(pilar => {
+        const divPadre = document.getElementById(contenedores[pilar]);
+        divPadre.innerHTML = "";
+        
+        if (data[pilar] && data[pilar].length > 0) {
+            data[pilar].forEach(s => {
+                const fila = document.createElement('div');
+                fila.className = "boton-herramienta";
+                fila.style.justifyContent = "space-between";
+                fila.onclick = () => abrirDetalleServicio(s.sku, pilar);
+                
+                // Neuro-Diseño: Si el precio es cero, muestra "GRATIS" con neón verde
+                let stringPrecio = s.valorNormal === 0 ? "<span style='color:var(--neon-f); font-weight:bold; font-size:0.8em;'>[ GRATIS ]</span>" : `<span style="font-size:0.8em; opacity:0.7;">$${s.valorNormal.toLocaleString()}</span>`;
+                
+                // Si el usuario es Suscriptor y el servicio cuesta dinero, le tachamos el precio normal para detonar recompensa
+                if (sessionUser && sessionUser.rango === "Suscriptor" && s.valorNormal > 0) {
+                    stringPrecio = `<span style="font-size:0.8em; text-shadow: 0 0 5px var(--neon-f); color:var(--neon-f); font-weight:bold;">$${s.valorSuscriptor.toLocaleString()}</span>`;
+                }
+
+                fila.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${s.urlImagen}" style="width:22px; height:22px; flex-shrink:0;">
+                        <span style="font-size:0.8em; text-align:left; color:#fff; font-weight:500; line-height:1.2;">${s.nombre}</span>
+                    </div>
+                    ${stringPrecio}
+                `;
+                divPadre.appendChild(fila);
+            });
+        } else {
+            divPadre.innerHTML = "<p style='font-size:0.75em; color:rgba(255,255,255,0.2); text-align:center;'>Próximamente...</p>";
+        }
+    });
+}
+
+function abrirDetalleServicio(sku, pilar) {
+    const servicio = catalogoServiciosCache[pilar].find(x => x.sku === sku);
+    if (!servicio) return;
+    
+    servicioSeleccionadoActivo = servicio;
+    document.getElementById('main-content').classList.add('blur-effect');
+    
+    document.getElementById('ser-modal-img').src = servicio.urlImagen;
+    document.getElementById('ser-modal-nombre').innerText = servicio.nombre;
+    document.getElementById('ser-modal-sku').innerText = `SKU: ${servicio.sku} | MÓDULO: ${servicio.accion}`;
+    document.getElementById('ser-modal-desc').innerText = servicio.descripcion;
+    
+    // Formateo de precios en base a Neuroventa
+    document.getElementById('ser-modal-precio-normal').innerText = servicio.valorNormal === 0 ? "GRATIS" : `$${servicio.valorNormal.toLocaleString()}`;
+    document.getElementById('ser-modal-precio-vip').innerText = servicio.valorSuscriptor === 0 ? "GRATIS" : `$${servicio.valorSuscriptor.toLocaleString()}`;
+    
+    // Tratamiento Neuro-Marketing: Si el cliente ya es Suscriptor, tachamos visualmente el precio caro
+    if (sessionUser && sessionUser.rango === "Suscriptor") {
+        document.getElementById('ser-modal-precio-normal').style.textDecoration = "line-through";
+        document.getElementById('ser-modal-precio-normal').style.opacity = "0.4";
+    } else {
+        document.getElementById('ser-modal-precio-normal').style.textDecoration = "none";
+        document.getElementById('ser-modal-precio-normal').style.opacity = "1";
+    }
+
+    // Evaluamos el interruptor dinámico de ACCION de la columna I
+    const contenedorVarios = document.getElementById('ser-contenedor-varios');
+    const btnAccion = document.getElementById('ser-btn-accion');
+    
+    if (servicio.accion === "VARIOS") {
+        contenedorVarios.classList.remove('hidden');
+        btnAccion.innerText = "ELEGIR COMPLEMENTO Y PAGAR";
+    } else if (servicio.accion === "RESERVA") {
+        contenedorVarios.classList.add('hidden');
+        btnAccion.innerText = (servicio.valorNormal === 0) ? "RESERVAR MI HORA GRATUITA" : "RESERVAR HORARIO Y ADQUIRIR";
+    } else {
+        contenedorVarios.classList.add('hidden');
+        btnAccion.innerText = "ADQUIRIR ACCESO DIRECTO";
+    }
+
+    const modal = document.getElementById('modal-detalle-servicio');
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+}
+
+function ejecutarAccionComercialServicio() {
+    const s = servicioSeleccionadoActivo;
+    if (!s) return;
+
+    // 🛡️ CONTROL DE PROTECCIÓN: Si el servicio tiene costo y no tiene sesión, congelamos y forzamos el login
+    if (s.valorNormal > 0 && !sessionUser) {
+        cerrarDetalleServicio();
+        document.getElementById('modulo-servicios-comunidad').classList.add('hidden');
+        dispararMuroProspecto("SERVICIOS", s);
+        return;
+    }
+
+    const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Invitado Anónimo";
+    const paisUser = sessionUser ? (sessionUser.pais || "País") : "Matrix";
+    const rangoUser = sessionUser ? sessionUser.rango : "Invitado";
+    
+    let txtMensaje = "";
+
+    if (s.accion === "RESERVA") {
+        // Flujo Reserva de horas (Gratis o Pago)
+        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de completar mis parámetros en la comunidad y solicito coordinar una hora de atención en la agenda para el servicio: "${s.nombre}". Mi estatus actual es Miembro ${rangoUser}.`);
+        window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
+    } 
+    else if (s.accion === "VARIOS") {
+        // Flujo con selección de regalo previo
+        const regaloElegido = document.getElementById('ser-select-regalo').value;
+        txtMensaje = encodeURIComponent(`¡Hola Coach! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de adquirir el programa "${s.nombre}" y elegí como complemento de regalo para mi consumo: [${regaloElegido}]. Solicito coordinar el inicio de mi programa.`);
+        window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
+    } 
+    else {
+        // Flujo WhatsApp Directo / Cursos Personalizados
+        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Solicitó coordinar la entrega del material digital y las claves de acceso para: "${s.nombre}". Quedo atento a las instrucciones de inicio.`);
+        window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
+    }
+    
+    cerrarDetalleServicio();
+}
+
+function cerrarDetalleServicio() {
+    document.getElementById('main-content').classList.remove('blur-effect');
+    const modal = document.getElementById('modal-detalle-servicio');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+    servicioSeleccionadoActivo = null;
 }
     </script>
 
