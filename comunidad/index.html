@@ -2884,85 +2884,47 @@ async function ejecutarLogin() {
 
 
   async function ejecutarRegistro() {
-
     const form = document.getElementById('regForm');
-
     const formData = Object.fromEntries(new FormData(form));
-
-
 
     if (formData.pass !== formData.confirmPass) return notify("Las contraseñas no coinciden.");
 
-
+    // 🛡️ Si existe un rastro de compra anónima reciente en esta PC, lo anexamos para fusionar el historial
+    const tokenEcomPendiente = localStorage.getItem('kairo_ecommerce_token_anonimo');
+    if (tokenEcomPendiente) {
+        formData.token_anonimo = tokenEcomPendiente;
+    }
 
     const fotoInput = form.querySelector('input[name="foto"]');
-
     if (fotoInput && fotoInput.files[0] && fotoInput.files[0].size > 2 * 1024 * 1024) {
-
         return notify("La foto es demasiado pesada. Máximo 2MB.");
-
     }
-
-
-
     if (formData.origen === 'Internet') {
-
         formData.invitador_nombre = "ORIGEN_INTERNET";
-
         formData.invitador_email = "no-reply@coach3d.app";
-
     } else if (formData.origen === 'Invitado') {
-
         if (!formData.invitador_nombre || !formData.invitador_email) {
-
             return notify("Por favor, completa los datos de quien te invitó.");
-
         }
-
     }
-
-
 
     const btnReg = document.querySelector('#regForm .btn-f');
-
     const textoOriginal = btnReg.innerText;
-
     btnReg.innerText = "PROCESANDO...";
-
     btnReg.disabled = true;
-
-
-
     const res = await apiCall("registrarUsuario", formData);
-
-
-
     btnReg.innerText = textoOriginal;
-
     btnReg.disabled = false;
-
-
-
     if (res && res.success && res.kairo) { 
-
         iniciarKairo(); 
-
     } else if (res && !res.success) {
-
         notify(res.msg || "Error de conexión.");
-
     } else {
-
         notify("Error desconocido al registrar.");
-
     }
-
 }
 
-
-
 // Convierte links de Drive en imágenes directas
-
 function filtrarUrlImagen(url) {
 
   if (!url) return "";
@@ -3066,6 +3028,73 @@ async function loadDashboard() {
                   if (moduloCalc) moduloCalc.classList.remove('hidden');
                   
                   ejecutarCalculoFinanzasFinal();
+                  return;
+              }
+              else if (backupHerramienta === "SERVICIOS") {
+                  // 🛡️ INTERCEPTOR EXCLUSIVO DE E-COMMERCE DE SERVICIOS APAGADO PARA OTRAS RAMAS
+                  const skuItem = localStorage.getItem('kairo_ecommerce_sku');
+                  const nombreItem = localStorage.getItem('kairo_ecommerce_nombre');
+                  const accionItem = localStorage.getItem('kairo_ecommerce_accion');
+                  const montoItem = localStorage.getItem('kairo_ecommerce_monto');
+                  const detalleItem = localStorage.getItem('kairo_ecommerce_detalle');
+                  const tokenEcom = localStorage.getItem('kairo_ecommerce_token_anonimo');
+                  
+                  var emailComprador = sessionUser ? sessionUser.email : "ANÓNIMO";
+
+                  // 1. Registramos asíncronamente la transacción en el nuevo HISTORIAL_COMPRAS
+                  apiCall("registrarCompraHistorial", {
+                      token: tokenEcom,
+                      email: emailComprador,
+                      sku: skuItem,
+                      nombre: nombreItem,
+                      monto: montoItem,
+                      detalle: detalleItem
+                  });
+
+                  // Limpieza quirúrgica de variables temporales comerciales
+                  limpiarCachesProspecto();
+                  localStorage.removeItem('kairo_ecommerce_sku');
+                  localStorage.removeItem('kairo_ecommerce_nombre');
+                  localStorage.removeItem('kairo_ecommerce_accion');
+                  localStorage.removeItem('kairo_ecommerce_monto');
+                  localStorage.removeItem('kairo_ecommerce_detalle');
+                  localStorage.removeItem('kairo_ecommerce_tipo');
+
+                  document.getElementById('kairo-loader-global').style.display = 'none';
+
+                  // 2. Construcción de texto para el WhatsApp final post-pago
+                  let txtWhatsApp = "";
+                  if (accionItem === "RESERVA") {
+                      txtWhatsApp = encodeURIComponent(`¡Hola Coach Diego! Mi pago ha sido procesado con éxito para el servicio "${nombreItem}". Solicito confirmar mi reserva de hora en tu agenda. Mi identificador es: ${emailComprador}.`);
+                  } else {
+                      txtWhatsApp = encodeURIComponent(`¡Hola Coach! Mi pago ha sido procesado con éxito para el programa "${nombreItem}" (${detalleItem}). Solicito coordinar los accesos de inicio.`);
+                  }
+
+                  let cuerpoMensajeFinal = `
+                      <div style="text-align: center; width: 100%;">
+                          <p style="color: var(--neon-f); font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 10px rgba(16,185,129,0.4); margin-bottom: 15px;">🎉 ¡INVERSIÓN COMPLETA EN LA MATRIX!</p>
+                          <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
+                              Tu orden para <b>${nombreItem}</b> fue acreditada de forma exitosa. Se ha despachado una notificación de auditoría a tu correo electrónico.
+                          </p>
+                          <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${txtWhatsApp}', '_blank')">🚀 COORDINAR INICIO / CONFIRMAR HORA</button>
+                  `;
+
+                  // GATILLO NEUROVENTA INVITADOS: Si es anónimo, se le ofrece registrarse para no perder el historial
+                  if (emailComprador === "ANÓNIMO") {
+                      cuerpoMensajeFinal += `
+                          <div style="margin-top: 20px; padding: 15px; background: rgba(34, 211, 238, 0.05); border: 1px dashed var(--neon-n); border-radius: 12px;">
+                              <p style="font-size: 0.8em; color: var(--neon-n); margin: 0 0 10px 0; line-height: 1.4; text-align: left;">
+                                  <b>🔥 ¡REGISTRA TU INVERSIÓN!</b> Crea tu cuenta gratuita en la comunidad ahora mismo para transferir esta compra a tu Historial Personalizado y comenzar a acumular puntos de beneficio tridimensional.
+                              </p>
+                              <button class="btn btn-n" style="width:100%; font-size: 0.8em; padding: 8px;" onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button>
+                          </div>
+                      `;
+                  }
+
+                  cuerpoMensajeFinal += `</div>`;
+
+                  await kairoMessage({ mensaje: cuerpoMensajeFinal, icon: "🏆" });
+                  salirDelModulo();
                   return;
               }
           }
@@ -5912,37 +5941,58 @@ function ejecutarAccionComercialServicio() {
     const s = servicioSeleccionadoActivo;
     if (!s) return;
 
-    // 🛡️ CONTROL DE PROTECCIÓN: Si el servicio tiene costo y no tiene sesión, congelamos y forzamos el login
-    if (s.valorNormal > 0 && !sessionUser) {
-        cerrarDetalleServicio();
-        document.getElementById('modulo-servicios-comunidad').classList.add('hidden');
-        dispararMuroProspecto("SERVICIOS", s);
-        return;
-    }
+    // 🛡️ Evaluamos el precio real según el rango legítimo en la Matrix para evitar fugas
+    var precioFinalACobrar = (sessionUser && sessionUser.rango === "Suscriptor") ? (s.valorSuscriptor || 0) : (s.valorNormal || 0);
 
-    const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Invitado Anónimo";
+    const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Cliente Invitado";
+    const emailUser = sessionUser ? sessionUser.email : "ANÓNIMO";
     const paisUser = sessionUser ? (sessionUser.pais || "País") : "Matrix";
     const rangoUser = sessionUser ? sessionUser.rango : "Invitado";
-    
-    let txtMensaje = "";
 
+    // Generamos un token transaccional único para amarrar compras anónimas si se registran después
+    var tokenCompra = "TK-" + new Date().getTime() + "-" + Math.floor(Math.random() * 1000);
+
+    // Congelamos los metadatos de e-commerce en el disco local para resistir el retorno de MercadoPago
+    localStorage.setItem('kairo_ecommerce_sku', s.sku);
+    localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
+    localStorage.setItem('kairo_ecommerce_accion', s.accion);
+    localStorage.setItem('kairo_ecommerce_monto', precioFinalACobrar);
+    localStorage.setItem('kairo_ecommerce_token_anonimo', tokenCompra);
+    localStorage.setItem('kairo_ecommerce_tipo', "SERVICIOS");
+    localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS");
+    if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
+
+    // --- INTERCEPCIÓN CONDICIONAL DE COSTOS (GRATIS VS PAGO) ---
+    if (precioFinalACobrar > 0) {
+        if (s.linkPago && s.linkPago !== "" && s.linkPago !== "#") {
+            
+            // Evaluamos parámetros específicos antes del rebote comercial
+            if (s.accion === "VARIOS") {
+                const regalo = document.getElementById('ser-select-regalo').value;
+                localStorage.setItem('kairo_ecommerce_detalle', `Regalo: ${regalo}`);
+            } else if (s.accion === "RESERVA") {
+                localStorage.setItem('kairo_ecommerce_detalle', `Módulo Reserva de Hora`);
+            } else {
+                localStorage.setItem('kairo_ecommerce_detalle', `Compra Directa WhatsApp`);
+            }
+
+            cerrarDetalleServicio();
+            window.location.href = s.linkPago; // Forzamos el salto a MercadoPago
+            return;
+        } else {
+            return notify("Kairo Alerta: Este servicio requiere un enlace de MercadoPago activo en la columna J.");
+        }
+    }
+
+    // --- CANAL EXCLUSIVO PARA SERVICIOS GRATUITOS ($0 - Ganchos de Cortesía) ---
+    let txtMensaje = "";
     if (s.accion === "RESERVA") {
-        // Flujo Reserva de horas (Gratis o Pago)
-        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de completar mis parámetros en la comunidad y solicito coordinar una hora de atención en la agenda para el servicio: "${s.nombre}". Mi estatus actual es Miembro ${rangoUser}.`);
-        window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
-    } 
-    else if (s.accion === "VARIOS") {
-        // Flujo con selección de regalo previo
-        const regaloElegido = document.getElementById('ser-select-regalo').value;
-        txtMensaje = encodeURIComponent(`¡Hola Coach! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de adquirir el programa "${s.nombre}" y elegí como complemento de regalo para mi consumo: [${regaloElegido}]. Solicito coordinar el inicio de mi programa.`);
-        window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
-    } 
-    else {
-        // Flujo WhatsApp Directo / Cursos Personalizados
-        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Solicitó coordinar la entrega del material digital y las claves de acceso para: "${s.nombre}". Quedo atento a las instrucciones de inicio.`);
-        window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
+        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de completar mis parámetros en la comunidad y solicito coordinar una hora de atención en la agenda para la sesión gratuita: "${s.nombre}". Mi estatus actual es Miembro ${rangoUser}.`);
+    } else {
+        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Solicito coordinar el inicio de la actividad de cortesía: "${s.nombre}".`);
     }
     
+    window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
     cerrarDetalleServicio();
 }
 
