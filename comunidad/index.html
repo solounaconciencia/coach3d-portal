@@ -2200,8 +2200,8 @@
             <input type="password" id="p-reg-confirm" placeholder="Confirmar Contraseña" required style="grid-column: span 1;">
             <input type="text" id="p-reg-whatsapp" placeholder="WhatsApp" required style="grid-column: span 1;">
             <input type="text" id="p-reg-pais" placeholder="País" required style="grid-column: span 1;">
-            <input type="number" id="p-reg-edad" placeholder="Edad" required min="15" max="120" style="grid-column: span 2;">
-            
+            <input type="date" id="p-reg-fechaNacimiento" required title="Fecha de Nacimiento" style="grid-column: span 2; color: #cbd5e1;">
+            <input type="number" id="p-reg-edad" placeholder="Edad" required min="15" max="120" style="grid-column: span 2;">            
             <select id="p-reg-pregunta" required style="grid-column: span 2;">
                 <option value="">Pregunta Secreta de Recuperación</option>
                 <option>¿Nombre de tu primera mascota?</option>
@@ -2255,58 +2255,36 @@
                 <div><label>Color Primario (Neón N)</label><input type="color" id="conf-color-n" style="height: 40px; padding: 2px;"></div>
 
                 <div><label>Color Secundario (Neón M)</label><input type="color" id="conf-color-m" style="height: 40px; padding: 2px;"></div>
-
             </div>
-
         </div>
 
         <div id="tab-pilares" class="seccion-tab hidden">
-
             <p style="font-size: 0.8em; opacity: 0.7;">Gestiona los nombres de tus pilares actuales y herramientas.</p>
-
-            <div id="lista-pilares-admin"></div>
-
+            <div id="lista-pilares-admin"></div>            
             <div style="margin-top: 20px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 20px;">
-
                 <h4 style="color: var(--neon-f); font-size: 0.8em; text-transform: uppercase;">NUEVA HERRAMIENTA RÁPIDA</h4>
-
                 <input type="text" id="new-h-nombre" placeholder="Nombre Herramienta (Ej: Calculadora de Interés)">
-
                 <input type="text" id="new-h-url" placeholder="URL Destino (https://...)">
-
                 <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-
                     <label style="font-size: 0.7em; color: white;">Color Tarjeta:</label>
-
                     <input type="color" id="new-h-color" value="#22d3ee" style="height: 35px; width: 60px; background: transparent; border: none;">
-
                 </div>
-
                 <select id="new-h-pilar" style="margin-top: 10px; background: rgba(0,0,0,0.5); color: white; border: 1px solid var(--neon-n); padding: 5px;">
-
                     <option value="FINANZAS">Pilar Finanzas</option>
-
                     <option value="NUTRICION">Pilar Nutrición</option>
-
                     <option value="MENTALIDAD">Pilar Mentalidad</option>
-
                 </select>
-
                 <button class="btn btn-f" style="width: 100%; margin-top: 15px; font-weight: bold;" onclick="ejecutarCrearHerramienta()">+ INYECTAR HERRAMIENTA A LA MATRIX</button>
-
             </div>
-
             <button class="btn btn-m" style="width: 100%; margin-top: 25px; font-size: 0.8em; opacity: 0.8;" onclick="nuevoPilar()">⚙️ GESTIONAR NOMBRES DE PILARES</button>
-
         </div>
-
+        
         <div id="tab-kairo" class="seccion-tab hidden">
             <div style="background: #000; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8em; color: var(--neon-f); border: 1px solid var(--neon-f);">
                 <p>> STATUS: <span id="kairo-status">CONECTADO</span></p>
                 <p>> DB: Google Sheets (CONFIG)</p>
                 <p>> MEMORIA: Estable</p>
-            </div>
-            
+            </div>            
             <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px; text-align: left;">
                 <h4 style="color: var(--neon-n); margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; font-size: 0.85em; letter-spacing: 1px;">PREMIACIONES MATRICIALES</h4>
                 <label style="font-size:0.75em; color:#94a3b8;">Puntos Regalo Cumpleaños (B6):</label>
@@ -2315,15 +2293,11 @@
                 <input type="number" id="conf-regalo-aniversario" placeholder="Ej: 1000" style="padding:8px; margin-bottom:10px;">
                 <label style="font-size:0.75em; color:#94a3b8;">Puntos por Referido en Aniversario (B8):</label>
                 <input type="number" id="conf-regalo-referido-aniversario" placeholder="Ej: 200" style="padding:8px;">
-            </div>
-            
-            <button class="btn btn-m" style="width: 100%; margin-top: 15px;"
+            </div>            
+            <button class="btn btn-m" style="width: 100%; margin-top: 15px;" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID_EXTERNO, '_blank')">ABRIR PLANILLA MAESTRA</button>
         </div>
-
         <button class="btn btn-n" style="width: 100%; margin-top: 30px; font-size: 1.1em;" onclick="guardarConfiguracion()">GUARDAR CAMBIOS EN LA MATRIX</button>
-
     </div>
-
 </div>
 
 
@@ -5616,6 +5590,7 @@ async function procesarRegistroProspecto() {
         whatsapp: document.getElementById('p-reg-whatsapp').value.trim(),
         pais: document.getElementById('p-reg-pais').value.trim(),
         edad: document.getElementById('p-reg-edad').value,
+        fechaNacimiento: document.getElementById('p-reg-fechaNacimiento').value, // 🛡️ FOCUS
         pregunta: document.getElementById('p-reg-pregunta').value,
         respuesta: document.getElementById('p-reg-respuesta').value.trim(),
         origen: document.getElementById('p-reg-origen').value,
