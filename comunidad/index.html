@@ -4276,7 +4276,10 @@ async function abrirAdminHerramientas() {
   document.getElementById('conf-titulo').value = tituloActual;
   document.getElementById('conf-fondo').value = fondoActual;
 
-  // 3. Mostramos el panel
+  // 3. Mostramos el panel (Líneas restauradas por FOCUS)
+  document.getElementById('modal-alquimia').classList.remove('hidden');
+  tabAlquimia('estetica');
+
   // 🛡️ FOCUS: Precarga asíncrona de puntos configurados en Sheets
   const resConfig = await apiCall("obtenerConfiguracionSistema", { email: sessionUser.email });
   if (resConfig && resConfig.success) {
@@ -5620,7 +5623,140 @@ function cerrarModalProspecto() {
     document.getElementById('main-content').classList.remove('blur-effect');
     salirDelModulo();
 }
+
+// =========================================================================
+// 💰 MOTOR OPERATIVO: CALCULADORA FINANCIERA C3D UNI-FLOW
+// =========================================================================
+var ingData = [];
+var gasData = [];
+
+function iniciarcalculadorafinanciera() {
+    closeAlert();
+    const welcome = document.getElementById('view-welcome');
+    const dash = document.getElementById('view-dashboard');
+    const herramientas = document.getElementById('seccion-herramientas');
+    const moduloCalc = document.getElementById('modulo-calculadora-financiera');
+
+    if (welcome) welcome.classList.add('hidden');
+    if (dash) dash.classList.add('hidden');
+    if (herramientas) herramientas.classList.add('hidden');
+    if (moduloCalc) {
+        moduloCalc.classList.remove('hidden');
+        document.getElementById('app-content-calc').style.display = 'block';
+        document.getElementById('results-calc').style.display = 'none';
+        reiniciarCalculadoraLocal();
+    }
+}
+
+function addIngreso() {
+    var desc = document.getElementById('ing-desc').value.trim();
+    var val = parseFloat(document.getElementById('ing-val').value);
+    if (desc && !isNaN(val)) {
+      ingData.push({ concepto: desc, monto: val, tipo: 'INGRESO', categoria: 'General' });
+      renderVisualCalc();
+      document.getElementById('ing-desc').value = '';
+      document.getElementById('ing-val').value = '';
+    }
+}
+
+function addGasto() {
+    var desc = document.getElementById('gas-desc').value.trim();
+    var val = parseFloat(document.getElementById('gas-val').value);
+    if (desc && !isNaN(val)) {
+      gasData.push({ concepto: desc, monto: val, tipo: 'GASTO', categoria: 'General' });
+      renderVisualCalc();
+      document.getElementById('gas-desc').value = '';
+      document.getElementById('gas-val').value = '';
+    }
+}
+
+function renderVisualCalc() {
+    var htmlIng = "", htmlGas = "";
+    for (var i = 0; i < ingData.length; i++) {
+      htmlIng += `<div style="display:flex; justify-content:space-between; padding:6px; background:rgba(255,255,255,0.02); border-radius:5px; margin-bottom:4px; border-left:2px solid var(--neon-f);"><span>${ingData[i].concepto}</span><span style="color:var(--neon-f); font-weight:bold;">$${ingData[i].monto.toLocaleString()}</span></div>`;
+    }
+    for (var j = 0; j < gasData.length; j++) {
+      htmlGas += `<div style="display:flex; justify-content:space-between; padding:6px; background:rgba(255,255,255,0.02); border-radius:5px; margin-bottom:4px; border-left:2px solid var(--neon-m);"><span>${gasData[j].concepto}</span><span style="color:var(--neon-m); font-weight:bold;">$${gasData[j].monto.toLocaleString()}</span></div>`;
+    }
+    document.getElementById('list-ing').innerHTML = htmlIng;
+    document.getElementById('list-gas').innerHTML = htmlGas;
+}
+
+function processFinance() {
+    if (ingData.length === 0 && gasData.length === 0) return notify("Ingresa datos en el Debe o Haber para analizar.");
+
+    // 🛡️ INTERCEPCIÓN UNIVERSAL: Si es invitado desconocido, congela la sesión y levanta el muro de registro
+    if (!sessionUser) {
+        var payloadPendiente = { ing: ingData, gas: gasData };
+        sessionStorage.setItem('kairo_calculadora_pendiente', JSON.stringify(payloadPendiente));
+        localStorage.setItem('kairo_calculadora_respuestas_backup', JSON.stringify(payloadPendiente));
         
+        dispararMuroProspecto("CALCULADORA", null);
+        return;
+    }
+
+    ejecutarCalculoFinanzasFinal();
+}
+
+async function ejecutarCalculoFinanzasFinal() {
+    document.getElementById('app-content-calc').style.display = 'none';
+    document.getElementById('loader-calc').style.display = 'block';
+
+    var totalIng = 0, totalGas = 0;
+    for(var k=0; k<ingData.length; k++) { totalIng += ingData[k].monto; }
+    for(var l=0; l<gasData.length; l++) { totalGas += gasData[l].monto; }
+    
+    var flujo = totalIng - totalGas;
+    var porcentajeUso = totalIng > 0 ? (totalGas / totalIng) * 100 : 100;
+
+    var todosLosDatos = ingData.concat(gasData);
+    apiCall("guardarEnBD", { datos: todosLosDatos });
+
+    const res = await apiCall("obtenerDatosDeRangos");
+    
+    if (res && res.success) {
+        var rangos = res.rangos;
+        var miRango = rangos[rangos.length - 1];
+        for(var m=0; m < rangos.length; m++) {
+          if (porcentajeUso <= rangos[m].max) {
+            miRango = rangos[m];
+            break;
+          }
+        }
+
+        document.getElementById('res-total-ing').innerText = "$" + totalIng.toLocaleString();
+        document.getElementById('res-total-gas').innerText = "$" + totalGas.toLocaleString();
+        document.getElementById('res-flujo').innerText = "$" + flujo.toLocaleString();
+        
+        var dist = flujo > 0 ? Math.floor(flujo/3).toLocaleString() : "0";
+        document.getElementById('res-dist').innerText = "$" + dist + " para cada pilar";
+
+        var ideal = totalGas / 0.5;
+        document.getElementById('id-ing').innerText = "$" + ideal.toLocaleString();
+        document.getElementById('id-dist').innerText = "$" + Math.floor(ideal * 0.1).toLocaleString();
+
+        document.getElementById('status-name').innerText = miRango.nombre;
+        document.getElementById('status-msg').innerText = miRango.mensaje;
+        
+        var waTxt = encodeURIComponent("¡Hola! He completado mi análisis financiero C3D en la Matrix. Mi estado patrimonial es: " + miRango.nombre + ". Solicito mi primera sesión de asesoría gratuita.");
+        document.getElementById('wa-link-calc').setAttribute('data-href', "https://wa.me/56976003402?text=" + waTxt);
+
+        document.getElementById('loader-calc').style.display = 'none';
+        document.getElementById('results-calc').style.display = 'block';
+    } else {
+        notify("Kairo Alerta: Error de sincronización con la tabla de rangos.");
+        reiniciarCalculadoraLocal();
+    }
+}
+
+function reiniciarCalculadoraLocal() {
+    ingData = []; gasData = [];
+    document.getElementById('list-ing').innerHTML = '';
+    document.getElementById('list-gas').innerHTML = '';
+    document.getElementById('app-content-calc').style.display = 'block';
+    document.getElementById('results-calc').style.display = 'none';
+    document.getElementById('loader-calc').style.display = 'none';
+}
     </script>
 
 
