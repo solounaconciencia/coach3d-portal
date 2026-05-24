@@ -2293,7 +2293,7 @@
                 <input type="number" id="conf-regalo-aniversario" placeholder="Ej: 1000" style="padding:8px; margin-bottom:10px;">
                 <label style="font-size:0.75em; color:#94a3b8;">Puntos por Referido en Aniversario (B8):</label>
                 <input type="number" id="conf-regalo-referido-aniversario" placeholder="Ej: 200" style="padding:8px;">
-            </div>            
+            </div>
             <button class="btn btn-m" style="width: 100%; margin-top: 15px;" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID_EXTERNO, '_blank')">ABRIR PLANILLA MAESTRA</button>
         </div>
         <button class="btn btn-n" style="width: 100%; margin-top: 30px; font-size: 1.1em;" onclick="guardarConfiguracion()">GUARDAR CAMBIOS EN LA MATRIX</button>
@@ -4213,8 +4213,7 @@ function cerrarModalSuscripcion() {
 
 }
 
-function abrirAdminHerramientas() {
-
+async function abrirAdminHerramientas() {
   // 1. Capturamos los colores actuales de la App (Variables CSS)
   const root = document.documentElement;
   const colorN = getComputedStyle(root).getPropertyValue('--neon-n').trim();
