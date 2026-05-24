@@ -5671,9 +5671,7 @@ async function ejecutarCalculoFinanzasFinal() {
     var flujo = totalIng - totalGas;
     var porcentajeUso = totalIng > 0 ? (totalGas / totalIng) * 100 : 100;
 
-    var todosLosDatos = ingData.concat(gasData);
-    apiCall("guardarEnBD", { datos: todosLosDatos });
-
+    // Llamamos primero a la consulta de rangos externos
     const res = await apiCall("obtenerDatosDeRangos");
     
     if (res && res.success) {
@@ -5686,6 +5684,27 @@ async function ejecutarCalculoFinanzasFinal() {
           }
         }
 
+        var ideal = totalGas / 0.5;
+        var diezOro = Math.floor(ideal * 0.1);
+
+        // 🛡️ FOCUS: Orquestación y empaquetamiento relacional hacia las nuevas hojas financieras
+        var todosLosLosItems = ingData.concat(gasData);
+        var emailUsuarioActivo = (sessionUser && sessionUser.email) ? sessionUser.email : "ANÓNIMO";
+        
+        apiCall("guardarEnBD", { 
+            datos: {
+                email: emailUsuarioActivo,
+                totalIng: totalIng,
+                totalGas: totalGas,
+                flujo: flujo,
+                porcentajeUso: porcentajeUso,
+                rangoEstado: miRango.nombre,
+                ingObjetivo: ideal,
+                diezPorcientoOro: diezOro,
+                items: todosLosLosItems
+            }
+        });
+
         document.getElementById('res-total-ing').innerText = "$" + totalIng.toLocaleString();
         document.getElementById('res-total-gas').innerText = "$" + totalGas.toLocaleString();
         document.getElementById('res-flujo').innerText = "$" + flujo.toLocaleString();
@@ -5693,9 +5712,8 @@ async function ejecutarCalculoFinanzasFinal() {
         var dist = flujo > 0 ? Math.floor(flujo/3).toLocaleString() : "0";
         document.getElementById('res-dist').innerText = "$" + dist + " para cada pilar";
 
-        var ideal = totalGas / 0.5;
         document.getElementById('id-ing').innerText = "$" + ideal.toLocaleString();
-        document.getElementById('id-dist').innerText = "$" + Math.floor(ideal * 0.1).toLocaleString();
+        document.getElementById('id-dist').innerText = "$" + diezOro.toLocaleString();
 
         document.getElementById('status-name').innerText = miRango.nombre;
         document.getElementById('status-msg').innerText = miRango.mensaje;
