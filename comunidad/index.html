@@ -2165,7 +2165,7 @@
         <p style="font-size: 0.85em; color: #ccc; max-width: 600px; margin: 0 auto; line-height: 1.4;">Para guardar tus parámetros de forma inalterable y procesar tu reporte avanzado en alta definición, selecciona un plan comunitario y sincroniza tus accesos.</p>
     </div>
 
-    <div id="prospecto-paso-planes">
+    <div id="prospecto-paso-planes" class="hidden">
         <h4 style="text-align: left; color: var(--white); margin: 0; font-size: 0.9em; letter-spacing: 1px;">1. SELECCIONA TU MODELO DE ACCESO:</h4>
         <div id="grid-planes-dinamicos" class="plans-grid">
             <p style="color: var(--neon-n); text-align: center; grid-column: 1/-1;">Sincronizando pasarela comercial...</p>
@@ -2180,9 +2180,9 @@
         <button class="btn btn-f" style="width: 100%; padding: 15px; font-size: 1.1em;" onclick="avanzarFormularioProspecto()">CONFIRMAR PLAN Y CONTINUAR</button>
     </div>
 
-    <div id="prospecto-paso-auth" class="hidden" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
+    <div id="prospecto-paso-auth" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 20px;">
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button id="btn-prospecto-tab-login" class="btn btn-n" style="flex:1; padding: 10px; font-size: 0.8em;" onclick="alternarAuthProspecto('login')">TENGU CUENTA (LOGIN)</button>
+            <button id="btn-prospecto-tab-login" class="btn btn-n" style="flex:1; padding: 10px; font-size: 0.8em;" onclick="alternarAuthProspecto('login')">TENGO CUENTA (LOGIN)</button>
             <button id="btn-prospecto-tab-reg" class="btn" style="flex:1; padding: 10px; font-size: 0.8em; background: rgba(255,255,255,0.05); color: white; border: 1px solid #444;" onclick="alternarAuthProspecto('registro')">SOY NUEVO (REGISTRO GRATIS)</button>
         </div>
 
@@ -5362,8 +5362,8 @@ function dispararMuroProspecto(herramientaId, payload) {
 
     // Activar desenfoque e interfaz base
     document.getElementById('main-content').classList.add('blur-effect');
-    document.getElementById('prospecto-paso-planes').classList.remove('hidden');
-    document.getElementById('prospecto-paso-auth').classList.add('hidden');
+    document.getElementById('prospecto-paso-planes').classList.add('hidden');
+    document.getElementById('prospecto-paso-auth').classList.remove('hidden');
     
     const modal = document.getElementById('modal-nuevo-prospecto');
     modal.classList.remove('hidden');
@@ -5437,8 +5437,8 @@ async function aplicarCuponProspecto() {
 
 function avanzarFormularioProspecto() {
     if (!planSeleccionadoId) return notify("Por favor, selecciona un modelo de acceso para continuar.");
-    document.getElementById('prospecto-paso-planes').classList.add('hidden');
-    document.getElementById('prospecto-paso-auth').classList.remove('hidden');
+    // 🛡️ FOCUS: Al ser el segundo paso, procesamos el plan seleccionado acoplado a la sesión actual
+    ejecutarContinuidadExitoso(sessionUser);
 }
 
 function alternarAuthProspecto(pestana) {
@@ -5501,12 +5501,18 @@ async function procesarRegistroProspecto() {
     btn.innerText = "CREAR PERFIL EN LA MATRIX Y EJECUTAR"; btn.disabled = false;
 
     if (res && res.success && res.kairo) {
-        // Al venir de herramienta, guardamos sesión y puenteamos directo para no romper el test
+        // Al venir de herramienta, guardamos sesión de inmediato en estado latente en la memoria de la Matrix
         const fakeUser = {
             nombre: formData.nombre, email: formData.email, pais: formData.pais, edad: formData.edad,
             seudónimo: formData.nombre, rango: "Usuario", foto: ""
         };
-        ejecutarContinuidadExitoso(fakeUser);
+        fakeUser.timestamp = new Date().getTime();
+        sessionUser = fakeUser;
+        sessionStorage.setItem('kairo_session', JSON.stringify(fakeUser));
+
+        // 🛡️ FOCUS: Ocultamos la pasarela de autenticación y abrimos el catálogo para definir el RANGO comercial
+        document.getElementById('prospecto-paso-auth').classList.add('hidden');
+        document.getElementById('prospecto-paso-planes').classList.remove('hidden');
     } else {
         return notify(res && res.msg ? res.msg : "Fallo al registrar.");
     }
