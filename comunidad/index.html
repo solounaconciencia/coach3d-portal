@@ -4531,195 +4531,93 @@ let respuestasDiag = new Array(27).fill(0);
 // --- CIRUGÍA FOCUS: PREPARAR DIAGNÓSTICO ---
 
 async function prepararDiagnostico() {
-
     console.log("🛡️ Kairo: Verificando permisos...");
-
     
-
-    if (!sessionUser || !sessionUser.email) {
-
-        const ancla = localStorage.getItem('kairo_session');
-
-        if (ancla) {
-
-            sessionUser = JSON.parse(ancla);
-
-        } else {
-
-            notify("Tu sesión expiró. Por favor, recarga la página o inicia sesión de nuevo.");
-
-            salirDelModulo();
-
-            return;
-
-        }
-
-    }
-
-
-
+    // 🛡️ FOCUS: Si no hay usuario activo, permitimos que avance dejando el email vacío para el modo invitado
+    const emailParaConsulta = (sessionUser && sessionUser.email) ? sessionUser.email : "";
     slideDiag = 0;
-
     respuestasDiag = new Array(27).fill(0);
 
-
-
     const cuerpo = document.getElementById('cuerpo-diagnostico');
-
     cuerpo.innerHTML = '<div class="spinner"></div><p class="amber" style="text-align:center; margin-top:15px;">SINCRONIZANDO PERMISOS...</p>';
 
+    // FOCUS: Conexión con la API usando el email dinámico (soporta invitados)
+    const res = await apiCall("obtenerTodoDiagnostico", { email: emailParaConsulta });
 
-
-    // FOCUS: Conexión con la API
-
-    const res = await apiCall("obtenerTodoDiagnostico", { email: sessionUser.email });
-
-
-
-    if (res && res.intentos !== undefined) {
-
-        if (res.intentos >= 2) {
-
+    // 🛡️ FOCUS: Si es invitado, 'res.preguntas' vendrá con el cuestionario listo desde la base de datos
+    if (res && res.preguntas) {
+        // Solo bloqueamos por límite de intentos si el usuario ya está registrado en el sistema
+        if (emailParaConsulta !== "" && res.intentos >= 2) {
             mostrarAvisoLimite();
-
             return;
-
         }
-
         console.log("✅ Acceso concedido. Cargando Matrix...");
-
         preguntasDiag = res.preguntas;
-
         document.getElementById('footer-diagnostico').style.display = 'block';
-
         renderizarPreguntaDiag();
-
     } else {
-
         console.error("❌ Error Crítico:", res ? res.msg : "Sin respuesta");
-
         notify("Error de conexión con el servidor Coach 3D.");
-
         salirDelModulo();
-
     }
-
 }
 
 
-
 /**
-
  * RENDERIZADO ESTILO LIBRO Y ORDEN ALEATORIO
-
  */
 
 function renderizarPreguntaDiag() {
-
     const cuerpo = document.getElementById('cuerpo-diagnostico');
-
     if (!cuerpo) return;
-
-
-
     if (slideDiag >= 27) return finalizarDiagnostico();
-
-
-
     const p = preguntasDiag[slideDiag];
-
     const barra = document.getElementById('barra-diagnostico');
-
     if (barra) barra.style.width = ((slideDiag / 27) * 100) + "%";
 
-
-
     // Columnas I (index 8) y J (index 9) según instrucciones
-
     const urlImagen = p[8] || "https://i.postimg.cc/wjNJr54L/imagen3.png"; 
-
     const textoSlide = p[9] || "Visualiza tu progreso...";
 
-
-
     // Creamos los objetos de respuesta para poder mezclarlos sin perder su puntaje
-
     let alternativas = [
 
         { texto: p[3], puntos: 1 },
-
         { texto: p[4], puntos: 2 },
-
         { texto: p[5], puntos: 3 },
-
         { texto: p[6], puntos: 4 },
-
         { texto: p[7], puntos: 5 }
-
     ];
 
-
-
     // ALGORITMO DE MEZCLA (Shuffle) - Garantiza orden dinámico
-
     alternativas = alternativas.sort(() => Math.random() - 0.5);
-
-
-
     cuerpo.innerHTML = `
-
         <div class="libro-wrapper">
-
             <div class="col-media">
-
                 <p class="texto-slide">${textoSlide}</p>
-
                 <img src="${urlImagen}" class="img-diagnostico" onerror="this.src='https://i.postimg.cc/wjNJr54L/imagen3.png'">
-
             </div>
-
-
 
             <div class="col-quiz">
-
                 <small style="color: var(--neon-n); letter-spacing: 2px; font-weight: bold; font-size: 0.7em;">
-
                     ${p[1]} | AVANCE: ${slideDiag + 1}/27
-
                 </small>
-
-                <h3 class="titulo-pregunta">${p[2]}</h3>
-
-                
-
+                <h3 class="titulo-pregunta">${p[2]}</h3>              
                 <div class="alternativas-container">
-
                     ${alternativas.map(opt => `
-
                         <button class="opt-btn" onclick="nextDiag(${opt.puntos})">
-
                             ${opt.texto}
-
                         </button>
-
                     `).join('')}
-
                 </div>
-
             </div>
-
         </div>
-
     `;
-
 }
 
 
-
 /**
-
  * PROCESAR RESPUESTA Y AVANCE
-
  */
 
 function nextDiag(puntos) {
