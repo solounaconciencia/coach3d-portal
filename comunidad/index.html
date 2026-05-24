@@ -4918,71 +4918,39 @@ function mostrarAvisoLimite() {
 function salirDelModulo() {
 
     const diagModulo = document.getElementById('contenido-modulo-diagnostico');
-
     if (diagModulo) diagModulo.classList.add('hidden');
-
-    
-
+        
     const perfilModulo = document.getElementById('modulo-perfil-bienestar');
-
     if (perfilModulo) {
-
         perfilModulo.classList.add('hidden');
-
         document.getElementById('form-perfil-bienestar').classList.remove('hidden');
-
         document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
-
         document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
-
     }
 
-
+    // 🛡️ INYECCIÓN FOCUS: Apaga el módulo de e-commerce de servicios al salir
+    const serviciosModulo = document.getElementById('modulo-servicios-comunidad');
+    if (serviciosModulo) serviciosModulo.classList.add('hidden');
 
     document.getElementById('view-dashboard').classList.remove('hidden');
-
     if (typeof loadDashboard === 'function' && sessionUser) {
-
         loadDashboard();
-
     }
-
     
-
     const cuerpoDiag = document.getElementById('cuerpo-diagnostico');
-
     if (cuerpoDiag) cuerpoDiag.innerHTML = '<div class="spinner"></div>';
-
-    
-
     if (typeof closeAlert === 'function') closeAlert();
-
     document.getElementById('main-content').classList.remove('blur-effect');
-
 }
-
-
 
 function cerrarAlertaClaveYAbrirPerfil() {
-
     document.getElementById('modal-alerta-clave').classList.add('hidden');
-
     document.getElementById('modal-alerta-clave').style.display = 'none';
-
     document.getElementById('main-content').classList.remove('blur-effect');
-
     abrirPerfil();
-
 }
 
-
-
-// =========================================================================
-
 // 🍏 MÓDULO INTEGRADO: PERFIL DE BIENESTAR FRONTIER V2
-
-// ========================================================================
-
 function iniciarPerfilBienestar() {
 
     closeAlert();
@@ -5233,163 +5201,78 @@ async function ejecutarEnvioPerfilAlServidor(payload) {
 
 }
 
-
-
-// =========================================================================
-
 // 🛡️ MOTOR INDEPENDIENTE: CONTROLADOR AUTH INLINE REUSABLE ("ventanaregistro")
-
-// =========================================================================
-
-
-
 function cambiarTabAuthInline(pestana) {
-
     const loginForm = document.getElementById('auth-inline-login');
-
     const regForm = document.getElementById('auth-inline-registro');
-
     const btnLogin = document.getElementById('btn-tab-login-inline');
-
     const btnReg = document.getElementById('btn-tab-reg-inline');
 
-
-
     if (pestana === 'login') {
-
         loginForm.classList.remove('hidden');
-
         regForm.classList.add('hidden');
-
         btnLogin.className = "btn btn-n";
-
         btnReg.className = "btn";
-
         btnReg.style.backgroundColor = "rgba(255,255,255,0.05)";
-
         btnReg.style.color = "white";
-
         btnReg.style.border = "1px solid #444";
-
     } else {
-
         loginForm.classList.add('hidden');
-
         regForm.classList.remove('hidden');
-
         btnReg.className = "btn btn-f";
-
         btnLogin.className = "btn";
-
         btnLogin.style.backgroundColor = "rgba(255,255,255,0.05)";
-
         btnLogin.style.color = "white";
-
         btnLogin.style.border = "1px solid #444";
-
     }
-
 }
-
-
 
 function toggleInvitadorInline() {
-
     const origen = document.getElementById('inline-reg-origen').value;
-
     const camposExtra = document.getElementById('inline-campos-invitado');
-
     if (origen === 'Invitado') camposExtra.classList.remove('hidden');
-
     else camposExtra.classList.add('hidden');
-
 }
-
-
 
 async function ejecutarLoginInline() {
-
     const email = document.getElementById('inline-login-email').value.trim();
-
     const pass = document.getElementById('inline-login-pass').value;
 
-    
-
     if(!email || !pass) return notify("Por favor, rellena todos los campos.");
-
-
-
     const btn = document.querySelector('#inlineLoginForm .btn-n');
-
     btn.innerText = "VERIFICANDO..."; btn.disabled = true;
 
-
-
     const res = await apiCall("login", { email: email, pass: pass });
-
-
-
     if(res && res.success) {
-
         res.user.timestamp = new Date().getTime(); 
-
         sessionUser = res.user;
-
         sessionStorage.setItem('kairo_session', JSON.stringify(res.user));
 
-        
-
         document.getElementById('modal-registro-bienestar').classList.add('hidden');
-
         document.getElementById('modal-registro-bienestar').style.display = 'none';
-
         document.getElementById('main-content').classList.remove('blur-effect');
 
-
-
         const fotoPrincipal = document.getElementById('user-photo');
-
         if(fotoPrincipal) fotoPrincipal.src = res.user.foto || "https://ui-avatars.com/api/?name=Usuario";
 
-
-
         btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
-
         const pendingData = sessionStorage.getItem('kairo_perfil_pendiente');
-
         if (pendingData) {
-
             sessionStorage.removeItem('kairo_perfil_pendiente');
-
             const payload = JSON.parse(pendingData);
-
             payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
-
             payload.email = sessionUser.email;
 
-            
-
             const btnCalcular = document.querySelector('#form-perfil-bienestar .btn-n');
-
             if (btnCalcular) btnCalcular.innerText = "⚡ PROCESANDO INFORMACIÓN...";
-
             ejecutarEnvioPerfilAlServidor(payload);
-
         }
-
     } else {
-
         // 🛑 MURO DE CONTENCIÓN ESTRICTO: Si falla, frena en seco y no altera la caché
-
         btn.innerText = "CONTINUAR CON EL CÁLCULO DEL PERFIL"; btn.disabled = false;
-
         return notify(res && res.msg ? res.msg : "Credenciales incorrectas en la Matrix.");
-
     }
-
 }
-
-
 
 async function ejecutarRegistroInline() {
     const pass = document.getElementById('inline-reg-pass').value;
@@ -6003,24 +5886,10 @@ function cerrarDetalleServicio() {
     modal.classList.add('hidden');
     servicioSeleccionadoActivo = null;
 }
+
+
+        
     </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-    
-
 </body>
 
 </html>
