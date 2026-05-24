@@ -5838,12 +5838,14 @@ function renderizarTarjetasServicios(data) {
                 fila.style.justifyContent = "space-between";
                 fila.onclick = () => abrirDetalleServicio(s.sku, pilar);
                 
-                // Neuro-Diseño: Si el precio es cero, muestra "GRATIS" con neón verde
-                let stringPrecio = s.valorNormal === 0 ? "<span style='color:var(--neon-f); font-weight:bold; font-size:0.8em;'>[ GRATIS ]</span>" : `<span style="font-size:0.8em; opacity:0.7;">$${s.valorNormal.toLocaleString()}</span>`;
+                // 🛡️ FOCUS: Antídoto de nulos para evitar congelamiento de pantalla
+                var precioNormalSeguro = s.valorNormal || 0;
+                var precioVipSeguro = s.valorSuscriptor || 0;
+
+                let stringPrecio = precioNormalSeguro === 0 ? "<span style='color:var(--neon-f); font-weight:bold; font-size:0.8em;'>[ GRATIS ]</span>" : `<span style="font-size:0.8em; opacity:0.7;">$${precioNormalSeguro.toLocaleString()}</span>`;
                 
-                // Si el usuario es Suscriptor y el servicio cuesta dinero, le tachamos el precio normal para detonar recompensa
-                if (sessionUser && sessionUser.rango === "Suscriptor" && s.valorNormal > 0) {
-                    stringPrecio = `<span style="font-size:0.8em; text-shadow: 0 0 5px var(--neon-f); color:var(--neon-f); font-weight:bold;">$${s.valorSuscriptor.toLocaleString()}</span>`;
+                if (sessionUser && sessionUser.rango === "Suscriptor" && precioNormalSeguro > 0) {
+                    stringPrecio = `<span style="font-size:0.8em; text-shadow: 0 0 5px var(--neon-f); color:var(--neon-f); font-weight:bold;">$${precioVipSeguro.toLocaleString()}</span>`;
                 }
 
                 fila.innerHTML = `
