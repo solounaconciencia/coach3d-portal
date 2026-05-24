@@ -1957,7 +1957,78 @@
 
 </div>
 
+<div id="modulo-calculadora-financiera" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-m); position: relative; overflow: hidden; padding: 25px;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h2 style="color: var(--neon-m); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase; font-size: 1.4em; text-shadow: 0 0 10px var(--neon-m);">Calculadora Financiera C3D</h2>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Descifra tu flujo de caja y genera tu Reporte de Libertad</p>
+    </div>
 
+    <div id="app-content-calc">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px;">
+            <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid var(--neon-f); padding: 20px; border-radius: 15px;">
+                <h3 style="color: var(--neon-f); margin-top:0; font-family:'Orbitron', sans-serif; font-size: 1em; letter-spacing: 1px;">+ HABER (INGRESOS)</h3>
+                <input type="text" id="ing-desc" placeholder="Concepto (Ej. Sueldo o Venta)" style="background: rgba(0,0,0,0.6);">
+                <input type="number" id="ing-val" placeholder="Monto $" style="background: rgba(0,0,0,0.6);">
+                <button class="btn btn-f" onclick="addIngreso()" style="width: 100%; margin-top: 5px;">AGREGAR A HABER</button>
+            </div>
+
+            <div style="background: rgba(168, 85, 247, 0.03); border: 1px solid var(--neon-m); padding: 20px; border-radius: 15px;">
+                <h3 style="color: var(--neon-m); margin-top:0; font-family:'Orbitron', sans-serif; font-size: 1em; letter-spacing: 1px;">- DEBE (GASTOS)</h3>
+                <input type="text" id="gas-desc" placeholder="Concepto (Ej. Arriendo o Tarjeta)" style="background: rgba(0,0,0,0.6);">
+                <input type="number" id="gas-val" placeholder="Monto $" style="background: rgba(0,0,0,0.6);">
+                <button class="btn btn-m" onclick="addGasto()" style="width: 100%; margin-top: 5px;">AGREGAR A DEBE</button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.4); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; min-height: 120px;">
+            <div style="border-right: 1px solid rgba(255,255,255,0.05); padding: 15px;">
+                <div style="color: var(--neon-f); font-weight: bold; border-bottom: 2px solid var(--neon-f); padding-bottom: 5px; font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 10px;">Ingresos Registrados</div>
+                <div id="list-ing" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; font-size: 0.9em;"></div>
+            </div>
+            <div style="padding: 15px;">
+                <div style="color: var(--neon-m); font-weight: bold; border-bottom: 2px solid var(--neon-m); padding-bottom: 5px; font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 10px;">Gastos Registrados</div>
+                <div id="list-gas" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; font-size: 0.9em;"></div>
+            </div>
+        </div>
+
+        <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 16px; font-family: 'Orbitron', sans-serif;" onclick="processFinance()">GENERAR REPORTE DE LIBERTAD</button>
+        <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6;" onclick="salirDelModulo()">CANCELAR</button>
+    </div>
+
+    <div id="loader-calc" style="display:none; text-align: center; padding: 40px 10px;">
+        <div class="spinner" style="border-left-color: var(--neon-m);"></div>
+        <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-m); letter-spacing: 2px; margin-top: 20px; font-size: 0.9em;">DESCIFRANDO TU ADN FINANCIERO...</p>
+    </div>
+
+    <div id="results-calc" style="display:none; animation: fadeIn 0.5s ease-out;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px;">
+            
+            <div class="glass-panel" style="border-left: 4px solid var(--neon-n); padding: 15px; text-align: left;">
+                <h3 style="color: var(--neon-n); margin: 0 0 10px 0; font-size: 0.9em; font-family: 'Orbitron', sans-serif;">ESTADO ACTUAL</h3>
+                <p style="margin: 6px 0; font-size: 0.9em;">Total Ingresos: <span id="res-total-ing" style="color:#fff; font-weight:bold;"></span></p>
+                <p style="margin: 6px 0; font-size: 0.9em;">Total Gastos: <span id="res-total-gas" style="color:#fff; font-weight:bold;"></span></p>
+                <p style="margin: 6px 0; font-size: 0.9em;">Flujo Libre: <span id="res-flujo" style="color: var(--neon-f); font-weight:bold;"></span></p>
+                <div style="border-top:1px dashed rgba(255,255,255,0.1); margin: 10px 0; padding-top: 8px;"></div>
+                <p style="margin: 0; font-size: 0.8em; color: #ccc; line-height: 1.3;">Sugerencia (Aho/Inv/Pre): <br><span id="res-dist" style="color: var(--neon-n); font-weight: bold;"></span></p>
+            </div>
+
+            <div class="glass-panel" style="border-left: 4px solid var(--neon-f); padding: 15px; text-align: left;">
+                <h3 style="color: var(--neon-f); margin: 0 0 10px 0; font-size: 0.9em; font-family: 'Orbitron', sans-serif;">META NEURO-FINANCIERA</h3>
+                <p style="margin: 6px 0; font-size: 0.9em;">Ingreso Objetivo: <span id="id-ing" style="color:#fff; font-weight:bold;"></span></p>
+                <p style="margin: 6px 0; font-size: 0.9em;">Tu 10% de Oro: <span id="id-dist" style="color: var(--neon-f); font-weight:bold;"></span></p>
+            </div>
+
+            <div class="glass-panel" style="border-left: 4px solid var(--neon-m); padding: 15px; text-align: left; grid-column: span 1;">
+                <h2 id="status-name" style="color: var(--neon-m); margin: 0 0 5px 0; font-size: 1.1em; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;"></h2>
+                <p id="status-msg" style="margin: 0; font-size: 0.85em; color: #cbd5e1; line-height: 1.4;"></p>
+            </div>
+        </div>
+
+        <button id="wa-link-calc" class="btn btn-f" style="width: 100%; padding: 15px; font-weight: bold; margin-bottom: 15px;" onclick="window.open(this.getAttribute('data-href'), '_blank')">🚀 SOLICITAR ASESORÍA FINANCIERA GRATUITA</button>
+        <button class="btn btn-n" style="width: 100%;" onclick="reiniciarCalculadoraLocal()">NUEVO ANÁLISIS</button>
+    </div>
+</div>
 
 </div> <div id="modal-perfil" class="hidden glass-panel">
     <h3 style="color: var(--neon-n); text-align: center;">Editar Perfil</h3>
@@ -2888,9 +2959,10 @@ async function loadDashboard() {
   
   const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
   const d3dPendiente = sessionStorage.getItem('kairo_d3d_pendiente');
+  const calcPendiente = sessionStorage.getItem('kairo_calculadora_pendiente'); // 🛡️ Captura de calculadora gratuita
   const urlParams = new URLSearchParams(window.location.search);
 
-  // 🛡️ CORRECCIÓN CRÍTICA FOCUS: CAPTURA Y VERIFICACIÓN REAL DE MERCADOPAGO
+  // 🛡️ INTERCEPTOR MAESTRO DE MERCADOPAGO (RETORNO DE PAGO)
   if (urlParams.get('modulo') === 'retorno_pago') {
       console.log("💳 Kairo: Retorno detectado. Validando transacciones...");
       
@@ -2914,44 +2986,66 @@ async function loadDashboard() {
               sessionUser.rango = "Suscriptor";
               sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
               
-              // 4. Rehidratamos la matriz de respuestas del Quiz y limpiamos el disco
-              respuestasDiag = JSON.parse(backupRespuestas);
-              
-              localStorage.removeItem('kairo_prospecto_plan');
-              localStorage.removeItem('kairo_prospecto_nombre_plan');
-              localStorage.removeItem('kairo_prospecto_respuestas');
-              localStorage.removeItem('kairo_prospecto_herramienta');
-
-              // Apagamos la pantalla de carga global
-              document.getElementById('kairo-loader-global').style.display = 'none';
-
-              // 5. Ejecutamos el procesador del PDF y mostramos resultados
+              // 4. ACCIÓN: Evaluamos qué herramienta dejó datos congelados en el disco local
               if (backupHerramienta === "D3D") {
+                  respuestasDiag = JSON.parse(backupRespuestas);
+                  limpiarCachesProspecto();
+                  
+                  document.getElementById('kairo-loader-global').style.display = 'none';
                   document.getElementById('view-dashboard').classList.add('hidden');
                   const moduloDiag = document.getElementById('contenido-modulo-diagnostico');
                   if (moduloDiag) moduloDiag.classList.remove('hidden');
                   finalizarDiagnostico();
+                  return;
+              } 
+              else if (backupHerramienta === "CALCULADORA") {
+                  // 🛡️ Si el pago viene de la calculadora, recuperamos su Debe y Haber
+                  const dataBackup = JSON.parse(localStorage.getItem('kairo_calculadora_respuestas_backup'));
+                  if (dataBackup) {
+                      ingData = dataBackup.ing;
+                      gasData = dataBackup.gas;
+                  }
+                  limpiarCachesProspecto();
+                  localStorage.removeItem('kairo_calculadora_respuestas_backup');
+
+                  document.getElementById('kairo-loader-global').style.display = 'none';
+                  document.getElementById('view-dashboard').classList.add('hidden');
+                  const moduloCalc = document.getElementById('modulo-calculadora-financiera');
+                  if (moduloCalc) moduloCalc.classList.remove('hidden');
+                  
+                  ejecutarCalculoFinanzasFinal();
                   return;
               }
           }
       }
   }
 
-  // Flujo ordinario si no viene de pagar
-  if (perfilPendiente) {
+  // 🛡️ ENRUTADOR DE ACCESOS DIRECTOS O DATOS PENDIENTES DE REGISTROS GRATUITOS
+  if (calcPendiente) {
+      // Caso: Invitado de la Calculadora que se registró Gratis
+      sessionStorage.removeItem('kairo_calculadora_pendiente');
+      const dataCalc = JSON.parse(calcPendiente);
+      ingData = dataCalc.ing; 
+      gasData = dataCalc.gas;
+      
+      document.getElementById('view-dashboard').classList.add('hidden');
+      const moduloCalc = document.getElementById('modulo-calculadora-financiera');
+      if (moduloCalc) moduloCalc.classList.remove('hidden');
+      ejecutarCalculoFinanzasFinal();
+  } 
+  else if (perfilPendiente) {
       const payload = JSON.parse(perfilPendiente);
       payload.nombre = sessionUser.seudónimo || sessionUser.nombre;
       payload.email = sessionUser.email;
-      
       sessionStorage.removeItem('kairo_perfil_pendiente');
       
       document.getElementById('view-dashboard').classList.add('hidden');
       const moduloPerfil = document.getElementById('modulo-perfil-bienestar');
       if(moduloPerfil) moduloPerfil.classList.remove('hidden');
-      
       document.getElementById('bubblePerfil').innerHTML = "<b>Kairo informa:</b> Identidad verificada correctamente. Procesando información metabólica...";
       ejecutarEnvioPerfilAlServidor(payload);
-  } else if (d3dPendiente) {
+  } 
+  else if (d3dPendiente) {
       sessionStorage.removeItem('kairo_d3d_pendiente');
       const dataD3D = JSON.parse(d3dPendiente);
       respuestasDiag = dataD3D.respuestas;
@@ -2959,14 +3053,20 @@ async function loadDashboard() {
       document.getElementById('view-dashboard').classList.add('hidden');
       const moduloDiag = document.getElementById('contenido-modulo-diagnostico');
       if (moduloDiag) moduloDiag.classList.remove('hidden');
-      
       finalizarDiagnostico();
-  } else if (urlParams.get('modulo') === 'perfil') {
+  } 
+  else if (urlParams.get('modulo') === 'perfil') {
       iniciarPerfilBienestar();
-  } else if (urlParams.get('modulo') === 'd3d') {
+  } 
+  else if (urlParams.get('modulo') === 'd3d') {
       iniciarDiagnosticoModular();
-  } else {
-      // 🛡️ ESCUDO FOCUS: Estas instrucciones se ejecutan ÚNICAMENTE en el dashboard estándar ordinario
+  } 
+  else if (urlParams.get('modulo') === 'calculadora') {
+      // 🛡️ Si entran por link directo a la calculadora financiera
+      iniciarcalculadorafinanciera();
+  } 
+  else {
+      // Dashboard normal de la comunidad
       document.getElementById('view-dashboard').classList.remove('hidden');
       
       const panelDiag = document.getElementById('contenido-modulo-diagnostico');
@@ -2976,9 +3076,10 @@ async function loadDashboard() {
       if (herramientas) { herramientas.classList.remove('hidden'); }
   }
   
-  // Apagamos de forma universal el protector de carga una vez definido el escenario
+  // Apagamos el telón negro de carga
   document.getElementById('kairo-loader-global').style.display = 'none';
 
+  // Renderizado de datos del usuario en el panel principal
   document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
   document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
 
@@ -3034,55 +3135,39 @@ async function loadDashboard() {
   }
 }
 
+// 🛡️ Función interna auxiliar para limpiar rastros del disco local
+function limpiarCachesProspecto() {
+    localStorage.removeItem('kairo_prospecto_plan');
+    localStorage.removeItem('kairo_prospecto_nombre_plan');
+    localStorage.removeItem('kairo_prospecto_respuestas');
+    localStorage.removeItem('kairo_prospecto_herramienta');
+}
+
     function recuperarPass() {
-
       document.getElementById('view-welcome').classList.add('hidden');
-
       document.getElementById('modal-recover').classList.remove('hidden');
-
     }
 
-
-
     async function buscarPregunta() {
-
   const email = document.getElementById('recover-email').value;
-
   const res = await apiCall("obtenerPreguntaSeguridad", { email: email });
 
   if(res && res.success) {
-
     document.getElementById('step-1-recover').classList.add('hidden');
-
     document.getElementById('display-question').innerText = res.pregunta;
-
     document.getElementById('step-2-recover').classList.remove('hidden');
-
   } else { notify(res ? res.msg : "Error al conectar."); }
-
 }
-
-
 
 async function validarAcceso() {
-
   const email = document.getElementById('recover-email').value;
-
   const respuesta = document.getElementById('recover-answer').value;
-
   const res = await apiCall("validarRespuestaSeguridad", { email: email, respuesta: respuesta });
-
   if(res && res.success) {
-
     notify("Validado. Clave temporal: " + res.tempPass);
-
     cancelarRegistro();
-
   } else { notify(res ? res.msg : "Respuesta incorrecta."); }
-
 }
-
-
 
 function logout() {
   // 🛡️ CAPA 4: Limpieza absoluta de ambas memorias (Evita el auto-login eterno)
@@ -3119,6 +3204,8 @@ function checkSession() {
           iniciarPerfilBienestar(); 
       } else if (urlParams.get('modulo') === 'd3d') {
           iniciarDiagnosticoModular();
+      } else if (urlParams.get('modulo') === 'calculadora') {
+          iniciarcalculadorafinanciera();
       } else {
           document.getElementById('view-welcome').classList.remove('hidden'); 
       }
