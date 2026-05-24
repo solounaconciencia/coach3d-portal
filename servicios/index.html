@@ -262,13 +262,14 @@
                 
                 if (data[key] && data[key].length > 0) {
                     data[key].forEach(s => {
-                        const btn = document.createElement('div');
-                        btn.className = "card-servicio-btn";
-                        btn.style.borderLeft = `3px solid ${pilares[key].color}`;
-                        btn.onclick = () => abrirModalPublico(s.sku, key);
+                            const btn = document.createElement('div');
+                            btn.className = "card-servicio-btn";
+                            btn.style.borderLeft = `3px solid ${pilares[key].color}`;
+                            btn.onclick = () => abrirModalPublico(s.sku, key);
 
-                        const textPrecio = s.valorNormal === 0 ? `<span style="color:var(--neon-f); font-weight:bold; font-size:0.82em;">[ GRATIS ]</span>` : `<span style="font-size:0.82em; color:#fff; font-weight:600;">$${s.valorNormal.toLocaleString()}</span>`;
-
+                            // 🛡️ FOCUS: Doble Escudo contra errores de tipeo en el Sheets
+                            var precioNormalSeguro = s.valorNormal || 0;
+                            const textPrecio = precioNormalSeguro === 0 ? `<span style="color:var(--neon-f); font-weight:bold; font-size:0.82em;">[ GRATIS ]</span>` : `<span style="font-size:0.82em; color:#fff; font-weight:600;">$${precioNormalSeguro.toLocaleString()}</span>`;
                         btn.innerHTML = `
                             <div style="display:flex; align-items:center; gap:10px; max-width:75%;">
                                 <img src="${s.urlImagen}" style="width:20px; height:20px; flex-shrink:0;">
