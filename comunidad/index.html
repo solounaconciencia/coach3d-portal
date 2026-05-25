@@ -2388,348 +2388,176 @@
     </div>
 </div>
 
-
-
 <div id="custom-alert" class="glass-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000; pointer-events: auto; text-align: center; padding: 30px; border-radius: 15px; background: rgba(10, 15, 30, 0.98); border: 1px solid var(--neon-n); min-width: 320px; box-shadow: 0 0 50px rgba(0,0,0,0.9);">
-
     <button onclick="cerrarKairoMsg()" style="position: absolute; top: 12px; right: 15px; background: transparent; border: none; color: rgba(255,255,255,0.5); font-size: 26px; cursor: pointer; transition: 0.3s;" onmouseover="this.style.color='var(--neon-n)'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">×</button>
-
     <div id="alert-icon" style="font-size: 3em; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--neon-n));">🛡️</div>
-
     <p id="alert-message" style="margin-bottom: 25px; color: white; line-height: 1.5; font-size: 1.1em;"></p>
-
     <div id="alert-buttons" style="display: flex; flex-direction: column; gap: 15px; justify-content: center;"></div>
-
 </div>
 
-
+</div> 
 
     <script>
 
         // CONFIGURACIÓN GLOBAL
-
         const API_URL = "https://script.google.com/macros/s/AKfycbx0P7lLzRvfq-H2YueMV8y5KznAO0qZziGfPm2tcrvDYkc7-Tx0vhsscxm4NbfxgVD4MQ/exec";
 
-        
-
         // La variable sessionUser se mantiene igual
-
         let sessionUser = null;
-
         let menuAppCargado = false;
 
 
-
-        // ==========================================
-
         // 🛡️ CAPA 4: INTERCEPTOR CRIPTOGRÁFICO (GHOST SCRIPT)
-
-        // ==========================================
-
         (function() {
-
             const KAIRO_KEY = "c3d_matrix_2026"; // Llave maestra
-
             const originalSetItem = Storage.prototype.setItem;
-
             const originalGetItem = Storage.prototype.getItem;
-
             const originalRemoveItem = Storage.prototype.removeItem;
 
-
-
             // 1. Intercepta el Guardado (Lo encripta en el aire)
-
             Storage.prototype.setItem = function(key, value) {
-
                 if (key === 'kairo_session') {
-
                     let encoded = "";
-
                     for (let i = 0; i < value.length; i++) {
-
                         encoded += String.fromCharCode(value.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
-
                     }
 
                     originalSetItem.call(this, 'kairo_token', btoa(encoded));
-
                     // Borramos el rastro en texto plano para los curiosos
-
                     originalSetItem.call(this, 'kairo_session', "ENCRIPTADO_POR_KAIRO"); 
-
                 } else {
-
                     originalSetItem.call(this, key, value);
-
                 }
-
             };
-
-
 
             // 2. Intercepta la Lectura (Lo desencripta antes de entregarlo)
-
             Storage.prototype.getItem = function(key) {
-
                 if (key === 'kairo_session') {
-
                     let token = originalGetItem.call(this, 'kairo_token');
-
                     if (!token) return null;
-
                     try {
-
                         let decoded = atob(token);
-
                         let str = "";
-
                         for (let i = 0; i < decoded.length; i++) {
-
                             str += String.fromCharCode(decoded.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
-
                         }
-
                         return str;
-
                     } catch(e) { return null; }
-
                 }
-
                 return originalGetItem.call(this, key);
-
             };
-
-
 
             // 3. Intercepta el Borrado al cerrar sesión (Limpia los rastros)
-
             Storage.prototype.removeItem = function(key) {
-
                 if (key === 'kairo_session') {
-
                     originalRemoveItem.call(this, 'kairo_token');
-
                     originalRemoveItem.call(this, 'kairo_session');
-
                 } else {
-
                     originalRemoveItem.call(this, key);
-
                 }
-
             };
-
         })();
 
-
-
 // --- MOTOR CORS BYPASS (EL CEREBRO DEFINITIVO) ---
-
         async function apiCall(action, payload = {}) {
-
     try {
-
         const data = { action: action, ...payload };
-
         const response = await fetch(API_URL, {
-
             method: 'POST',
-
             // FOCUS: Al usar text/plain, Google no bloquea la lectura de datos
-
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-
             body: JSON.stringify(data)
-
         });
-
         return await response.json(); // Leemos la respuesta real de la Matrix
-
     } catch (error) {
-
         console.error("Error API:", error);
-
         return { success: false, msg: error.toString() };
-
     }
-
 }
 
-
-
-        // EL MOTOR DE VENTANAS DE KAIRO - EVOLUCIONADO
-
+// EL MOTOR DE VENTANAS DE KAIRO - EVOLUCIONADO
 function kairoMessage({ mensaje, tipo = 'alerta', icon = '🛡️' }) {
-
     return new Promise((resolve) => {
-
         const modal = document.getElementById('custom-alert');
-
         const txt = document.getElementById('alert-message');
-
         const btnContainer = document.getElementById('alert-buttons');
-
         const iconContainer = document.getElementById('alert-icon');
 
-
-
         // Configuración de contenido
-
         txt.innerHTML = mensaje;
-
         iconContainer.innerText = icon;
-
         btnContainer.innerHTML = ''; 
 
-        
-
         // Efecto visual de apertura
-
         modal.style.display = 'block';
-
         modal.style.opacity = '0';
-
         setTimeout(() => {
-
           modal.style.transition = "opacity 0.3s ease";
-
           modal.style.opacity = '1';
-
         }, 10);
-
-
 
         document.getElementById('main-content').classList.add('blur-effect');
 
-
-
         // --- LÓGICA DE BOTONES NEÓN ---
-
         if (tipo === 'confirmar') {
-
             // Botón 1: Mantener
-
             const btnOk = document.createElement('button');
-
             btnOk.className = 'btn btn-n'; 
-
             btnOk.style.width = "100%";
-
             btnOk.innerText = 'MANTENER CONEXIÓN';
-
             btnOk.onclick = () => { cerrarKairoMsg(); resolve(true); };
 
-
-
             // Botón 2: Salir
-
             const btnCancel = document.createElement('button');
-
             btnCancel.className = 'btn btn-m';
-
             btnCancel.style.width = "100%";
-
             btnCancel.innerText = 'CERRAR SESIÓN';
-
             btnCancel.onclick = () => { cerrarKairoMsg(); resolve(false); };
-
-
-
             btnContainer.appendChild(btnOk);
-
             btnContainer.appendChild(btnCancel);
-
         } else {
-
             // Caso Informativo / Guardar
-
             const btnEntendido = document.createElement('button');
-
             btnEntendido.className = 'btn-matrix';
-
             btnEntendido.style.width = "100%";
-
             btnEntendido.style.background = "var(--neon-n)";
-
             btnEntendido.innerText = 'ENTENDIDO';
-
             btnEntendido.onclick = () => { cerrarKairoMsg(); resolve(true); };
-
             btnContainer.appendChild(btnEntendido);
-
         }
-
     });
-
 }
-
-
 
 function cerrarKairoMsg() {
-
     const modal = document.getElementById('custom-alert');
-
     modal.style.opacity = '0';
-
     setTimeout(() => {
-
       modal.style.display = 'none';
-
       document.getElementById('main-content').classList.remove('blur-effect');
-
     }, 300);
-
 }
-
-
-
-
-
-    // Función para validar: 6-12 caracteres, al menos una Mayúscula y un Número
-
-    function validarSeguridadPass(pass) {
-
+        
+// Función para validar: 6-12 caracteres, al menos una Mayúscula y un Número
+function validarSeguridadPass(pass) {
   const regex = /^(?=.*[A-Z])(?=.*\d).{6,12}$/;
-
   return regex.test(pass);
-
 }
-
-   
-
-    // FOCUS: La función vieja ahora usa el Motor Neón, garantizando siempre un botón "ENTENDIDO"
-
+  
+// FOCUS: La función vieja ahora usa el Motor Neón, garantizando siempre un botón "ENTENDIDO"
 function notify(msg) {
-
   kairoMessage({ mensaje: msg, icon: '⚠️' });
-
 }
 
-
-
-    function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
-
-
-
-    function showForm(type) {
-
+function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+function showForm(type) {
   document.getElementById('view-welcome').classList.add('hidden');
-
   if(type === 'register') {
-
     document.getElementById('modal-register').classList.remove('hidden');
-
   } else {
-
     document.getElementById('modal-login').classList.remove('hidden');
-
     // FOCUS: Activamos el Enter solo cuando el modal se ve
-
     prepararEnterLogin();
-
   }
-
 }
 
     function toggleInvitador() {
@@ -2928,8 +2756,11 @@ function filtrarUrlImagen(url) {
 
 async function loadDashboard() {
   closeAlert();
+  const urlParams = new URLSearchParams(window.location.search);
+  const esRetornoVenta = urlParams.get('modulo') === 'retorno_pago';
 
-  if (!sessionUser) {
+  // 🛡️ FOCUS: Bloqueamos accesos ordinarios sin sesión, pero permitimos pasar si es una validación de MercadoPago
+  if (!sessionUser && !esRetornoVenta) {
     return notify("Error: Sesión Expirada. Por favor, inicia sesión de nuevo.");
   }
 
@@ -3250,6 +3081,12 @@ function checkSession() {
       sessionStorage.removeItem('kairo_session');
       sessionUser = null;
       
+      // 🛡️ FOCUS ESCUDO: Si es un comprador anónimo regresando de MercadoPago, permitimos el flujo a loadDashboard
+      if (urlParams.get('modulo') === 'retorno_pago') {
+          loadDashboard();
+          return;
+      }
+      
       if (urlParams.get('modulo') === 'perfil') {
           iniciarPerfilBienestar(); 
       } else if (urlParams.get('modulo') === 'd3d') {
@@ -3257,7 +3094,6 @@ function checkSession() {
       } else if (urlParams.get('modulo') === 'calculadora') {
           iniciarcalculadorafinanciera();
       } else if (urlParams.get('modulo') === 'servicios') {
-          // 🛡️ FOCUS: Abre de forma síncrona el catálogo comercial si entran deslogueados
           iniciarservicios();
       } else {
           document.getElementById('view-welcome').classList.remove('hidden'); 
@@ -4899,6 +4735,10 @@ function salirDelModulo() {
     // 🛡️ INYECCIÓN FOCUS: Apaga el módulo de e-commerce de servicios al salir
     const serviciosModulo = document.getElementById('modulo-servicios-comunidad');
     if (serviciosModulo) serviciosModulo.classList.add('hidden');
+
+    // 🛡️ REPARO CO-CREACIÓN: Oculta la calculadora financiera para evitar superposiciones en pantalla
+    const calcModulo = document.getElementById('modulo-calculadora-financiera');
+    if (calcModulo) calcModulo.classList.add('hidden');
 
     document.getElementById('view-dashboard').classList.remove('hidden');
     if (typeof loadDashboard === 'function' && sessionUser) {
