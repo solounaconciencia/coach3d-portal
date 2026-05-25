@@ -2030,17 +2030,28 @@
         </div>
     </div>
 
-    <div id="ser-contenedor-varios" class="hidden" style="margin-bottom: 15px; background: rgba(168, 85, 247, 0.03); padding: 12px; border: 1px dashed var(--neon-m); border-radius: 10px; text-align: left;">
+    <div id="ser-contenedor-varios" class="hidden" style="margin-bottom: 15px; background: rgba(168, 85, 247, 0.03); padding: 15px; border: 1px dashed var(--neon-m); border-radius: 12px; text-align: left;">
         <label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 8px;">🎁 SELECCIONA TU COMPLEMENTO DE REGALO OBLIGATORIO:</label>
         <select id="ser-select-regalo" style="margin: 0; background: #000; border-color: var(--neon-m); font-size: 0.85em;">
-            <option value="Té Energizante">🍵 Té Energizante de Cortesía</option>
-            <option value="Multivitamínico">💊 Multivitamínico de Cortesía</option>
-            <option value="Muffin de Chocolate">🧁 Muffin de Chocolate Saludable</option>
-            <option value="Batido Nutricional">🥤 Batido Nutricional Premium</option>
-        </select>
+            </select>
         <p style="font-size: 0.65em; color: #94a3b8; margin: 8px 0 0 0; line-height: 1.3;">
             <b>🔒 Cláusula de Consumo:</b> Regalo exclusivo para consumo personal. No vincula a redes de distribución corporativas (Herbalife). Consulta a tu Coach para activar tu 25% de descuento por 12 meses como Cliente Preferente.
         </p>
+    </div>
+
+    <div id="ser-contenedor-reserva" class="hidden" style="margin-bottom: 15px; background: rgba(34, 211, 238, 0.03); padding: 15px; border: 1px dashed var(--neon-n); border-radius: 12px; text-align: left;">
+        <label style="font-size: 0.75em; color: var(--neon-n); font-weight: bold; display: block; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">📅 CALENDARIO DE ATENCIÓN: JUNIO 2026</label>
+        
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-size: 0.7em; font-weight: bold; color: var(--neon-n); margin-bottom: 8px;">
+            <div>DO</div><div>LU</div><div>MA</div><div>MI</div><div>JU</div><div>VI</div><div>SA</div>
+        </div>
+        <div id="ser-mesh-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 15px;">
+            </div>
+
+        <div id="ser-bloque-horas-dia" class="hidden" style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
+            <label style="font-size: 0.72em; color: #fff; display: block; margin-bottom: 8px; font-weight: 600;">⏰ Bloques Horarios Disponibles para el día seleccionado:</label>
+            <div id="ser-lista-botones-horas" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;"></div>
+        </div>
     </div>
 
     <button id="ser-btn-accion" class="btn btn-n" style="width: 100%; padding: 14px; font-family: 'Orbitron', sans-serif;" onclick="ejecutarAccionComercialServicio()">ADQUIRIR ACCESO DIRECTO</button>
@@ -5608,18 +5619,42 @@ function abrirDetalleServicio(sku, pilar) {
         document.getElementById('ser-modal-precio-normal').style.opacity = "1";
     }
 
-    // Evaluamos el interruptor dinámico de ACCION de la columna I
-    const contenedorVarios = document.getElementById('ser-contenedor-varios');
+    // 🛡️ CENTRAL INTERRUPTORES: Limpieza de capas de visualización
+    const boxVarios = document.getElementById('ser-contenedor-varios');
+    const boxReserva = document.getElementById('ser-contenedor-reserva');
     const btnAccion = document.getElementById('ser-btn-accion');
     
+    boxVarios.classList.add('hidden');
+    boxReserva.classList.add('hidden');
+    document.getElementById('ser-bloque-horas-dia').classList.add('hidden');
+    
+    slotSeleccionadoCacheId = null; // Reseteamos puntero de hora tomado
+    btnAccion.style.opacity = "1";
+
     if (servicio.accion === "VARIOS") {
-        contenedorVarios.classList.remove('hidden');
-        btnAccion.innerText = "ELEGIR COMPLEMENTO Y PAGAR";
-    } else if (servicio.accion === "RESERVA") {
-        contenedorVarios.classList.add('hidden');
-        btnAccion.innerText = (servicio.valorNormal === 0) ? "RESERVAR MI HORA GRATUITA" : "RESERVAR HORARIO Y ADQUIRIR";
-    } else {
-        contenedorVarios.classList.add('hidden');
+        boxVarios.classList.remove('hidden');
+        btnAccion.innerText = "ELEGIR OPCIÓN Y CONTINUAR";
+        
+        // Separamos y rellenamos el select dinámico desde la columna K
+        const comboRegalo = document.getElementById('ser-select-regalo');
+        comboRegalo.innerHTML = "";
+        var opcionesArray = servicio.variantes ? servicio.variantes.split(",") : [];
+        opcionesArray.forEach(opt => {
+            var elOpt = document.createElement('option');
+            elOpt.value = opt.trim();
+            elOpt.innerText = opt.trim();
+            comboRegalo.appendChild(elOpt);
+        });
+    } 
+    else if (servicio.accion === "RESERVA") {
+        boxReserva.classList.remove('hidden');
+        btnAccion.innerText = "SELECCIONA DÍA Y HORA EN EL CALENDARIO";
+        btnAccion.style.opacity = "0.4"; // Congelado síncronamente hasta que amarre hora
+        
+        // Arrancamos el motor de renderizado de la agenda de junio 2026
+        inicializarCalendarioEcomm3D(servicio.sku);
+    } 
+    else {
         btnAccion.innerText = "ADQUIRIR ACCESO DIRECTO";
     }
 
@@ -5695,7 +5730,103 @@ function cerrarDetalleServicio() {
     servicioSeleccionadoActivo = null;
 }
 
+// =========================================================================
+// 📅 MATRIX CALENDAR ENGINE: EXPERIENCIA MENSUAL DINÁMICA C3D
+// =========================================================================
+let databaseHorariosCache = [];
 
+async function inicializarCalendarioEcomm3D(skuServicio) {
+    const mesh = document.getElementById('ser-mesh-calendario');
+    mesh.innerHTML = "<p style='color:var(--neon-n); font-size:0.75em; text-align:center; grid-column:1/-1;'>Sincronizando agenda...</p>";
+    
+    const res = await apiCall("obtenerHorariosDisponibles");
+    if (res && res.success) {
+        databaseHorariosCache = res.horarios;
+        renderizarMesJunio2026();
+    } else {
+        mesh.innerHTML = "<p style='color:#f87171; font-size:0.75em; grid-column:1/-1;'>Error al conectar con la agenda.</p>";
+    }
+}
+
+function renderizarMesJunio2026() {
+    const mesh = document.getElementById('ser-mesh-calendario');
+    mesh.innerHTML = "";
+
+    // 🛡️ Configuración fija para Junio 2026 (Basado en tu captura y calendario real)
+    // El mes arranca en día Lunes (index 1 de la cuadrícula)
+    const desfaseDiasVacios = 1; 
+    const totalDiasMes = 30;
+
+    // Rellenamos los casilleros vacíos del desfase
+    for (let i = 0; i < desfaseDiasVacios; i++) {
+        let vacio = document.createElement('div');
+        mesh.appendChild(vacio);
+    }
+
+    // Dibujamos los 30 casilleros del mes
+    for (let dia = 1; dia <= totalDiasMes; dia++) {
+        let cell = document.createElement('div');
+        let diaString = dia.toString().padStart(2, '0');
+        let fechaTarget = `2026-06-${diaString}`;
+
+        // Filtramos en la caché si ese día específico tiene horas libres
+        let tieneDisponibilidad = databaseHorariosCache.some(h => h.fecha === fechaTarget);
+
+        cell.innerText = dia;
+        cell.style = "padding:8px 0; font-size:0.8em; border-radius:6px; color:#475569; font-weight:600; transition:0.2s;";
+
+        if (tieneDisponibilidad) {
+            cell.style.color = "#fff";
+            cell.style.background = "rgba(34, 211, 238, 0.08)";
+            cell.style.border = "1px solid rgba(34, 211, 238, 0.2)";
+            cell.style.cursor = "pointer";
+            
+            cell.onclick = function() {
+                // Limpieza visual de selección de casilleros
+                const todasLasCeldas = mesh.querySelectorAll('div');
+                todasLasCeldas.forEach(c => { if(c.style.backgroundColor === "var(--neon-n)") { c.style.background = "rgba(34, 211, 238, 0.08)"; c.style.color = "#fff"; } });
+                
+                cell.style.background = "var(--neon-n)";
+                cell.style.color = "#000";
+                desplegarHorasDelDiaElegido(fechaTarget);
+            };
+        }
+        mesh.appendChild(cell);
+    }
+}
+
+function desplegarHorasDelDiaElegido(fechaFiltro) {
+    const bloqueHoras = document.getElementById('ser-bloque-horas-dia');
+    const contenedorBotones = document.getElementById('ser-lista-botones-horas');
+    
+    contenedorBotones.innerHTML = "";
+    bloqueHoras.classList.remove('hidden');
+
+    let slotsDelDia = databaseHorariosCache.filter(h => h.fecha === fechaFiltro);
+
+    slotsDelDia.forEach(slot => {
+        let btnHora = document.createElement('button');
+        btnHora.className = "btn";
+        btnHora.style = "padding:6px 12px; font-size:0.78em; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); color:#fff; width:auto; margin:0;";
+        btnHora.innerText = slot.hora;
+
+        btnHora.onclick = function() {
+            const todosLosBtn = contenedorBotones.querySelectorAll('button');
+            todosLosBtn.forEach(b => { b.style.background = "rgba(255,255,255,0.03)"; b.style.borderColor = "rgba(255,255,255,0.1)"; b.style.color = "#fff"; });
+
+            btnHora.style.background = "var(--neon-n)";
+            btnHora.style.borderColor = "var(--neon-n)";
+            btnHora.style.color = "#000";
+
+            slotSeleccionadoCacheId = slot.id; // Amarramos el ID Horario elegido
+            
+            const btnAccionPrincipal = document.getElementById('ser-btn-accion');
+            btnAccionPrincipal.style.opacity = "1";
+            btnAccionPrincipal.innerText = "CONFIRMAR RESERVA Y AVANZAR";
+        };
+        contenedorBotones.appendChild(btnHora);
+    });
+}
         
     </script>
 </body>
