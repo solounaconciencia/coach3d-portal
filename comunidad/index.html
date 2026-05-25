@@ -1597,18 +1597,16 @@
         </div>
 
         <div id="step-2-recover" class="hidden">
-
             <p id="display-question" style="color: var(--neon-n); font-weight: bold;"></p>
-
             <input type="text" id="recover-answer" placeholder="Tu respuesta">
-
             <button class="btn btn-f" onclick="validarAcceso()">Validar Respuesta</button>
-
         </div>
 
         <button class="btn" onclick="cancelarRegistro()" style="margin-top: 10px; font-size: 0.8em;">Volver</button>
-    </div> <div id="view-dashboard" class="hidden">
-      <button class="btn-hamburguesa" onclick="toggleMenuApp()">☰</button>
+    </div>
+    <div id="view-dashboard" class="hidden">
+        <button class="btn-hamburguesa" onclick="toggleMenuApp()">☰</button>
+        
       <div id="overlay-menu" class="overlay-menu" onclick="toggleMenuApp()"></div>
       <div id="sidebar-menu" class="sidebar-menu">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
@@ -2420,6 +2418,8 @@
         // La variable sessionUser se mantiene igual
         let sessionUser = null;
         let menuAppCargado = false;
+        let cacheRegalosDisponibles = []; // 🛡️ Sostiene las fichas de los productos leídos del Excel
+        let slotSeleccionadoCacheId = null; // 🛡️ Almacena el ID del horario que toque el usuario en el calendario
 
 
         // 🛡️ CAPA 4: INTERCEPTOR CRIPTOGRÁFICO (GHOST SCRIPT)
@@ -2785,7 +2785,6 @@ async function loadDashboard() {
   const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
   const d3dPendiente = sessionStorage.getItem('kairo_d3d_pendiente');
   const calcPendiente = sessionStorage.getItem('kairo_calculadora_pendiente'); // 🛡️ Captura de calculadora gratuita
-  const urlParams = new URLSearchParams(window.location.search);
 
   // 🛡️ INTERCEPTOR MAESTRO DE MERCADOPAGO (RETORNO DE PAGO)
   if (urlParams.get('modulo') === 'retorno_pago') {
@@ -5543,6 +5542,12 @@ async function iniciarservicios() {
     
     const contenedorModulo = document.getElementById('modulo-servicios-comunidad');
     contenedorModulo.classList.remove('hidden');
+    // 🛡️ REPARO CO-CREACIÓN: Descarga síncrona de regalos desde el Sheets de Productos
+    cacheRegalosDisponibles = [];
+    const resRegalos = await apiCall("obtenerRegalosDisponibles");
+    if (resRegalos && resRegalos.success) {
+        cacheRegalosDisponibles = resRegalos.regalos;
+    }
 
     document.getElementById('lista-servicios-f').innerHTML = "<p style='font-size:0.8em; color:var(--neon-f); text-align:center;'>Cargando Matrix...</p>";
     document.getElementById('lista-servicios-n').innerHTML = "<p style='font-size:0.8em; color:var(--neon-n); text-align:center;'>Cargando Matrix...</p>";
@@ -5610,10 +5615,12 @@ function abrirDetalleServicio(sku, pilar) {
     document.getElementById('ser-modal-sku').innerText = `SKU: ${servicio.sku} | MÓDULO: ${servicio.accion}`;
     document.getElementById('ser-modal-desc').innerText = servicio.descripcion;
     
-    // Formateo de precios en base a Neuroventa
-    document.getElementById('ser-modal-precio-normal').innerText = servicio.valorNormal === 0 ? "GRATIS" : `$${servicio.valorNormal.toLocaleString()}`;
-    document.getElementById('ser-modal-precio-vip').innerText = servicio.valorSuscriptor === 0 ? "GRATIS" : `$${servicio.valorSuscriptor.toLocaleString()}`;
-    
+    // 🛡️ FOCUS: Caspeo numérico preventivo para evitar crashes si el Sheets viene vacío
+    var pNormalSeguro = Number(servicio.valorNormal || 0);
+    var pVipSeguro = Number(servicio.valorSuscriptor || 0);
+
+    document.getElementById('ser-modal-precio-normal').innerText = pNormalSeguro === 0 ? "GRATIS" : `$${pNormalSeguro.toLocaleString()}`;
+    document.getElementById('ser-modal-precio-vip').innerText = pVipSeguro === 0 ? "GRATIS" : `$${pVipSeguro.toLocaleString()}`;    
     // Tratamiento Neuro-Marketing: Si el cliente ya es Suscriptor, tachamos visualmente el precio caro
     if (sessionUser && sessionUser.rango === "Suscriptor") {
         document.getElementById('ser-modal-precio-normal').style.textDecoration = "line-through";
@@ -5639,20 +5646,19 @@ function abrirDetalleServicio(sku, pilar) {
         boxVarios.classList.remove('hidden');
         btnAccion.innerText = "ELEGIR OPCIÓN Y CONTINUAR";
         
-        // Separamos y rellenamos el select dinámico desde la columna K
         const comboRegalo = document.getElementById('ser-select-regalo');
         comboRegalo.innerHTML = "";
-        var opcionesArray = servicio.variantes ? servicio.variantes.split(",") : [];
-        opcionesArray.forEach(opt => {
+        
+        // 🛡️ El listado se alimenta directo de la caché descargada desde tu hoja PRODUCTOS
+        cacheRegalosDisponibles.forEach(r => {
             var elOpt = document.createElement('option');
-            elOpt.value = opt.trim();
-            elOpt.innerText = opt.trim();
+            elOpt.value = r.sku; // El valor real síncrono es el SKU del Producto
+            elOpt.innerText = r.nombre;
             comboRegalo.appendChild(elOpt);
         });
         
-        // 🛡️ FOCUS: Ejecutamos el render de la primera ficha técnica por defecto
         actualizarFichaTecnicaVariante();
-    } 
+    }
     else if (servicio.accion === "RESERVA") {
         boxReserva.classList.remove('hidden');
         btnAccion.innerText = "SELECCIONA DÍA Y HORA EN EL CALENDARIO";
@@ -5670,70 +5676,88 @@ function abrirDetalleServicio(sku, pilar) {
     modal.style.display = 'block';
 }
 
-function ejecutarAccionComercialServicio() {
-    const s = servicioSeleccionadoActivo;
+async function ejecutarAccionComercialServicio() {
+    const s = servicioSelectedActivo || servicioSeleccionadoActivo;
     if (!s) return;
 
-    // 🛡️ Evaluamos el precio real según el rango legítimo en la Matrix para evitar fugas
     var precioFinalACobrar = (sessionUser && sessionUser.rango === "Suscriptor") ? (s.valorSuscriptor || 0) : (s.valorNormal || 0);
-
     const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Cliente Invitado";
     const emailUser = sessionUser ? sessionUser.email : "ANÓNIMO";
     const paisUser = sessionUser ? (sessionUser.pais || "País") : "Matrix";
-    const rangoUser = sessionUser ? sessionUser.rango : "Invitado";
-
-    // Generamos un token transaccional único para amarrar compras anónimas si se registran después
+    
     var tokenCompra = "TK-" + new Date().getTime() + "-" + Math.floor(Math.random() * 1000);
+    var detalleString = "Compra Directa WhatsApp";
 
-    // Congelamos los metadatos de e-commerce en el disco local para resistir el retorno de MercadoPago
-    localStorage.setItem('kairo_ecommerce_sku', s.sku);
-    localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
-    localStorage.setItem('kairo_ecommerce_accion', s.accion);
-    localStorage.setItem('kairo_ecommerce_monto', precioFinalACobrar);
-    localStorage.setItem('kairo_ecommerce_token_anonimo', tokenCompra);
-    localStorage.setItem('kairo_ecommerce_tipo', "SERVICIOS");
-    localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS");
-    if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
+    // 🛡️ REGLA 1: Captura relacional de Variantes desde tu hoja de PRODUCTOS
+    if (s.accion === "VARIOS") {
+        const skuRegalo = document.getElementById('ser-select-regalo').value;
+        const regaloObj = cacheRegalosDisponibles.find(x => x.sku === skuRegalo);
+        const nombreRegalo = regaloObj ? regaloObj.nombre : "Regalo Suplemento";
+        const comboSabores = document.getElementById('ser-select-sabor');
+        
+        if (comboSabores && comboSabores.options.length > 0 && !document.getElementById('ser-contenedor-sabores').classList.contains('hidden')) {
+            const saborElegido = comboSabores.value;
+            detalleString = `Regalo: ${nombreRegalo} (Sabor: ${saborElegido}) | SKU Regalo: ${skuRegalo}`;
+        } else {
+            detalleString = `Regalo: ${nombreRegalo} | SKU Regalo: ${skuRegalo}`;
+        }
+    }
 
-    // --- INTERCEPCIÓN CONDICIONAL DE COSTOS (GRATIS VS PAGO) ---
-    if (precioFinalACobrar > 0) {
-        if (s.linkPago && s.linkPago !== "" && s.linkPago !== "#") {
-            
-            // 🛡️ REPARO MULTI-VARIACIÓN: Captura del regalo y su sabor condicional
-            if (s.accion === "VARIOS") {
-                const regalo = document.getElementById('ser-select-regalo').value;
-                if (regalo === "Batido Nutricional") {
-                    const sabor = document.getElementById('ser-select-sabor').value;
-                    localStorage.setItem('kairo_ecommerce_detalle', `Regalo: Batido Nutricional (Sabor: ${sabor})`);
-                } else {
-                    localStorage.setItem('kairo_ecommerce_detalle', `Regalo: ${regalo}`);
-                }
-            } else if (s.accion === "RESERVA") {
-                localStorage.setItem('kairo_ecommerce_detalle', `Módulo Reserva de Hora`);
-            } else {
-                localStorage.setItem('kairo_ecommerce_detalle', `Compra Directa WhatsApp`);
+    // 🛡️ REGLA 2: Bloqueo de agenda interactiva en tu cuadrícula mensual
+    if (s.accion === "RESERVA") {
+        if (!slotSeleccionadoCacheId) {
+            return notify("Por favor, selecciona un día y una hora en el calendario antes de continuar.");
+        }
+        
+        // Si el servicio es gratis, consolida directo en Sheets; si es de pago, pasa por el retenedor temporal
+        if (precioFinalACobrar > 0) {
+            document.getElementById('ser-btn-accion').innerText = "⚡ RETENIENDO HORARIO...";
+            const resBloqueo = await apiCall("intentarBloqueoTemporalHorario", {
+                idHorario: slotSeleccionadoCacheId,
+                email: emailUser,
+                sku: s.sku
+            });
+
+            if (!resBloqueo || !resBloqueo.success) {
+                notify(resBloqueo ? resBloqueo.msg : "Ese horario acaba de ser tomado. Por favor, selecciona otro bloque.");
+                inicializarCalendarioEcomm3D(s.sku);
+                return;
             }
+            detalleString = `Hora Reservada: ${resBloqueo.fecha} a las ${resBloqueo.hora}`;
+        } else {
+            await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre });
+            detalleString = `Reserva de Cortesía Agendada con Éxito`;
+        }
+    }
 
+    // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago
+    if (precioFinalACobrar > 0) {
+        localStorage.setItem('kairo_ecommerce_sku', s.sku);
+        localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
+        localStorage.setItem('kairo_ecommerce_accion', s.accion);
+        localStorage.setItem('kairo_ecommerce_monto', precioFinalACobrar);
+        localStorage.setItem('kairo_ecommerce_token_anonimo', tokenCompra);
+        localStorage.setItem('kairo_ecommerce_detalle', detalleString);
+        localStorage.setItem('kairo_ecommerce_tipo', "SERVICIOS");
+        localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS");
+        if (s.accion === "RESERVA") localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoCacheId);
+        if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
+
+        if (s.linkPago && s.linkPago !== "" && s.linkPago !== "#") {
             cerrarDetalleServicio();
-            window.location.href = s.linkPago; // Forzamos el salto a MercadoPago
+            window.location.href = s.linkPago;
             return;
         } else {
             return notify("Kairo Alerta: Este servicio requiere un enlace de MercadoPago activo en la columna J.");
         }
     }
 
-    // --- CANAL EXCLUSIVO PARA SERVICIOS GRATUITOS ($0 - Ganchos de Cortesía) ---
-    let txtMensaje = "";
-    if (s.accion === "RESERVA") {
-        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de completar mis parámetros en la comunidad y solicito coordinar una hora de atención en la agenda para la sesión gratuita: "${s.nombre}". Mi estatus actual es Miembro ${rangoUser}.`);
-    } else {
-        txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Solicito coordinar el inicio de la actividad de cortesía: "${s.nombre}".`);
-    }
-    
+    // --- SALIDA AUTOMATIZADA EXCLUSIVA PARA SERVICIOS GRATUITOS ---
+    let txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de procesar el acceso de cortesía para: "${s.nombre}" (${detalleString}).`);
     window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
     cerrarDetalleServicio();
 }
-
+        
 function cerrarDetalleServicio() {
     document.getElementById('main-content').classList.remove('blur-effect');
     const modal = document.getElementById('modal-detalle-servicio');
@@ -5839,7 +5863,38 @@ function desplegarHorasDelDiaElegido(fechaFiltro) {
         contenedorBotones.appendChild(btnHora);
     });
 }
+
+function actualizarFichaTecnicaVariante() {
+    const skuElegido = document.getElementById('ser-select-regalo').value;
+    const imgComponente = document.getElementById('ser-variante-img');
+    const descComponente = document.getElementById('ser-variante-desc');
+    const saboresBox = document.getElementById('ser-contenedor-sabores');
+    const comboSabores = document.getElementById('ser-select-sabor');
+
+    // Buscamos síncronamente el producto en la caché usando el SKU real de la fila del Excel
+    const regalo = cacheRegalosDisponibles.find(x => x.sku === skuElegido);
+    if (!regalo) return;
+
+    imgComponente.src = regalo.urlImagen;
+    descComponente.innerText = regalo.descripcion;
+
+    // 🛡️ INTERRUPTOR DE SABORES RELACIONAL: Si la columna L del Sheets contiene texto, abre el sub-desplegable
+    if (regalo.sabores && regalo.sabores.trim() !== "") {
+        saboresBox.classList.remove('hidden');
+        comboSabores.innerHTML = "";
         
+        var saboresArray = regalo.sabores.split(",");
+        saboresArray.forEach(sab => {
+            var elOpt = document.createElement('option');
+            elOpt.value = sab.trim();
+            elOpt.innerText = sab.trim();
+            comboSabores.appendChild(elOpt);
+        });
+    } else {
+        saboresBox.classList.add('hidden');
+        comboSabores.innerHTML = "";
+    }
+}
     </script>
 </body>
 
