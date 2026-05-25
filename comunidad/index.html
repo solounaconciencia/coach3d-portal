@@ -1488,6 +1488,56 @@
 @media (max-width: 768px) {
   .plans-grid { grid-template-columns: 1fr !important; }
 }
+
+/* Pestañas Neón del Filtro Superior */
+.pilar-filter-bar {
+    display: flex; justify-content: center; gap: 15px; margin-bottom: 35px;
+}
+.filter-tab {
+    padding: 10px 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px; color: #cbd5e1; font-family: 'Orbitron', sans-serif; font-size: 0.8em;
+    cursor: pointer; transition: all 0.3s ease; letter-spacing: 1px;
+}
+.filter-tab.active {
+    background: rgba(34, 211, 238, 0.1); border-color: var(--neon-n); color: var(--neon-n);
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+}
+
+/* Tarjetas Reversibles Premium */
+.premium-service-card {
+    display: flex; align-items: center; gap: 40px; background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 25px;
+    margin-bottom: 25px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.premium-service-card:hover {
+    border-color: rgba(255,255,255,0.15); transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+
+/* Efecto Espejo Cruzado Automático */
+.premium-service-card:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.premium-card-media {
+    width: 40%; overflow: hidden; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);
+}
+.premium-card-media img {
+    width: 100%; height: 220px; object-fit: cover; transition: transform 0.5s ease;
+}
+/* Micro-Zoom Cinematográfico Dopamínico */
+.premium-service-card:hover .premium-card-media img {
+    transform: scale(1.06);
+}
+
+.premium-card-info {
+    width: 60%; display: flex; flex-direction: column; gap: 12px; text-align: left;
+}
+
+@media (max-width: 768px) {
+    .premium-service-card, .premium-service-card:nth-child(even) { flex-direction: column; gap: 20px; }
+    .premium-card-media, .premium-card-info { width: 100%; }
+}
   </style>
 
     
@@ -5564,45 +5614,72 @@ async function iniciarservicios() {
     }
 }
 
+let pilarActivoFiltro = "FINANZAS";
+
 function renderizarTarjetasServicios(data) {
-    const contenedores = { FINANZAS: 'lista-servicios-f', NUTRICION: 'lista-servicios-n', MENTALIDAD: 'lista-servicios-m' };
+    const contenedorUnico = document.getElementById('modulo-servicios-comunidad');
     
-    Object.keys(contenedores).forEach(pilar => {
-        const divPadre = document.getElementById(contenedores[pilar]);
-        divPadre.innerHTML = "";
-        
-        if (data[pilar] && data[pilar].length > 0) {
-            data[pilar].forEach(s => {
-                const fila = document.createElement('div');
-                fila.className = "boton-herramienta";
-                fila.style.justifyContent = "space-between";
-                fila.onclick = () => abrirDetalleServicio(s.sku, pilar);
-                
-                // 🛡️ FOCUS: Antídoto de nulos para evitar congelamiento de pantalla
-                var precioNormalSeguro = s.valorNormal || 0;
-                var precioVipSeguro = s.valorSuscriptor || 0;
+    // Si no existen las pestañas de filtro en el DOM, las inyectamos en la parte superior
+    if (!document.getElementById('bar-filtros-pilares')) {
+        const filterBar = document.createElement('div');
+        filterBar.id = "bar-filtros-pilares";
+        filterBar.className = "pilar-filter-bar";
+        filterBar.innerHTML = `
+            <div class="filter-tab ${pilarActivoFiltro === 'FINANZAS' ? 'active' : ''}" onclick="cambiarPilarFiltro('FINANZAS')">FINANZAS</div>
+            <div class="filter-tab ${pilarActivoFiltro === 'NUTRICION' ? 'active' : ''}" onclick="cambiarPilarFiltro('NUTRICION')">NUTRICIÓN</div>
+            <div class="filter-tab ${pilarActivoFiltro === 'MENTALIDAD' ? 'active' : ''}" onclick="cambiarPilarFiltro('MENTALIDAD')">MENTALIDAD</div>
+        `;
+        contenedorUnico.insertBefore(filterBar, contenedorUnico.children[1]);
+    }
 
-                let stringPrecio = precioNormalSeguro === 0 ? "<span style='color:var(--neon-f); font-weight:bold; font-size:0.8em;'>[ GRATIS ]</span>" : `<span style="font-size:0.8em; opacity:0.7;">$${precioNormalSeguro.toLocaleString()}</span>`;
-                
-                if (sessionUser && sessionUser.rango === "Suscriptor" && precioNormalSeguro > 0) {
-                    stringPrecio = `<span style="font-size:0.8em; text-shadow: 0 0 5px var(--neon-f); color:var(--neon-f); font-weight:bold;">$${precioVipSeguro.toLocaleString()}</span>`;
-                }
-
-                fila.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${s.urlImagen}" style="width:22px; height:22px; flex-shrink:0;">
-                        <span style="font-size:0.8em; text-align:left; color:#fff; font-weight:500; line-height:1.2;">${s.nombre}</span>
-                    </div>
-                    ${stringPrecio}
-                `;
-                divPadre.appendChild(fila);
-            });
-        } else {
-            divPadre.innerHTML = "<p style='font-size:0.75em; color:rgba(255,255,255,0.2); text-align:center;'>Próximamente...</p>";
-        }
+    // Identificamos las sub-listas viejas y las limpiamos para dar espacio al nuevo Grid Premium
+    const pilares = ['lista-servicios-f', 'lista-servicios-n', 'lista-servicios-m'];
+    pilares.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = ""; // Limpieza quirúrgica de la vista fría de listado
     });
+
+    // Inyectamos las tarjetas exclusivas del pilar activo dentro de su bloque correspondiente
+    const targetDiv = document.getElementById(`lista-servicios-${pilarActivoFiltro === 'FINANZAS' ? 'f' : pilarActivoFiltro === 'NUTRICION' ? 'n' : 'm'}`);
+    
+    if (data[pilarActivoFiltro] && data[pilarActivoFiltro].length > 0) {
+        data[pilarActivoFiltro].forEach(s => {
+            const card = document.createElement('div');
+            card.className = "premium-service-card";
+            
+            // Neuro-copywriting: Truncado de descripción de alto impacto preservando curiosidad
+            var textoTruncado = s.descripcion.length > 140 ? s.descripcion.substring(0, 140) + "..." : s.descripcion;
+            var pNormal = Number(s.valorNormal || 0);
+            var stringPrecio = pNormal === 0 ? "[ GRATIS ]" : `$${pNormal.toLocaleString()}`;
+
+            card.innerHTML = `
+                <div class="premium-card-media">
+                    <img src="${s.urlImagen}" onerror="this.src='https://i.postimg.cc/wjNJr54L/imagen3.png'">
+                </div>
+                <div class="premium-card-info">
+                    <small style="color:var(--neon-n); font-family:'Orbitron'; font-size:0.7em; letter-spacing:2px;">${pilarActivoFiltro}</small>
+                    <h3 style="margin:0; color:#fff; font-size:1.25em; font-family:'Orbitron';">${s.nombre}</h3>
+                    <p style="margin:0; font-size:0.82rem; color:#cbd5e1; line-height:1.5;">${textoTruncado}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <span style="font-size:1.15rem; font-weight:800; color:var(--neon-f); font-family:'Orbitron';">${stringPrecio}</span>
+                        <button class="btn btn-n" style="padding:8px 16px; font-size:0.72em;" onclick="abrirDetalleServicio('${s.sku}', '${pilarActivoFiltro}')">Más Información</button>
+                    </div>
+                </div>
+            `;
+            targetDiv.appendChild(card);
+        });
+    } else {
+        targetDiv.innerHTML = "<p style='font-size:0.8em; opacity:0.3; padding:40px 0;'>Próximamente más mentorías avanzadas...</p>";
+    }
 }
 
+function cambiarPilarFiltro(nuevoPilar) {
+    pilarActivoFiltro = nuevoPilar;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    if (catalogoServiciosCache) renderizarTarjetasServicios(catalogoServiciosCache);
+}
+        
 function abrirDetalleServicio(sku, pilar) {
     const servicio = catalogoServiciosCache[pilar].find(x => x.sku === sku);
     if (!servicio) return;
@@ -5725,10 +5802,15 @@ async function ejecutarAccionComercialServicio() {
             }
             detalleString = `Hora Reservada: ${resBloqueo.fecha} a las ${resBloqueo.hora}`;
         } else {
-            await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre });
-            detalleString = `Reserva de Cortesía Agendada con Éxito`;
+                await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre });
+                detalleString = `Reserva de Cortesía Agendada con Éxito`;
+            }
         }
-    }
+
+        // 🛡️ PERSISTENCIA INTEGRAL: Si el servicio con variantes es GRATIS, lo registramos en la hoja antes de abrir el chat
+        if (s.accion === "VARIOS" && precioFinalACobrar === 0) {
+            await apiCall("registrarVarianteGratuitaBD", { token: tokenCompra, email: emailUser, sku: s.sku, detalle: detalleString });
+        }
 
     // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago
     if (precioFinalACobrar > 0) {
@@ -5894,6 +5976,36 @@ function actualizarFichaTecnicaVariante() {
         saboresBox.classList.add('hidden');
         comboSabores.innerHTML = "";
     }
+}
+
+function desplegarFormularioCoach3D() {
+    const box = document.getElementById('ser-modal-capacitacion');
+    box.classList.toggle('hidden');
+    if(!box.classList.contains('hidden')) box.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function enviarFormularioCoach3D() {
+    const btn = document.querySelector('#formFormacionCoach .btn');
+    btn.innerText = "⚡ TRANSMITIENDO DATOS..."; btn.disabled = true;
+
+    const payload = {
+        nombre: document.getElementById('fc-nombre').value.trim(),
+        correo: document.getElementById('fc-correo').value.trim(),
+        edad: document.getElementById('fc-edad').value,
+        motivo: document.getElementById('fc-motivo').value.trim()
+    };
+
+    // Envío asíncronizado directo a tu receptor central de Apps Script
+    const res = await apiCall("procesarAdmisionCapacitacionCoach", payload);
+    
+    btn.innerText = "ENVIAR SOLICITUD DE CAPACITACIÓN"; btn.disabled = false;
+    document.getElementById('formFormacionCoach').reset();
+    document.getElementById('ser-modal-capacitacion').classList.add('hidden');
+
+    kairoMessage({
+        mensaje: `<b style="color:var(--neon-f);">🎉 ¡SOLICITUD RADIAL ENVIADA!</b><br><br>Gracias por tu interés en el próximo ciclo de capacitaciones, ${payload.nombre}. Tu postulación ha sido inyectada al correo central de auditoría académica con éxito. Un Coach se pondrá en contacto contigo.`,
+        icon: "🎓"
+    });
 }
     </script>
 </body>
