@@ -1776,9 +1776,10 @@
     <div class="logout-btn btn-m" onclick="logout()" style="position: absolute; top: 10px; right: 10px; font-size: 0.7em; padding: 5px 10px;">Cerrar Sesión</div>
 
     <div id="admin-panel" class="admin-bar">
-
-        <strong>MODO ADMINISTRADOR</strong> | <button onclick="abrirAdminHerramientas()">Gestionar Botones</button>
-
+        <strong>MODO ADMINISTRADOR</strong> | 
+        <button onclick="abrirAdminHerramientas()">Gestionar Botones</button> |
+        <button onclick="abrirAdminProductoNuevo()" style="color: var(--neon-f); border-color: var(--neon-f);">+ Subir Producto</button> |
+        <button onclick="abrirAdminListaProductos()" style="color: var(--neon-n); border-color: var(--neon-n);">✎ Modificar Producto</button>
     </div>
 
 
@@ -2622,20 +2623,51 @@
                     <option value="Naranja Crema Tropical">Naranja Crema Tropical</option>
 
                 </select>
-
             </div>
-
-
-
             <p style="font-size: 0.63em; color: #94a3b8; margin: 12px 0 0 0; line-height: 1.3;">
-
                 <b>🔒 Cláusula de Consumo:</b> Regalo exclusivo para consumo personal. No vincula a redes de distribución corporativas (Herbalife). Consulta a tu Coach para activar tu 25% de descuento por 12 meses como Cliente Preferente.
-
             </p>
-
         </div>
-
     </div>
+
+    <div id="modal-admin-lista-productos" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 3000000 !important; width: 95% !important; max-width: 500px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+    <h3 style="color: var(--neon-n); text-align: center; font-family: 'Orbitron', sans-serif; margin-top: 0;">INVENTARIO DE PRODUCTOS</h3>
+    <div id="admin-lista-prod-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
+    <button class="btn" style="width: 100%; border: 1px solid #444; color: #ccc;" onclick="cerrarAdminListaProductos()">CERRAR INVENTARIO</button>
+</div>
+
+<div id="modal-admin-producto" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 3000005 !important; width: 95% !important; max-width: 600px !important; max-height: 90vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-f) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left;">
+    <h3 id="admin-prod-titulo" style="color: var(--neon-f); text-align: center; font-family: 'Orbitron', sans-serif; margin-top: 0;">NUEVO PRODUCTO</h3>
+    <input type="hidden" id="admin-prod-sku">
+
+    <input type="text" id="admin-prod-nombre" placeholder="Nombre del Producto" style="font-size: 1.1em; font-weight: bold;">
+    <textarea id="admin-prod-desc" placeholder="Descripción (Máximo 1000 caracteres)" maxlength="1000" rows="4" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; padding: 12px; margin: 10px 0; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+        <div><label style="font-size: 0.75em; color: var(--neon-admin);">Precio Público ($)</label><input type="number" id="admin-prod-precio-n" placeholder="0"></div>
+        <div><label style="font-size: 0.75em; color: var(--neon-f);">Precio Socio ($)</label><input type="number" id="admin-prod-precio-v" placeholder="0"></div>
+        <div><label style="font-size: 0.75em; color: var(--neon-n);">Stock Total</label><input type="number" id="admin-prod-stock" placeholder="0"></div>
+    </div>
+
+    <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px;">
+        <label style="font-size: 0.8em; color: var(--neon-m); font-weight: bold;">Variantes (Separa cada una con una coma ",")</label>
+        <input type="text" id="admin-prod-sabores" placeholder="Sabores (Ej: Fresa, Chocolate, Vainilla)">
+        <input type="text" id="admin-prod-colores" placeholder="Colores (Ej: Rojo, Azul, Negro)">
+        <input type="text" id="admin-prod-tamanos" placeholder="Tamaños (Ej: S, M, L, XL)">
+    </div>
+
+    <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.02); border: 1px dashed var(--neon-n); border-radius: 10px;">
+        <label style="font-size: 0.8em; color: var(--neon-n); font-weight: bold;">Galería de Imágenes</label>
+        <p style="font-size: 0.7em; color: #aaa; margin: 5px 0 10px 0; line-height: 1.3;">Sube las imágenes en el orden que se requiera para coordinarlas con sabor/color/tamaño. Puedes moverlas o eliminarlas tras subirlas.</p>
+        <input type="file" id="admin-prod-fotos" multiple accept="image/*" onchange="procesarFotosProductoAdmin(this)" style="padding: 0; background: transparent; border: none;">
+        <div id="admin-prod-galeria" style="display: flex; gap: 10px; overflow-x: auto; padding: 15px 0; min-height: 80px;"></div>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn" style="flex:1; border: 1px solid #444; color: #ccc;" onclick="cerrarAdminProducto()">CANCELAR</button>
+        <button class="btn btn-f" style="flex:1;" onclick="guardarAdminProducto()">GUARDAR PRODUCTO</button>
+    </div>
+</div>
 
     <script>
 
@@ -6319,6 +6351,188 @@ async function procesarRegistroAcademiaCoach() {
         mensaje: `<b style="color:var(--neon-f); font-size:1.15rem;">🎓 ¡MÁSTER REGISTRO COMPLETADO!</b><br><br>Gracias por tu interés en el próximo ciclo de capacitaciones, ${variablesForm.nombre}. Tu expediente ha sido inyectado al correo institucional de admisiones con éxito. Evaluaremos tu motivo y nos comunicaremos contigo.`,
         icon: "🏆"
     });
+}
+
+// =========================================================================
+// 📦 MOTOR ADMIN: GESTIÓN DE PRODUCTOS Y VARIANTES
+// =========================================================================
+let tempFotosProductoAdmin = [];
+
+function abrirAdminProductoNuevo() {
+    document.getElementById('admin-prod-titulo').innerText = "NUEVO PRODUCTO";
+    document.getElementById('admin-prod-sku').value = "";
+    document.getElementById('admin-prod-nombre').value = "";
+    document.getElementById('admin-prod-desc').value = "";
+    document.getElementById('admin-prod-precio-n').value = "";
+    document.getElementById('admin-prod-precio-v').value = "";
+    document.getElementById('admin-prod-stock').value = "";
+    document.getElementById('admin-prod-sabores').value = "";
+    document.getElementById('admin-prod-colores').value = "";
+    document.getElementById('admin-prod-tamanos').value = "";
+    tempFotosProductoAdmin = [];
+    renderizarGaleriaProductoAdmin();
+
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-admin-producto').classList.remove('hidden');
+    document.getElementById('modal-admin-producto').style.display = 'block';
+}
+
+function cerrarAdminProducto() {
+    document.getElementById('modal-admin-producto').classList.add('hidden');
+    document.getElementById('modal-admin-producto').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+function procesarFotosProductoAdmin(input) {
+    const files = Array.from(input.files);
+    files.forEach(file => {
+        if (file.size > 2000000) { notify("Una imagen supera los 2MB y fue omitida."); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            tempFotosProductoAdmin.push(e.target.result);
+            renderizarGaleriaProductoAdmin();
+        };
+        reader.readAsDataURL(file);
+    });
+    input.value = ""; 
+}
+
+function renderizarGaleriaProductoAdmin() {
+    const galeria = document.getElementById('admin-prod-galeria');
+    galeria.innerHTML = "";
+    if(tempFotosProductoAdmin.length === 0) {
+        galeria.innerHTML = "<p style='color:#666; font-size:0.8em; margin:auto;'>Sin imágenes agregadas.</p>";
+        return;
+    }
+    tempFotosProductoAdmin.forEach((foto, index) => {
+        const div = document.createElement('div');
+        div.style = "position: relative; min-width: 90px; height: 90px; border: 2px solid var(--neon-n); border-radius: 8px; background: #000; flex-shrink: 0;";
+        div.innerHTML = `
+            <img src="${foto}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+            <button onclick="eliminarFotoProductoAdmin(${index})" style="position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 10px; font-weight:bold; box-shadow:0 0 5px #000;">X</button>
+            <div style="position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; background: rgba(0,0,0,0.9); border:1px solid #444; border-radius: 12px; padding: 2px;">
+                <button onclick="moverFotoProductoAdmin(${index}, -1)" style="background: transparent; color: white; border: none; cursor: pointer; padding:2px 5px;">◄</button>
+                <button onclick="moverFotoProductoAdmin(${index}, 1)" style="background: transparent; color: white; border: none; cursor: pointer; padding:2px 5px;">►</button>
+            </div>
+            <div style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.7); color:white; font-size:10px; padding:2px 5px; border-radius:4px;">#${index+1}</div>
+        `;
+        galeria.appendChild(div);
+    });
+}
+
+function eliminarFotoProductoAdmin(index) {
+    tempFotosProductoAdmin.splice(index, 1);
+    renderizarGaleriaProductoAdmin();
+}
+
+function moverFotoProductoAdmin(index, dir) {
+    if (index + dir < 0 || index + dir >= tempFotosProductoAdmin.length) return;
+    const temp = tempFotosProductoAdmin[index];
+    tempFotosProductoAdmin[index] = tempFotosProductoAdmin[index + dir];
+    tempFotosProductoAdmin[index + dir] = temp;
+    renderizarGaleriaProductoAdmin();
+}
+
+async function abrirAdminListaProductos() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    const modal = document.getElementById('modal-admin-lista-productos');
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+    
+    const contenedor = document.getElementById('admin-lista-prod-container');
+    contenedor.innerHTML = "<div class='spinner'></div><p style='text-align:center; color:var(--neon-n);'>Descargando inventario de la Matrix...</p>";
+
+    const res = await apiCall("obtenerInventarioAdmin");
+    if (res && res.success) {
+        contenedor.innerHTML = "";
+        if (res.productos.length === 0) {
+            contenedor.innerHTML = "<p style='text-align:center; color:#ccc;'>No hay productos registrados.</p>";
+            return;
+        }
+        res.productos.forEach(p => {
+            const btn = document.createElement('div');
+            btn.style = "display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); padding: 12px; border: 1px solid var(--neon-n); border-radius: 10px; cursor: pointer; transition: 0.3s;";
+            btn.onmouseover = () => btn.style.background = "rgba(34, 211, 238, 0.1)";
+            btn.onmouseout = () => btn.style.background = "rgba(255,255,255,0.05)";
+            btn.onclick = () => cargarDatosModificarProducto(p);
+            
+            const portadas = p.imagenes ? p.imagenes.split(',') : [];
+            const imgPortada = portadas.length > 0 ? portadas[0] : "https://img.icons8.com/fluency/48/box.png";
+            
+            btn.innerHTML = `
+                <img src="${imgPortada}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                <div style="flex-grow:1; text-align:left;">
+                    <p style="margin:0; font-weight:bold; color:white;">${p.nombre}</p>
+                    <p style="margin:0; font-size:0.75em; color:var(--neon-admin);">SKU: ${p.sku} | Stock: ${p.stock}</p>
+                </div>
+                <div style="color:var(--neon-f); font-weight:bold;">$${p.precioNormal}</div>
+            `;
+            contenedor.appendChild(btn);
+        });
+    } else {
+        contenedor.innerHTML = "<p style='color:#ff4444; text-align:center;'>Error al descargar inventario.</p>";
+    }
+}
+
+function cerrarAdminListaProductos() {
+    document.getElementById('modal-admin-lista-productos').classList.add('hidden');
+    document.getElementById('modal-admin-lista-productos').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+function cargarDatosModificarProducto(prod) {
+    cerrarAdminListaProductos();
+    document.getElementById('admin-prod-titulo').innerText = "MODIFICAR PRODUCTO";
+    document.getElementById('admin-prod-sku').value = prod.sku;
+    document.getElementById('admin-prod-nombre').value = prod.nombre;
+    document.getElementById('admin-prod-desc').value = prod.descripcion;
+    document.getElementById('admin-prod-precio-n').value = prod.precioNormal;
+    document.getElementById('admin-prod-precio-v').value = prod.precioSuscriptor;
+    document.getElementById('admin-prod-stock').value = prod.stock;
+    document.getElementById('admin-prod-sabores').value = prod.sabores;
+    document.getElementById('admin-prod-colores').value = prod.colores;
+    document.getElementById('admin-prod-tamanos').value = prod.tamanos;
+
+    tempFotosProductoAdmin = prod.imagenes ? prod.imagenes.split(',') : [];
+    renderizarGaleriaProductoAdmin();
+
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-admin-producto').classList.remove('hidden');
+    document.getElementById('modal-admin-producto').style.display = 'block';
+}
+
+async function guardarAdminProducto() {
+    const payload = {
+        emailAdmin: sessionUser.email,
+        sku: document.getElementById('admin-prod-sku').value,
+        nombre: document.getElementById('admin-prod-nombre').value.trim(),
+        descripcion: document.getElementById('admin-prod-desc').value.trim(),
+        precioNormal: document.getElementById('admin-prod-precio-n').value,
+        precioSuscriptor: document.getElementById('admin-prod-precio-v').value,
+        stock: document.getElementById('admin-prod-stock').value,
+        sabores: document.getElementById('admin-prod-sabores').value.trim(),
+        colores: document.getElementById('admin-prod-colores').value.trim(),
+        tamanos: document.getElementById('admin-prod-tamanos').value.trim(),
+        imagenes: tempFotosProductoAdmin 
+    };
+
+    if (!payload.nombre) return notify("El nombre del producto es obligatorio.");
+
+    const btnG = document.querySelector('#modal-admin-producto .btn-f');
+    btnG.innerText = "Sincronizando con la Matrix...";
+    btnG.disabled = true;
+
+    const res = await apiCall("guardarProductoDesdeAdmin", payload);
+    
+    btnG.innerText = "GUARDAR PRODUCTO";
+    btnG.disabled = false;
+
+    if (res && res.success) {
+        notify("✅ Producto almacenado exitosamente en el inventario.");
+        cerrarAdminProducto();
+    } else {
+        notify("❌ Error al guardar: " + (res ? res.msg : "Sin conexión"));
+    }
 }
     </script>
 </body>
