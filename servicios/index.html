@@ -11,9 +11,9 @@
         :root {
             --primary-bg: #0a0f1e;
             --glass: rgba(15, 25, 45, 0.85);
-            --neon-f: #10b981; /* Finanzas - Verde */
-            --neon-n: #22d3ee; /* Nutrición - Cian */
-            --neon-m: #a855f7; /* Mentalidad - Púrpura */
+            --neon-f: #10b981; 
+            --neon-n: #22d3ee; 
+            --neon-m: #a855f7; 
             --white: #e2e8f0;
         }
 
@@ -44,7 +44,6 @@
             width: 100%;
         }
 
-        /* BANNER GATILLO NEUROVENTA: Alerta de Beneficio */
         .neuro-incentivo-bar {
             background: linear-gradient(90deg, rgba(34,211,238,0.15), rgba(168,85,247,0.15));
             border: 1px solid var(--neon-n);
@@ -56,104 +55,69 @@
             line-height: 1.4;
             box-shadow: 0 0 15px rgba(34,211,238,0.1);
         }
+        .neuro-incentivo-bar a { color: var(--neon-n); font-weight: bold; text-decoration: underline; cursor: pointer; }
 
-        .neuro-incentivo-bar a {
-            color: var(--neon-n);
-            font-weight: bold;
-            text-decoration: underline;
-            cursor: pointer;
+        /* 💎 PESTAÑAS NEÓN */
+        .pilar-filter-bar {
+            display: flex; justify-content: center; gap: 15px; margin: 25px 0 35px; flex-wrap: wrap;
+        }
+        .filter-tab-neon {
+            padding: 12px 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px; color: #cbd5e1; font-family: 'Orbitron', sans-serif; font-size: 0.8em;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 1px;
+        }
+        .filter-tab-neon.active {
+            background: rgba(34, 211, 238, 0.12); border-color: var(--neon-n); color: var(--neon-n);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
         }
 
-        .grid-pilares {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
+        /* 💎 ZEBRA LAYOUT */
+        .premium-catalog-grid { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; }
+        .premium-service-card {
+            display: flex; align-items: center; gap: 40px; background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px;
+            transition: all 0.4s ease; box-sizing: border-box; width: 100%;
         }
-
-        .col-pilar {
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-sizing: border-box;
-            background: rgba(0,0,0,0.3);
+        .premium-service-card:hover {
+            border-color: rgba(255,255,255,0.15); transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
-
-        .col-pilar h3 {
-            margin: 0 0 10px 0;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9em;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid;
-        }
-
-        /* BOTONES DE CADA SERVICIO */
-        .card-servicio-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.03);
-            padding: 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .card-servicio-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
-        }
-
+        .premium-service-card:nth-child(even) { flex-direction: row-reverse; }
+        .premium-card-media { width: 40%; overflow: hidden; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); height: 220px; }
+        .premium-card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .premium-service-card:hover .premium-card-media img { transform: scale(1.08); }
+        .premium-card-info { width: 60%; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        
         .btn {
-            padding: 12px 25px; border: none; border-radius: 8px;
-            cursor: pointer; font-weight: bold; transition: 0.3s;
-            text-transform: uppercase; letter-spacing: 1px;
-            display: inline-block; text-align: center;
-            font-family: 'Orbitron', sans-serif;
+            padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px; display: inline-block; text-align: center; font-family: 'Orbitron', sans-serif;
         }
+        .btn-n { background: var(--neon-n); color: #000; }
+        .btn-f { background: var(--neon-f); color: #000; }
 
-        /* MODAL DE DETALLE COMERCIAL */
+        /* MODAL COMERCIAL */
         .modal-servicio {
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            z-index: 1000000 !important;
-            width: 90% !important;
-            max-width: 480px !important;
-            padding: 25px !important;
-            background: rgba(10, 15, 30, 0.99) !important;
-            border: 2px solid var(--neon-n);
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.95);
-            box-sizing: border-box;
-            display: none;
+            position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important;
+            z-index: 1000000 !important; width: 90% !important; max-width: 500px !important; padding: 25px !important;
+            background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n); border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.95); box-sizing: border-box; display: none; max-height: 90vh; overflow-y: auto;
         }
-
-        .blur-effect {
-            filter: blur(8px) grayscale(30%);
-            pointer-events: none;
-            user-select: none;
-        }
-
+        .blur-effect { filter: blur(8px) grayscale(30%); pointer-events: none; user-select: none; }
         .hidden { display: none !important; }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            border-left-color: var(--neon-n);
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
-        }
+        
+        /* CALENDARIO */
+        .grid-calendario { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .slot-dia { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .slot-dia:hover, .slot-dia.active { border-color: var(--neon-n); background: rgba(34, 211, 238, 0.1); }
+        .slot-hora { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 8px; font-size: 0.85em; cursor: pointer; margin-top: 5px; }
+        .slot-hora:hover, .slot-hora.active { border-color: var(--neon-n); color: var(--neon-n); }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--neon-n); animation: spin 1s linear infinite; margin: 30px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .premium-service-card, .premium-service-card:nth-child(even) { flex-direction: column; gap: 20px; padding: 20px; }
+            .premium-card-media, .premium-card-info { width: 100%; }
+            .premium-card-media img { height: 180px; }
+        }
     </style>
 </head>
 <body>
@@ -164,26 +128,21 @@
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png" style="width: 60px; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--neon-n));">
                 <h1 style="font-family: 'Orbitron', sans-serif; font-size: 1.6em; letter-spacing: 3px; margin: 0; text-shadow: 0 0 15px var(--neon-n); color: #fff;">COACH 3D LATAM</h1>
-                <p style="font-size: 0.85em; color: #cbd5e1; font-style: italic; margin-top: 5px;">Plataforma de Transformación Tridimensional Integrada</p>
+                <p style="font-size: 0.85em; color: #cbd5e1; font-style: italic; margin-top: 5px;">Catálogo Externo de Mentorías y Servicios</p>
             </div>
 
             <div class="neuro-incentivo-bar">
-                ⚡ <b>¿Eres integrante registrado de la comunidad?</b> Los miembros activos con rango suscriptor ahorran hasta un 40% en todas las mentorías y sesiones avanzadas. <a href="https://coach3dlatam.app/comunidad/">Ingresar a la Matrix Aquí</a>
+                ⚡ <b>¿Eres integrante registrado de la comunidad?</b> Los miembros activos con rango suscriptor ahorran hasta un 40% en todas las mentorías y sesiones avanzadas. <a href="https://coach3dlatam.app/">Ingresar a la Matrix Aquí</a>
             </div>
 
-            <div class="grid-pilares">
-                <div class="col-pilar" style="border: 1px solid var(--neon-f);">
-                    <h3 style="color: var(--neon-f); border-color: var(--neon-f); text-shadow: 0 0 8px var(--neon-f);">Propulsión Financiera</h3>
-                    <div id="lista-f"></div>
-                </div>
-                <div class="col-pilar" style="border: 1px solid var(--neon-n);">
-                    <h3 style="color: var(--neon-n); border-color: var(--neon-n); text-shadow: 0 0 8px var(--neon-n);">Metabolismo Celular</h3>
-                    <div id="lista-n"></div>
-                </div>
-                <div class="col-pilar" style="border: 1px solid var(--neon-m);">
-                    <h3 style="color: var(--neon-m); border-color: var(--neon-m); text-shadow: 0 0 8px var(--neon-m);">Alquimia Mental</h3>
-                    <div id="lista-m"></div>
-                </div>
+            <div class="pilar-filter-bar" id="premium-tabs-selector">
+                <div class="filter-tab-neon active" onclick="conmutarFiltroPilarEx('FINANZAS')">FINANZAS</div>
+                <div class="filter-tab-neon" onclick="conmutarFiltroPilarEx('NUTRICION')">NUTRICIÓN</div>
+                <div class="filter-tab-neon" onclick="conmutarFiltroPilarEx('MENTALIDAD')">MENTALIDAD</div>
+            </div>
+
+            <div class="premium-catalog-grid" id="premium-grid-servicios">
+                <div class="spinner"></div>
             </div>
 
         </div>
@@ -191,7 +150,7 @@
 
     <div id="modal-publico-servicio" class="modal-servicio">
         <div style="text-align: center; margin-bottom: 15px;">
-            <img id="modal-img" src="" style="width: 50px; height: 50px; margin-bottom: 8px;">
+            <img id="modal-img" src="" style="width: 50px; height: 50px; margin-bottom: 8px; border-radius:8px; object-fit:cover;">
             <h3 id="modal-titulo" style="color: #fff; font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.15em;"></h3>
             <small id="modal-sku" style="color: #94a3b8; font-size: 0.7em; letter-spacing: 2px; display: block; margin-top: 3px;"></small>
         </div>
@@ -204,97 +163,122 @@
                 <span id="modal-precio-normal" style="font-size: 1.2em; font-weight: bold; color: #fff;"></span>
             </div>
             <div style="border-left: 1px solid rgba(255,255,255,0.1); height: 30px;"></div>
-            <div style="position: relative;">
+            <div>
                 <span style="font-size: 0.65em; display:block; color: var(--neon-f); letter-spacing: 1px;">PRECIO SOCIO 🔒</span>
                 <span id="modal-precio-vip" style="font-size: 1.1em; font-weight: bold; color: var(--neon-f); opacity: 0.4; text-decoration: line-through;"></span>
             </div>
         </div>
 
-        <div id="modal-zona-varios" class="hidden" style="margin-bottom: 15px; text-align: left; background: rgba(168,85,247,0.03); border: 1px dashed var(--neon-m); padding: 10px; border-radius: 8px;">
-            <label style="font-size: 0.72em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 5px;">🎁 ELIGE TU COMPLEMENTO NUTRICIONAL DE REGALO:</label>
-            <select id="modal-select-regalo" style="background: #000; color: #fff; width: 100%; padding: 8px; border: 1px solid var(--neon-m); border-radius: 5px; font-size: 0.85em;">
-                <option value="Té Energizante">🍵 Té Energizante de Cortesía</option>
-                <option value="Multivitamínico">💊 Multivitamínico de Cortesía</option>
-                <option value="Muffin de Chocolate">🧁 Muffin de Chocolate Saludable</option>
-                <option value="Batido Nutricional">🥤 Batido Nutricional Premium</option>
-            </select>
+        <div id="modal-zona-varios" class="hidden">
+            <div id="paso-A-varios" style="text-align:center; margin-bottom:15px;">
+                <button class="btn btn-n" style="width:100%;" onclick="avanzarEmbudoEx()">QUIERO COMENZAR</button>
+            </div>
+            <div id="paso-B-varios" class="hidden" style="margin-bottom: 15px; text-align: left; background: rgba(168,85,247,0.03); border: 1px dashed var(--neon-m); padding: 10px; border-radius: 8px;">
+                <label style="font-size: 0.72em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 5px;">🎁 SELECCIONA TU COMPLEMENTO DE REGALO:</label>
+                <select id="modal-select-regalo" style="background: #000; color: #fff; width: 100%; padding: 8px; border: 1px solid var(--neon-m); border-radius: 5px; font-size: 0.85em;" onchange="actualizarFichaVarianteEx()"></select>
+                
+                <div style="display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; margin-top: 10px;">
+                    <img id="var-img" src="" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;">
+                    <p id="var-desc" style="font-size: 0.75em; color: #cbd5e1; margin: 0; line-height: 1.4;"></p>
+                </div>
+
+                <div id="zona-sabores" class="hidden" style="margin-top:10px; border-top:1px dashed rgba(168,85,247,0.2); padding-top:10px;">
+                    <label style="font-size: 0.72em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 5px;">🥤 ELIGE EL SABOR:</label>
+                    <select id="modal-select-sabor" style="background: #000; color: #fff; width: 100%; padding: 8px; border: 1px solid var(--neon-m); border-radius: 5px; font-size: 0.85em;"></select>
+                </div>
+            </div>
         </div>
 
-        <button id="modal-btn-trigger" class="btn" style="width: 100%; padding: 14px; font-size: 0.95em; color: #000;" onclick="procesarPasarelaPublica()">ACCEDER AHORA</button>
+        <div id="modal-zona-reserva" class="hidden" style="margin-bottom: 15px; background: rgba(34, 211, 238, 0.03); border: 1px dashed var(--neon-n); padding: 10px; border-radius: 8px;">
+            <label id="lbl-mes-calendario" style="font-size: 0.72em; color: var(--neon-n); font-weight: bold; display: block; text-align: center;">📅 CALENDARIO DE ATENCIÓN</label>
+            <div id="mesh-calendario" class="grid-calendario"></div>
+            <div id="box-horas" class="hidden" style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; text-align:center;">
+                <p style="font-size:0.7em; color:#cbd5e1; margin:0 0 5px 0;">Horas Disponibles:</p>
+                <div id="listado-horas" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;"></div>
+            </div>
+        </div>
+
+        <button id="modal-btn-trigger" class="btn" style="width: 100%; padding: 14px; font-size: 0.95em; color: #000;" onclick="procesarPasarelaPublica()"></button>
         <button class="btn" style="width: 100%; margin-top: 8px; background: transparent; border: 1px solid #444; color: #aaa; font-size: 0.8em; padding: 10px;" onclick="cerrarModalPublico()">CERRAR</button>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbx0P7lLzRvfq-H2YueMV8y5KznAO0qZziGfPm2tcrvDYkc7-Tx0vhsscxm4NbfxgVD4MQ/exec";
-        let serviciosCache = null;
+        let catalogoServiciosCache = null;
+        let cacheRegalosDisponibles = [];
+        let baseHorariosCache = [];
+        let pilarActivoFiltro = "FINANZAS";
         let itemActivo = null;
+        let slotSeleccionadoId = null;
 
-        async function cargarCatalogoPublico() {
-            document.getElementById('lista-f').innerHTML = '<div class="spinner"></div>';
-            document.getElementById('lista-n').innerHTML = '<div class="spinner"></div>';
-            document.getElementById('lista-m').innerHTML = '<div class="spinner"></div>';
-
+        async function initExterno() {
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "obtenerServiciosDinamicos" })
-                });
-                const res = await response.json();
+                const resRegalos = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "obtenerRegalosDisponibles" }) });
+                const dataRegalos = await resRegalos.json();
+                if (dataRegalos.success) cacheRegalosDisponibles = dataRegalos.regalos;
+
+                const resServicios = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "obtenerServiciosDinamicos" }) });
+                const dataServicios = await resServicios.json();
                 
-                if (res && res.success) {
-                    serviciosCache = res.data;
-                    renderizarColumnasPublicas(res.data);
+                if (dataServicios.success) {
+                    catalogoServiciosCache = dataServicios.data;
+                    renderizarGrid();
                 } else {
-                    alert("Kairo Alerta: No se pudo conectar con el catálogo central.");
+                    document.getElementById('premium-grid-servicios').innerHTML = "<p>Error de conexión.</p>";
                 }
-            } catch(e) {
-                console.error(e);
+            } catch(e) { console.error(e); }
+        }
+
+        function conmutarFiltroPilarEx(pilar) {
+            pilarActivoFiltro = pilar;
+            document.querySelectorAll('.filter-tab-neon').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderizarGrid();
+        }
+
+        function renderizarGrid() {
+            const grid = document.getElementById('premium-grid-servicios');
+            grid.innerHTML = "";
+            const catalogo = catalogoServiciosCache[pilarActivoFiltro];
+
+            if (catalogo && catalogo.length > 0) {
+                catalogo.forEach(s => {
+                    var descTruncada = s.descripcion.length > 135 ? s.descripcion.substring(0, 135) + "..." : s.descripcion;
+                    var normalPrecio = Number(s.valorNormal || 0);
+                    var stringPrecio = normalPrecio === 0 ? "[ GRATIS ]" : `$${normalPrecio.toLocaleString()}`;
+
+                    const card = document.createElement('div');
+                    card.className = "premium-service-card";
+                    card.innerHTML = `
+                        <div class="premium-card-media"><img src="${s.urlImagen}"></div>
+                        <div class="premium-card-info">
+                            <small style="color:var(--neon-n); font-family:'Orbitron'; font-size:0.7em;">PILAR COGNITIVO | ${pilarActivoFiltro}</small>
+                            <h3 style="margin:0; color:#fff; font-size:1.3em; font-family:'Orbitron';">${s.nombre}</h3>
+                            <p style="margin:0; font-size:0.84rem; color:#cbd5e1; line-height:1.5;">${descTruncada}</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:12px;">
+                                <span style="font-size:1.2rem; font-weight:800; color:var(--neon-f); font-family:'Orbitron';">${stringPrecio}</span>
+                                <button class="btn btn-n" style="padding:8px 18px; font-size:0.72em;" onclick="abrirModalPublico('${s.sku}', '${pilarActivoFiltro}')">Más Información</button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } else {
+                grid.innerHTML = "<p style='text-align:center; opacity:0.5;'>Próximamente...</p>";
             }
         }
 
-        function renderizarColumnasPublicas(data) {
-            const pilares = { FINANZAS: { id: 'lista-f', color: 'var(--neon-f)' }, NUTRICION: { id: 'lista-n', color: 'var(--neon-n)' }, MENTALIDAD: { id: 'lista-m', color: 'var(--neon-m)' } };
-            
-            Object.keys(pilares).forEach(key => {
-                const contenedor = document.getElementById(pilares[key].id);
-                contenedor.innerHTML = "";
-                
-                if (data[key] && data[key].length > 0) {
-                    data[key].forEach(s => {
-                            const btn = document.createElement('div');
-                            btn.className = "card-servicio-btn";
-                            btn.style.borderLeft = `3px solid ${pilares[key].color}`;
-                            btn.onclick = () => abrirModalPublico(s.sku, key);
-
-                            // 🛡️ FOCUS: Doble Escudo contra errores de tipeo en el Sheets
-                            var precioNormalSeguro = s.valorNormal || 0;
-                            const textPrecio = precioNormalSeguro === 0 ? `<span style="color:var(--neon-f); font-weight:bold; font-size:0.82em;">[ GRATIS ]</span>` : `<span style="font-size:0.82em; color:#fff; font-weight:600;">$${precioNormalSeguro.toLocaleString()}</span>`;
-                        btn.innerHTML = `
-                            <div style="display:flex; align-items:center; gap:10px; max-width:75%;">
-                                <img src="${s.urlImagen}" style="width:20px; height:20px; flex-shrink:0;">
-                                <span style="font-size:0.82em; text-align:left; font-weight:500; line-height:1.2; color:#fff;">${s.nombre}</span>
-                            </div>
-                            ${textPrecio}
-                        `;
-                        contenedor.appendChild(btn);
-                    });
-                } else {
-                    contenedor.innerHTML = "<p style='font-size:0.75em; opacity:0.3; text-align:center;'>Próximamente...</p>";
-                }
-            });
-        }
-
         function abrirModalPublico(sku, pilar) {
-            const s = serviciosCache[pilar].find(x => x.sku === sku);
+            const s = catalogoServiciosCache[pilar].find(x => x.sku === sku);
             if (!s) return;
             
             itemActivo = s;
+            slotSeleccionadoId = null;
             document.getElementById('main-content').classList.add('blur-effect');
             
             document.getElementById('modal-img').src = s.urlImagen;
             document.getElementById('modal-titulo').innerText = s.nombre;
-            document.getElementById('modal-sku').innerText = `SKU: ${s.sku}`;
+            document.getElementById('modal-sku').innerText = `SKU: ${s.sku} | MÓDULO: ${s.accion}`;
             document.getElementById('modal-desc').innerText = s.descripcion;
             
             document.getElementById('modal-precio-normal').innerText = s.valorNormal === 0 ? "GRATIS" : `$${s.valorNormal.toLocaleString()}`;
@@ -302,58 +286,178 @@
 
             const btn = document.getElementById('modal-btn-trigger');
             const zonaVarios = document.getElementById('modal-zona-varios');
+            const zonaReserva = document.getElementById('modal-zona-reserva');
+            
+            zonaVarios.classList.add('hidden');
+            zonaReserva.classList.add('hidden');
+            document.getElementById('paso-A-varios').classList.remove('hidden');
+            document.getElementById('paso-B-varios').classList.add('hidden');
+            btn.style.opacity = "1";
 
-            // Neuro-Configuración de Estilos Dinámicos según el pilar del Servicio
             if (pilar === "FINANZAS") { btn.style.background = "var(--neon-f)"; document.getElementById('modal-publico-servicio').style.borderColor = "var(--neon-f)"; }
             else if (pilar === "NUTRICION") { btn.style.background = "var(--neon-n)"; document.getElementById('modal-publico-servicio').style.borderColor = "var(--neon-n)"; }
             else { btn.style.background = "var(--neon-m)"; document.getElementById('modal-publico-servicio').style.borderColor = "var(--neon-m)"; }
 
-            if (s.accion === "VARIOS") { zonaVarios.classList.remove('hidden'); btn.innerText = "CONFIRMAR REGALO Y CONTINUAR"; }
-            else { zonaVarios.classList.add('hidden'); btn.innerText = s.valorNormal === 0 ? "AGENDAR SESIÓN DE CORTESÍA" : "ADQUIRIR MENTORÍA PREMIUM"; }
+            if (s.accion === "WHATSAPP") {
+                btn.innerText = "CONTACTAR VÍA WHATSAPP";
+            } else if (s.accion === "VARIOS") {
+                zonaVarios.classList.remove('hidden');
+                btn.innerText = "QUIERO COMENZAR";
+            } else if (s.accion === "RESERVA") {
+                zonaReserva.classList.remove('hidden');
+                btn.innerText = "SELECCIONA FECHA Y HORA";
+                btn.style.opacity = "0.4";
+                cargarCalendarioEx();
+            } else {
+                btn.innerText = "ACCEDER AHORA";
+            }
 
-            const m = document.getElementById('modal-publico-servicio');
-            m.classList.remove('hidden');
-            m.style.display = 'block';
+            document.getElementById('modal-publico-servicio').classList.remove('hidden');
+            document.getElementById('modal-publico-servicio').style.display = 'block';
+        }
+
+        function avanzarEmbudoEx() {
+            document.getElementById('paso-A-varios').classList.add('hidden');
+            document.getElementById('paso-B-varios').classList.remove('hidden');
+            
+            const combo = document.getElementById('modal-select-regalo');
+            combo.innerHTML = "";
+            cacheRegalosDisponibles.forEach(r => {
+                let opt = document.createElement('option'); opt.value = r.sku; opt.innerText = r.nombre; combo.appendChild(opt);
+            });
+            actualizarFichaVarianteEx();
+            document.getElementById('modal-btn-trigger').innerText = "CONTINUAR A PASARELA";
+        }
+
+        function actualizarFichaVarianteEx() {
+            const skuElegido = document.getElementById('modal-select-regalo').value;
+            const r = cacheRegalosDisponibles.find(x => x.sku === skuElegido);
+            if (!r) return;
+
+            document.getElementById('var-img').src = r.urlImagen;
+            document.getElementById('var-desc').innerText = r.descripcion;
+            
+            const comboSabores = document.getElementById('modal-select-sabor');
+            const boxSabores = document.getElementById('zona-sabores');
+            if (r.sabores && r.sabores.trim() !== "") {
+                boxSabores.classList.remove('hidden');
+                comboSabores.innerHTML = "";
+                r.sabores.split(',').forEach(s => {
+                    let opt = document.createElement('option'); opt.value = s.trim(); opt.innerText = s.trim(); comboSabores.appendChild(opt);
+                });
+            } else {
+                boxSabores.classList.add('hidden');
+            }
+        }
+
+        async function cargarCalendarioEx() {
+            document.getElementById('mesh-calendario').innerHTML = "<p style='grid-column:1/-1; text-align:center;'>Sincronizando...</p>";
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "obtenerHorariosDisponibles" }) });
+            const data = await res.json();
+            if (data.success) {
+                baseHorariosCache = data.horarios;
+                if(data.horarios.length > 0) {
+                    let p = data.horarios[0].fecha.split("-");
+                    let ms = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+                    document.getElementById('lbl-mes-calendario').innerText = `📅 ${ms[parseInt(p[1])-1]} ${p[0]}`;
+                }
+                renderMeshEx();
+            }
+        }
+
+        function renderMeshEx() {
+            const grid = document.getElementById('mesh-calendario');
+            grid.innerHTML = "";
+            let diasMap = {};
+            baseHorariosCache.forEach(h => {
+                if(h.estado === "LIBRE") {
+                    if(!diasMap[h.fecha]) diasMap[h.fecha] = [];
+                    diasMap[h.fecha].push(h);
+                }
+            });
+
+            Object.keys(diasMap).forEach(fecha => {
+                let p = fecha.split("-");
+                let div = document.createElement('div');
+                div.className = "slot-dia";
+                div.innerHTML = `<b style="font-size:1.2em; display:block;">${p[2]}</b><span style="font-size:0.7em;">${p[1]}/${p[0]}</span>`;
+                div.onclick = () => mostrarHorasEx(fecha, div, diasMap[fecha]);
+                grid.appendChild(div);
+            });
+        }
+
+        function mostrarHorasEx(fecha, elementoDOM, arrHoras) {
+            document.querySelectorAll('.slot-dia').forEach(e => e.classList.remove('active'));
+            elementoDOM.classList.add('active');
+            
+            const box = document.getElementById('box-horas');
+            const list = document.getElementById('listado-horas');
+            box.classList.remove('hidden');
+            list.innerHTML = "";
+            slotSeleccionadoId = null;
+            document.getElementById('modal-btn-trigger').style.opacity = "0.4";
+
+            arrHoras.forEach(h => {
+                let b = document.createElement('div');
+                b.className = "slot-hora";
+                b.innerText = h.hora;
+                b.onclick = () => {
+                    document.querySelectorAll('.slot-hora').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    slotSeleccionadoId = h.idHorario;
+                    document.getElementById('modal-btn-trigger').style.opacity = "1";
+                };
+                list.appendChild(b);
+            });
         }
 
         function procesarPasarelaPublica() {
             const s = itemActivo;
             if (!s) return;
 
-            // Almacenamos de forma síncrona en LocalStorage qué servicio se está comprando
+            if (s.accion === "VARIOS" && document.getElementById('paso-B-varios').classList.contains('hidden')) {
+                avanzarEmbudoEx(); return;
+            }
+
+            if (s.accion === "WHATSAPP") {
+                window.open(`https://wa.me/56976003402?text=${encodeURIComponent('Hola Coach! Solicito info de: ' + s.nombre)}`, '_blank');
+                cerrarModalPublico(); return;
+            }
+
+            if (s.accion === "RESERVA" && !slotSeleccionadoId) {
+                alert("Selecciona un horario disponible."); return;
+            }
+
             localStorage.setItem('kairo_ecommerce_sku', s.sku);
             localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
             localStorage.setItem('kairo_ecommerce_accion', s.accion);
             localStorage.setItem('kairo_ecommerce_tipo', "SERVICIOS");
+            if (s.accion === "RESERVA") localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoId);
 
             if (s.accion === "VARIOS") {
-                const regalo = document.getElementById('modal-select-regalo').value;
-                localStorage.setItem('kairo_ecommerce_detalle', `Regalo: ${regalo}`);
+                const reg = document.getElementById('modal-select-regalo').value;
+                const sab = document.getElementById('modal-select-sabor');
+                localStorage.setItem('kairo_ecommerce_detalle', `Regalo: ${reg} ${sab && !document.getElementById('zona-sabores').classList.contains('hidden') ? '(Sabor: '+sab.value+')' : ''}`);
             } else {
-                localStorage.setItem('kairo_ecommerce_detalle', `Flujo Directo Invitado`);
+                localStorage.setItem('kairo_ecommerce_detalle', `Flujo Externo Invitado`);
             }
 
-            // 🛡️ REGLA COMERCIAL DE INVITADOS: Si vale dinero ($0 >), salta directo a tu link de MercadoPago
-            if (s.valorNormal > 0 && s.linkPago && s.linkPago !== "" && s.linkPago !== "#") {
+            if (s.valorNormal > 0 && s.linkPago && s.linkPago !== "") {
                 window.location.href = s.linkPago;
-                return;
+            } else {
+                window.open(`https://wa.me/56976003402?text=${encodeURIComponent('Hola Coach Diego! Acabo de solicitar acceso a la cortesía: ' + s.nombre)}`, '_blank');
+                cerrarModalPublico();
             }
-
-            // Si vale $0 (Los Cafés de cortesía), brinca síncronamente al WhatsApp de agendamiento
-            const txt = encodeURIComponent(`Hola Coach Diego! Soy un nuevo visitante de la web. Acabo de revisar el catálogo de servicios y solicito agendar mi hora para la sesión gratuita: "${s.nombre}". Quedo atento a las horas disponibles en tu calendario.`);
-            window.open(`https://wa.me/56976003402?text=${txt}`, '_blank');
-            cerrarModalPublico();
         }
 
         function cerrarModalPublico() {
             document.getElementById('main-content').classList.remove('blur-effect');
             const m = document.getElementById('modal-publico-servicio');
-            m.style.display = 'none';
-            m.classList.add('hidden');
+            m.style.display = 'none'; m.classList.add('hidden');
             itemActivo = null;
         }
 
-        window.onload = cargarCatalogoPublico;
+        window.onload = initExterno;
     </script>
 </body>
 </html>
