@@ -5733,14 +5733,13 @@ async function iniciarservicios() {
     const contenedorModulo = document.getElementById('modulo-servicios-comunidad');
     contenedorModulo.classList.remove('hidden');
 
-    document.getElementById('dinámico-grid-servicios-premium').innerHTML = "<p style='font-size:0.85em; color:var(--neon-n); text-align:center; padding:40px 0;'>Sincronizando catálogo con la Matrix de Productos...</p>";
+    document.getElementById('premium-grid-servicios').innerHTML = "<p style='font-size:0.85em; color:var(--neon-n); text-align:center; padding:40px 0;'>Sincronizando catálogo con la Matrix de Productos...</p>";
 
     const res = await apiCall("obtenerServiciosDinamicos");
     if (res && res.success) {
         catalogoServiciosCache = res.data;
-        
         // Renderizamos las pestañas de selección superior una única vez
-        const contenedorTabs = document.getElementById('contenedor-tabs-servicios');
+        const contenedorTabs = document.getElementById('premium-tabs-selector');
         contenedorTabs.innerHTML = `
             <div class="filter-tab-premium ${pilarActivoComercial === 'FINANZAS' ? 'active' : ''}" onclick="conmutarPilarCatalogo('FINANZAS')">FINANZAS</div>
             <div class="filter-tab-premium ${pilarActivoComercial === 'NUTRICION' ? 'active' : ''}" onclick="conmutarPilarCatalogo('NUTRICION')">NUTRICIÓN</div>
@@ -5755,7 +5754,7 @@ async function iniciarservicios() {
 }
 
 function renderizarTarjetasServicios() {
-    const grid = document.getElementById('dinámico-grid-servicios-premium');
+    const grid = document.getElementById('premium-grid-servicios');
     grid.innerHTML = "";
     
     const dataFiltrada = catalogoServiciosCache[pilarActivoComercial];
@@ -5855,12 +5854,6 @@ async function enviarPostulacionCoach3D() {
     });
 }
         
-function cambiarPilarFiltro(nuevoPilar) {
-    pilarActivoFiltro = nuevoPilar;
-    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    if (catalogoServiciosCache) renderizarTarjetasServicios(catalogoServiciosCache);
-}
         
 function abrirDetalleServicio(sku, pilar) {
     const servicio = catalogoServiciosCache[pilar].find(x => x.sku === sku);
@@ -5930,6 +5923,12 @@ function abrirDetalleServicio(sku, pilar) {
 async function ejecutarAccionComercialServicio() {
     const s = servicioSelectedActivo || servicioSeleccionadoActivo;
     if (!s) return;
+
+    // 🛡️ REGLA INTERCEPTORA: Si es un servicio con variantes y el Paso B está oculto, avanzamos el embudo primero
+    if (s.accion === "VARIOS" && document.getElementById('ser-varios-paso-B').classList.contains('hidden')) {
+        avanzarEmbudoRegaloVarios();
+        return;
+    }
 
     var precioFinalACobrar = (sessionUser && sessionUser.rango === "Suscriptor") ? (s.valorSuscriptor || 0) : (s.valorNormal || 0);
     const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Cliente Invitado";
