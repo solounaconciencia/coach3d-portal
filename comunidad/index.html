@@ -5746,30 +5746,19 @@ async function iniciarservicios() {
     document.getElementById('view-dashboard').classList.add('hidden');
     document.getElementById('seccion-herramientas').classList.add('hidden');
     const cajaAcademiaBase = document.getElementById('ser-box-form-academia');
-    if (cajaAcademiaBase) cajaAcademiaBase.classList.add('hidden'); // Ocultar formulario de admisión preventivamente
+    if (cajaAcademiaBase) cajaAcademiaBase.classList.add('hidden');
     
     const contenedorModulo = document.getElementById('modulo-servicios-comunidad');
     contenedorModulo.classList.remove('hidden');
-
     document.getElementById('premium-grid-servicios').innerHTML = "<p style='font-size:0.85em; color:var(--neon-n); text-align:center; padding:40px 0;'>Sincronizando catálogo con la Matrix de Productos...</p>";
 
-    const res = await apiCall("obtenerServiciosDinamicos");
-    if (res && res.success) {
-        catalogoServiciosCache = res.data;
-        // Renderizamos las pestañas de selección superior una única vez
-        const contenedorTabs = document.getElementById('premium-tabs-selector');
-        contenedorTabs.innerHTML = `
-            <div class="filter-tab-premium ${pilarActivoComercial === 'FINANZAS' ? 'active' : ''}" onclick="conmutarPilarCatalogo('FINANZAS')">FINANZAS</div>
-            <div class="filter-tab-premium ${pilarActivoComercial === 'NUTRICION' ? 'active' : ''}" onclick="conmutarPilarCatalogo('NUTRICION')">NUTRICIÓN</div>
-            <div class="filter-tab-premium ${pilarActivoComercial === 'MENTALIDAD' ? 'active' : ''}" onclick="conmutarPilarCatalogo('MENTALIDAD')">MENTALIDAD</div>
-        `;
-        
-        renderizarTarjetasServicios();
-    } else {
-        notify("Error al conectar con la pasarela de servicios.");
-        salirDelModulo();
+    // 🛡️ FOCUS: Sincronización previa del catálogo de Regalos para la acción VARIOS
+    const resRegalos = await apiCall("obtenerRegalosDisponibles");
+    if (resRegalos && resRegalos.success) {
+        cacheRegalosDisponibles = resRegalos.regalos;
     }
-}
+
+    const res = await apiCall("obtenerServiciosDinamicos");
 
 function renderizarTarjetasServicios() {
     const grid = document.getElementById('premium-grid-servicios');
