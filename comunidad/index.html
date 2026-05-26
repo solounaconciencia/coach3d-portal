@@ -1484,66 +1484,6 @@
 }
 .coupon-container input { margin: 0; padding: 10px; }
 .coupon-container button { margin: 0; width: auto; padding: 0 20px; font-size: 0.85em; }
-
-@media (max-width: 768px) {
-  .plans-grid { grid-template-columns: 1fr !important; }
-}
-
-@media (max-width: 768px) {
-  .plans-grid { grid-template-columns: 1fr !important; }
-}
-
-/* 💎 INTERFAZ PREMIUM SERVICIOS: PILARES, ZEBRA LAYOUT Y NEURO-ZOOM */
-.pilar-filter-bar {
-    display: flex; justify-content: center; gap: 15px; margin: 25px 0 35px; flex-wrap: wrap;
-}
-.filter-tab-neon {
-    padding: 12px 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 30px; color: #cbd5e1; font-family: 'Orbitron', sans-serif; font-size: 0.8em;
-    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 1px;
-}
-.filter-tab-neon.active {
-    background: rgba(34, 211, 238, 0.12); border-color: var(--neon-n); color: var(--neon-n);
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
-}
-.premium-catalog-grid {
-    display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px;
-}
-.premium-service-card {
-    display: flex; align-items: center; gap: 40px; background: var(--glass);
-    border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px;
-    transition: all 0.4s ease; box-sizing: border-box; width: 100%;
-}
-.premium-service-card:hover {
-    border-color: rgba(255,255,255,0.15); transform: translateY(-3px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-}
-/* 🦓 ZEBRA LAYOUT: Alineación en Espejo Cruzado Automático */
-.premium-service-card:nth-child(even) {
-    flex-direction: row-reverse;
-}
-.premium-card-media {
-    width: 40%; overflow: hidden; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); height: 220px;
-}
-.premium-card-media img {
-    width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-/* 🔍 MICRO-ZOOM: Proximidad Dopamínica al pasar el puntero */
-.premium-service-card:hover .premium-card-media img {
-    transform: scale(1.08);
-}
-.premium-card-info {
-    width: 60%; display: flex; flex-direction: column; gap: 12px; text-align: left;
-}
-.multistep-box {
-    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-top: 15px;
-}
-@media (max-width: 768px) {
-    .premium-service-card, .premium-service-card:nth-child(even) { flex-direction: column; gap: 20px; padding: 20px; }
-    .premium-card-media, .premium-card-info { width: 100%; }
-    .premium-card-media img { height: 180px; }
-}
-  </style>
 .filter-tab {
     padding: 10px 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 30px; color: #cbd5e1; font-family: 'Orbitron', sans-serif; font-size: 0.8em;
@@ -1646,7 +1586,65 @@
     .premium-card-media, .premium-card-info { width: 100%; height: auto; }
     .premium-card-media img { height: 180px; }
 }
+
+@media (max-width: 768px) {
+  .plans-grid { grid-template-columns: 1fr !important; }
+}
+
+/* 💎 INTERFAZ PREMIUM SERVICIOS: PILARES, ZEBRA LAYOUT Y NEURO-ZOOM */
+.pilar-filter-bar {
+    display: flex; justify-content: center; gap: 15px; margin: 25px 0 35px; flex-wrap: wrap;
+}
+.filter-tab-neon {
+    padding: 12px 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px; color: #cbd5e1; font-family: 'Orbitron', sans-serif; font-size: 0.8em;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 1px;
+}
+.filter-tab-neon.active {
+    background: rgba(34, 211, 238, 0.12); border-color: var(--neon-n); color: var(--neon-n);
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+}
+.premium-catalog-grid {
+    display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px;
+}
+.premium-service-card {
+    display: flex; align-items: center; gap: 40px; background: var(--glass);
+    border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px;
+    transition: all 0.4s ease; box-sizing: border-box; width: 100%;
+}
+.premium-service-card:hover {
+    border-color: rgba(255,255,255,0.15); transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+/* 🦓 ZEBRA LAYOUT: Alineación en Espejo Cruzado Automático */
+.premium-service-card:nth-child(even) {
+    flex-direction: row-reverse;
+}
+.premium-card-media {
+    width: 40%; overflow: hidden; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); height: 220px;
+}
+.premium-card-media img {
+    width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+/* 🔍 MICRO-ZOOM: Proximidad Dopamínica al pasar el puntero */
+.premium-service-card:hover .premium-card-media img {
+    transform: scale(1.08);
+}
+.premium-card-info {
+    width: 60%; display: flex; flex-direction: column; gap: 12px; text-align: left;
+}
+.multistep-box {
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-top: 15px;
+}
+@media (max-width: 768px) {
+    .premium-service-card, .premium-service-card:nth-child(even) { flex-direction: column; gap: 20px; padding: 20px; }
+    .premium-card-media, .premium-card-info { width: 100%; }
+    .premium-card-media img { height: 180px; }
+}
   </style>
+
+
+
 
     
 
@@ -2130,35 +2128,35 @@
 
 <div id="modulo-servicios-comunidad" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
     
-    <div class="pilar-filter-container">
-        <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" class="kairo-filter-avatar">
-        <div style="text-align: left; flex-grow: 1;">
-            <h4 style="margin:0; font-family:'Orbitron'; color:var(--neon-n); font-size:0.95em; letter-spacing:1px;">CENTRAL DE MENTORÍAS C3D</h4>
-            <p style="margin:3px 0 0 0; font-size:0.78em; color:#94a3b8;">Hola, soy Kairo. Selecciona el pilar de transformación que deseas explorar hoy:</p>
+    <div style="display: flex; align-items: center; gap: 20px; background: rgba(10, 15, 30, 0.5); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); text-align: left;">
+        <img src="https://i.postimg.cc/yNGjM0nS/Kairo_Perfil.png" style="width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--neon-n); box-shadow: 0 0 15px var(--neon-n); background: #0a0f1e; object-fit: contain;">
+        <div>
+            <h2 style="color: #fff; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; margin: 0; text-transform: uppercase; font-size: 1.25em;">Descubre tu Siguiente Nivel</h2>
+            <p style="font-size: 0.8em; color: #cbd5e1; margin: 4px 0 0 0;">Hola, soy Kairo. Selecciona un pilar y activa el plan maestro diseñado para tu transformación integral.</p>
         </div>
-        <div class="pilar-tabs-wrapper" id="contenedor-tabs-servicios">
-            </div>
     </div>
 
-    <div id="dinámico-grid-servicios-premium" style="min-height: 200px;"></div>
+    <div class="pilar-filter-bar" id="premium-tabs-selector"></div>
 
-    <div style="margin-top: 50px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 30px; text-align: center;">
+    <div class="premium-catalog-grid" id="premium-grid-servicios"></div>
+
+    <div style="margin-top: 50px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 35px; text-align: center;">
         <p style="font-size: 0.88rem; line-height: 1.6; color: #cbd5e1; max-width: 750px; margin: 0 auto 20px;">
-            Servicios Profesionales ofertados por el equipo de Coaches Tridimensionales en Latinoamérica. Si quieres capacitarte como Coach 3D y tener un ingreso extra, <a onclick="desplegarFormularioCapacitacion3D()" style="color: var(--neon-m); text-decoration: underline; cursor: pointer; font-weight: bold;">regístrate aquí</a> para informarte del próximo ciclo de capacitaciones.
+            Servicios Profesionales ofertados por el equipo de Coaches Tridimensionales en Latinoamérica. Si quieres capacitarte como Coach 3D y tener un ingreso extra, <a onclick="conmutarFormularioFormacion()" style="color: var(--neon-m); text-decoration: underline; cursor: pointer; font-weight: bold;">regístrate aquí</a> para informarte del próximo ciclo de capacitaciones.
         </p>
         
         <button class="btn btn-n" style="font-size: 0.68em; padding: 8px 16px; margin-bottom: 25px;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">▲ VOLVER ARRIBA</button>
 
-        <div id="ser-box-formulario-coach" class="hidden" style="background: rgba(10, 15, 30, 0.4); padding: 25px; border-radius: 15px; border: 1px dashed var(--neon-m); text-align: left; max-width: 650px; margin: 0 auto;">
-            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; font-size: 1.05em; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Formulario de Postulación Académica</h3>
-            <form id="formInscripcionAcademica" onsubmit="event.preventDefault(); enviarPostulacionCoach3D();">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
-                    <input type="text" id="coach-nombre" placeholder="Nombre Completo" required style="background: rgba(0,0,0,0.6);">
-                    <input type="email" id="coach-correo" placeholder="Correo Electrónico" required style="background: rgba(0,0,0,0.6);">
-                    <input type="number" id="coach-edad" placeholder="Edad" required min="18" max="100" style="background: rgba(0,0,0,0.6);">
+        <div id="ser-box-form-academia" class="hidden glass-panel" style="max-width: 600px; margin: 15px auto 0; border: 1px dashed var(--neon-m); text-align: left; background: rgba(10,15,30,0.9);">
+            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; font-size: 1.1em; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Solicitud de Ingreso a Academia C3D</h3>
+            <form id="formAcademiaCoach" onsubmit="event.preventDefault(); procesarRegistroAcademiaCoach();">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+                    <input type="text" id="ac-nombre" placeholder="Nombre Completo" required style="background: rgba(0,0,0,0.6);">
+                    <input type="email" id="ac-correo" placeholder="Correo Electrónico" required style="background: rgba(0,0,0,0.6);">
+                    <input type="number" id="ac-edad" placeholder="Edad" required min="18" max="99" style="background: rgba(0,0,0,0.6);">
                 </div>
-                <input type="text" id="coach-motivo" placeholder="¿Cuál es tu principal motivo para querer ser un Coach Tridimensional?" required style="background: rgba(0,0,0,0.6); margin-top: 10px;">
-                <button type="submit" class="btn btn-m" style="width: 100%; margin-top: 15px; padding: 12px;">ENVIAR POSTULACIÓN AL PROXIMO CICLO</button>
+                <input type="text" id="ac-motivo" placeholder="¿Cuál es tu principal motivo para querer transformarte en un Coach Tridimensional?" required style="background: rgba(0,0,0,0.6); margin-top: 10px;">
+                <button type="submit" class="btn btn-m" style="width: 100%; margin-top: 15px; padding: 12px;">ENVIAR EXPENDIENTE DE POSTULACIÓN</button>
             </form>
         </div>
     </div>
@@ -3038,6 +3036,17 @@ async function loadDashboard() {
                       nombre: nombreItem,
                       monto: montoItem,
                       detalle: detalleItem
+                  });
+
+                  // 🛡️ ENLACE FASE 4: Disparo asíncrono de correos premium para Órdenes de Pago aprobadas
+                  apiCall("dispararNotificacionesEmailServicio", {
+                      emailUsuario: emailComprador,
+                      nombreUsuario: sessionUser ? sessionUser.nombre : "Integrante Comunidad",
+                      nombreServicio: nombreItem,
+                      skuServicio: skuItem,
+                      monto: montoItem,
+                      detalle: detalleItem,
+                      pais: sessionUser ? sessionUser.pais : "LATAM"
                   });
 
                   // Limpieza quirúrgica de variables temporales comerciales
@@ -5803,6 +5812,25 @@ function desplegarFormularioCapacitacion3D() {
     if(!caja.classList.contains('hidden')) caja.scrollIntoView({ behavior: 'smooth' });
 }
 
+function avanzarEmbudoRegaloVarios() {
+    document.getElementById('ser-varios-paso-A').classList.add('hidden');
+    document.getElementById('ser-varios-paso-B').classList.remove('hidden');
+    
+    const comboRegalo = document.getElementById('ser-select-regalo');
+    comboRegalo.innerHTML = "";
+    
+    cacheRegalosDisponibles.forEach(r => {
+        var elOpt = document.createElement('option');
+        elOpt.value = r.sku;
+        elOpt.innerText = r.nombre;
+        comboRegalo.appendChild(elOpt);
+    });
+    
+    actualizarFichaTecnicaVariante();
+    const btnAccion = document.getElementById('ser-btn-accion');
+    btnAccion.innerText = "AGREGAR";
+}
+
 async function enviarPostulacionCoach3D() {
     const btn = document.querySelector('#formInscripcionAcademica .btn');
     btn.innerText = "⚡ PROCESANDO REGISTRO RADIAL..."; btn.disabled = true;
@@ -5875,20 +5903,9 @@ function abrirDetalleServicio(sku, pilar) {
 
     if (servicio.accion === "VARIOS") {
         boxVarios.classList.remove('hidden');
-        btnAccion.innerText = "ELEGIR OPCIÓN Y CONTINUAR";
-        
-        const comboRegalo = document.getElementById('ser-select-regalo');
-        comboRegalo.innerHTML = "";
-        
-        // 🛡️ El listado se alimenta directo de la caché descargada desde tu hoja PRODUCTOS
-        cacheRegalosDisponibles.forEach(r => {
-            var elOpt = document.createElement('option');
-            elOpt.value = r.sku; // El valor real síncrono es el SKU del Producto
-            elOpt.innerText = r.nombre;
-            comboRegalo.appendChild(elOpt);
-        });
-        
-        actualizarFichaTecnicaVariante();
+        document.getElementById('ser-varios-paso-A').classList.remove('hidden');
+        document.getElementById('ser-varios-paso-B').classList.add('hidden');
+        btnAccion.innerText = "QUIERO COMENZAR";
     }
     else if (servicio.accion === "RESERVA") {
         boxReserva.classList.remove('hidden');
@@ -5992,6 +6009,17 @@ async function ejecutarAccionComercialServicio() {
     }
 
     // --- SALIDA AUTOMATIZADA EXCLUSIVA PARA SERVICIOS GRATUITOS ---
+    // 🛡️ ENLACE FASE 4: Disparo asíncrono de correos premium (Comprobante Cliente + Auditoría Diego)
+    apiCall("dispararNotificacionesEmailServicio", {
+        emailUsuario: emailUser,
+        nombreUsuario: nombreUser,
+        nombreServicio: s.nombre,
+        skuServicio: s.sku,
+        monto: 0,
+        detalle: detalleString,
+        pais: paisUser
+    });
+
     let txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de procesar el acceso de cortesía para: "${s.nombre}" (${detalleString}).`);
     window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
     cerrarDetalleServicio();
