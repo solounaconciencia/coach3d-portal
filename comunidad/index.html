@@ -3074,23 +3074,40 @@ async function loadDashboard() {
                           <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
                               Tu orden para <b>${nombreItem}</b> fue acreditada de forma exitosa. Se ha despachado una notificación de auditoría a tu correo electrónico.
                           </p>
-                          <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${txtWhatsApp}', '_blank')">🚀 COORDINAR INICIO / CONFIRMAR HORA</button>
+                          <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;"
+onclick="window.open('https://wa.me/56976003402?text=${txtWhatsApp}', '_blank')">🚀 COORDINAR INICIO / CONFIRMAR HORA</button>
                   `;
 
                   // GATILLO NEUROVENTA INVITADOS: Si es anónimo, se le ofrece registrarse para no perder el historial
                   if (emailComprador === "ANÓNIMO") {
                       cuerpoMensajeFinal += `
+                          <div id="box-registro-email-respaldo" style="margin-top: 20px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed var(--neon-n); text-align: left;">
+                              <p style="font-size: 0.82em; color: #cbd5e1; margin: 0 0 10px 0; line-height: 1.4;">
+                                  No has iniciado sesión en la plataforma. Ingresa tu correo electrónico para enviarte un respaldo inmediato del servicio elegido:
+                              </p>
+                              <div style="display: flex; gap: 8px;">
+                                  <input type="email" id="retorno-email-respaldo" placeholder="tu-correo@ejemplo.com" style="flex-grow: 1; background: #000; border: 1px solid var(--neon-n); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.85em; margin:0; box-sizing: border-box;">
+                                  <button class="btn btn-n" style="padding: 10px 15px; font-size: 0.8em; margin: 0; font-family:'Orbitron';"
+onclick="procesarEmailRespaldoAnonimo('${tokenEcom}', '${skuItem}', '${nombreItem}', '${montoItem}', '${detalleItem}')">ENVIAR</button>
+                              </div>
+                          </div>
+
                           <div style="margin-top: 20px; padding: 15px; background: rgba(34, 211, 238, 0.05); border: 1px dashed var(--neon-n); border-radius: 12px;">
                               <p style="font-size: 0.8em; color: var(--neon-n); margin: 0 0 10px 0; line-height: 1.4; text-align: left;">
                                   <b>🔥 ¡REGISTRA TU INVERSIÓN!</b> Crea tu cuenta gratuita en la comunidad ahora mismo para transferir esta compra a tu Historial Personalizado y comenzar a acumular puntos de beneficio tridimensional.
                               </p>
-                              <button class="btn btn-n" style="width:100%; font-size: 0.8em; padding: 8px;" onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button>
+                              <button class="btn btn-n" style="width:100%; font-size: 0.8em; padding: 8px;"
+onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button>
                           </div>
                       `;
+                  } else {
+                     // Si el usuario sí estaba logueado, le mostramos el botón de completar perfil para no dejar vacía la tarjeta.
+                     cuerpoMensajeFinal += `
+                         <button class="btn btn-n" style="width: 100%; padding: 14px; font-family:'Orbitron';" onclick="cerrarKairoMsg(); abrirPerfil();">🔒 COMPLETAR REGISTRO COMUNIDAD</button>
+                     `;
                   }
 
-                  cuerpoMensajeFinal += `</div>`;
-
+                  cuerpoMensajeFinal += `</div>`; // Cerramos el div principal de texto centrado.
                   await kairoMessage({ mensaje: cuerpoMensajeFinal, icon: "🏆" });
                   salirDelModulo();
                   return;
@@ -5728,7 +5745,8 @@ async function iniciarservicios() {
     document.getElementById('view-welcome').classList.add('hidden');
     document.getElementById('view-dashboard').classList.add('hidden');
     document.getElementById('seccion-herramientas').classList.add('hidden');
-    document.getElementById('ser-box-formulario-coach').classList.add('hidden'); // Ocultar formulario de admisión preventivamente
+    const cajaAcademiaBase = document.getElementById('ser-box-form-academia');
+    if (cajaAcademiaBase) cajaAcademiaBase.classList.add('hidden'); // Ocultar formulario de admisión preventivamente
     
     const contenedorModulo = document.getElementById('modulo-servicios-comunidad');
     contenedorModulo.classList.remove('hidden');
@@ -5805,10 +5823,12 @@ function descargarRegalosDeProductos() {
 // --- SUB-SISTEMA DINÁMICO DE POSTULACIÓN ACADÉMICA ---
 function prevenirEntrada(e) { e.preventDefault(); }
 
-function desplegarFormularioCapacitacion3D() {
-    const caja = document.getElementById('ser-box-formulario-coach');
-    caja.classList.toggle('hidden');
-    if(!caja.classList.contains('hidden')) caja.scrollIntoView({ behavior: 'smooth' });
+function conmutarFormularioFormacion() {
+    const caja = document.getElementById('ser-box-form-academia');
+    if (caja) {
+        caja.classList.toggle('hidden');
+        if(!caja.classList.contains('hidden')) caja.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 function avanzarEmbudoRegaloVarios() {
@@ -5938,7 +5958,15 @@ async function ejecutarAccionComercialServicio() {
     var tokenCompra = "TK-" + new Date().getTime() + "-" + Math.floor(Math.random() * 1000);
     var detalleString = "Compra Directa WhatsApp";
 
-    // 🛡️ REGLA 1: Captura relacional de Variantes desde tu hoja de PRODUCTOS
+    // 🛡️ BYPASS TRINIDAD - ACCIÓN: WHATSAPP (Va directo al chat sin importar el precio o pasarela)
+    if (s.accion === "WHATSAPP") {
+        let txtMensajeDirecto = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Solicito información directa sobre el programa: "${s.nombre}".`);
+        window.open(`https://wa.me/56976003402?text=${txtMensajeDirecto}`, '_blank');
+        cerrarDetalleServicio();
+        return;
+    }
+
+    // 🛡️ TRINIDAD - ACCIÓN: VARIOS (Captura relacional de Variantes desde tu hoja de PRODUCTOS)
     if (s.accion === "VARIOS") {
         const skuRegalo = document.getElementById('ser-select-regalo').value;
         const regaloObj = cacheRegalosDisponibles.find(x => x.sku === skuRegalo);
@@ -5953,7 +5981,7 @@ async function ejecutarAccionComercialServicio() {
         }
     }
 
-    // 🛡️ REGLA 2: Bloqueo de agenda interactiva en tu cuadrícula mensual
+    // 🛡️ TRINIDAD - ACCIÓN: RESERVA (Bloqueo de agenda interactiva en tu cuadrícula mensual)
     if (s.accion === "RESERVA") {
         if (!slotSeleccionadoCacheId) {
             return notify("Por favor, selecciona un día y una hora en el calendario antes de continuar.");
@@ -5975,17 +6003,17 @@ async function ejecutarAccionComercialServicio() {
             }
             detalleString = `Hora Reservada: ${resBloqueo.fecha} a las ${resBloqueo.hora}`;
         } else {
-                await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre });
-                detalleString = `Reserva de Cortesía Agendada con Éxito`;
-            }
+            await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre });
+            detalleString = `Reserva de Cortesía Agendada con Éxito`;
         }
+    }
 
-        // 🛡️ PERSISTENCIA INTEGRAL: Si el servicio con variantes es GRATIS, lo registramos en la hoja antes de abrir el chat
-        if (s.accion === "VARIOS" && precioFinalACobrar === 0) {
-            await apiCall("registrarVarianteGratuitaBD", { token: tokenCompra, email: emailUser, sku: s.sku, detalle: detalleString });
-        }
+    // 🛡️ PERSISTENCIA INTEGRAL: Si el servicio con variantes es GRATIS, lo registramos en la hoja antes de abrir el chat
+    if (s.accion === "VARIOS" && precioFinalACobrar === 0) {
+        await apiCall("registrarVarianteGratuitaBD", { token: tokenCompra, email: emailUser, sku: s.sku, detalle: detalleString });
+    }
 
-    // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago
+    // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago (Exceptuando WHATSAPP que ya salió arriba)
     if (precioFinalACobrar > 0) {
         localStorage.setItem('kairo_ecommerce_sku', s.sku);
         localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
@@ -6044,6 +6072,16 @@ async function inicializarCalendarioEcomm3D(skuServicio) {
     const res = await apiCall("obtenerHorariosDisponibles");
     if (res && res.success) {
         databaseHorariosCache = res.horarios;
+        
+        let cabeceraCalculada = "MENSUAL";
+        if(res.horarios.length > 0) {
+            let partesFecha = res.horarios[0].fecha.split("-");
+            let mesesPalabras = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+            cabeceraCalculada = `${mesesPalabras[parseInt(partesFecha[1])-1]} ${partesFecha[0]}`;
+        }
+        const lblCalendario = document.querySelector('#ser-contenedor-reserva label');
+        if (lblCalendario) lblCalendario.innerText = `📅 CALENDARIO DE ATENCIÓN: ${cabeceraCalculada}`;
+        
         renderizarMesJunio2026();
     } else {
         mesh.innerHTML = "<p style='color:#f87171; font-size:0.75em; grid-column:1/-1;'>Error al conectar con la agenda.</p>";
@@ -6162,33 +6200,77 @@ function actualizarFichaTecnicaVariante() {
     }
 }
 
+async function procesarEmailRespaldoAnonimo(token, sku, nombre, monto, detalle) {
+    const inputEmail = document.getElementById('retorno-email-respaldo');
+    if (!inputEmail || !inputEmail.value.trim() || !inputEmail.value.includes('@')) {
+        return notify("Por favor, ingresa un correo electrónico válido para procesar el envío.");
+    }
+    const emailIngresado = inputEmail.value.trim();
+    
+    const btnEnviar = document.querySelector('#box-registro-email-respaldo button');
+    if (btnEnviar) {
+        btnEnviar.innerText = "⚡...";
+        btnEnviar.disabled = true;
+    }
+    
+    // Disparamos las notificaciones bilaterales al correo real suministrado por el usuario invitado
+    await apiCall("dispararNotificacionesEmailServicio", {
+        emailUsuario: emailIngresado,
+        nombreUsuario: "Integrante Comunidad",
+        nombreServicio: nombre,
+        skuServicio: sku,
+        monto: Number(monto),
+        detalle: detalle,
+        pais: "LATAM"
+    });
+    
+    const contenedorBox = document.getElementById('box-registro-email-respaldo');
+    if (contenedorBox) {
+        contenedorBox.innerHTML = `
+            <p style="font-size: 0.85em; color: var(--neon-f); margin: 5px 0 0 0; font-weight: bold; text-align: center; animation: fadeIn 0.4s ease;">
+                🎉 ¡Respaldo transaccional enviado con éxito a ${emailIngresado}!
+            </p>
+        `;
+    }
+}
+        
 function desplegarFormularioCoach3D() {
     const box = document.getElementById('ser-modal-capacitacion');
     box.classList.toggle('hidden');
     if(!box.classList.contains('hidden')) box.scrollIntoView({ behavior: 'smooth' });
 }
 
-async function enviarFormularioCoach3D() {
-    const btn = document.querySelector('#formFormacionCoach .btn');
-    btn.innerText = "⚡ TRANSMITIENDO DATOS..."; btn.disabled = true;
+async function procesarRegistroAcademiaCoach() {
+    const btn = document.querySelector('#formAcademiaCoach .btn');
+    if (btn) {
+        btn.innerText = "⚡ PROCESANDO REGISTRO RADIAL...";
+        btn.disabled = true;
+    }
 
-    const payload = {
-        nombre: document.getElementById('fc-nombre').value.trim(),
-        correo: document.getElementById('fc-correo').value.trim(),
-        edad: document.getElementById('fc-edad').value,
-        motivo: document.getElementById('fc-motivo').value.trim()
+    const variablesForm = {
+        nombre: document.getElementById('ac-nombre').value.trim(),
+        correo: document.getElementById('ac-correo').value.trim(),
+        edad: document.getElementById('ac-edad').value,
+        motivo: document.getElementById('ac-motivo').value.trim()
     };
 
-    // Envío asíncronizado directo a tu receptor central de Apps Script
-    const res = await apiCall("procesarAdmisionCapacitacionCoach", payload);
+    // Petición síncrona a la API central para disparo automatizado de correos
+    const res = await apiCall("procesarAdmisionCapacitacionCoach", variablesForm);
     
-    btn.innerText = "ENVIAR SOLICITUD DE CAPACITACIÓN"; btn.disabled = false;
-    document.getElementById('formFormacionCoach').reset();
-    document.getElementById('ser-modal-capacitacion').classList.add('hidden');
-
+    if (btn) {
+        btn.innerText = "ENVIAR EXPENDIENTE DE POSTULACIÓN";
+        btn.disabled = false;
+    }
+    
+    const formularioAcademia = document.getElementById('formAcademiaCoach');
+    if (formularioAcademia) formularioAcademia.reset();
+    
+    const cajaAcademia = document.getElementById('ser-box-form-academia');
+    if (cajaAcademia) cajaAcademia.classList.add('hidden');
+    
     kairoMessage({
-        mensaje: `<b style="color:var(--neon-f);">🎉 ¡SOLICITUD RADIAL ENVIADA!</b><br><br>Gracias por tu interés en el próximo ciclo de capacitaciones, ${payload.nombre}. Tu postulación ha sido inyectada al correo central de auditoría académica con éxito. Un Coach se pondrá en contacto contigo.`,
-        icon: "🎓"
+        mensaje: `<b style="color:var(--neon-f); font-size:1.15rem;">🎓 ¡MÁSTER REGISTRO COMPLETADO!</b><br><br>Gracias por tu interés en el próximo ciclo de capacitaciones, ${variablesForm.nombre}. Tu expediente ha sido inyectado al correo institucional de admisiones con éxito. Evaluaremos tu motivo y nos comunicaremos contigo.`,
+        icon: "🏆"
     });
 }
     </script>
