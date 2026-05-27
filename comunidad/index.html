@@ -7176,10 +7176,11 @@ function abrirModalEcommerce(sku) {
     if(!p) return;
     productoActivoEcom = p;
 
-    document.getElementById('main-content').classList.add('blur-effect');
+    // 🛡️ CIRUGÍA FOCUS: Solo difuminamos el catálogo, liberando al modal
+    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     
     const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
-    document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png";
+    document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "https://img.icons8.com/fluency/96/box.png";
     document.getElementById('ecom-modal-sku').innerText = `SKU: ${p.sku} | STOCK: ${p.stock}`;
     document.getElementById('ecom-modal-nombre').innerText = p.nombre;
     document.getElementById('ecom-modal-estrellas').innerHTML = generarEstrellasUI(p.estrellas);
@@ -7188,7 +7189,6 @@ function abrirModalEcommerce(sku) {
     document.getElementById('ecom-modal-precio-n').innerText = `$${p.precioNormal.toLocaleString()}`;
     document.getElementById('ecom-modal-precio-v').innerText = `$${p.precioSuscriptor.toLocaleString()}`;
 
-    // Despliegue de Variantes (Solo mostramos el primero que encuentre con datos)
     const boxVariantes = document.getElementById('ecom-modal-variantes');
     const select = document.getElementById('ecom-modal-select-variante');
     select.innerHTML = "";
@@ -7225,7 +7225,7 @@ function cambiarFotoVarianteEcom() {
 function cerrarModalEcommerce() {
     document.getElementById('modal-ecommerce-producto').classList.add('hidden');
     document.getElementById('modal-ecommerce-producto').style.display = 'none';
-    document.getElementById('main-content').classList.remove('blur-effect');
+    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
     productoActivoEcom = null;
 }
 
@@ -7266,7 +7266,7 @@ function abrirModalPatrocinador(index) {
     btn.innerText = p.textoBoton || "IR AL SITIO WEB";
     btn.setAttribute('data-url', p.url);
 
-    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     document.getElementById('modal-patrocinador').classList.remove('hidden');
     document.getElementById('modal-patrocinador').style.display = 'block';
 }
@@ -7274,7 +7274,7 @@ function abrirModalPatrocinador(index) {
 function cerrarPatrocinador() {
     document.getElementById('modal-patrocinador').classList.add('hidden');
     document.getElementById('modal-patrocinador').style.display = 'none';
-    document.getElementById('main-content').classList.remove('blur-effect');
+    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
 }
 
 function solicitarTiendaEcom() {
@@ -7391,17 +7391,16 @@ function eliminarDelCarrito(index) {
 function cerrarCheckout() {
     document.getElementById('modal-ecommerce-checkout').classList.add('hidden');
     document.getElementById('modal-ecommerce-checkout').style.display = "none";
-    document.getElementById('main-content').classList.remove('blur-effect');
-    toggleCart(); // Reabrimos el carro
+    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
+    toggleCart(); 
 }
 
 function abrirCheckout() {
     if(carritoCompras.length === 0) return notify("No hay productos en tu carrito.");
     toggleCart();
-    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     document.getElementById('checkout-total-monto').innerText = document.getElementById('cart-total-price').innerText;
     
-    // Si no hay sesión iniciada, mostramos los campos para pedir datos
     if (!sessionUser) {
         document.getElementById('checkout-guest-fields').classList.remove('hidden');
     } else {
@@ -7453,9 +7452,8 @@ async function procesarPagoCarrito() {
 
 async function abrirModalTransferencia() {
     cerrarCheckout();
-    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     
-    // Obtenemos los datos bancarios desde la Matrix
     const resConf = await apiCall("obtenerDatosBancariosPublicos");
     if (resConf && resConf.success) {
         document.getElementById('transf-monto').innerText = document.getElementById('checkout-total-monto').innerText;
@@ -7473,10 +7471,10 @@ async function abrirModalTransferencia() {
 function cerrarTransferencia() {
     document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
     document.getElementById('modal-ecommerce-transferencia').style.display = "none";
-    document.getElementById('main-content').classList.remove('blur-effect');
+    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
     abrirCheckout();
 }
-
+        
 async function ejecutarEnvioTransferencia() {
     const inputFoto = document.getElementById('transf-foto-comprobante');
     if (!inputFoto.files || inputFoto.files.length === 0) {
@@ -7488,7 +7486,6 @@ async function ejecutarEnvioTransferencia() {
     const btn = document.getElementById('btn-enviar-transferencia');
     btn.innerText = "ENVIANDO A LA MATRIX..."; btn.disabled = true;
 
-    // Convertimos la foto a Base64 para el backend
     const reader = new FileReader();
     reader.onload = async (e) => {
         const fotoBase64 = e.target.result;
@@ -7506,14 +7503,13 @@ async function ejecutarEnvioTransferencia() {
         const res = await apiCall("registrarTransferenciaEcommerce", payload);
 
         if (res && res.success) {
-            // Limpiamos el carrito local
             carritoCompras = [];
             guardarCarritoLocal();
             renderizarCarrito();
             
             document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
             document.getElementById('modal-ecommerce-transferencia').style.display = "none";
-            document.getElementById('main-content').classList.remove('blur-effect');
+            document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
             
             const numPedido = res.orden_id;
             const waTxt = encodeURIComponent(`¡Hola Coach! Acabo de hacer una transferencia por productos en la web.\n\n📦 N° Pedido: ${numPedido}\n💵 Monto: ${payload.montoTotal}\n\nQuedo atento para coordinar la entrega.`);
@@ -7530,7 +7526,8 @@ async function ejecutarEnvioTransferencia() {
             await kairoMessage({ mensaje: tarjetaHTML, icon: "📦" });
             salirDelModulo();
         } else {
-            btn.innerText = "ENVIAR COMPROBANTE"; btn.disabled = false;
+            btn.innerText = "ENVIAR COMPROBANTE";
+            btn.disabled = false;
             notify("Error al registrar: " + (res ? res.msg : "Sin conexión"));
         }
     };
