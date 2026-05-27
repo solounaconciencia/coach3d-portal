@@ -7240,17 +7240,6 @@ function eliminarDelCarrito(index) {
     renderizarCarrito();
 }
 
-function abrirCheckout() {
-    if(carritoCompras.length === 0) return notify("No hay productos en tu carrito.");
-    toggleCart();
-    document.getElementById('main-content').classList.add('blur-effect');
-    document.getElementById('checkout-total-monto').innerText = document.getElementById('cart-total-price').innerText;
-    
-    const modal = document.getElementById('modal-ecommerce-checkout');
-    modal.classList.remove('hidden');
-    modal.style.display = "block";
-}
-
 function cerrarCheckout() {
     document.getElementById('modal-ecommerce-checkout').classList.add('hidden');
     document.getElementById('modal-ecommerce-checkout').style.display = "none";
@@ -7319,7 +7308,7 @@ async function abrirModalTransferencia() {
     document.getElementById('main-content').classList.add('blur-effect');
     
     // Obtenemos los datos bancarios desde la Matrix
-    const resConf = await apiCall("obtenerConfiguracionSistema", {email: "admin_bypass_transferencia"}); // Bypass temporal de lectura
+    const resConf = await apiCall("obtenerDatosBancariosPublicos");
     if (resConf && resConf.success) {
         document.getElementById('transf-monto').innerText = document.getElementById('checkout-total-monto').innerText;
         document.getElementById('transf-banco').innerText = resConf.bancoNombre || "N/A";
@@ -7399,6 +7388,35 @@ async function ejecutarEnvioTransferencia() {
     };
     reader.readAsDataURL(file);
 }
+
+// 🛡️ SENSOR DE RETORNO DE MERCADOPAGO (PRODUCTOS)
+window.addEventListener('load', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('modulo') === 'retorno_pago_ecom' && urlParams.get('status') === 'approved') {
+        document.getElementById('kairo-loader-global').style.display = 'none';
+        
+        const paymentId = urlParams.get('payment_id');
+        const waTxt = encodeURIComponent(`🚀 *¡PAGO CONFIRMADO TIENDA C3D!*\n\n📌 *Transacción MP:* ${paymentId}\n\n*Hola Coach, acabo de pagar mi carrito de compras por MercadoPago. Coordinemos el envío/retiro.*`);
+        
+        // Vaciamos el carrito porque ya se pagó
+        localStorage.removeItem('kairo_carrito_ecom');
+        carritoCompras = [];
+        
+        const tarjetaHTML = `
+            <div style="text-align: center; width: 100%;">
+                <p style="color: var(--neon-n); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡PAGO ACREDITADO!</p>
+                <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
+                    Tu pago ha sido validado por MercadoPago (Ref: ${paymentId}).<br><br>Escríbele a un Coach ahora mismo para coordinar la logística.
+                </p>
+                <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
+            </div>
+        `;
+        await kairoMessage({ mensaje: tarjetaHTML, icon: "🛍️" });
+        
+        // Limpiamos la URL para no repetir el mensaje si recarga la página
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
     </script>
 </body>
 
