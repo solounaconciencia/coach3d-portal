@@ -1641,19 +1641,351 @@
     .premium-card-media, .premium-card-info { width: 100%; }
     .premium-card-media img { height: 180px; }
 }
+
+/* =========================================================================
+   🛒 MÓDULO E-COMMERCE: CARRITO Y BURBUJA (FOCUS)
+   ========================================================================= */
+
+.cart-float-bubble {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    background: var(--neon-n);
+    border-radius: 50%;
+    display: none; /* Se activa por JS */
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.4);
+    z-index: 5400;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: black;
+    font-size: 1.6rem;
+}
+
+.cart-float-bubble:hover {
+    transform: scale(1.1) rotate(5deg);
+    background: white;
+}
+
+.cart-badge-float {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444; /* Rojo alerta */
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--primary-bg);
+}
+
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 380px;
+    height: 100%;
+    background: rgba(10, 15, 30, 0.98);
+    backdrop-filter: blur(15px);
+    border-left: 1px solid var(--neon-n);
+    z-index: 100000;
+    transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+}
+
+.cart-sidebar.active { right: 0; }
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 20px;
+}
+
+.cart-header h3 { font-family: 'Orbitron', sans-serif; margin: 0; letter-spacing: 2px; color: var(--neon-n); }
+.close-cart { font-size: 2rem; cursor: pointer; color: #666; transition: 0.3s; }
+.close-cart:hover { color: white; transform: rotate(90deg); }
+
+.cart-items-container {
+    flex: 1;
+    overflow-y: auto;
+    margin: 25px 0;
+    padding-right: 10px; /* Para el scrollbar */
+}
+
+/* Custom Scrollbar para el carrito */
+.cart-items-container::-webkit-scrollbar { width: 6px; }
+.cart-items-container::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.3); border-radius: 10px; }
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+
+.btn-qty {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;
+    width: 25px; height: 25px; cursor: pointer; border-radius: 4px; transition: 0.2s;
+}
+.btn-qty:hover { background: var(--neon-n); color: black; border-color: var(--neon-n); }
+
+.btn-del {
+    background: none; border: none; color: #ef4444; cursor: pointer; margin-left: 10px; transition: 0.2s;
+}
+.btn-del:hover { transform: scale(1.2); }
+
+.cart-footer {
+    border-top: 1px solid rgba(34, 211, 238, 0.3);
+    padding-top: 20px;
+}
+
+.cart-total-box {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    color: var(--neon-f);
+    margin-bottom: 20px;
+}
+
+.checkout-payment-options {
+    background: rgba(0,0,0,0.4);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 20px;
+}
+
+.custom-radio {
+    display: flex; align-items: center; gap: 10px; font-size: 0.85rem; cursor: pointer; margin-bottom: 10px; color: #cbd5e1;
+}
+.custom-radio input[type="radio"] {
+    appearance: none; width: 16px; height: 16px; border: 2px solid var(--neon-n); border-radius: 50%; outline: none; transition: 0.2s;
+}
+.custom-radio input[type="radio"]:checked {
+    background-color: var(--neon-n); box-shadow: inset 0 0 0 3px var(--primary-bg);
+}
+
+@media (max-width: 768px) {
+    .cart-sidebar { width: 100%; right: -100%; }
+    .cart-float-bubble { bottom: 20px; right: 20px; width: 55px; height: 55px; font-size: 1.3rem; }
+}
+
+/* =========================================================================
+   📦 MÓDULO E-COMMERCE: GRILLA ESTILO AMAZON/SHOPIFY (FOCUS)
+   ========================================================================= */
+
+.store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.store-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.store-card:hover {
+    border-color: var(--neon-n);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.15);
+    background: rgba(34, 211, 238, 0.02);
+}
+
+.store-card-img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* Ratio 1:1 Cuadrado perfecto */
+    overflow: hidden;
+    background: rgba(0,0,0,0.3);
+}
+
+.store-card-img {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: contain; /* Estilo Amazon: imagen completa sobre fondo limpio */
+    padding: 15px;
+    box-sizing: border-box;
+    transition: transform 0.5s ease;
+}
+
+.store-card:hover .store-card-img {
+    transform: scale(1.08);
+}
+
+.store-card-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.store-card-title {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    margin: 0 0 5px 0;
+    line-height: 1.3;
+    /* Truncado a 2 líneas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.store-card-brand {
+    font-size: 0.7rem;
+    color: var(--neon-n);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.store-card-rating {
+    color: #fbbf24; /* Color estrella dorada */
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.store-card-price-row {
+    margin-top: auto; /* Empuja el precio al fondo */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.store-card-price {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+}
+
+.store-card-price-old {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-decoration: line-through;
+    margin-bottom: 3px;
+    display: block;
+}
+
+/* Modal Detalle Producto E-commerce */
+.modal-ecommerce-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.modal-ecommerce-gallery {
+    width: 45%;
+    position: relative;
+}
+
+.modal-ecommerce-main-img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-ecommerce-info {
+    width: 55%;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .modal-ecommerce-layout { flex-direction: column; gap: 15px; }
+    .modal-ecommerce-gallery, .modal-ecommerce-info { width: 100%; }
+}
+
+/* =========================================================================
+   🛒 MÓDULO E-COMMERCE: CARRITO Y GRILLA PREMIUM (FOCUS)
+   ========================================================================= */
+.cart-float-bubble {
+    position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: var(--neon-n);
+    border-radius: 50%; display: none; justify-content: center; align-items: center;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.4); z-index: 5400; cursor: pointer; transition: 0.3s;
+    color: black; font-size: 1.6rem;
+}
+.cart-float-bubble:hover { transform: scale(1.1) rotate(5deg); background: white; }
+.cart-badge-float {
+    position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.75rem;
+    font-weight: bold; min-width: 22px; height: 22px; border-radius: 50%; display: flex;
+    justify-content: center; align-items: center; border: 2px solid var(--primary-bg);
+}
+.cart-sidebar {
+    position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: rgba(10, 15, 30, 0.98);
+    backdrop-filter: blur(15px); border-left: 1px solid var(--neon-n); z-index: 100000;
+    transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); padding: 30px; display: flex; flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.8); box-sizing: border-box;
+}
+.cart-sidebar.active { right: 0; }
+.cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+.cart-header h3 { font-family: 'Orbitron', sans-serif; margin: 0; color: var(--neon-n); }
+.close-cart { font-size: 2rem; cursor: pointer; color: #666; transition: 0.3s; line-height: 1; }
+.close-cart:hover { color: white; transform: rotate(90deg); }
+.cart-items-container { flex: 1; overflow-y: auto; margin: 25px 0; padding-right: 10px; }
+.cart-items-container::-webkit-scrollbar { width: 6px; }
+.cart-items-container::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.3); border-radius: 10px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+.btn-qty { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; width: 25px; height: 25px; cursor: pointer; border-radius: 4px; }
+.btn-qty:hover { background: var(--neon-n); color: black; }
+.cart-total-box { display: flex; justify-content: space-between; font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: var(--neon-f); margin-bottom: 20px; }
+.custom-radio { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; cursor: pointer; margin-bottom: 10px; color: #cbd5e1; }
+.custom-radio input[type="radio"] { appearance: none; width: 16px; height: 16px; border: 2px solid var(--neon-n); border-radius: 50%; outline: none; transition: 0.2s; }
+.custom-radio input[type="radio"]:checked { background-color: var(--neon-n); box-shadow: inset 0 0 0 3px var(--primary-bg); }
+
+.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-top: 20px; }
+.store-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 15px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; }
+.store-card:hover { border-color: var(--neon-n); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.15); background: rgba(34, 211, 238, 0.02); }
+.store-card-img-wrapper { position: relative; width: 100%; padding-top: 100%; overflow: hidden; background: rgba(0,0,0,0.3); }
+.store-card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 15px; box-sizing: border-box; transition: transform 0.5s ease; }
+.store-card:hover .store-card-img { transform: scale(1.08); }
+.store-card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+.store-card-title { font-size: 0.95rem; color: #e2e8f0; margin: 0 0 5px 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.store-card-price-row { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; }
+.modal-ecommerce-layout { display: flex; gap: 30px; align-items: flex-start; }
+.modal-ecommerce-gallery { width: 45%; }
+.modal-ecommerce-info { width: 55%; display: flex; flex-direction: column; }
+@media (max-width: 768px) {
+    .cart-sidebar { width: 100%; right: -100%; }
+    .modal-ecommerce-layout { flex-direction: column; gap: 15px; }
+    .modal-ecommerce-gallery, .modal-ecommerce-info { width: 100%; }
+}
   </style>
 
-
-
-
-    
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
-
-
-
 </head>
 <body onload="checkSession()">
 
@@ -2505,20 +2837,37 @@
         </div>
         
         <div id="tab-kairo" class="seccion-tab hidden">
-            <div style="background: #000; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8em; color: var(--neon-f); border: 1px solid var(--neon-f);">
+            <div style="background: #000; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8em; color: var(--neon-f); border: 1px solid var(--neon-f); margin-bottom: 15px;">
                 <p>> STATUS: <span id="kairo-status">CONECTADO</span></p>
                 <p>> DB: Google Sheets (CONFIG)</p>
-                <p>> MEMORIA: Estable</p>
+                <p>> MEMORIA E-COMMERCE: Lista para expansión</p>
             </div>            
-            <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px; text-align: left;">
-                <h4 style="color: var(--neon-n); margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; font-size: 0.85em; letter-spacing: 1px;">PREMIACIONES MATRICIALES</h4>
-                <label style="font-size:0.75em; color:#94a3b8;">Puntos Regalo Cumpleaños (B6):</label>
-                <input type="number" id="conf-regalo-cumpleanos" placeholder="Ej: 500" style="padding:8px; margin-bottom:10px;">
-                <label style="font-size:0.75em; color:#94a3b8;">Puntos Regalo Aniversario (B7):</label>
-                <input type="number" id="conf-regalo-aniversario" placeholder="Ej: 1000" style="padding:8px; margin-bottom:10px;">
-                <label style="font-size:0.75em; color:#94a3b8;">Puntos por Referido en Aniversario (B8):</label>
-                <input type="number" id="conf-regalo-referido-aniversario" placeholder="Ej: 200" style="padding:8px;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="border: 1px dashed rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; text-align: left;">
+                    <h4 style="color: var(--neon-n); margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; font-size: 0.85em; letter-spacing: 1px;">PREMIACIONES MATRICIALES</h4>
+                    <label style="font-size:0.75em; color:#94a3b8;">Regalo Cumpleaños (Puntos):</label>
+                    <input type="number" id="conf-regalo-cumpleanos" class="nave-input" placeholder="Ej: 500" style="padding:8px; margin-bottom:10px;">
+                    <label style="font-size:0.75em; color:#94a3b8;">Regalo Aniversario (Puntos):</label>
+                    <input type="number" id="conf-regalo-aniversario" class="nave-input" placeholder="Ej: 1000" style="padding:8px; margin-bottom:10px;">
+                    <label style="font-size:0.75em; color:#94a3b8;">Referido Aniversario (Puntos):</label>
+                    <input type="number" id="conf-regalo-referido-aniversario" class="nave-input" placeholder="Ej: 200" style="padding:8px;">
+                </div>
+
+                <div style="border: 1px dashed rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; text-align: left;">
+                    <h4 style="color: var(--neon-f); margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; font-size: 0.85em; letter-spacing: 1px;">E-COMMERCE & PAGOS</h4>
+                    <label style="font-size:0.75em; color:#94a3b8;">Token MercadoPago (PROD):</label>
+                    <input type="password" id="conf-mp-token" class="nave-input" placeholder="APP_USR-..." style="padding:8px; margin-bottom:10px;">
+                    
+                    <label style="font-size:0.75em; color:#94a3b8;">Datos Bancarios (Transferencia):</label>
+                    <input type="text" id="conf-banco-nombre" class="nave-input" placeholder="Banco (Ej: Banco Estado)" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-banco-tipo" class="nave-input" placeholder="Tipo Cuenta (Ej: Cuenta RUT)" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-banco-rut" class="nave-input" placeholder="RUT (Ej: 11.111.111-1)" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-banco-numero" class="nave-input" placeholder="N° Cuenta" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-banco-correo" class="nave-input" placeholder="Correo comprobantes" style="padding:8px;">
+                </div>
             </div>
+            
             <button class="btn btn-m" style="width: 100%; margin-top: 15px;" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID_EXTERNO, '_blank')">ABRIR PLANILLA MAESTRA</button>
         </div>
         <button class="btn btn-n" style="width: 100%; margin-top: 30px; font-size: 1.1em;" onclick="guardarConfiguracion()">GUARDAR CAMBIOS EN LA MATRIX</button>
@@ -2667,6 +3016,105 @@
         <button class="btn" style="flex:1; border: 1px solid #444; color: #ccc;" onclick="cerrarAdminProducto()">CANCELAR</button>
         <button class="btn btn-f" style="flex:1;" onclick="guardarAdminProducto()">GUARDAR PRODUCTO</button>
     </div>
+</div>
+
+    <div id="modulo-productos-ecommerce" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Tienda C3D Premium</h2>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Suplementación, Accesorios y Herramientas Tridimensionales</p>
+    </div>
+    <div class="store-grid" id="ecommerce-store-grid"></div>
+    <button class="btn" style="width: 100%; margin-top: 25px; opacity: 0.7;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+</div>
+
+<div id="modal-ecommerce-producto" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 92% !important; max-width: 800px !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
+    <div class="modal-ecommerce-layout">
+        <div class="modal-ecommerce-gallery">
+            <img id="ecom-modal-img" src="" style="width: 100%; aspect-ratio: 1/1; object-fit: contain; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; box-sizing: border-box;">
+        </div>
+        <div class="modal-ecommerce-info">
+            <small id="ecom-modal-sku" style="color: var(--neon-n); font-family:'Orbitron'; font-size: 0.7em; letter-spacing: 2px;"></small>
+            <h2 id="ecom-modal-nombre" style="margin: 5px 0 10px 0; color: white; font-family:'Orbitron'; font-size:1.4rem;"></h2>
+            <div id="ecom-modal-estrellas" style="margin-bottom: 10px;"></div>
+            <p id="ecom-modal-desc" style="font-size: 0.85em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px; max-height: 120px; overflow-y: auto;"></p>
+            
+            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+                <span style="font-size: 0.75em; color: #94a3b8; text-decoration: line-through;">Precio Lista: <span id="ecom-modal-precio-n"></span></span>
+                <div style="font-size: 1.8em; font-weight: bold; color: var(--neon-f); font-family:'Orbitron'; margin-top: 5px;" id="ecom-modal-precio-v"></div>
+            </div>
+
+            <div id="ecom-modal-variantes" class="hidden" style="margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px dashed var(--neon-m);">
+                <label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 8px;">SELECCIONA VARIANTE:</label>
+                <select id="ecom-modal-select-variante" style="margin: 0; background: #000; border-color: var(--neon-m); font-size: 0.85em;" onchange="cambiarFotoVarianteEcom()"></select>
+            </div>
+
+            <button class="btn btn-n" style="width: 100%; padding: 15px; font-weight:bold;" onclick="agregarAlCarritoDesdeModal()">AGREGAR AL CARRO 🛒</button>
+            <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarModalEcommerce()">SEGUIR MIRANDO</button>
+        </div>
+    </div>
+</div>
+
+<div id="cart-float-bubble" class="cart-float-bubble" onclick="toggleCart()">
+    🛒<span id="cart-count" class="cart-badge-float">0</span>
+</div>
+
+<div id="cart-sidebar" class="cart-sidebar">
+    <div class="cart-header">
+        <h3>TU CARRITO</h3>
+        <span class="close-cart" onclick="toggleCart()">×</span>
+    </div>
+    <div class="cart-items-container" id="cart-items"></div>
+    <div class="cart-footer">
+        <div class="cart-total-box"><span>TOTAL:</span><span id="cart-total-price">$0</span></div>
+        <button class="btn btn-f" style="width: 100%; padding: 15px; font-family: 'Orbitron';" onclick="abrirCheckout()">IR A PAGAR</button>
+    </div>
+</div>
+
+<div id="modal-ecommerce-checkout" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000005 !important; width: 92% !important; max-width: 500px !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-f) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
+    <h3 style="text-align:center; color: var(--neon-f); font-family: 'Orbitron'; margin-top:0;">FINALIZAR COMPRA</h3>
+    <p style="text-align:center; color: #cbd5e1; font-size:0.9em; margin-bottom:20px;">Total a pagar: <strong id="checkout-total-monto" style="font-size:1.3em; color:white; display:block; margin-top:5px;">$0</strong></p>
+    
+    <div id="checkout-guest-fields" class="hidden" style="margin-bottom: 15px;">
+        <input type="text" id="checkout-guest-nombre" placeholder="Tu Nombre Completo" style="width: 100%; margin-bottom: 10px; background: rgba(0,0,0,0.6); padding: 12px; border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+        <input type="email" id="checkout-guest-email" placeholder="Tu Correo (Para enviarte el comprobante)" style="width: 100%; background: rgba(0,0,0,0.6); padding: 12px; border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+    </div>
+
+    <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+        <label class="custom-radio">
+            <input type="radio" name="metodoPago" value="MP" checked>
+            <strong>MercadoPago</strong> (Tarjetas, Débito, Efectivo)
+        </label>
+        <label class="custom-radio">
+            <input type="radio" name="metodoPago" value="TRANSFERENCIA">
+            <strong>Transferencia Bancaria</strong> (Adjuntar comprobante)
+        </label>
+    </div>
+
+    <button id="btn-checkout-pagar" class="btn btn-f" style="width:100%; padding:15px; font-weight:bold; font-family:'Orbitron';" onclick="procesarPagoCarrito()">CONFIRMAR Y PAGAR</button>
+    <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarCheckout()">VOLVER AL CARRITO</button>
+</div>
+
+<div id="modal-ecommerce-transferencia" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000010 !important; width: 92% !important; max-width: 500px !important; max-height: 90vh !important; overflow-y: auto !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
+    <h3 style="text-align:center; color: var(--neon-n); font-family: 'Orbitron'; margin-top:0;">TRANSFERENCIA BANCARIA</h3>
+    <div style="background: rgba(34, 211, 238, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--neon-n); margin-bottom: 20px; font-size: 0.85em; color: #cbd5e1; line-height: 1.5;">
+        <p style="margin-top:0;">Realiza una transferencia por el monto exacto de <strong id="transf-monto" style="color:white; font-size:1.2em;"></strong> a la siguiente cuenta:</p>
+        <ul style="list-style: none; padding: 0; color: white;">
+            <li><strong>Banco:</strong> <span id="transf-banco"></span></li>
+            <li><strong>Tipo:</strong> <span id="transf-tipo"></span></li>
+            <li><strong>N° Cuenta:</strong> <span id="transf-numero"></span></li>
+            <li><strong>RUT:</strong> <span id="transf-rut"></span></li>
+            <li><strong>Correo:</strong> <span id="transf-correo"></span></li>
+        </ul>
+        <p style="color: #f87171; font-weight: bold; margin-bottom: 0; font-size: 0.9em;">⚠️ ATENCIÓN: Transfiere el monto EXACTO. No hay devoluciones ni "vueltos".</p>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <label style="display:block; margin-bottom: 10px; color: var(--neon-m); font-weight: bold;">Sube la foto de tu comprobante:</label>
+        <input type="file" id="transf-foto-comprobante" accept="image/*" style="width: 100%; background: #000; padding: 10px; border: 1px solid var(--neon-m); color: white; border-radius: 5px;">
+    </div>
+
+    <button id="btn-enviar-transferencia" class="btn btn-n" style="width:100%; padding:15px; font-weight:bold; font-family:'Orbitron';" onclick="ejecutarEnvioTransferencia()">ENVIAR COMPROBANTE</button>
+    <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarTransferencia()">CANCELAR</button>
 </div>
 
     <script>
@@ -4438,6 +4886,14 @@ async function abrirAdminHerramientas() {
       document.getElementById('conf-regalo-cumpleanos').value = resConfig.regaloCumpleanos || 0;
       document.getElementById('conf-regalo-aniversario').value = resConfig.regaloAniversario || 0;
       document.getElementById('conf-regalo-referido-aniversario').value = resConfig.regaloReferidoAniversario || 0;
+      
+      // Nuevos campos E-commerce
+      document.getElementById('conf-mp-token').value = resConfig.tokenMP || "";
+      document.getElementById('conf-banco-nombre').value = resConfig.bancoNombre || "";
+      document.getElementById('conf-banco-tipo').value = resConfig.bancoTipo || "";
+      document.getElementById('conf-banco-rut').value = resConfig.bancoRut || "";
+      document.getElementById('conf-banco-numero').value = resConfig.bancoNumero || "";
+      document.getElementById('conf-banco-correo').value = resConfig.bancoCorreo || "";
   }
 }
 
@@ -4469,10 +4925,16 @@ async function guardarConfiguracion() {
     fondo: document.getElementById('conf-fondo').value,
     colorN: document.getElementById('conf-color-n').value,
     colorM: document.getElementById('conf-color-m').value,
-    // Sincronización horizontal hacia la base de datos
     regaloCumpleanos: document.getElementById('conf-regalo-cumpleanos').value,
     regaloAniversario: document.getElementById('conf-regalo-aniversario').value,
-    regaloReferidoAniversario: document.getElementById('conf-regalo-referido-aniversario').value
+    regaloReferidoAniversario: document.getElementById('conf-regalo-referido-aniversario').value,
+    // Sincronización E-commerce
+    tokenMP: document.getElementById('conf-mp-token').value,
+    bancoNombre: document.getElementById('conf-banco-nombre').value,
+    bancoTipo: document.getElementById('conf-banco-tipo').value,
+    bancoRut: document.getElementById('conf-banco-rut').value,
+    bancoNumero: document.getElementById('conf-banco-numero').value,
+    bancoCorreo: document.getElementById('conf-banco-correo').value
   };
 
   const root = document.documentElement;
@@ -6533,6 +6995,409 @@ async function guardarAdminProducto() {
     } else {
         notify("❌ Error al guardar: " + (res ? res.msg : "Sin conexión"));
     }
+}
+
+// =========================================================================
+// 🛒 MOTOR E-COMMERCE: TIENDA PREMIUM Y CARRITO
+// =========================================================================
+let inventarioEcommerce = [];
+let carritoCompras = [];
+let productoActivoEcom = null;
+
+async function iniciarproductos() {
+    closeAlert();
+    const ocultar = ['view-welcome', 'view-dashboard', 'seccion-herramientas', 'modulo-servicios-comunidad', 'modulo-perfil-bienestar', 'modulo-calculadora-financiera', 'contenido-modulo-diagnostico'];
+    ocultar.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    
+    const moduloProd = document.getElementById('modulo-productos-ecommerce');
+    if (moduloProd) moduloProd.classList.remove('hidden');
+
+    document.getElementById('ecommerce-store-grid').innerHTML = "<p style='color:var(--neon-n); text-align:center; grid-column:1/-1;'>Descargando inventario de la Matrix...</p>";
+
+    const res = await apiCall("obtenerInventarioAdmin");
+    if(res && res.success) {
+        inventarioEcommerce = res.productos.filter(p => p.estado === "ACTIVO");
+        renderizarGrillaEcommerce();
+        cargarCarritoLocal();
+        document.getElementById('cart-float-bubble').style.display = "flex";
+    } else {
+        document.getElementById('ecommerce-store-grid').innerHTML = "<p style='color:#ff4444; text-align:center; grid-column:1/-1;'>Error de conexión con la tienda.</p>";
+    }
+}
+
+function generarEstrellasUI(valor) {
+    let html = "";
+    let enteros = Math.floor(valor);
+    let decimal = (valor - enteros) >= 0.5 ? 1 : 0;
+    let vacias = 5 - enteros - decimal;
+    for(let i=0; i<enteros; i++) html += "★";
+    if(decimal) html += "⯨"; // Carácter de media estrella
+    for(let i=0; i<vacias; i++) html += "☆";
+    return `<span style="color:#fbbf24; letter-spacing:2px; font-size:1.2em;">${html} <span style="color:#cbd5e1; font-size:0.7em;">(${valor})</span></span>`;
+}
+
+function renderizarGrillaEcommerce() {
+    const grid = document.getElementById('ecommerce-store-grid');
+    grid.innerHTML = "";
+    if(inventarioEcommerce.length === 0) {
+        grid.innerHTML = "<p style='color:#ccc; text-align:center; grid-column:1/-1;'>Sin productos disponibles por ahora.</p>";
+        return;
+    }
+    
+    const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
+    
+    inventarioEcommerce.forEach(p => {
+        const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
+        const portada = fotosArray.length > 0 ? fotosArray[0] : "https://img.icons8.com/fluency/48/box.png";
+        
+        let htmlPrecio = "";
+        if (esSusc) {
+            htmlPrecio = `<span class="store-card-price-old">$${p.precioNormal.toLocaleString()}</span>
+                          <span class="store-card-price" style="color:var(--neon-f);">$${p.precioSuscriptor.toLocaleString()}</span>`;
+        } else {
+            htmlPrecio = `<span class="store-card-price">$${p.precioNormal.toLocaleString()}</span>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = "store-card";
+        card.innerHTML = `
+            <div class="store-card-img-wrapper" style="cursor:pointer;" onclick="abrirModalEcommerce('${p.sku}')">
+                <img class="store-card-img" src="${portada}">
+            </div>
+            <div class="store-card-content">
+                <div class="store-card-brand">C3D | ${p.pilar}</div>
+                <h3 class="store-card-title" style="cursor:pointer;" onclick="abrirModalEcommerce('${p.sku}')">${p.nombre}</h3>
+                <div class="store-card-rating">${generarEstrellasUI(p.estrellas || 5)}</div>
+                <div class="store-card-price-row">
+                    <div>${htmlPrecio}</div>
+                    <button class="btn btn-n" style="padding: 8px 15px; font-size: 0.8em;" onclick="abrirModalEcommerce('${p.sku}')">VER MÁS</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function abrirModalEcommerce(sku) {
+    const p = inventarioEcommerce.find(x => x.sku === sku);
+    if(!p) return;
+    productoActivoEcom = p;
+
+    document.getElementById('main-content').classList.add('blur-effect');
+    
+    const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
+    document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "";
+    document.getElementById('ecom-modal-sku').innerText = `SKU: ${p.sku} | STOCK: ${p.stock}`;
+    document.getElementById('ecom-modal-nombre').innerText = p.nombre;
+    document.getElementById('ecom-modal-estrellas').innerHTML = generarEstrellasUI(p.estrellas || 5);
+    document.getElementById('ecom-modal-desc').innerText = p.descripcion;
+    
+    document.getElementById('ecom-modal-precio-n').innerText = `$${p.precioNormal.toLocaleString()}`;
+    document.getElementById('ecom-modal-precio-v').innerText = `$${p.precioSuscriptor.toLocaleString()}`;
+
+    // Despliegue de Variantes si las tiene
+    const boxVariantes = document.getElementById('ecom-modal-variantes');
+    const select = document.getElementById('ecom-modal-select-variante');
+    select.innerHTML = "";
+    
+    // Asumimos que sabores, colores o tamaños separan opciones por coma
+    let listaVar = [];
+    if(p.sabores) listaVar = p.sabores.split(',');
+    else if(p.colores) listaVar = p.colores.split(',');
+    else if(p.tamanos) listaVar = p.tamanos.split(',');
+
+    if(listaVar.length > 0) {
+        boxVariantes.classList.remove('hidden');
+        listaVar.forEach((v, index) => {
+            const opt = document.createElement('option');
+            opt.value = v.trim();
+            opt.innerText = v.trim();
+            // Vinculamos la variante con la posición de la foto si existe
+            opt.setAttribute('data-img', fotosArray[index] ? fotosArray[index] : fotosArray[0]);
+            select.appendChild(opt);
+        });
+    } else {
+        boxVariantes.classList.add('hidden');
+    }
+
+    const modal = document.getElementById('modal-ecommerce-producto');
+    modal.classList.remove('hidden');
+    modal.style.display = "block";
+}
+
+function cambiarFotoVarianteEcom() {
+    const select = document.getElementById('ecom-modal-select-variante');
+    const imgSelec = select.options[select.selectedIndex].getAttribute('data-img');
+    if(imgSelec) document.getElementById('ecom-modal-img').src = imgSelec;
+}
+
+function cerrarModalEcommerce() {
+    document.getElementById('modal-ecommerce-producto').classList.add('hidden');
+    document.getElementById('modal-ecommerce-producto').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+    productoActivoEcom = null;
+}
+
+// Lógica para que al salir a Dashboard, el carrito flote desaparezca
+const originalSalirDelModulo = salirDelModulo;
+salirDelModulo = function() {
+    originalSalirDelModulo();
+    document.getElementById('cart-float-bubble').style.display = "none";
+    const mod = document.getElementById('modulo-productos-ecommerce');
+    if(mod) mod.classList.add('hidden');
+}
+
+// --- CARRITO CEREBRO ---
+function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('active'); }
+
+function cargarCarritoLocal() {
+    const saved = localStorage.getItem('kairo_carrito_ecom');
+    if(saved) carritoCompras = JSON.parse(saved);
+    else carritoCompras = [];
+    renderizarCarrito();
+}
+
+function guardarCarritoLocal() {
+    localStorage.setItem('kairo_carrito_ecom', JSON.stringify(carritoCompras));
+}
+
+function agregarAlCarritoDesdeModal() {
+    if(!productoActivoEcom) return;
+    const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
+    const precio = esSusc ? productoActivoEcom.precioSuscriptor : productoActivoEcom.precioNormal;
+    
+    let varianteElegida = "";
+    if(!document.getElementById('ecom-modal-variantes').classList.contains('hidden')) {
+        varianteElegida = document.getElementById('ecom-modal-select-variante').value;
+    }
+
+    // Buscar si ya existe la misma variante en el carrito
+    const idx = carritoCompras.findIndex(x => x.sku === productoActivoEcom.sku && x.variante === varianteElegida);
+    if(idx > -1) {
+        carritoCompras[idx].cantidad++;
+    } else {
+        carritoCompras.push({
+            sku: productoActivoEcom.sku,
+            nombre: productoActivoEcom.nombre,
+            precio: precio,
+            variante: varianteElegida,
+            cantidad: 1,
+            foto: document.getElementById('ecom-modal-img').src
+        });
+    }
+    guardarCarritoLocal();
+    renderizarCarrito();
+    cerrarModalEcommerce();
+    toggleCart(); // Abre el drawer para confirmar visualmente
+}
+
+function renderizarCarrito() {
+    const cont = document.getElementById('cart-items');
+    cont.innerHTML = "";
+    let total = 0;
+    let count = 0;
+
+    if(carritoCompras.length === 0) {
+        cont.innerHTML = "<p style='text-align:center; color:#666; margin-top:40px;'>Tu carrito está vacío.</p>";
+    } else {
+        carritoCompras.forEach((item, index) => {
+            total += (item.precio * item.cantidad);
+            count += item.cantidad;
+            const div = document.createElement('div');
+            div.className = "cart-item";
+            div.innerHTML = `
+                <img src="${item.foto}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
+                <div style="flex-grow:1; margin-left:10px;">
+                    <div style="font-size:0.85em; font-weight:bold; color:white; line-height:1.2;">${item.nombre}</div>
+                    ${item.variante ? `<div style="font-size:0.7em; color:var(--neon-n);">${item.variante}</div>` : ''}
+                    <div style="font-size:0.9em; color:var(--neon-f); font-weight:bold; margin-top:3px;">$${item.precio.toLocaleString()}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button class="btn-qty" onclick="cambiarCantidadCart(${index}, -1)">-</button>
+                    <span style="color:white; font-size:0.9em; min-width:15px; text-align:center;">${item.cantidad}</span>
+                    <button class="btn-qty" onclick="cambiarCantidadCart(${index}, 1)">+</button>
+                    <button class="btn-del" onclick="eliminarDelCarrito(${index})">🗑️</button>
+                </div>
+            `;
+            cont.appendChild(div);
+        });
+    }
+
+    document.getElementById('cart-total-price').innerText = "$" + total.toLocaleString();
+    document.getElementById('cart-count').innerText = count;
+}
+
+function cambiarCantidadCart(index, delta) {
+    carritoCompras[index].cantidad += delta;
+    if(carritoCompras[index].cantidad <= 0) carritoCompras.splice(index, 1);
+    guardarCarritoLocal();
+    renderizarCarrito();
+}
+
+function eliminarDelCarrito(index) {
+    carritoCompras.splice(index, 1);
+    guardarCarritoLocal();
+    renderizarCarrito();
+}
+
+function abrirCheckout() {
+    if(carritoCompras.length === 0) return notify("No hay productos en tu carrito.");
+    toggleCart();
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('checkout-total-monto').innerText = document.getElementById('cart-total-price').innerText;
+    
+    const modal = document.getElementById('modal-ecommerce-checkout');
+    modal.classList.remove('hidden');
+    modal.style.display = "block";
+}
+
+function cerrarCheckout() {
+    document.getElementById('modal-ecommerce-checkout').classList.add('hidden');
+    document.getElementById('modal-ecommerce-checkout').style.display = "none";
+    document.getElementById('main-content').classList.remove('blur-effect');
+    toggleCart(); // Reabrimos el carro
+}
+
+function abrirCheckout() {
+    if(carritoCompras.length === 0) return notify("No hay productos en tu carrito.");
+    toggleCart();
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('checkout-total-monto').innerText = document.getElementById('cart-total-price').innerText;
+    
+    // Si no hay sesión iniciada, mostramos los campos para pedir datos
+    if (!sessionUser) {
+        document.getElementById('checkout-guest-fields').classList.remove('hidden');
+    } else {
+        document.getElementById('checkout-guest-fields').classList.add('hidden');
+    }
+
+    const modal = document.getElementById('modal-ecommerce-checkout');
+    modal.classList.remove('hidden');
+    modal.style.display = "block";
+}
+
+async function procesarPagoCarrito() {
+    let emailComprador = sessionUser ? sessionUser.email : document.getElementById('checkout-guest-email').value.trim();
+    let nombreComprador = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : document.getElementById('checkout-guest-nombre').value.trim();
+
+    if (!sessionUser && (!emailComprador || !nombreComprador || !emailComprador.includes('@'))) {
+        return notify("Por favor, ingresa un nombre y un correo válido para enviarte el comprobante de compra.");
+    }
+
+    const metodo = document.querySelector('input[name="metodoPago"]:checked').value;
+    const btn = document.getElementById('btn-checkout-pagar');
+    btn.innerText = "CONECTANDO CON LA MATRIX..."; btn.disabled = true;
+
+    if (metodo === "MP") {
+        // Redirección Dinámica MercadoPago
+        const returnUrlBase = window.location.origin + window.location.pathname;
+        const res = await apiCall("crearPreferenciaMP", {
+            carrito: carritoCompras,
+            email: emailComprador,
+            nombre: nombreComprador,
+            urlRetorno: returnUrlBase
+        });
+
+        if (res && res.success) {
+            // Guardamos el token de la orden en caso de abandono o retorno exitoso
+            localStorage.setItem('kairo_ecommerce_token_anonimo', "ECOM-" + new Date().getTime());
+            localStorage.setItem('kairo_ecommerce_tipo', "PRODUCTOS");
+            window.location.href = res.init_point;
+        } else {
+            btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+            notify("Error al conectar con MercadoPago: " + (res ? res.msg : "Sin respuesta."));
+        }
+    } else if (metodo === "TRANSFERENCIA") {
+        // Abrimos ventana de Transferencia
+        btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+        abrirModalTransferencia();
+    }
+}
+
+async function abrirModalTransferencia() {
+    cerrarCheckout();
+    document.getElementById('main-content').classList.add('blur-effect');
+    
+    // Obtenemos los datos bancarios desde la Matrix
+    const resConf = await apiCall("obtenerConfiguracionSistema", {email: "admin_bypass_transferencia"}); // Bypass temporal de lectura
+    if (resConf && resConf.success) {
+        document.getElementById('transf-monto').innerText = document.getElementById('checkout-total-monto').innerText;
+        document.getElementById('transf-banco').innerText = resConf.bancoNombre || "N/A";
+        document.getElementById('transf-tipo').innerText = resConf.bancoTipo || "N/A";
+        document.getElementById('transf-numero').innerText = resConf.bancoNumero || "N/A";
+        document.getElementById('transf-rut').innerText = resConf.bancoRut || "N/A";
+        document.getElementById('transf-correo').innerText = resConf.bancoCorreo || "N/A";
+    }
+
+    document.getElementById('modal-ecommerce-transferencia').classList.remove('hidden');
+    document.getElementById('modal-ecommerce-transferencia').style.display = "block";
+}
+
+function cerrarTransferencia() {
+    document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
+    document.getElementById('modal-ecommerce-transferencia').style.display = "none";
+    document.getElementById('main-content').classList.remove('blur-effect');
+    abrirCheckout();
+}
+
+async function ejecutarEnvioTransferencia() {
+    const inputFoto = document.getElementById('transf-foto-comprobante');
+    if (!inputFoto.files || inputFoto.files.length === 0) {
+        return notify("Debes subir la foto del comprobante para continuar.");
+    }
+    const file = inputFoto.files[0];
+    if (file.size > 3000000) return notify("El comprobante es muy pesado. Máximo 3MB.");
+
+    const btn = document.getElementById('btn-enviar-transferencia');
+    btn.innerText = "ENVIANDO A LA MATRIX..."; btn.disabled = true;
+
+    // Convertimos la foto a Base64 para el backend
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const fotoBase64 = e.target.result;
+        let emailComprador = sessionUser ? sessionUser.email : document.getElementById('checkout-guest-email').value.trim();
+        let nombreComprador = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : document.getElementById('checkout-guest-nombre').value.trim();
+
+        const payload = {
+            carrito: carritoCompras,
+            email: emailComprador,
+            nombre: nombreComprador,
+            comprobanteBase64: fotoBase64,
+            montoTotal: document.getElementById('checkout-total-monto').innerText
+        };
+
+        const res = await apiCall("registrarTransferenciaEcommerce", payload);
+
+        if (res && res.success) {
+            // Limpiamos el carrito local
+            carritoCompras = [];
+            guardarCarritoLocal();
+            renderizarCarrito();
+            
+            document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
+            document.getElementById('modal-ecommerce-transferencia').style.display = "none";
+            document.getElementById('main-content').classList.remove('blur-effect');
+            
+            const numPedido = res.orden_id;
+            const waTxt = encodeURIComponent(`¡Hola Coach! Acabo de hacer una transferencia por productos en la web.\n\n📦 N° Pedido: ${numPedido}\n💵 Monto: ${payload.montoTotal}\n\nQuedo atento para coordinar la entrega.`);
+            
+            const tarjetaHTML = `
+                <div style="text-align: center; width: 100%;">
+                    <p style="color: var(--neon-n); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡ORDEN RECIBIDA!</p>
+                    <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
+                        Tu comprobante fue inyectado en la Matrix. Tu N° de Pedido es: <strong style="color:white;">${numPedido}</strong>.<br><br>Escríbele a un Coach ahora mismo para coordinar el envío/entrega.
+                    </p>
+                    <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
+                </div>
+            `;
+            await kairoMessage({ mensaje: tarjetaHTML, icon: "📦" });
+            salirDelModulo();
+        } else {
+            btn.innerText = "ENVIAR COMPROBANTE"; btn.disabled = false;
+            notify("Error al registrar: " + (res ? res.msg : "Sin conexión"));
+        }
+    };
+    reader.readAsDataURL(file);
 }
     </script>
 </body>
