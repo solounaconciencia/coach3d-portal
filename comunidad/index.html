@@ -7048,7 +7048,7 @@ async function iniciarproductos() {
     if(res && res.success) {
         // Fallback imagen si la original no carga
         inventarioEcommerce = res.productos.filter(p => p.estado === "ACTIVO").map(p => {
-            if(!p.imagenes) p.imagenes = "https://i.postimg.cc/1RF0H6Ff/Logoew.png";
+            if(!p.imagenes) p.imagenes = "https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png";
             if(!p.estrellas) p.estrellas = 5;
             categoriasEcommerce.add(p.accion); // Guardamos la categoría (columna Acción)
             return p;
@@ -7138,7 +7138,7 @@ function renderizarGrillaEcommerce(lista = inventarioEcommerce) {
     
     lista.forEach(p => {
         const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
-        const portada = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/1RF0H6Ff/Logoew.png";
+        const portada = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png";
         
         let htmlPrecio = "";
         if (esSusc) {
@@ -7152,7 +7152,7 @@ function renderizarGrillaEcommerce(lista = inventarioEcommerce) {
         card.className = "store-card";
         card.innerHTML = `
             <div class="store-card-img-wrapper" style="cursor:pointer;" onclick="abrirModalEcommerce('${p.sku}')">
-                <img class="store-card-img" src="${portada}" onerror="this.src='https://i.postimg.cc/1RF0H6Ff/Logoew.png'">
+                <img class="store-card-img" src="${portada}" onerror="this.src='https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png'">
             </div>
             <div class="store-card-content">
                 <div class="store-card-brand">C3D | ${p.pilar}</div>
@@ -7176,7 +7176,7 @@ function abrirModalEcommerce(sku) {
     document.getElementById('main-content').classList.add('blur-effect');
     
     const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
-    document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/1RF0H6Ff/Logoew.png";
+    document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png";
     document.getElementById('ecom-modal-sku').innerText = `SKU: ${p.sku} | STOCK: ${p.stock}`;
     document.getElementById('ecom-modal-nombre').innerText = p.nombre;
     document.getElementById('ecom-modal-estrellas').innerHTML = generarEstrellasUI(p.estrellas);
