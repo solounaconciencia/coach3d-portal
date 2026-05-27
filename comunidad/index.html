@@ -3030,7 +3030,7 @@
         <form id="form-cta-tienda" class="hidden" style="margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto; text-align: left;" onsubmit="event.preventDefault(); solicitarTiendaEcom();">
             <input type="text" id="cta-tienda-nombre" class="nave-input" placeholder="Tu Nombre Completo" required>
             <input type="text" id="cta-tienda-rubro" class="nave-input" placeholder="¿De qué trata tu negocio?" required>
-            <button type="submit" class="btn btn-f" style="width: 100%; padding: 12px; margin-top: 10px;">ENVIAR SOLICITUD A KAIRO</button>
+            <button type="submit" class="btn btn-f" style="width: 100%; padding: 12px; margin-top: 10px;">SOLICITAR POR WHATSAPP 🚀</button>
         </form>
     </div>
 
@@ -3048,8 +3048,11 @@
     </div>
 </div>
 
-<div id="modal-ecommerce-producto" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 92% !important; max-width: 800px !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
-    <div class="modal-ecommerce-layout">
+<div id="modal-ecommerce-producto" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 92% !important; max-width: 800px !important; max-height: 85vh !important; overflow-y: auto !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
+    
+    <button onclick="cerrarModalEcommerce()" style="position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; z-index: 10; font-weight: bold;">×</button>
+    
+    <div class="modal-ecommerce-layout" style="margin-top: 15px;">
         <div class="modal-ecommerce-gallery">
             <img id="ecom-modal-img" src="" style="width: 100%; aspect-ratio: 1/1; object-fit: contain; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; box-sizing: border-box;">
         </div>
@@ -7274,24 +7277,21 @@ function cerrarPatrocinador() {
     document.getElementById('main-content').classList.remove('blur-effect');
 }
 
-async function solicitarTiendaEcom() {
-    const nombre = document.getElementById('cta-tienda-nombre').value;
-    const rubro = document.getElementById('cta-tienda-rubro').value;
-    const btn = document.querySelector('#form-cta-tienda button');
+function solicitarTiendaEcom() {
+    const nombre = document.getElementById('cta-tienda-nombre').value.trim();
+    const rubro = document.getElementById('cta-tienda-rubro').value.trim();
     
-    btn.innerText = "ENVIANDO..."; btn.disabled = true;
-    const emailActivo = sessionUser ? sessionUser.email : "Visitante (Sin Sesión)";
+    if (!nombre || !rubro) return notify("Por favor completa los campos.");
 
-    await apiCall("enviarCorreoSoporte", { 
-        asunto: "NUEVA SOLICITUD DE TIENDA E-COMMERCE", 
-        mensaje: `Nombre: ${nombre}<br>Rubro: ${rubro}<br>Email Sesión: ${emailActivo}` 
-    });
+    // Armamos el texto predeterminado de neuroventa
+    const textoWA = `¡Hola Coach Diego! 🚀 Me interesa tener mi propia tienda E-Commerce clonada.\n\n👤 *Mi nombre es:* ${nombre}\n💼 *Mi negocio es de:* ${rubro}\n\nQuedo atento a los pasos a seguir.`;
+    
+    // Disparamos WhatsApp en una pestaña nueva
+    window.open(`https://wa.me/56976003402?text=${encodeURIComponent(textoWA)}`, '_blank');
 
+    // Reseteamos y ocultamos el formulario
     document.getElementById('form-cta-tienda').reset();
     document.getElementById('form-cta-tienda').classList.add('hidden');
-    btn.innerText = "ENVIAR SOLICITUD A KAIRO"; btn.disabled = false;
-    
-    kairoMessage({ mensaje: "¡Solicitud Inyectada en la Matrix! Un Coach 3D te contactará pronto para clonar tu E-Commerce.", icon: "🚀" });
 }
 
 
