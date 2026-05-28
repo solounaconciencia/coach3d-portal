@@ -7176,9 +7176,6 @@ function abrirModalEcommerce(sku) {
     if(!p) return;
     productoActivoEcom = p;
 
-    // 🛡️ CIRUGÍA FOCUS: Solo difuminamos el catálogo, liberando al modal
-    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
-    
     const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
     document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "https://img.icons8.com/fluency/96/box.png";
     document.getElementById('ecom-modal-sku').innerText = `SKU: ${p.sku} | STOCK: ${p.stock}`;
@@ -7216,16 +7213,9 @@ function abrirModalEcommerce(sku) {
     modal.style.display = "block";
 }
 
-function cambiarFotoVarianteEcom() {
-    const select = document.getElementById('ecom-modal-select-variante');
-    const imgSelec = select.options[select.selectedIndex].getAttribute('data-img');
-    if(imgSelec) document.getElementById('ecom-modal-img').src = imgSelec;
-}
-
 function cerrarModalEcommerce() {
     document.getElementById('modal-ecommerce-producto').classList.add('hidden');
     document.getElementById('modal-ecommerce-producto').style.display = 'none';
-    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
     productoActivoEcom = null;
 }
 
@@ -7250,7 +7240,6 @@ function renderizarMarqueePatrocinadores() {
         `<img src="${pat.logo}" class="patrocinador-logo" onclick="abrirModalPatrocinador(${index})">`
     ).join('');
     
-    // Duplicamos el HTML para el efecto infinito de loop
     marquee.innerHTML = htmlLogos + htmlLogos;
 }
 
@@ -7266,7 +7255,6 @@ function abrirModalPatrocinador(index) {
     btn.innerText = p.textoBoton || "IR AL SITIO WEB";
     btn.setAttribute('data-url', p.url);
 
-    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     document.getElementById('modal-patrocinador').classList.remove('hidden');
     document.getElementById('modal-patrocinador').style.display = 'block';
 }
@@ -7274,28 +7262,20 @@ function abrirModalPatrocinador(index) {
 function cerrarPatrocinador() {
     document.getElementById('modal-patrocinador').classList.add('hidden');
     document.getElementById('modal-patrocinador').style.display = 'none';
-    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
 }
 
 function solicitarTiendaEcom() {
     const nombre = document.getElementById('cta-tienda-nombre').value.trim();
     const rubro = document.getElementById('cta-tienda-rubro').value.trim();
-    
     if (!nombre || !rubro) return notify("Por favor completa los campos.");
 
-    // Armamos el texto predeterminado de neuroventa
     const textoWA = `¡Hola Coach Diego! 🚀 Me interesa tener mi propia tienda E-Commerce clonada.\n\n👤 *Mi nombre es:* ${nombre}\n💼 *Mi negocio es de:* ${rubro}\n\nQuedo atento a los pasos a seguir.`;
-    
-    // Disparamos WhatsApp en una pestaña nueva
     window.open(`https://wa.me/56976003402?text=${encodeURIComponent(textoWA)}`, '_blank');
 
-    // Reseteamos y ocultamos el formulario
     document.getElementById('form-cta-tienda').reset();
     document.getElementById('form-cta-tienda').classList.add('hidden');
 }
 
-
-// --- CARRITO CEREBRO ---
 function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('active'); }
 
 function cargarCarritoLocal() {
@@ -7319,7 +7299,6 @@ function agregarAlCarritoDesdeModal() {
         varianteElegida = document.getElementById('ecom-modal-select-variante').value;
     }
 
-    // Buscar si ya existe la misma variante en el carrito
     const idx = carritoCompras.findIndex(x => x.sku === productoActivoEcom.sku && x.variante === varianteElegida);
     if(idx > -1) {
         carritoCompras[idx].cantidad++;
@@ -7336,7 +7315,7 @@ function agregarAlCarritoDesdeModal() {
     guardarCarritoLocal();
     renderizarCarrito();
     cerrarModalEcommerce();
-    toggleCart(); // Abre el drawer para confirmar visualmente
+    toggleCart(); 
 }
 
 function renderizarCarrito() {
@@ -7344,7 +7323,6 @@ function renderizarCarrito() {
     cont.innerHTML = "";
     let total = 0;
     let count = 0;
-
     if(carritoCompras.length === 0) {
         cont.innerHTML = "<p style='text-align:center; color:#666; margin-top:40px;'>Tu carrito está vacío.</p>";
     } else {
@@ -7370,7 +7348,6 @@ function renderizarCarrito() {
             cont.appendChild(div);
         });
     }
-
     document.getElementById('cart-total-price').innerText = "$" + total.toLocaleString();
     document.getElementById('cart-count').innerText = count;
 }
@@ -7391,14 +7368,12 @@ function eliminarDelCarrito(index) {
 function cerrarCheckout() {
     document.getElementById('modal-ecommerce-checkout').classList.add('hidden');
     document.getElementById('modal-ecommerce-checkout').style.display = "none";
-    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
     toggleCart(); 
 }
 
 function abrirCheckout() {
     if(carritoCompras.length === 0) return notify("No hay productos en tu carrito.");
     toggleCart();
-    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     document.getElementById('checkout-total-monto').innerText = document.getElementById('cart-total-price').innerText;
     
     if (!sessionUser) {
@@ -7415,17 +7390,16 @@ function abrirCheckout() {
 async function procesarPagoCarrito() {
     let emailComprador = sessionUser ? sessionUser.email : document.getElementById('checkout-guest-email').value.trim();
     let nombreComprador = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : document.getElementById('checkout-guest-nombre').value.trim();
-
     if (!sessionUser && (!emailComprador || !nombreComprador || !emailComprador.includes('@'))) {
         return notify("Por favor, ingresa un nombre y un correo válido para enviarte el comprobante de compra.");
     }
 
     const metodo = document.querySelector('input[name="metodoPago"]:checked').value;
     const btn = document.getElementById('btn-checkout-pagar');
-    btn.innerText = "CONECTANDO CON LA MATRIX..."; btn.disabled = true;
+    btn.innerText = "CONECTANDO CON LA MATRIX...";
+    btn.disabled = true;
 
     if (metodo === "MP") {
-        // Redirección Dinámica MercadoPago
         const returnUrlBase = window.location.origin + window.location.pathname;
         const res = await apiCall("crearPreferenciaMP", {
             carrito: carritoCompras,
@@ -7433,26 +7407,24 @@ async function procesarPagoCarrito() {
             nombre: nombreComprador,
             urlRetorno: returnUrlBase
         });
-
         if (res && res.success) {
-            // Guardamos el token de la orden en caso de abandono o retorno exitoso
             localStorage.setItem('kairo_ecommerce_token_anonimo', "ECOM-" + new Date().getTime());
             localStorage.setItem('kairo_ecommerce_tipo', "PRODUCTOS");
             window.location.href = res.init_point;
         } else {
-            btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+            btn.innerText = "CONFIRMAR Y PAGAR";
+            btn.disabled = false;
             notify("Error al conectar con MercadoPago: " + (res ? res.msg : "Sin respuesta."));
         }
     } else if (metodo === "TRANSFERENCIA") {
-        // Abrimos ventana de Transferencia
-        btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+        btn.innerText = "CONFIRMAR Y PAGAR";
+        btn.disabled = false;
         abrirModalTransferencia();
     }
 }
 
 async function abrirModalTransferencia() {
     cerrarCheckout();
-    document.getElementById('modulo-productos-ecommerce').classList.add('blur-effect');
     
     const resConf = await apiCall("obtenerDatosBancariosPublicos");
     if (resConf && resConf.success) {
@@ -7471,7 +7443,6 @@ async function abrirModalTransferencia() {
 function cerrarTransferencia() {
     document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
     document.getElementById('modal-ecommerce-transferencia').style.display = "none";
-    document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
     abrirCheckout();
 }
         
@@ -7482,7 +7453,6 @@ async function ejecutarEnvioTransferencia() {
     }
     const file = inputFoto.files[0];
     if (file.size > 3000000) return notify("El comprobante es muy pesado. Máximo 3MB.");
-
     const btn = document.getElementById('btn-enviar-transferencia');
     btn.innerText = "ENVIANDO A LA MATRIX..."; btn.disabled = true;
 
@@ -7491,7 +7461,6 @@ async function ejecutarEnvioTransferencia() {
         const fotoBase64 = e.target.result;
         let emailComprador = sessionUser ? sessionUser.email : document.getElementById('checkout-guest-email').value.trim();
         let nombreComprador = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : document.getElementById('checkout-guest-nombre').value.trim();
-
         const payload = {
             carrito: carritoCompras,
             email: emailComprador,
@@ -7499,7 +7468,6 @@ async function ejecutarEnvioTransferencia() {
             comprobanteBase64: fotoBase64,
             montoTotal: document.getElementById('checkout-total-monto').innerText
         };
-
         const res = await apiCall("registrarTransferenciaEcommerce", payload);
 
         if (res && res.success) {
@@ -7509,18 +7477,17 @@ async function ejecutarEnvioTransferencia() {
             
             document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
             document.getElementById('modal-ecommerce-transferencia').style.display = "none";
-            document.getElementById('modulo-productos-ecommerce').classList.remove('blur-effect');
             
             const numPedido = res.orden_id;
             const waTxt = encodeURIComponent(`¡Hola Coach! Acabo de hacer una transferencia por productos en la web.\n\n📦 N° Pedido: ${numPedido}\n💵 Monto: ${payload.montoTotal}\n\nQuedo atento para coordinar la entrega.`);
-            
             const tarjetaHTML = `
                 <div style="text-align: center; width: 100%;">
                     <p style="color: var(--neon-n); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡ORDEN RECIBIDA!</p>
                     <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
                         Tu comprobante fue inyectado en la Matrix. Tu N° de Pedido es: <strong style="color:white;">${numPedido}</strong>.<br><br>Escríbele a un Coach ahora mismo para coordinar el envío/entrega.
                     </p>
-                    <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
+                    <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;"
+onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
                 </div>
             `;
             await kairoMessage({ mensaje: tarjetaHTML, icon: "📦" });
