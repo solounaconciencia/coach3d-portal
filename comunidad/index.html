@@ -2998,9 +2998,9 @@
             <label style="font-size: 0.7em; color: #fbbf24; display: block; margin-bottom: 5px;">Recomendación</label>
             <select id="filtro-recomendacion" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
                 <option value="0">Todos (Nuevos)</option>
-                <option value="3.5">★ 3.5 o más</option>
+                <option value="2.0">★ 2.0 o más</option>
+                <option value="3.0">★ 3.0 o más</option>
                 <option value="4.0">★ 4.0 o más</option>
-                <option value="4.5">★ 4.5 o más</option>
                 <option value="5.0">★ 5.0 (Máxima)</option>
             </select>
         </div>
@@ -7074,17 +7074,19 @@ async function iniciarproductos() {
     }
 }
 
-// 🛡️ MOTOR DE ESTRELLAS FONTAWESOME
+// 🛡️ MOTOR DE ESTRELLAS NATIVO (SIN LIBRERÍAS EXTERNAS)
 function generarEstrellasUI(valor) {
+    let enteros = Math.round(valor); // Redondea al entero más cercano
+    if (enteros > 5) enteros = 5;
+    if (enteros < 0) enteros = 0;
+    
     let html = "";
-    let enteros = Math.floor(valor);
-    let decimal = (valor - enteros) >= 0.5 ? 1 : 0;
-    let vacias = 5 - enteros - decimal;
-    for(let i=0; i<enteros; i++) html += '<i class="fas fa-star"></i>';
-    if(decimal) html += '<i class="fas fa-star-half-alt"></i>';
-    for(let i=0; i<vacias; i++) html += '<i class="far fa-star"></i>';
-    return `<span style="color:#fbbf24; font-size:0.9em; letter-spacing:1px;">${html} <span style="color:#cbd5e1; font-size:0.8em; font-family:'Orbitron';">(${valor})</span></span>`;
+    for(let i=0; i<enteros; i++) html += '★';
+    for(let i=0; i<5-enteros; i++) html += '☆';
+    
+    return `<span style="color:#fbbf24; font-size:1.1em; letter-spacing:2px;">${html} <span style="color:#cbd5e1; font-size:0.7em; font-family:'Orbitron';">(${valor})</span></span>`;
 }
+
 
 function cambiarPilarTienda(pilar) {
     pilarTiendaActivo = pilar;
@@ -7178,7 +7180,7 @@ function abrirModalEcommerce(sku) {
 
     const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
     document.getElementById('ecom-modal-img').src = fotosArray.length > 0 ? fotosArray[0] : "https://img.icons8.com/fluency/96/box.png";
-    document.getElementById('ecom-modal-sku').innerText = `SKU: ${p.sku} | STOCK: ${p.stock}`;
+    document.getElementById('ecom-modal-sku').innerText = `SKU: ${p.sku}`;
     document.getElementById('ecom-modal-nombre').innerText = p.nombre;
     document.getElementById('ecom-modal-estrellas').innerHTML = generarEstrellasUI(p.estrellas);
     document.getElementById('ecom-modal-desc').innerText = p.descripcion;
