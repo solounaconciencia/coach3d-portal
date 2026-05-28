@@ -3788,12 +3788,12 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
   else if (urlParams.get('modulo') === 'calculadora') {
       // 🛡️ Si entran por link directo a la calculadora financiera
       iniciarcalculadorafinanciera();
-  } 
-  else if (urlParams.get('modulo') === 'servicios') {
+  } else if (urlParams.get('modulo') === 'servicios') {
       // 🛡️ Si entran por link directo al catálogo de servicios de coaching
       iniciarservicios();
-  }
-  else {
+  } else if (urlParams.get('modulo') === 'tienda') {
+      iniciarproductos(); // 🛡️ RUTA EXTERNA TIENDA (LOGUEADOS)
+  } else {
       // Dashboard normal de la comunidad
       document.getElementById('view-dashboard').classList.remove('hidden');
       
@@ -3942,12 +3942,14 @@ function checkSession() {
           iniciarcalculadorafinanciera();
       } else if (urlParams.get('modulo') === 'servicios') {
           iniciarservicios();
+      } else if (urlParams.get('modulo') === 'tienda') {
+          iniciarproductos(); // 🛡️ RUTA EXTERNA TIENDA (INVITADOS)
       } else {
-          document.getElementById('view-welcome').classList.remove('hidden'); 
+          document.getElementById('view-welcome').classList.remove('hidden');
       }
       
       document.getElementById('kairo-loader-global').style.display = 'none';
-      return; 
+      return;
     }
 
     const datosRecuperados = JSON.parse(anclaRaw);
