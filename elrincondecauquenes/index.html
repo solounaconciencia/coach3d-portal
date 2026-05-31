@@ -1075,7 +1075,56 @@ button {
         </div>
     </div>
 
+<footer style="text-align:center; padding:40px 20px; margin-top:60px; border-top:1px solid rgba(255,255,255,0.05);">
+        <p style="color:var(--gris-tenue); font-size:0.8rem;">© 2024 El Rincón de Cauquenes. Todos los derechos reservados.</p>
+        <p style="font-size:0.7rem; margin-top:10px; color:#555;">
+            Tecnología y Desarrollo: <a href="javascript:void(0)" onclick="document.getElementById('modal-agencia').style.display='flex'" style="color:var(--cian-pro); text-decoration:none; font-weight:bold; letter-spacing: 1px;">COACH 3D LATAM</a>
+        </p>
+    </footer>
 
+    <div id="modal-agencia" class="modal" style="display:none; align-items:center; justify-content:center;">
+        <div class="modal-content" style="max-width:400px; text-align:center; padding: 40px 30px;">
+            <span class="close-modal" onclick="document.getElementById('modal-agencia').style.display='none'">&times;</span>
+            <h2 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 5px;">COACH 3D LATAM</h2>
+            <p style="font-size:0.85rem; color:var(--gris-tenue); margin-bottom:25px;">Evolucionamos tu negocio. Cotiza tu propia App Web High-End.</p>
+            
+            <input type="text" id="ag-nombre" placeholder="Tu Nombre" style="width:100%; padding:15px; margin-bottom:12px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px;">
+            <input type="email" id="ag-correo" placeholder="Tu Correo" style="width:100%; padding:15px; margin-bottom:12px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px;">
+            <select id="ag-servicio" style="width:100%; padding:15px; margin-bottom:12px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px;">
+                <option value="E-Commerce Propio">Quiero mi propio E-Commerce</option>
+                <option value="Solución Tecnológica">Otra solución tecnológica</option>
+            </select>
+            <textarea id="ag-mensaje" placeholder="Detalles de tu proyecto..." style="width:100%; padding:15px; margin-bottom:20px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px; height: 100px;"></textarea>
+            
+            <button id="btn-agencia" onclick="enviarLeadAgencia()" class="btn-checkout" style="margin-top:0;">ENVIAR SOLICITUD</button>
+        </div>
+    </div>
+
+    <div id="modal-producto-admin" class="modal" style="display:none; align-items:center; justify-content:center; z-index: 20000;">
+        <div class="modal-content" style="max-width:500px; border-color: var(--amber-premium);">
+            <h2 style="color:var(--amber-premium); font-family:var(--fuente-titulo); margin-bottom:20px;">NUEVO PRODUCTO</h2>
+            <input type="text" id="prod-nombre" placeholder="Nombre del Producto" style="width:100%; padding:12px; margin-bottom:10px; background:#111; color:white; border:1px solid #333;">
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <input type="number" id="prod-precio" placeholder="Precio ($)" style="width:50%; padding:12px; background:#111; color:white; border:1px solid #333;">
+                <input type="number" id="prod-stock" placeholder="Stock Inicial" style="width:50%; padding:12px; background:#111; color:white; border:1px solid #333;">
+            </div>
+            <input type="text" id="prod-categoria" placeholder="Categoría (Ej: Semillas)" style="width:100%; padding:12px; margin-bottom:10px; background:#111; color:white; border:1px solid #333;">
+            <textarea id="prod-desc" placeholder="Descripción..." style="width:100%; height:80px; padding:12px; margin-bottom:15px; background:#111; color:white; border:1px solid #333;"></textarea>
+            
+            <h4 style="color:var(--cian-pro); margin-bottom:10px;">VARIANTES (Opcional)</h4>
+            <input type="text" id="prod-opciones" placeholder="Ej: Rojo, Azul, Verde (Separado por comas)" style="width:100%; padding:12px; margin-bottom:15px; background:#111; color:white; border:1px solid #333;">
+
+            <label style="display:block; margin-bottom:5px; color:#888; font-size:0.8rem;">FOTO PRINCIPAL (Opcional):</label>
+            <input type="file" id="prod-foto" accept="image/*" style="margin-bottom:20px; color:#fff;">
+            
+            <div style="display:flex; gap:10px;">
+                <button id="btn-guardar-prod" onclick="guardarProductoCentral()" class="btn-checkout" style="margin-top:0;">GUARDAR PRODUCTO</button>
+                <button onclick="document.getElementById('modal-producto-admin').style.display='none'" class="btn-back" style="width:100%;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    
     <?!= incluir('scripts'); ?>
     <?!= incluir('admin'); ?>
 
