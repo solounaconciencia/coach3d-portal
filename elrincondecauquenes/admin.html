@@ -3,244 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mando Central | Rincón de Cauquenes</title>
+    <title>MANDO CENTRAL | Rincón de Cauquenes</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@300;400;600;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --bg-negro: #050505;
-            --bg-card: #111111;
-            --cian-pro: #00e5ff;
-            --amber-premium: #f1c40f;
-            --blanco-puro: #ffffff;
-            --gris-tenue: #888888;
-            --fuente-titulo: 'Orbitron', sans-serif;
-            --fuente-texto: 'Montserrat', sans-serif;
+            --neon-green: #00e5ff; /* Adaptado a cian por defecto */
+            --amber: #f1c40f;
+            --cian: #00ffff;
+            --bg-space: #020204;
+            --glass: rgba(255, 255, 255, 0.05);
+            --font-main: 'Montserrat', sans-serif;
+            --font-brand: 'Orbitron', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        body {
-            background-color: var(--bg-negro);
-            color: var(--blanco-puro);
-            font-family: var(--fuente-texto);
-            margin: 0;
-            padding: 0;
-        }
-
-        .admin-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Estilos de Botones y Formularios */
-        .btn-checkout, .btn-back, .admin-tab-btn {
-            background: var(--cian-pro);
-            color: black;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-family: var(--fuente-titulo);
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        
-        .btn-back {
-            background: transparent;
-            color: var(--blanco-puro);
-            border: 1px solid #444;
-        }
-
-        .admin-tab-btn.active {
-            border-color: var(--cian-pro);
-            color: var(--cian-pro);
-        }
-
-        .admin-input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: #0a0a0a;
-            color: white;
-            border: 1px solid #333;
-            border-radius: 8px;
-            font-family: var(--fuente-texto);
-            box-sizing: border-box;
-        }
-
-        /* Estilos de Login */
-        #admin-login-view {
-            max-width: 400px;
-            margin: 100px auto;
-            background: var(--bg-card);
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid #222;
-            text-align: center;
-        }
-
-        /* Diseño de Pestañas (Cards) */
-        .admin-card {
-            background: var(--bg-card);
-            border: 1px solid #222;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .toast {
-            visibility: hidden; min-width: 250px; background-color: var(--cian-pro); color: #000;
-            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
-            z-index: 10000; left: 50%; bottom: 30px; font-weight: bold;
-            transform: translateX(-50%); font-family: var(--fuente-titulo);
-        }
-        .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-        
-        /* Modal Nuevo Producto */
-        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
-        .modal-content { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--amber-premium); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;}
+        body { background: var(--bg-space); color: white; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 0; min-height: 100vh; }
+        .admin-nav { background: #000; padding: 15px; display: flex; gap: 10px; overflow-x: auto; border-bottom: 1px solid var(--cian); }
+        .tab-btn { background: transparent; border: 1px solid #333; color: #888; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-weight: bold; font-family: var(--font-brand); font-size: 0.7rem; transition: 0.3s; white-space: nowrap; }
+        .tab-btn.active { border-color: var(--cian); color: var(--cian); box-shadow: 0 0 10px rgba(0,255,255,0.2); }
+        .admin-container { padding: 20px; max-width: 1200px; margin: auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .metric-card { background: rgba(10, 15, 26, 0.95); border-left: 4px solid var(--cian); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #1a1a1a; }
+        .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .admin-table th { text-align: left; color: var(--amber); padding: 10px; border-bottom: 1px solid #333; font-family: var(--font-brand); }
+        .admin-table td { padding: 10px; border-bottom: 1px solid #111; }
+        .nave-input, .input-admin { width: 100%; padding: 12px 15px; margin-bottom: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 10px; color: white; font-size: 16px; outline: none; font-family: var(--font-main); box-sizing: border-box;}
+        .btn-nave-main { width: 100%; padding: 14px; background: var(--neon-green); color: black; border: none; border-radius: 10px; font-family: var(--font-brand); font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-nave-main:hover { transform: scale(1.02); background: white; }
+        .modal { display: none; position: fixed; z-index: 100000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #0b0f1a; border: 1px solid var(--cian); padding: 25px; border-radius: 15px; width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-nave { position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; color: var(--neon-green); background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 50%; transition: 0.3s; }
+        .close-nave:hover { background: var(--neon-green); color: black !important; transform: rotate(90deg) scale(1.1); }
+        .cian { color: var(--cian); } .amber { color: var(--amber); }
+        .custom-file-upload { border: 1px dashed var(--cian); background: rgba(0, 255, 255, 0.05); color: var(--cian); padding: 12px 15px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--font-brand); font-size: 0.75rem; width: 100%; transition: 0.3s; box-sizing: border-box; }
+        .hidden-file { display: none; }
+        .toast-weed { position: fixed; bottom: 20px; right: 20px; background: var(--cian); color: black; padding: 15px 25px; border-radius: 5px; font-family: var(--font-brand); font-size: 0.8rem; font-weight: bold; box-shadow: 0 0 15px rgba(0,255,255,0.3); z-index: 200000; animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .tool-btn { background: var(--glass); border: 1px solid var(--cian); color: white; padding: 15px 5px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <div id="admin-login-view">
-            <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--cian-pro); margin-bottom:15px;"></i>
-            <h3 style="font-family: var(--fuente-titulo); letter-spacing: 2px; margin-bottom: 30px;">MANDO CENTRAL</h3>
-            <input type="text" id="admin-user" placeholder="Usuario" class="admin-input">
-            <input type="password" id="admin-pass" placeholder="Contraseña" class="admin-input">
-            <button onclick="loginAdmin()" class="btn-checkout" style="width: 100%;">VERIFICAR IDENTIDAD</button>
+    <div id="login-container" style="display:flex; height:100vh; align-items:center; justify-content:center;">
+        <div class="modal-content" style="max-width: 400px; text-align:center;">
+            <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--cian); margin-bottom:20px;"></i>
+            <h2 style="font-family:var(--font-brand); color:var(--amber); letter-spacing:2px; margin-bottom:30px;">MANDO CENTRAL</h2>
+            <input type="text" id="admin-user" class="nave-input" placeholder="USUARIO">
+            <input type="password" id="admin-pass" class="nave-input" placeholder="CONTRASEÑA">
+            <button class="btn-nave-main" onclick="ejecutarLoginAdmin()">VERIFICAR IDENTIDAD</button>
+        </div>
+    </div>
+
+    <div id="admin-dashboard" style="display:none;">
+        <div class="admin-nav">
+            <button class="tab-btn active" onclick="showSection('dash', this)"><i class="fas fa-chart-line"></i> MÉTRICAS</button>
+            <button class="tab-btn" onclick="showSection('productos_manager', this)"><i class="fas fa-box-open"></i> PRODUCTOS</button>
+            <button class="tab-btn" onclick="showSection('config', this)"><i class="fas fa-cog"></i> REDES Y PAGOS</button>
+            <button class="tab-btn" onclick="showSection('estilo', this)"><i class="fas fa-palette"></i> ESTILO</button>
+            <button class="tab-btn" onclick="location.reload()" style="margin-left:auto; border-color:#ff4444; color:#ff4444;"><i class="fas fa-sign-out-alt"></i> SALIR</button>
         </div>
 
-        <div id="admin-menu-view" style="display:none;">
-            <div style="display:flex; gap:10px; margin-bottom:25px; border-bottom:1px solid #333; padding-bottom:15px; overflow-x:auto;">
-                <button class="btn-back admin-tab-btn active" onclick="showAdminTab('dash', this)">MÉTRICAS</button>
-                <button class="btn-back admin-tab-btn" onclick="showAdminTab('pedidos', this)">ESTADO PEDIDOS</button>
-                <button class="btn-back admin-tab-btn" onclick="showAdminTab('catalogo', this)">CATÁLOGO</button>
-                <button class="btn-back admin-tab-btn" onclick="showAdminTab('ajustes', this)">ESTILOS Y REDES</button>
-                <button class="btn-back" onclick="location.reload()" style="margin-left:auto; border-color:#e74c3c; color:#e74c3c;"><i class="fas fa-sign-out-alt"></i> SALIR</button>
-            </div>
-
-            <div id="tab-dash" class="admin-tab-content" style="display:block;">
-                <h3 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 20px;">RENDIMIENTO GLOBAL</h3>
-                <div class="admin-card" style="height: 300px; display: flex; align-items: center; justify-content: center; color: #555;">
-                    <i>Gráfico de rendimiento en construcción (Requiere conexión API)</i>
+        <div class="admin-container">
+            
+            <div id="dash" class="section active">
+                <h2 class="cian" style="font-family:var(--font-brand);">CONTROL DE CAJA</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="metric-card"><h3>HOY</h3><p id="ventas-hoy" class="cian" style="font-size: 1.5rem; font-weight:bold; margin:0;">$0</p></div>
+                    <div class="metric-card"><h3>ESTE MES</h3><p id="ventas-mes" class="amber" style="font-size: 1.5rem; font-weight:bold; margin:0;">$0</p></div>
+                </div>
+                <div style="margin-top:20px; display:flex; align-items:center; gap:10px;">
+                    <label style="font-size:0.7rem; color:var(--cian);">PERIODO:</label>
+                    <select id="periodo-selector" class="nave-input" style="width:auto; margin:0;" onchange="actualizarGrafico()">
+                        <option value="0" selected>MES EN CURSO</option>
+                        <option value="3">Últimos 3 Meses</option>
+                        <option value="6">Últimos 6 Meses</option>
+                        <option value="12">Último Año</option>
+                    </select>
+                </div>
+                <div class="metric-card" style="margin-top:15px; padding:10px; height:350px;">
+                    <canvas id="ventasChart"></canvas>
                 </div>
             </div>
 
-            <div id="tab-pedidos" class="admin-tab-content" style="display:none;">
-                <h3 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 20px;">GESTIÓN DE VENTAS</h3>
-                <input type="text" id="search-pedidos" class="admin-input" placeholder="Buscar por ID de pedido...">
-                <div class="admin-card" id="lista-pedidos-status" style="max-height: 400px; overflow-y: auto;">
-                    <p style="text-align:center; color:#555;">Cargando pedidos...</p>
+            <div id="productos_manager" class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <h2 class="cian" style="font-family:var(--font-brand);"><i class="fas fa-box-open"></i> GESTIÓN DE CATÁLOGO</h2>
+                    <button class="btn-nave-main" style="width: auto; padding: 10px 20px; margin: 0;" onclick="abrirModalNuevoProducto()">
+                        <i class="fas fa-plus"></i> NUEVO PRODUCTO
+                    </button>
+                </div>
+                <div style="margin-top: 20px;">
+                    <input type="text" id="search-catalogo" class="nave-input" placeholder="Buscar por Nombre o SKU..." onkeyup="filtrarCatalogo()" style="max-width: 400px;">
+                </div>
+                <div style="overflow-x: auto; margin-top: 15px; background:rgba(0,0,0,0.5); border-radius:10px; border:1px solid #222;">
+                    <table class="admin-table">
+                        <thead><tr><th>FOTO</th><th>PRODUCTO / SKU</th><th>CATEGORÍA</th><th>PRECIO Y STOCK</th><th>ACCIONES</th></tr></thead>
+                        <tbody id="tbody-catalogo"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div id="tab-catalogo" class="admin-tab-content" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h3 style="color:var(--amber-premium); font-family:var(--fuente-titulo); margin:0;">INVENTARIO Y CATÁLOGO</h3>
-                    <button onclick="document.getElementById('modal-producto-admin').style.display='flex'" class="btn-back" style="border-color:var(--cian-pro); color:var(--cian-pro);"><i class="fas fa-plus"></i> NUEVO PRODUCTO</button>
+            <div id="config" class="section">
+                <h2 class="cian" style="font-family:var(--font-brand);"><i class="fas fa-cogs"></i> REDES Y PAGOS</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div class="metric-card" style="margin-bottom:0; border-color: #e1306c;">
+                        <h3 style="color: #e1306c; margin-top:0; margin-bottom: 15px;"><i class="fas fa-hashtag"></i> COMUNICACIÓN</h3>
+                        <label style="font-size:0.7rem; color:#888;">WHATSAPP (Ventas y Soporte)</label>
+                        <input type="text" id="aj_wa" class="nave-input" placeholder="569...">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">LINK INSTAGRAM</label>
+                        <input type="text" id="aj_ig" class="nave-input" placeholder="https://instagram.com/...">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">LINK FACEBOOK</label>
+                        <input type="text" id="aj_fb" class="nave-input" placeholder="https://facebook.com/...">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">LINK TIKTOK</label>
+                        <input type="text" id="aj_tk" class="nave-input" placeholder="https://tiktok.com/...">
+                    </div>
+                    <div class="metric-card" style="margin-bottom:0; border-color: #00ff88;">
+                        <h3 style="color: #00ff88; margin-top:0; margin-bottom: 15px;"><i class="fas fa-university"></i> DATOS BANCARIOS</h3>
+                        <label style="font-size:0.7rem; color:#888;">NOMBRE DEL BANCO</label>
+                        <input type="text" id="aj_banco_nombre" class="nave-input" placeholder="Ej: Banco Estado">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">TIPO DE CUENTA</label>
+                        <input type="text" id="aj_banco_tipo" class="nave-input" placeholder="Ej: Cuenta RUT">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">RUT</label>
+                        <input type="text" id="aj_banco_rut" class="nave-input" placeholder="Ej: 11.111.111-1">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">NÚMERO DE CUENTA</label>
+                        <input type="text" id="aj_banco_numero" class="nave-input" placeholder="Ej: 11111111">
+                        <label style="font-size:0.7rem; color:#888; margin-top:10px; display:block;">CORREO ELECTRÓNICO</label>
+                        <input type="text" id="aj_banco_correo" class="nave-input" placeholder="pagos@tuweb.cl">
+                    </div>
                 </div>
-                <div class="admin-card" id="lista-productos-admin" style="max-height: 400px; overflow-y: auto;">
-                    <p style="text-align:center; color:#555;">Cargando catálogo...</p>
-                </div>
+                <button class="btn-nave-main" style="width: 100%; margin-top: 20px; padding: 15px;" onclick="guardarAjustesPanel(this)"><i class="fas fa-save"></i> GUARDAR CONFIGURACIÓN</button>
             </div>
 
-            <div id="tab-ajustes" class="admin-tab-content" style="display:none;">
-                <h3 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 20px;">CONFIGURACIÓN DE PLATAFORMA</h3>
-                
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+            <div id="estilo" class="section">
+                <h2 class="amber" style="font-family:var(--font-brand);"><i class="fas fa-palette"></i> METAMORFOSIS VISUAL</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                     
-                    <div class="admin-card">
-                        <h4 style="color:var(--amber-premium); margin-top:0; margin-bottom:15px;"><i class="fas fa-hashtag"></i> REDES SOCIALES</h4>
-                        <label style="font-size:0.8rem; color:#888;">WhatsApp Soporte (Solo números):</label>
-                        <input type="text" id="aj_wa" class="admin-input" placeholder="Ej: 56912345678">
-                        
-                        <label style="font-size:0.8rem; color:#888;">Instagram URL:</label>
-                        <input type="text" id="aj_ig" class="admin-input" placeholder="https://instagram.com/...">
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-fingerprint"></i> IDENTIDAD</h3>
+                        <label style="font-size:0.7rem; color:#ccc;">LOGO PRINCIPAL (URL):</label>
+                        <input type="text" id="est-logo" class="nave-input" placeholder="URL de la imagen...">
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:10px; display:block;">LOGO SECUNDARIO / ERROR:</label>
+                        <input type="text" id="est-logo-error" class="nave-input" placeholder="URL de la imagen...">
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:10px; display:block;">FAVICON (Icono pestaña navegador):</label>
+                        <input type="text" id="est-favicon" class="nave-input" placeholder="URL del icono...">
                     </div>
 
-                    <div class="admin-card">
-                        <h4 style="color:var(--amber-premium); margin-top:0; margin-bottom:15px;"><i class="fas fa-palette"></i> METAMORFOSIS VISUAL</h4>
-                        
-                        <label style="font-size:0.8rem; color:#888;">Logo URL (Drive o Imgur):</label>
-                        <input type="text" id="est-logo" class="admin-input" placeholder="https://...">
-                        
-                        <div style="display:flex; gap:10px; margin-bottom:15px;">
-                            <div style="flex:1;">
-                                <label style="font-size:0.8rem; color:#888;">Color Neón:</label>
-                                <input type="color" id="est-color-neon" value="#00e5ff" class="admin-input" style="height:45px; padding:2px; cursor:pointer;">
-                            </div>
-                            <div style="flex:1;">
-                                <label style="font-size:0.8rem; color:#888;">Color Ámbar:</label>
-                                <input type="color" id="est-color-amber" value="#f1c40f" class="admin-input" style="height:45px; padding:2px; cursor:pointer;">
-                            </div>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-image"></i> FONDO Y BANNER SUPERIOR</h3>
+                        <label style="font-size:0.7rem; color:#ccc;">FONDO DE LA TIENDA (URL Imagen):</label>
+                        <input type="text" id="est-bg-img" class="nave-input" placeholder="Dejar vacío para usar color...">
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:10px; display:block;">COMPORTAMIENTO DEL FONDO:</label>
+                        <select id="est-bg-modo" class="nave-input" style="padding:12px;">
+                            <option value="cover">Estirar (Cubrir pantalla completa)</option>
+                            <option value="repeat">Mosaico (Repetir patrón)</option>
+                        </select>
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:10px; display:block;">FONDO DEL BANNER SUPERIOR (URL o Hex):</label>
+                        <input type="text" id="est-banner-bg" class="nave-input" placeholder="Ej: #000000 o URL imagen...">
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-tint"></i> PALETA CROMÁTICA</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <label style="font-size:0.7rem; color:#ccc;">NEÓN (Éxito/Precios):</label>
+                            <input type="color" id="est-color-neon" value="#00e5ff" style="background:none; border:none; cursor:pointer;">
                         </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <label style="font-size:0.7rem; color:#ccc;">ÁMBAR (Destacados):</label>
+                            <input type="color" id="est-color-amber" value="#f1c40f" style="background:none; border:none; cursor:pointer;">
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <label style="font-size:0.7rem; color:#ccc;">CIAN (Vínculos/Bordes):</label>
+                            <input type="color" id="est-color-cian" value="#00ffff" style="background:none; border:none; cursor:pointer;">
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <label style="font-size:0.7rem; color:#ccc;">FONDO ESPACIO (Base):</label>
+                            <input type="color" id="est-color-bg" value="#020204" style="background:none; border:none; cursor:pointer;">
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label style="font-size:0.7rem; color:#ccc;">CRISTAL (Modales):</label>
+                            <input type="color" id="est-color-glass" value="#ffffff" style="background:none; border:none; cursor:pointer;">
+                        </div>
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:15px; display:block;">OPACIDAD CRISTAL (0% a 100%):</label>
+                        <input type="range" id="est-opacidad" min="0" max="100" value="5" style="width:100%; accent-color:var(--cian);">
+                    </div>
 
-                        <label style="font-size:0.8rem; color:#888;">Fuente de Títulos:</label>
-                        <select id="est-font-titulos" class="admin-input">
-                            <option value="'Orbitron', sans-serif">Orbitron (Cyber)</option>
-                            <option value="'Montserrat', sans-serif">Montserrat (Elegante)</option>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-font"></i> TIPOGRAFÍA</h3>
+                        <label style="font-size:0.7rem; color:#ccc;">TÍTULOS PRINCIPALES:</label>
+                        <select id="est-font-titulos" class="nave-input" style="padding:12px;">
+                            <option value="'Orbitron', sans-serif">Orbitron (Tecnológica)</option>
+                            <option value="'Bebas Neue', sans-serif">Bebas Neue (Imponente)</option>
+                            <option value="'Cinzel', serif">Cinzel (Elegante)</option>
+                            <option value="'Oswald', sans-serif">Oswald (Moderna)</option>
                         </select>
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:5px; display:block;">MENÚ Y BARRA SUPERIOR:</label>
+                        <select id="est-font-menu" class="nave-input" style="padding:12px;">
+                            <option value="'Montserrat', sans-serif">Montserrat (Limpia)</option>
+                            <option value="'Share Tech Mono', monospace">Share Tech Mono (Cyberpunk)</option>
+                            <option value="'Rajdhani', sans-serif">Rajdhani (Sci-Fi)</option>
+                        </select>
+                        <label style="font-size:0.7rem; color:#ccc; margin-top:5px; display:block;">TARJETAS DE PRODUCTO:</label>
+                        <select id="est-font-cuerpo" class="nave-input" style="padding:12px;">
+                            <option value="'Montserrat', sans-serif">Montserrat (Actual)</option>
+                            <option value="'Inter', sans-serif">Inter (App Moderna)</option>
+                            <option value="'Poppins', sans-serif">Poppins (Suave)</option>
+                        </select>
+                    </div>
 
-                        <label style="font-size:0.8rem; color:#888;">Efecto de Fondo (Atmósfera):</label>
-                        <select id="est-efecto-fondo" class="admin-input">
-                            <option value="ninguno">Ninguno (Negro puro)</option>
-                            <option value="espacial">Espacio Profundo (Estrellas)</option>
-                            <option value="matrix">Matrix Hacker (Lluvia verde)</option>
-                            <option value="bokeh">Brisa Dorada (Elegante)</option>
-                            <option value="vaporwave">Neón 80s (Retro)</option>
-                            <option value="naturaleza">Verde Orgánico (Relajante)</option>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-meteor"></i> EFECTOS AVANZADOS</h3>
+                        <label style="font-size:0.7rem; color:#ccc;">TIPO DE ATMÓSFERA ANIMADA:</label>
+                        <select id="est-atmosfera" class="nave-input" style="padding:12px; border-color:var(--amber);">
+                            <option value="espacial">1. Espacial (Estrellas aceleradas)</option>
+                            <option value="matrix">2. Matrix / Cyberpunk</option>
+                            <option value="bokeh">3. Brisa Elegante (Luces)</option>
+                            <option value="vaporwave">4. Retro Vaporwave 80s</option>
+                            <option value="naturaleza">5. Naturaleza Zen (Hojas)</option>
+                            <option value="ondas">6. Ondas Minimalistas</option>
+                            <option value="ninguna">7. Ninguna (Fondo estático)</option>
                         </select>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-map-marked-alt"></i> UBICACIÓN Y MEDIA</h3>
+                        <label style="font-size:0.7rem; color:#ccc;">DIRECCIÓN EXACTA (Para Mapa):</label>
+                        <input type="text" id="est-direccion-txt" class="nave-input" placeholder="Ej: Providencia 123, Santiago">
+                        <label style="font-size:0.7rem; color:#ccc; display:block;">ID VIDEO DE PRESENTACIÓN (Google Drive):</label>
+                        <input type="text" id="est-video-id" class="nave-input" placeholder="Ej: 1f_LD_zdHRSa3wYCm3_IdwoHTe2nrIr89">
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px; grid-column: 1 / -1;">
+                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-handshake"></i> MARCAS CARRUSEL</h3>
+                        <div id="est-auspiciadores-container" style="display:flex; gap:10px; overflow-x:auto; padding:15px 5px; border-bottom: 1px dashed rgba(0,255,255,0.2); margin-bottom: 15px;"></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div><label style="font-size:0.65rem; color:#ccc;">NOMBRE:</label><input type="text" id="ausp-nombre" class="nave-input"></div>
+                            <div><label style="font-size:0.65rem; color:#ccc;">TXT BOTÓN:</label><input type="text" id="ausp-btn" class="nave-input"></div>
+                            <div style="grid-column: 1 / -1;"><label style="font-size:0.65rem; color:#ccc;">URL (Link):</label><input type="text" id="ausp-url" class="nave-input"></div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label for="est-nuevo-auspiciador" class="custom-file-upload" id="lbl-est-ausp"><i class="fas fa-upload"></i> SUBIR LOGO DE MARCA</label>
+                            <input type="file" id="est-nuevo-auspiciador" accept="image/*" class="hidden-file">
+                        </div>
                     </div>
                 </div>
-                
-                <button onclick="guardarAjustes()" class="btn-checkout" style="width: 100%; margin-top: 10px;">GUARDAR TODOS LOS AJUSTES</button>
+                <button class="btn-nave-main" style="margin-top:30px; font-size:1.1rem; padding:15px;" onclick="guardarEstilos()"><i class="fas fa-save"></i> GUARDAR Y MUTAR NAVE</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-producto-admin" class="modal">
+    <div id="modal-nuevo-producto" class="modal">
         <div class="modal-content">
-            <h2 style="color:var(--amber-premium); font-family:var(--fuente-titulo); margin-top:0;">NUEVO PRODUCTO</h2>
-            
-            <input type="text" id="prod-nombre" class="admin-input" placeholder="Nombre del Producto">
-            
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="prod-precio" class="admin-input" placeholder="Precio ($)">
-                <input type="number" id="prod-stock" class="admin-input" placeholder="Stock">
+            <span class="close-nave" onclick="cerrarModalNuevoProducto()">×</span>
+            <h2 class="neon-green" style="font-family:var(--font-brand); margin-top:0;"><i class="fas fa-rocket"></i> ALTA DE PRODUCTO</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-size:0.7rem; color:var(--cian);">NOMBRE:</label><input type="text" id="np-nombre" class="nave-input">
+                    <label style="font-size:0.7rem; color:var(--cian);">CATEGORÍA:</label><input type="text" id="np-categoria" class="nave-input">
+                    <label style="font-size:0.7rem; color:var(--cian);">MARCA:</label><input type="text" id="np-marca" class="nave-input" value="Original">
+                </div>
+                <div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;"><label style="font-size:0.7rem; color:var(--cian);">PRECIO ($):</label><input type="number" id="np-precio" class="nave-input"></div>
+                        <div style="flex:1;"><label style="font-size:0.7rem; color:var(--cian);">STOCK:</label><input type="number" id="np-stock" class="nave-input"></div>
+                    </div>
+                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid var(--amber); padding: 10px; border-radius: 8px;">
+                        <label style="font-size:0.65rem; color:#ccc;">TIPO DE PROMO:</label>
+                        <select id="np-tipo-promo" class="nave-input" style="padding: 8px;"><option value="Ninguna">NORMAL</option><option value="Descuento">DESCUENTO</option><option value="Regalo">REGALO</option></select>
+                        <div style="display:flex; gap:5px;"><input type="number" id="np-precio-promo" class="nave-input" placeholder="Precio final"><input type="text" id="np-detalle-promo" class="nave-input" placeholder="Detalle/SKU"></div>
+                    </div>
+                </div>
             </div>
-            
-            <input type="text" id="prod-categoria" class="admin-input" placeholder="Categoría">
-            <textarea id="prod-desc" class="admin-input" placeholder="Descripción..." style="height:80px;"></textarea>
-            
-            <h4 style="color:var(--cian-pro); margin-bottom:10px;">VARIANTES AVANZADAS</h4>
-            <input type="text" id="prod-sabor" class="admin-input" placeholder="Variante 1 (Ej: Sabor, Material)">
-            <input type="text" id="prod-color" class="admin-input" placeholder="Variante 2 (Ej: Colores separados por coma)">
-            <input type="text" id="prod-tamano" class="admin-input" placeholder="Variante 3 (Ej: S, M, L)">
-
-            <label style="display:block; margin-bottom:5px; color:#888; font-size:0.8rem;">FOTO PRINCIPAL (Se subirá a Google Drive):</label>
-            <input type="file" id="prod-foto" accept="image/*" style="margin-bottom:20px; color:white;">
-            
-            <div style="display:flex; gap:10px;">
-                <button id="btn-guardar-prod" onclick="guardarProductoCentral()" class="btn-checkout" style="flex:1;">GUARDAR</button>
-                <button onclick="document.getElementById('modal-producto-admin').style.display='none'" class="btn-back" style="flex:1;">CANCELAR</button>
+            <h4 style="color:var(--cian); border-bottom: 1px solid var(--cian); padding-bottom:5px; margin-top:15px;">VARIANTES (Separar con comas)</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div><label style="font-size:0.65rem; color:#888;">SABORES:</label><input type="text" id="np-sabor" class="nave-input"></div>
+                <div><label style="font-size:0.65rem; color:#888;">COLORES:</label><input type="text" id="np-color" class="nave-input"></div>
+                <div><label style="font-size:0.65rem; color:#888;">TAMAÑOS:</label><input type="text" id="np-tamano" class="nave-input"></div>
             </div>
+            <label style="font-size:0.7rem; color:var(--cian);">DESCRIPCIÓN:</label>
+            <textarea id="np-descripcion" class="nave-input" style="min-height: 80px; resize:vertical;"></textarea>
+            <h4 style="color:var(--neon-green); border-bottom: 1px solid var(--neon-green); padding-bottom:5px;"><i class="fas fa-images"></i> FOTOS</h4>
+            <div id="np-fotos-container" style="display:flex; gap:10px; overflow-x:auto; padding:10px 0;"></div>
+            <label for="np-nueva-foto" class="custom-file-upload" id="lbl-np-foto"><i class="fas fa-upload"></i> AGREGAR FOTO</label>
+            <input type="file" id="np-nueva-foto" accept="image/*" class="hidden-file">
+            <button id="btn-crear-producto" class="btn-nave-main" onclick="procesarNuevoProducto()"><i class="fas fa-save"></i> GUARDAR PRODUCTO</button>
         </div>
     </div>
 
-    <div id="toast" class="toast">Notificación</div>
+    <div id="modal-editar-producto" class="modal">
+        <div class="modal-content">
+            <span class="close-nave" onclick="cerrarModalEdicion()">×</span>
+            <h2 class="amber" style="font-family:var(--font-brand); margin-top:0;"><i class="fas fa-edit"></i> EDITAR PRODUCTO</h2>
+            <input type="hidden" id="ed-sku">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-size:0.7rem; color:var(--cian);">NOMBRE:</label><input type="text" id="ed-nombre" class="nave-input">
+                    <label style="font-size:0.7rem; color:var(--cian);">CATEGORÍA:</label><input type="text" id="ed-categoria" class="nave-input">
+                    <label style="font-size:0.7rem; color:var(--cian);">MARCA:</label><input type="text" id="ed-marca" class="nave-input">
+                    <label style="font-size:0.7rem; color:var(--cian);">ESTADO:</label><select id="ed-estado" class="nave-input"><option value="ACTIVO">ACTIVO</option><option value="PAUSA">PAUSADO</option></select>
+                </div>
+                <div>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;"><label style="font-size:0.7rem; color:var(--cian);">PRECIO ($):</label><input type="number" id="ed-precio" class="nave-input"></div>
+                        <div style="flex:1;"><label style="font-size:0.7rem; color:var(--cian);">STOCK:</label><input type="number" id="ed-stock" class="nave-input"></div>
+                    </div>
+                    <div style="background: rgba(241, 196, 15, 0.1); border: 1px solid var(--amber); padding: 10px; border-radius: 8px;">
+                        <label style="font-size:0.65rem; color:#ccc;">TIPO DE PROMO:</label>
+                        <select id="ed-tipo-promo" class="nave-input" style="padding: 8px;"><option value="Ninguna">NORMAL</option><option value="Descuento">DESCUENTO</option><option value="Regalo">REGALO</option></select>
+                        <div style="display:flex; gap:5px;"><input type="number" id="ed-precio-promo" class="nave-input" placeholder="Precio final"><input type="text" id="ed-detalle-promo" class="nave-input" placeholder="Detalle/SKU"></div>
+                    </div>
+                </div>
+            </div>
+            <h4 style="color:var(--cian); border-bottom: 1px solid var(--cian); padding-bottom:5px; margin-top:15px;">VARIANTES</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div><label style="font-size:0.65rem; color:#888;">SABORES:</label><input type="text" id="ed-sabor" class="nave-input"></div>
+                <div><label style="font-size:0.65rem; color:#888;">COLORES:</label><input type="text" id="ed-color" class="nave-input"></div>
+                <div><label style="font-size:0.65rem; color:#888;">TAMAÑOS:</label><input type="text" id="ed-tamano" class="nave-input"></div>
+            </div>
+            <label style="font-size:0.7rem; color:var(--cian);">DESCRIPCIÓN:</label>
+            <textarea id="ed-descripcion" class="nave-input" style="min-height: 80px; resize:vertical;"></textarea>
+            <h4 style="color:var(--neon-green); border-bottom: 1px solid var(--neon-green); padding-bottom:5px;"><i class="fas fa-images"></i> FOTOS</h4>
+            <div id="ed-fotos-container" style="display:flex; gap:10px; overflow-x:auto; padding:10px 0;"></div>
+            <label for="ed-nueva-foto" class="custom-file-upload" id="lbl-ed-foto"><i class="fas fa-upload"></i> AGREGAR FOTO</label>
+            <input type="file" id="ed-nueva-foto" accept="image/*" class="hidden-file">
+            <button id="btn-guardar-edicion" class="btn-nave-main" onclick="guardarEdicionProducto()"><i class="fas fa-save"></i> GUARDAR CAMBIOS</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast-weed" style="display:none;">Notificación</div>
 
     <script>
-        // ¡¡IMPORTANTE!! PEGA AQUÍ LA URL DE TU GOOGLE APPS SCRIPT
-        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+        // ==========================================
+        // REEMPLAZA CON TU URL DE APPS SCRIPT
+        // ==========================================
+        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI"; 
 
-        // Motor Fetch API para comunicarse con Apps Script
+        let globalStock = [];
+        let miGrafico = null;
+        let fotosNuevo = [];
+        let fotosEditando = [];
+        let auspiciadoresActivos = [];
+
         async function apiCall(action, payload = null) {
             let url = API_URL + "?action=" + action;
             if (payload) payload.action = action;
@@ -252,105 +359,337 @@
                 const res = await fetch(url, options);
                 return await res.json();
             } catch (e) {
-                mostrarToast("Error de conexión");
-                console.error(e);
+                mostrarToast("Error de conexión.");
+                throw e;
             }
         }
 
-        // Utilidad: Mensajes
         function mostrarToast(mensaje) {
             const t = document.getElementById("toast");
             t.innerText = mensaje;
-            t.className = "toast show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+            t.style.display = "block";
+            setTimeout(() => { t.style.display = "none"; }, 3000);
         }
 
-        // Lógica Login
-        function loginAdmin() {
+        // LÓGICA BÁSICA DE LOGIN COMPATIBLE
+        async function ejecutarLoginAdmin() {
             const u = document.getElementById('admin-user').value;
             const p = document.getElementById('admin-pass').value;
-            mostrarToast("Verificando credenciales...");
+            if (!u || !p) return mostrarToast("Ingresa credenciales.");
+            mostrarToast("Verificando en la matriz...");
             
-            apiCall("validarAdmin", { user: u, pass: p }).then(res => {
-                // Asumiendo que tu backend devuelve un objeto { success: true/false } o boolean
-                if (res === true || (res && res.success)) {
-                    document.getElementById('admin-login-view').style.display = 'none';
-                    document.getElementById('admin-menu-view').style.display = 'block';
-                    mostrarToast("Acceso concedido");
-                } else {
-                    mostrarToast("Acceso denegado");
-                }
-            });
-        }
-
-        // Navegación Pestañas
-        function showAdminTab(tabId, btn) {
-            document.querySelectorAll('.admin-tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.admin-tab-btn').forEach(b => {
-                b.style.borderColor = '#444'; b.style.color = 'white';
-            });
-            document.getElementById('tab-' + tabId).style.display = 'block';
-            btn.style.borderColor = 'var(--cian-pro)';
-            btn.style.color = 'var(--cian-pro)';
-        }
-
-        // Lógica Guardar Producto con Imagen (Base64)
-        function guardarProductoCentral() {
-            const btn = document.getElementById('btn-guardar-prod');
-            const payload = {
-                nombre: document.getElementById('prod-nombre').value,
-                precio: document.getElementById('prod-precio').value,
-                stock: document.getElementById('prod-stock').value,
-                categoria: document.getElementById('prod-categoria').value,
-                descripcion: document.getElementById('prod-desc').value,
-                sabor: document.getElementById('prod-sabor').value,
-                color: document.getElementById('prod-color').value,
-                tamano: document.getElementById('prod-tamano').value,
-                fotosUrlArr: []
-            };
-
-            if(!payload.nombre || !payload.precio) return mostrarToast("Nombre y Precio obligatorios");
-
-            btn.innerText = "SUBIENDO IMAGEN...";
-            btn.disabled = true;
-
-            const fileInput = document.getElementById('prod-foto');
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    payload.fotosUrlArr.push(e.target.result);
-                    apiCall("crearProductoAdmin", payload).then(res => postGuardarProducto(res, btn));
-                };
-                reader.readAsDataURL(file);
+            const res = await apiCall("validarAdmin", { user: u, pass: p });
+            if (res === true || (res && res.success)) {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                mostrarToast("Acceso concedido");
+                iniciarPanelAdmin();
             } else {
-                apiCall("crearProductoAdmin", payload).then(res => postGuardarProducto(res, btn));
+                mostrarToast("Acceso denegado");
             }
         }
 
-        function postGuardarProducto(res, btn) {
-            mostrarToast("Producto subido al Excel!");
-            document.getElementById('modal-producto-admin').style.display = 'none';
-            btn.innerText = "GUARDAR";
-            btn.disabled = false;
+        function showSection(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+
+            if(id === 'dash') { setTimeout(() => actualizarGrafico(), 200); }
+            if(id === 'config') cargarAjustesPanel();
+            if(id === 'estilo') cargarEstilosPanel();
         }
 
-        // Lógica Guardar Ajustes (Avanzado)
-        function guardarAjustes() {
-            mostrarToast("Guardando configuración global...");
-            const payload = {
-                logo: document.getElementById('est-logo').value,
-                colorNeon: document.getElementById('est-color-neon').value,
-                colorAmber: document.getElementById('est-color-amber').value,
-                fontTitulos: document.getElementById('est-font-titulos').value,
-                efectoFondo: document.getElementById('est-efecto-fondo').value,
-                wa: document.getElementById('aj_wa').value,
-                ig: document.getElementById('aj_ig').value
+        async function iniciarPanelAdmin() {
+            const res = await apiCall("getAdminDashboardData");
+            if (res) {
+                globalStock = res.productos || [];
+                document.getElementById('ventas-hoy').innerText = "$" + (res.hoy || 0).toLocaleString('es-CL');
+                document.getElementById('ventas-mes').innerText = "$" + (res.mes || 0).toLocaleString('es-CL');
+                renderCatalogo(globalStock);
+                actualizarGrafico();
+            }
+        }
+
+        async function actualizarGrafico() {
+            const meses = document.getElementById('periodo-selector').value;
+            try {
+                const listaData = await apiCall("getHistoricalData", {meses: meses});
+                if(!listaData || listaData.length === 0) return;
+                const ctx = document.getElementById('ventasChart').getContext('2d');
+                const etiquetas = listaData.map(item => item.label);
+                const datosTotal = listaData.map(item => item.fisico + item.online);
+
+                if (miGrafico) miGrafico.destroy();
+                miGrafico = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{ 
+                            label: 'Ventas Neta', data: datosTotal, 
+                            borderColor: '#00ffff', backgroundColor: 'rgba(0, 255, 255, 0.1)', 
+                            fill: true, tension: 0.3, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#00ffff'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#1a1a1a' } }, x: { grid: { display: false } } } }
+                });
+            } catch(e) { console.error("Error Gráfico", e); }
+        }
+
+        function renderCatalogo(lista) {
+            const tbody = document.getElementById('tbody-catalogo');
+            if(!tbody) return;
+            tbody.innerHTML = lista.map(p => {
+                let imgPortada = Array.isArray(p.IMAGEN_URL) ? p.IMAGEN_URL[0] : (typeof p.IMAGEN_URL === 'string' ? p.IMAGEN_URL.split(',')[0] : 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png');
+                return `
+                <tr>
+                    <td><img src="${imgPortada}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;"></td>
+                    <td><strong class="cian">${p.NOMBRE}</strong><br><small style="color:#888;">${p.SKU}</small></td>
+                    <td>${p.CATEGORIA || '-'}</td>
+                    <td>
+                        <div style="display:flex; flex-direction:column; gap:5px; width: 80px;">
+                            <input type="number" class="input-admin" style="padding:5px; margin:0;" value="${p.PRECIO}" id="q-pr-${p.SKU}">
+                            <input type="number" class="input-admin" style="padding:5px; margin:0; border-color:var(--amber);" value="${p.STOCK}" id="q-st-${p.SKU}">
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex; flex-direction:column; gap:5px;">
+                            <button class="btn-nave-main" style="padding:8px; margin:0;" onclick="guardarRapido('${p.SKU}')">RÁPIDO</button>
+                            <button class="btn-nave-main" style="padding:8px; margin:0; background:var(--amber);" onclick="abrirModalEdicion('${p.SKU}')">EDITAR</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function guardarRapido(sku) {
+            const precio = document.getElementById('q-pr-' + sku).value;
+            const stock = document.getElementById('q-st-' + sku).value;
+            try {
+                await apiCall("actualizarProductoAdmin", {sku: sku, precio: precio, stock: stock});
+                mostrarToast("Stock y Precio guardados: " + sku);
+                const idx = globalStock.findIndex(it => it.SKU === sku);
+                if(idx !== -1) { globalStock[idx].PRECIO = precio; globalStock[idx].STOCK = stock; }
+            } catch(e) { mostrarToast("Error al guardar rápido."); }
+        }
+
+        function filtrarCatalogo() {
+            const txt = document.getElementById('search-catalogo').value.toLowerCase();
+            renderCatalogo(globalStock.filter(p => (p.NOMBRE && p.NOMBRE.toLowerCase().includes(txt)) || (p.SKU && p.SKU.toLowerCase().includes(txt))));
+        }
+
+        function limpiarEtiquetas(texto) {
+            if (!texto) return "";
+            return texto.split(',').map(t => t.trim()).filter(t => t.length > 0).map(t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase()).join(', ');
+        }
+
+        function abrirModalNuevoProducto() { fotosNuevo = []; renderFotosNuevo(); document.getElementById('modal-nuevo-producto').style.display='flex'; }
+        function cerrarModalNuevoProducto() { document.getElementById('modal-nuevo-producto').style.display='none'; }
+        
+        function renderFotosNuevo() {
+            const c = document.getElementById('np-fotos-container');
+            if(fotosNuevo.length === 0) { c.innerHTML = '<p style="color:#666; margin:auto;">Sin fotos.</p>'; return; }
+            c.innerHTML = fotosNuevo.map((f, i) => `
+                <div style="background:rgba(0,0,0,0.5); padding:5px; border-radius:5px; text-align:center;">
+                    <img src="${f}" style="width:60px; height:60px; object-fit:cover; margin-bottom:5px;">
+                    <button onclick="fotosNuevo.splice(${i},1); renderFotosNuevo();" style="background:#ff4444; color:white; border:none; padding:3px; border-radius:3px; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        }
+
+        document.getElementById('np-nueva-foto').addEventListener('change', e => {
+            if(!e.target.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = evt => { fotosNuevo.push(evt.target.result); renderFotosNuevo(); e.target.value=''; };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        async function procesarNuevoProducto() {
+            const btn = document.getElementById('btn-crear-producto');
+            const p = {
+                nombre: document.getElementById('np-nombre').value.trim(), categoria: document.getElementById('np-categoria').value.trim(),
+                marca: document.getElementById('np-marca').value.trim(), estado: document.getElementById('np-estado').value,
+                precio: document.getElementById('np-precio').value, stock: document.getElementById('np-stock').value,
+                tipo_promo: document.getElementById('np-tipo-promo').value, precio_promo: document.getElementById('np-precio-promo').value,
+                detalle_promo: document.getElementById('np-detalle-promo').value, sabor: limpiarEtiquetas(document.getElementById('np-sabor').value),
+                color: limpiarEtiquetas(document.getElementById('np-color').value), tamano: limpiarEtiquetas(document.getElementById('np-tamano').value),
+                descripcion: document.getElementById('np-descripcion').value.trim(), fotosUrlArr: fotosNuevo 
             };
-            
-            apiCall("actualizarEstilosGlobales", payload).then(res => {
-                mostrarToast("Estilos guardados exitosamente.");
-            });
+            if(!p.nombre || !p.precio) return mostrarToast("Nombre y Precio requeridos.");
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CREANDO...'; btn.disabled=true;
+            try {
+                await apiCall("crearProductoAdmin", p);
+                mostrarToast("Producto subido al Excel"); cerrarModalNuevoProducto(); iniciarPanelAdmin();
+            } catch(e) { mostrarToast("Error al crear."); }
+            btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PRODUCTO'; btn.disabled=false;
+        }
+
+        function abrirModalEdicion(sku) {
+            const p = globalStock.find(i => i.SKU === sku);
+            if(!p) return;
+            document.getElementById('ed-sku').value = p.SKU; document.getElementById('ed-nombre').value = p.NOMBRE;
+            document.getElementById('ed-categoria').value = p.CATEGORIA || ''; document.getElementById('ed-marca').value = p.MARCA || 'Original';
+            document.getElementById('ed-estado').value = p.ESTADO || 'ACTIVO'; document.getElementById('ed-precio').value = p.PRECIO || 0;
+            document.getElementById('ed-stock').value = p.STOCK || 0; document.getElementById('ed-tipo-promo').value = p.TIPO_PROMO || 'Ninguna';
+            document.getElementById('ed-precio-promo').value = p.PRECIO_PROMO || ''; document.getElementById('ed-detalle-promo').value = p.DETALLE_PROMO || '';
+            document.getElementById('ed-sabor').value = p.SABOR || ''; document.getElementById('ed-color').value = p.COLOR || '';
+            document.getElementById('ed-tamano').value = p.TAMANO || ''; document.getElementById('ed-descripcion').value = p.DESCRIPCION || '';
+            fotosEditando = [];
+            if(p.IMAGEN_URL) {
+                if(Array.isArray(p.IMAGEN_URL)) fotosEditando = [...p.IMAGEN_URL];
+                else if(typeof p.IMAGEN_URL === 'string') fotosEditando = p.IMAGEN_URL.split(',').map(u=>u.trim());
+            }
+            renderFotosEdicion(); document.getElementById('modal-editar-producto').style.display='flex';
+        }
+        function cerrarModalEdicion() { document.getElementById('modal-editar-producto').style.display='none'; }
+
+        function renderFotosEdicion() {
+            const c = document.getElementById('ed-fotos-container');
+            if(fotosEditando.length === 0) { c.innerHTML = '<p style="color:#666; margin:auto;">Sin fotos.</p>'; return; }
+            c.innerHTML = fotosEditando.map((f, i) => `
+                <div style="background:rgba(0,0,0,0.5); padding:5px; border-radius:5px; text-align:center;">
+                    <img src="${f}" style="width:60px; height:60px; object-fit:cover; margin-bottom:5px;">
+                    <button onclick="fotosEditando.splice(${i},1); renderFotosEdicion();" style="background:#ff4444; color:white; border:none; padding:3px; border-radius:3px; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+        }
+
+        document.getElementById('ed-nueva-foto').addEventListener('change', e => {
+            if(!e.target.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = evt => { fotosEditando.push(evt.target.result); renderFotosEdicion(); e.target.value=''; };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        async function guardarEdicionProducto() {
+            const btn = document.getElementById('btn-guardar-edicion');
+            const p = {
+                sku: document.getElementById('ed-sku').value, nombre: document.getElementById('ed-nombre').value.trim(),
+                categoria: document.getElementById('ed-categoria').value.trim(), marca: document.getElementById('ed-marca').value.trim(),
+                estado: document.getElementById('ed-estado').value, precio: document.getElementById('ed-precio').value,
+                stock: document.getElementById('ed-stock').value, tipo_promo: document.getElementById('ed-tipo-promo').value,
+                precio_promo: document.getElementById('ed-precio-promo').value, detalle_promo: document.getElementById('ed-detalle-promo').value,
+                sabor: limpiarEtiquetas(document.getElementById('ed-sabor').value), color: limpiarEtiquetas(document.getElementById('ed-color').value),
+                tamano: limpiarEtiquetas(document.getElementById('ed-tamano').value), descripcion: document.getElementById('ed-descripcion').value.trim(),
+                fotosUrlArr: fotosEditando 
+            };
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...'; btn.disabled=true;
+            try {
+                await apiCall("actualizarProductoAvanzado", p);
+                mostrarToast("Producto actualizado."); cerrarModalEdicion(); iniciarPanelAdmin();
+            } catch(e) { mostrarToast("Error al editar."); }
+            btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CAMBIOS'; btn.disabled=false;
+        }
+
+        // REDES Y BANCOS
+        async function cargarAjustesPanel() {
+            try {
+                const conf = await apiCall("getConfig");
+                document.getElementById('aj_wa').value = conf['WHATSAPP'] || '';
+                document.getElementById('aj_wa_admin').value = conf['WHATSAPP_ADMIN'] || '';
+                document.getElementById('aj_ig').value = conf['LINK_INSTAGRAM'] || '';
+                document.getElementById('aj_fb').value = conf['LINK_FACEBOOK'] || '';
+                document.getElementById('aj_tk').value = conf['LINK_TIKTOK'] || '';
+                document.getElementById('aj_banco_nombre').value = conf['BANCO_NOMBRE'] || '';
+                document.getElementById('aj_banco_tipo').value = conf['BANCO_TIPO'] || '';
+                document.getElementById('aj_banco_rut').value = conf['BANCO_RUT'] || '';
+                document.getElementById('aj_banco_numero').value = conf['BANCO_NUMERO'] || '';
+                document.getElementById('aj_banco_correo').value = conf['BANCO_CORREO'] || '';
+            } catch(e) { console.error("Error Config", e); }
+        }
+
+        async function guardarAjustesPanel(btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...'; btn.disabled = true;
+            const nuevos = {
+                'WHATSAPP': document.getElementById('aj_wa').value,
+                'WHATSAPP_ADMIN': document.getElementById('aj_wa_admin').value,
+                'LINK_INSTAGRAM': document.getElementById('aj_ig').value,
+                'LINK_FACEBOOK': document.getElementById('aj_fb').value,
+                'LINK_TIKTOK': document.getElementById('aj_tk').value,
+                'BANCO_NOMBRE': document.getElementById('aj_banco_nombre').value,
+                'BANCO_TIPO': document.getElementById('aj_banco_tipo').value,
+                'BANCO_RUT': document.getElementById('aj_banco_rut').value,
+                'BANCO_NUMERO': document.getElementById('aj_banco_numero').value,
+                'BANCO_CORREO': document.getElementById('aj_banco_correo').value
+            };
+            try { await apiCall("guardarAjustes", nuevos); mostrarToast("Configuración guardada."); } 
+            catch(e) { mostrarToast("Error al guardar."); }
+            btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CONFIGURACIÓN'; btn.disabled = false;
+        }
+
+        // ESTILOS 18 PARÁMETROS INTACTOS
+        async function cargarEstilosPanel() {
+            try {
+                document.getElementById('est-logo').value = "Conectando...";
+                const res = await apiCall("getEstilosPanelData");
+                const conf = (res && res.success) ? res.config : {};
+                
+                document.getElementById('est-logo').value = conf['LOGO_PRINCIPAL'] || '';
+                document.getElementById('est-logo-error').value = conf['LOGO_ERROR'] || '';
+                document.getElementById('est-favicon').value = conf['FAVICON'] || '';
+                document.getElementById('est-bg-img').value = conf['BG_IMG'] || '';
+                document.getElementById('est-bg-modo').value = conf['BG_MODO'] || 'cover';
+                document.getElementById('est-banner-bg').value = conf['BANNER_BG'] || '';
+                document.getElementById('est-color-neon').value = conf['COLOR_NEON'] || '#00e5ff';
+                document.getElementById('est-color-amber').value = conf['COLOR_AMBER'] || '#f1c40f';
+                document.getElementById('est-color-cian').value = conf['COLOR_CIAN'] || '#00ffff';
+                document.getElementById('est-color-bg').value = conf['COLOR_BG'] || '#020204';
+                document.getElementById('est-color-glass').value = conf['COLOR_GLASS'] || '#ffffff';
+                document.getElementById('est-opacidad').value = conf['OPACIDAD_GLASS'] || '5';
+                document.getElementById('est-font-titulos').value = conf['FONT_TITULOS'] || "'Orbitron', sans-serif";
+                document.getElementById('est-font-menu').value = conf['FONT_MENU'] || "'Montserrat', sans-serif";
+                document.getElementById('est-font-cuerpo').value = conf['FONT_CUERPO'] || "'Montserrat', sans-serif";
+                document.getElementById('est-atmosfera').value = conf['ATMOSFERA'] || 'espacial';
+                
+                const dirEl = document.getElementById('est-direccion-txt');
+                if(dirEl) dirEl.value = conf['DIRECCION_TEXTO'] || '';
+                const vidEl = document.getElementById('est-video-id');
+                if(vidEl) vidEl.value = conf['VIDEO_DRIVE_ID'] || '';
+                
+                auspiciadoresActivos = (res && res.success && res.auspiciadores) ? res.auspiciadores : [];
+                renderAuspiciadoresEstilo();
+            } catch(e) { console.error("Error estilos", e); }
+        }
+
+        function renderAuspiciadoresEstilo() {
+            const container = document.getElementById('est-auspiciadores-container');
+            if(!container) return;
+            if(auspiciadoresActivos.length===0){ container.innerHTML='<p style="color:#666; margin:auto;">Sin marcas.</p>'; return; }
+            container.innerHTML = auspiciadoresActivos.map((marca, i) => `
+                <div style="background:rgba(0,0,0,0.5); padding:5px; border-radius:5px; text-align:center; min-width:100px;">
+                    <img src="${marca.logo || marca}" style="width:60px; height:30px; object-fit:contain; margin-bottom:5px;">
+                    <p style="font-size:0.6rem; color:var(--amber); margin:0;">${marca.nombre || 'Marca'}</p>
+                    <button class="tool-btn" style="color:#ff4444; border-color:#ff4444; padding:2px 5px;" onclick="auspiciadoresActivos.splice(${i},1); renderAuspiciadoresEstilo();"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('est-nuevo-auspiciador').addEventListener('change', e => {
+            const file = e.target.files[0]; if(!file) return;
+            const n = document.getElementById('ausp-nombre')?document.getElementById('ausp-nombre').value:'Marca';
+            const u = document.getElementById('ausp-url')?document.getElementById('ausp-url').value:'';
+            const b = document.getElementById('ausp-btn')?document.getElementById('ausp-btn').value:'';
+            const r = new FileReader();
+            r.onload = evt => {
+                auspiciadoresActivos.push({nombre:n, url:u, btn:b, logo:evt.target.result});
+                renderAuspiciadoresEstilo(); e.target.value='';
+            };
+            r.readAsDataURL(file);
+        });
+
+        async function guardarEstilos() {
+            const payload = {
+                logo: document.getElementById('est-logo').value.trim(), logoError: document.getElementById('est-logo-error').value.trim(),
+                favicon: document.getElementById('est-favicon').value.trim(), bgImg: document.getElementById('est-bg-img').value.trim(),
+                bgModo: document.getElementById('est-bg-modo').value, bannerBg: document.getElementById('est-banner-bg').value.trim(),
+                colorNeon: document.getElementById('est-color-neon').value, colorAmber: document.getElementById('est-color-amber').value,
+                colorCian: document.getElementById('est-color-cian').value, colorBg: document.getElementById('est-color-bg').value,
+                colorGlass: document.getElementById('est-color-glass').value, opacidadGlass: document.getElementById('est-opacidad').value,
+                fontTitulos: document.getElementById('est-font-titulos').value, fontMenu: document.getElementById('est-font-menu').value,
+                fontCuerpo: document.getElementById('est-font-cuerpo').value, atmosfera: document.getElementById('est-atmosfera').value,
+                direccionTxt: document.getElementById('est-direccion-txt').value.trim(), videoId: document.getElementById('est-video-id').value.trim(),
+                auspiciadoresArr: auspiciadoresActivos
+            };
+            try { mostrarToast("Transfiriendo ADN Visual..."); await apiCall("actualizarEstilosGlobales", payload); mostrarToast("¡Estilos blindados!"); } 
+            catch(e) { mostrarToast("Error al guardar estilos."); }
         }
     </script>
 </body>
