@@ -1,0 +1,86 @@
+<div id="modal-admin" class="modal">
+    <div class="modal-content admin-modal" style="max-width: 800px; padding: 20px;">
+        <span class="close-modal" onclick="cerrarAdmin()">&times;</span>
+
+        <div id="admin-login-view">
+            <div style="text-align:center; margin-bottom:30px; margin-top:20px;">
+                <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--cian-pro); margin-bottom:15px;"></i>
+                <h3 style="font-family: var(--fuente-titulo); letter-spacing: 2px; color:white;">CONTROL MANDO CENTRAL</h3>
+            </div>
+            <input type="text" id="admin-user" placeholder="Usuario" class="admin-input" style="max-width: 300px; display:block; margin: 0 auto 15px auto;">
+            <input type="password" id="admin-pass" placeholder="Contraseña" class="admin-input" style="max-width: 300px; display:block; margin: 0 auto 15px auto;">
+            <button onclick="loginAdmin()" class="btn-checkout" style="max-width: 300px; display:block; margin: 0 auto;">VERIFICAR IDENTIDAD</button>
+        </div>
+
+        <div id="admin-menu-view" style="display:none; padding-top:10px;">
+            
+            <div style="display:flex; gap:10px; margin-bottom:25px; border-bottom:1px solid #333; padding-bottom:15px; overflow-x:auto;">
+                <button class="btn-back admin-tab-btn active" onclick="showAdminTab('dash', this)" style="border-color:var(--cian-pro); color:var(--cian-pro);">MÉTRICAS</button>
+                <button class="btn-back admin-tab-btn" onclick="showAdminTab('pedidos', this)">ESTADO PEDIDOS</button>
+                <button class="btn-back admin-tab-btn" onclick="showAdminTab('catalogo', this)">CATÁLOGO</button>
+                <button class="btn-back admin-tab-btn" onclick="showAdminTab('ajustes', this)">AJUSTES & REDES</button>
+                <button class="btn-back" onclick="resetVistasAdmin()" style="margin-left:auto; border-color:#e74c3c; color:#e74c3c;"><i class="fas fa-sign-out-alt"></i> SALIR</button>
+            </div>
+
+            <div id="tab-dash" class="admin-tab-content" style="display:block;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="color:var(--cian-pro); margin:0; font-family:var(--fuente-titulo);">RENDIMIENTO GLOBAL</h3>
+                </div>
+                <div class="period-selector" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:20px;">
+                    <button onclick="cargarGrafico(1)" class="btn-back">1 Mes</button>
+                    <button onclick="cargarGrafico(3)" class="btn-back">3 Meses</button>
+                    <button onclick="cargarGrafico(6)" class="btn-back">6 Meses</button>
+                    <button onclick="cargarGrafico(12)" class="btn-back">1 Año</button>
+                </div>
+                <div id="chart_div" style="width: 100%; height: 300px; background: #000; border-radius:12px; border:1px solid #222; padding:10px;"></div>
+            </div>
+
+            <div id="tab-pedidos" class="admin-tab-content" style="display:none;">
+                <h3 style="color:var(--cian-pro); margin-bottom:20px; font-family:var(--fuente-titulo);">GESTIÓN DE VENTAS</h3>
+                <input type="text" id="search-pedidos" placeholder="Buscar por ID_pedido..." style="width:100%; padding:15px; background:#0a0a0a; color:white; border:1px solid #222; border-radius:8px; margin-bottom:15px;" onkeyup="filtrarPedidosAdmin()">
+                <div id="lista-pedidos-status" style="max-height: 400px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222;">
+                    <p style="text-align:center; color:#555; padding:20px;">Cargando pedidos...</p>
+                </div>
+            </div>
+
+            <div id="tab-catalogo" class="admin-tab-content" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3 style="color:var(--amber-premium); margin:0; font-family:var(--fuente-titulo);">INVENTARIO Y CATÁLOGO</h3>
+                    <button onclick="document.getElementById('modal-producto-admin').style.display='flex'" class="btn-back" style="border-color:var(--cian-pro); color:var(--cian-pro);"><i class="fas fa-plus"></i> NUEVO PRODUCTO</button>
+                </div>
+                <div id="lista-productos-admin" class="admin-list" style="max-height: 350px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222; margin-bottom:15px;">
+                    </div>
+                <button onclick="ejecutarContabilizar()" class="btn-checkout" style="margin-top:0;">GUARDAR STOCK RÁPIDO <i class="fas fa-sync-alt" style="margin-left:10px;"></i></button>
+            </div>
+
+            <div id="tab-ajustes" class="admin-tab-content" style="display:none;">
+                <h3 style="color:var(--cian-pro); margin-bottom:20px; font-family:var(--fuente-titulo);">CONFIGURACIÓN DE PLATAFORMA</h3>
+                
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px;">
+                    <div style="background:#0a0a0a; border:1px solid #222; padding:20px; border-radius:12px;">
+                        <h4 style="color:var(--amber-premium); margin-bottom:15px;"><i class="fas fa-hashtag"></i> REDES SOCIALES</h4>
+                        <label style="font-size:0.8rem; color:#888;">WhatsApp Soporte:</label>
+                        <input type="text" id="aj_wa" placeholder="Ej: 56912345678" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                        <label style="font-size:0.8rem; color:#888;">Instagram URL:</label>
+                        <input type="text" id="aj_ig" placeholder="https://instagram.com/..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                    </div>
+
+                    <div style="background:#0a0a0a; border:1px solid #222; padding:20px; border-radius:12px;">
+                        <h4 style="color:var(--amber-premium); margin-bottom:15px;"><i class="fas fa-palette"></i> ESTILOS VISUALES</h4>
+                        <label style="font-size:0.8rem; color:#888;">Logo URL (Drive o Imgur):</label>
+                        <input type="text" id="est-logo" placeholder="https://..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <div style="flex:1;">
+                                <label style="font-size:0.8rem; color:#888;">Color Principal:</label>
+                                <input type="color" id="est-color" value="#00e5ff" style="width:100%; height:40px; background:#000; border:1px solid #333; border-radius:5px; cursor:pointer;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="guardarAjustes()" class="btn-checkout">GUARDAR TODOS LOS AJUSTES</button>
+            </div>
+
+        </div>
+    </div>
+</div>
