@@ -2129,6 +2129,111 @@ async function cambiarEstadoPedido(id, nuevoEstado) {
     }
 }
 
+// ==========================================
+// MÓDULOS AVANZADOS (Agencia, Catálogo, Tabs)
+// ==========================================
+
+// 1. Navegación de Pestañas Admin
+function showAdminTab(tabId, btn) {
+    document.querySelectorAll('.admin-tab-content').forEach(tab => tab.style.display = 'none');
+    document.querySelectorAll('.admin-tab-btn').forEach(b => {
+        b.style.borderColor = '#444';
+        b.style.color = 'var(--gris-tenue)';
+    });
+    
+    document.getElementById('tab-' + tabId).style.display = 'block';
+    btn.style.borderColor = 'var(--cian-pro)';
+    btn.style.color = 'var(--cian-pro)';
+
+    if(tabId === 'pedidos') cargarPedidosAdmin();
+    if(tabId === 'dash') {
+        google.charts.load('current', {'packages':['corechart']});
+        setTimeout(() => cargarGrafico(3), 500);
+    }
+    if(tabId === 'catalogo') mostrarGestion('VENTA'); 
+}
+
+// 2. Guardar Producto Nuevo (Con Base64)
+function guardarProductoCentral() {
+    const btn = document.getElementById('btn-guardar-prod');
+    const payload = {
+        nombre: document.getElementById('prod-nombre').value,
+        precio: document.getElementById('prod-precio').value,
+        stock: document.getElementById('prod-stock').value,
+        categoria: document.getElementById('prod-categoria').value,
+        descripcion: document.getElementById('prod-desc').value,
+        opciones: document.getElementById('prod-opciones').value,
+        fotosUrlArr: [] 
+    };
+
+    if(!payload.nombre || !payload.precio) return mostrarToast("Nombre y Precio obligatorios");
+
+    btn.innerText = "PROCESANDO...";
+    btn.disabled = true;
+
+    const fileInput = document.getElementById('prod-foto');
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            payload.fotosUrlArr.push(e.target.result);
+            enviarProductoAGoogle(payload, btn);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        enviarProductoAGoogle(payload, btn);
+    }
+}
+
+function enviarProductoAGoogle(payload, btn) {
+    google.script.run.withSuccessHandler((res) => {
+        mostrarToast("Producto creado: " + res.sku);
+        document.getElementById('modal-producto-admin').style.display = 'none';
+        btn.innerText = "GUARDAR PRODUCTO";
+        btn.disabled = false;
+        document.getElementById('prod-nombre').value = "";
+        document.getElementById('prod-precio').value = "";
+    }).crearProductoAdmin(payload);
+}
+
+// 3. Enviar Lead Agencia
+function enviarLeadAgencia() {
+    const btn = document.getElementById('btn-agencia');
+    const payload = {
+        nombre: document.getElementById('ag-nombre').value,
+        correo: document.getElementById('ag-correo').value,
+        servicio: document.getElementById('ag-servicio').value,
+        mensaje: document.getElementById('ag-mensaje').value
+    };
+    
+    if(!payload.nombre || !payload.correo) return mostrarToast("Ingresa nombre y correo");
+    
+    btn.innerText = "ENVIANDO...";
+    btn.disabled = true;
+    
+    google.script.run.withSuccessHandler(()=>{
+        mostrarToast("Solicitud enviada a Coach 3D Latam");
+        document.getElementById('modal-agencia').style.display = 'none';
+        btn.innerText = "ENVIAR SOLICITUD";
+        btn.disabled = false;
+    }).enviarCorreoAgencia(payload);
+}
+
+// Override de la función loginAdmin
+function loginAdmin() {
+    const u = document.getElementById('admin-user').value;
+    const p = document.getElementById('admin-pass').value;
+
+    google.script.run.withSuccessHandler(function(valido) {
+        if (valido) {
+            document.getElementById('admin-login-view').style.display = 'none';
+            document.getElementById('admin-menu-view').style.display = 'block';
+            showAdminTab('dash', document.querySelector('.admin-tab-btn')); 
+        } else {
+            mostrarToast("Acceso denegado");
+        }
+    }).validarAdmin(u, p);
+}
         
     </script>
 </body>
