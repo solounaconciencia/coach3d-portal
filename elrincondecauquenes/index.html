@@ -2130,7 +2130,7 @@ async function cambiarEstadoPedido(id, nuevoEstado) {
 }
 
 // ==========================================
-// MÓDULOS AVANZADOS (Agencia, Catálogo, Tabs)
+// MÓDULOS AVANZADOS: TABS, PRODUCTOS, AGENCIA
 // ==========================================
 
 // 1. Navegación de Pestañas Admin
@@ -2153,7 +2153,7 @@ function showAdminTab(tabId, btn) {
     if(tabId === 'catalogo') mostrarGestion('VENTA'); 
 }
 
-// 2. Guardar Producto Nuevo (Con Base64)
+// 2. Guardar Producto Nuevo (Con Imágenes Base64)
 function guardarProductoCentral() {
     const btn = document.getElementById('btn-guardar-prod');
     const payload = {
@@ -2172,7 +2172,7 @@ function guardarProductoCentral() {
     btn.disabled = true;
 
     const fileInput = document.getElementById('prod-foto');
-    if (fileInput.files.length > 0) {
+    if (fileInput && fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -2186,17 +2186,17 @@ function guardarProductoCentral() {
 }
 
 function enviarProductoAGoogle(payload, btn) {
-    google.script.run.withSuccessHandler((res) => {
-        mostrarToast("Producto creado: " + res.sku);
+    apiCall("crearProductoAdmin", payload).then(res => {
+        mostrarToast("Producto creado con éxito.");
         document.getElementById('modal-producto-admin').style.display = 'none';
         btn.innerText = "GUARDAR PRODUCTO";
         btn.disabled = false;
         document.getElementById('prod-nombre').value = "";
         document.getElementById('prod-precio').value = "";
-    }).crearProductoAdmin(payload);
+    });
 }
 
-// 3. Enviar Lead Agencia
+// 3. Enviar Formulario Embudo Agencia
 function enviarLeadAgencia() {
     const btn = document.getElementById('btn-agencia');
     const payload = {
@@ -2211,28 +2211,51 @@ function enviarLeadAgencia() {
     btn.innerText = "ENVIANDO...";
     btn.disabled = true;
     
-    google.script.run.withSuccessHandler(()=>{
+    apiCall("enviarCorreoAgencia", payload).then(res => {
         mostrarToast("Solicitud enviada a Coach 3D Latam");
         document.getElementById('modal-agencia').style.display = 'none';
         btn.innerText = "ENVIAR SOLICITUD";
         btn.disabled = false;
-    }).enviarCorreoAgencia(payload);
+    });
 }
 
-// Override de la función loginAdmin
+// 4. Guardar Ajustes Visuales
+function guardarAjustes() {
+    mostrarToast("Guardando configuración...");
+    const payload = {
+        logo: document.getElementById('est-logo').value,
+        colorNeon: document.getElementById('est-color-neon').value,
+        colorAmber: document.getElementById('est-color-amber').value,
+        fontTitulos: document.getElementById('est-font-titulos').value,
+        efectoFondo: document.getElementById('est-efecto-fondo').value
+    };
+    
+    apiCall("actualizarEstilosGlobales", payload).then(res => {
+        mostrarToast("Ajustes guardados. Recarga la página.");
+    });
+}
+
+// 5. Override de la función loginAdmin para activar las pestañas
 function loginAdmin() {
     const u = document.getElementById('admin-user').value;
     const p = document.getElementById('admin-pass').value;
 
-    google.script.run.withSuccessHandler(function(valido) {
-        if (valido) {
+    mostrarToast("VERIFICANDO...");
+    sessionUser = u; 
+    sessionPass = p;
+
+    apiCall("loginAdmin").then(res => {
+        if (res && res.success) {
             document.getElementById('admin-login-view').style.display = 'none';
             document.getElementById('admin-menu-view').style.display = 'block';
             showAdminTab('dash', document.querySelector('.admin-tab-btn')); 
+            mostrarToast("Acceso concedido");
         } else {
+            sessionUser = ""; 
+            sessionPass = "";
             mostrarToast("Acceso denegado");
         }
-    }).validarAdmin(u, p);
+    });
 }
         
     </script>
