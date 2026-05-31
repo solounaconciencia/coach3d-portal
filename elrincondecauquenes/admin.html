@@ -1,6 +1,6 @@
 <div id="modal-admin" class="modal">
     <div class="modal-content admin-modal" style="max-width: 800px; padding: 20px;">
-        <span class="close-modal" onclick="cerrarAdmin()">&times;</span>
+        <span class="close-modal" onclick="cerrarAdmin()">×</span>
 
         <div id="admin-login-view">
             <div style="text-align:center; margin-bottom:30px; margin-top:20px;">
@@ -18,7 +18,7 @@
                 <button class="btn-back admin-tab-btn active" onclick="showAdminTab('dash', this)" style="border-color:var(--cian-pro); color:var(--cian-pro);">MÉTRICAS</button>
                 <button class="btn-back admin-tab-btn" onclick="showAdminTab('pedidos', this)">ESTADO PEDIDOS</button>
                 <button class="btn-back admin-tab-btn" onclick="showAdminTab('catalogo', this)">CATÁLOGO</button>
-                <button class="btn-back admin-tab-btn" onclick="showAdminTab('ajustes', this)">AJUSTES & REDES</button>
+                <button class="btn-back admin-tab-btn" onclick="showAdminTab('ajustes', this)">AJUSTES VISUALES</button>
                 <button class="btn-back" onclick="resetVistasAdmin()" style="margin-left:auto; border-color:#e74c3c; color:#e74c3c;"><i class="fas fa-sign-out-alt"></i> SALIR</button>
             </div>
 
@@ -48,8 +48,7 @@
                     <h3 style="color:var(--amber-premium); margin:0; font-family:var(--fuente-titulo);">INVENTARIO Y CATÁLOGO</h3>
                     <button onclick="document.getElementById('modal-producto-admin').style.display='flex'" class="btn-back" style="border-color:var(--cian-pro); color:var(--cian-pro);"><i class="fas fa-plus"></i> NUEVO PRODUCTO</button>
                 </div>
-                <div id="lista-productos-admin" class="admin-list" style="max-height: 350px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222; margin-bottom:15px;">
-                    </div>
+                <div id="lista-productos-admin" class="admin-list" style="max-height: 350px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222; margin-bottom:15px;"></div>
                 <button onclick="ejecutarContabilizar()" class="btn-checkout" style="margin-top:0;">GUARDAR STOCK RÁPIDO <i class="fas fa-sync-alt" style="margin-left:10px;"></i></button>
             </div>
 
@@ -66,15 +65,33 @@
                     </div>
 
                     <div style="background:#0a0a0a; border:1px solid #222; padding:20px; border-radius:12px;">
-                        <h4 style="color:var(--amber-premium); margin-bottom:15px;"><i class="fas fa-palette"></i> ESTILOS VISUALES</h4>
-                        <label style="font-size:0.8rem; color:#888;">Logo URL (Drive o Imgur):</label>
+                        <h4 style="color:var(--amber-premium); margin-bottom:15px;"><i class="fas fa-palette"></i> METAMORFOSIS VISUAL</h4>
+                        <label style="font-size:0.8rem; color:#888;">Logo URL:</label>
                         <input type="text" id="est-logo" placeholder="https://..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                        
                         <div style="display:flex; gap:10px; margin-bottom:10px;">
                             <div style="flex:1;">
-                                <label style="font-size:0.8rem; color:#888;">Color Principal:</label>
-                                <input type="color" id="est-color" value="#00e5ff" style="width:100%; height:40px; background:#000; border:1px solid #333; border-radius:5px; cursor:pointer;">
+                                <label style="font-size:0.8rem; color:#888;">Color Neón:</label>
+                                <input type="color" id="est-color-neon" value="#00e5ff" style="width:100%; height:40px; background:#000; border:1px solid #333; border-radius:5px; cursor:pointer;">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="font-size:0.8rem; color:#888;">Color Ámbar:</label>
+                                <input type="color" id="est-color-amber" value="#f1c40f" style="width:100%; height:40px; background:#000; border:1px solid #333; border-radius:5px; cursor:pointer;">
                             </div>
                         </div>
+
+                        <label style="font-size:0.8rem; color:#888;">Fuente Títulos:</label>
+                        <select id="est-font-titulos" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                            <option value="'Orbitron', sans-serif">Orbitron (Cyber)</option>
+                            <option value="'Montserrat', sans-serif">Montserrat (Elegante)</option>
+                        </select>
+
+                        <label style="font-size:0.8rem; color:#888;">Efecto Fondo (Atmósfera):</label>
+                        <select id="est-efecto-fondo" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                            <option value="ninguno">Ninguno (Negro puro)</option>
+                            <option value="espacial">Espacio Profundo</option>
+                            <option value="matrix">Matrix Hacker</option>
+                        </select>
                     </div>
                 </div>
                 
