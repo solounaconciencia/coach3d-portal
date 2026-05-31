@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">/
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>El Rincón de Cauquenes</title>
     
@@ -2257,7 +2257,35 @@ function loginAdmin() {
         }
     });
 }
-        
+
+// ==========================================
+// APLICADOR DE ESTILOS DINÁMICOS (Rincón)
+// ==========================================
+function aplicarEstilosDinamicos(config) {
+    if (!config) return;
+    const fontTitulos = config['FONT_TITULOS'] || "'Orbitron', sans-serif";
+    const fontMenu = config['FONT_MENU'] || "'Montserrat', sans-serif";
+    const fontCuerpo = config['FONT_CUERPO'] || "'Montserrat', sans-serif";
+    
+    const fontClean = (f) => f.split(',')[0].replace(/'/g, '').replace(/ /g, '+');
+    const linkFonts = document.createElement('link');
+    linkFonts.rel = 'stylesheet';
+    linkFonts.href = `https://fonts.googleapis.com/css2?family=${fontClean(fontTitulos)}&family=${fontClean(fontMenu)}&family=${fontClean(fontCuerpo)}&display=swap`;
+    document.head.appendChild(linkFonts);
+
+    const root = document.documentElement;
+    if (config['COLOR_NEON']) root.style.setProperty('--cian-pro', config['COLOR_NEON']); // Mapeo a tu variable cian-pro
+    if (config['COLOR_AMBER']) root.style.setProperty('--amber-premium', config['COLOR_AMBER']); // Mapeo a tu variable amber
+    if (config['COLOR_BG']) root.style.setProperty('--bg-base', config['COLOR_BG']);
+    
+    root.style.setProperty('--fuente-titulo', fontTitulos);
+    root.style.setProperty('--fuente-cuerpo', fontCuerpo);
+
+    if (config['LOGO_PRINCIPAL']) {
+        const logoImg = document.querySelector('.main-logo');
+        if (logoImg) logoImg.src = config['LOGO_PRINCIPAL'].trim();
+    }
+}
     </script>
 </body>
 </html>
