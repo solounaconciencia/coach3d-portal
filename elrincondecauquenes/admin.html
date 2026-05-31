@@ -1,103 +1,357 @@
-<div id="modal-admin" class="modal">
-    <div class="modal-content admin-modal" style="max-width: 800px; padding: 20px;">
-        <span class="close-modal" onclick="cerrarAdmin()">×</span>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mando Central | Rincón de Cauquenes</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <style>
+        :root {
+            --bg-negro: #050505;
+            --bg-card: #111111;
+            --cian-pro: #00e5ff;
+            --amber-premium: #f1c40f;
+            --blanco-puro: #ffffff;
+            --gris-tenue: #888888;
+            --fuente-titulo: 'Orbitron', sans-serif;
+            --fuente-texto: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-negro);
+            color: var(--blanco-puro);
+            font-family: var(--fuente-texto);
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Estilos de Botones y Formularios */
+        .btn-checkout, .btn-back, .admin-tab-btn {
+            background: var(--cian-pro);
+            color: black;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: var(--fuente-titulo);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .btn-back {
+            background: transparent;
+            color: var(--blanco-puro);
+            border: 1px solid #444;
+        }
+
+        .admin-tab-btn.active {
+            border-color: var(--cian-pro);
+            color: var(--cian-pro);
+        }
+
+        .admin-input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #0a0a0a;
+            color: white;
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-family: var(--fuente-texto);
+            box-sizing: border-box;
+        }
+
+        /* Estilos de Login */
+        #admin-login-view {
+            max-width: 400px;
+            margin: 100px auto;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #222;
+            text-align: center;
+        }
+
+        /* Diseño de Pestañas (Cards) */
+        .admin-card {
+            background: var(--bg-card);
+            border: 1px solid #222;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .toast {
+            visibility: hidden; min-width: 250px; background-color: var(--cian-pro); color: #000;
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
+            z-index: 10000; left: 50%; bottom: 30px; font-weight: bold;
+            transform: translateX(-50%); font-family: var(--fuente-titulo);
+        }
+        .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        
+        /* Modal Nuevo Producto */
+        .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        .modal-content { background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--amber-premium); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;}
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
         <div id="admin-login-view">
-            <div style="text-align:center; margin-bottom:30px; margin-top:20px;">
-                <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--cian-pro); margin-bottom:15px;"></i>
-                <h3 style="font-family: var(--fuente-titulo); letter-spacing: 2px; color:white;">CONTROL MANDO CENTRAL</h3>
-            </div>
-            <input type="text" id="admin-user" placeholder="Usuario" class="admin-input" style="max-width: 300px; display:block; margin: 0 auto 15px auto;">
-            <input type="password" id="admin-pass" placeholder="Contraseña" class="admin-input" style="max-width: 300px; display:block; margin: 0 auto 15px auto;">
-            <button onclick="loginAdmin()" class="btn-checkout" style="max-width: 300px; display:block; margin: 0 auto;">VERIFICAR IDENTIDAD</button>
+            <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--cian-pro); margin-bottom:15px;"></i>
+            <h3 style="font-family: var(--fuente-titulo); letter-spacing: 2px; margin-bottom: 30px;">MANDO CENTRAL</h3>
+            <input type="text" id="admin-user" placeholder="Usuario" class="admin-input">
+            <input type="password" id="admin-pass" placeholder="Contraseña" class="admin-input">
+            <button onclick="loginAdmin()" class="btn-checkout" style="width: 100%;">VERIFICAR IDENTIDAD</button>
         </div>
 
-        <div id="admin-menu-view" style="display:none; padding-top:10px;">
-            
+        <div id="admin-menu-view" style="display:none;">
             <div style="display:flex; gap:10px; margin-bottom:25px; border-bottom:1px solid #333; padding-bottom:15px; overflow-x:auto;">
-                <button class="btn-back admin-tab-btn active" onclick="showAdminTab('dash', this)" style="border-color:var(--cian-pro); color:var(--cian-pro);">MÉTRICAS</button>
+                <button class="btn-back admin-tab-btn active" onclick="showAdminTab('dash', this)">MÉTRICAS</button>
                 <button class="btn-back admin-tab-btn" onclick="showAdminTab('pedidos', this)">ESTADO PEDIDOS</button>
                 <button class="btn-back admin-tab-btn" onclick="showAdminTab('catalogo', this)">CATÁLOGO</button>
-                <button class="btn-back admin-tab-btn" onclick="showAdminTab('ajustes', this)">AJUSTES VISUALES</button>
-                <button class="btn-back" onclick="resetVistasAdmin()" style="margin-left:auto; border-color:#e74c3c; color:#e74c3c;"><i class="fas fa-sign-out-alt"></i> SALIR</button>
+                <button class="btn-back admin-tab-btn" onclick="showAdminTab('ajustes', this)">ESTILOS Y REDES</button>
+                <button class="btn-back" onclick="location.reload()" style="margin-left:auto; border-color:#e74c3c; color:#e74c3c;"><i class="fas fa-sign-out-alt"></i> SALIR</button>
             </div>
 
             <div id="tab-dash" class="admin-tab-content" style="display:block;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h3 style="color:var(--cian-pro); margin:0; font-family:var(--fuente-titulo);">RENDIMIENTO GLOBAL</h3>
+                <h3 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 20px;">RENDIMIENTO GLOBAL</h3>
+                <div class="admin-card" style="height: 300px; display: flex; align-items: center; justify-content: center; color: #555;">
+                    <i>Gráfico de rendimiento en construcción (Requiere conexión API)</i>
                 </div>
-                <div class="period-selector" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:20px;">
-                    <button onclick="cargarGrafico(1)" class="btn-back">1 Mes</button>
-                    <button onclick="cargarGrafico(3)" class="btn-back">3 Meses</button>
-                    <button onclick="cargarGrafico(6)" class="btn-back">6 Meses</button>
-                    <button onclick="cargarGrafico(12)" class="btn-back">1 Año</button>
-                </div>
-                <div id="chart_div" style="width: 100%; height: 300px; background: #000; border-radius:12px; border:1px solid #222; padding:10px;"></div>
             </div>
 
             <div id="tab-pedidos" class="admin-tab-content" style="display:none;">
-                <h3 style="color:var(--cian-pro); margin-bottom:20px; font-family:var(--fuente-titulo);">GESTIÓN DE VENTAS</h3>
-                <input type="text" id="search-pedidos" placeholder="Buscar por ID_pedido..." style="width:100%; padding:15px; background:#0a0a0a; color:white; border:1px solid #222; border-radius:8px; margin-bottom:15px;" onkeyup="filtrarPedidosAdmin()">
-                <div id="lista-pedidos-status" style="max-height: 400px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222;">
-                    <p style="text-align:center; color:#555; padding:20px;">Cargando pedidos...</p>
+                <h3 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 20px;">GESTIÓN DE VENTAS</h3>
+                <input type="text" id="search-pedidos" class="admin-input" placeholder="Buscar por ID de pedido...">
+                <div class="admin-card" id="lista-pedidos-status" style="max-height: 400px; overflow-y: auto;">
+                    <p style="text-align:center; color:#555;">Cargando pedidos...</p>
                 </div>
             </div>
 
             <div id="tab-catalogo" class="admin-tab-content" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h3 style="color:var(--amber-premium); margin:0; font-family:var(--fuente-titulo);">INVENTARIO Y CATÁLOGO</h3>
+                    <h3 style="color:var(--amber-premium); font-family:var(--fuente-titulo); margin:0;">INVENTARIO Y CATÁLOGO</h3>
                     <button onclick="document.getElementById('modal-producto-admin').style.display='flex'" class="btn-back" style="border-color:var(--cian-pro); color:var(--cian-pro);"><i class="fas fa-plus"></i> NUEVO PRODUCTO</button>
                 </div>
-                <div id="lista-productos-admin" class="admin-list" style="max-height: 350px; overflow-y: auto; background: #000; padding:10px; border-radius:12px; border:1px solid #222; margin-bottom:15px;"></div>
-                <button onclick="ejecutarContabilizar()" class="btn-checkout" style="margin-top:0;">GUARDAR STOCK RÁPIDO <i class="fas fa-sync-alt" style="margin-left:10px;"></i></button>
+                <div class="admin-card" id="lista-productos-admin" style="max-height: 400px; overflow-y: auto;">
+                    <p style="text-align:center; color:#555;">Cargando catálogo...</p>
+                </div>
             </div>
 
             <div id="tab-ajustes" class="admin-tab-content" style="display:none;">
-                <h3 style="color:var(--cian-pro); margin-bottom:20px; font-family:var(--fuente-titulo);">CONFIGURACIÓN DE PLATAFORMA</h3>
+                <h3 style="color:var(--cian-pro); font-family:var(--fuente-titulo); margin-bottom: 20px;">CONFIGURACIÓN DE PLATAFORMA</h3>
                 
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px;">
-                    <div style="background:#0a0a0a; border:1px solid #222; padding:20px; border-radius:12px;">
-                        <h4 style="color:var(--amber-premium); margin-bottom:15px;"><i class="fas fa-hashtag"></i> REDES SOCIALES</h4>
-                        <label style="font-size:0.8rem; color:#888;">WhatsApp Soporte:</label>
-                        <input type="text" id="aj_wa" placeholder="Ej: 56912345678" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+                    
+                    <div class="admin-card">
+                        <h4 style="color:var(--amber-premium); margin-top:0; margin-bottom:15px;"><i class="fas fa-hashtag"></i> REDES SOCIALES</h4>
+                        <label style="font-size:0.8rem; color:#888;">WhatsApp Soporte (Solo números):</label>
+                        <input type="text" id="aj_wa" class="admin-input" placeholder="Ej: 56912345678">
+                        
                         <label style="font-size:0.8rem; color:#888;">Instagram URL:</label>
-                        <input type="text" id="aj_ig" placeholder="https://instagram.com/..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                        <input type="text" id="aj_ig" class="admin-input" placeholder="https://instagram.com/...">
                     </div>
 
-                    <div style="background:#0a0a0a; border:1px solid #222; padding:20px; border-radius:12px;">
-                        <h4 style="color:var(--amber-premium); margin-bottom:15px;"><i class="fas fa-palette"></i> METAMORFOSIS VISUAL</h4>
-                        <label style="font-size:0.8rem; color:#888;">Logo URL:</label>
-                        <input type="text" id="est-logo" placeholder="https://..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                    <div class="admin-card">
+                        <h4 style="color:var(--amber-premium); margin-top:0; margin-bottom:15px;"><i class="fas fa-palette"></i> METAMORFOSIS VISUAL</h4>
                         
-                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <label style="font-size:0.8rem; color:#888;">Logo URL (Drive o Imgur):</label>
+                        <input type="text" id="est-logo" class="admin-input" placeholder="https://...">
+                        
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
                             <div style="flex:1;">
                                 <label style="font-size:0.8rem; color:#888;">Color Neón:</label>
-                                <input type="color" id="est-color-neon" value="#00e5ff" style="width:100%; height:40px; background:#000; border:1px solid #333; border-radius:5px; cursor:pointer;">
+                                <input type="color" id="est-color-neon" value="#00e5ff" class="admin-input" style="height:45px; padding:2px; cursor:pointer;">
                             </div>
                             <div style="flex:1;">
                                 <label style="font-size:0.8rem; color:#888;">Color Ámbar:</label>
-                                <input type="color" id="est-color-amber" value="#f1c40f" style="width:100%; height:40px; background:#000; border:1px solid #333; border-radius:5px; cursor:pointer;">
+                                <input type="color" id="est-color-amber" value="#f1c40f" class="admin-input" style="height:45px; padding:2px; cursor:pointer;">
                             </div>
                         </div>
 
-                        <label style="font-size:0.8rem; color:#888;">Fuente Títulos:</label>
-                        <select id="est-font-titulos" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                        <label style="font-size:0.8rem; color:#888;">Fuente de Títulos:</label>
+                        <select id="est-font-titulos" class="admin-input">
                             <option value="'Orbitron', sans-serif">Orbitron (Cyber)</option>
                             <option value="'Montserrat', sans-serif">Montserrat (Elegante)</option>
                         </select>
 
-                        <label style="font-size:0.8rem; color:#888;">Efecto Fondo (Atmósfera):</label>
-                        <select id="est-efecto-fondo" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:white; border:1px solid #333; border-radius:5px;">
+                        <label style="font-size:0.8rem; color:#888;">Efecto de Fondo (Atmósfera):</label>
+                        <select id="est-efecto-fondo" class="admin-input">
                             <option value="ninguno">Ninguno (Negro puro)</option>
-                            <option value="espacial">Espacio Profundo</option>
-                            <option value="matrix">Matrix Hacker</option>
+                            <option value="espacial">Espacio Profundo (Estrellas)</option>
+                            <option value="matrix">Matrix Hacker (Lluvia verde)</option>
+                            <option value="bokeh">Brisa Dorada (Elegante)</option>
+                            <option value="vaporwave">Neón 80s (Retro)</option>
+                            <option value="naturaleza">Verde Orgánico (Relajante)</option>
                         </select>
                     </div>
                 </div>
                 
-                <button onclick="guardarAjustes()" class="btn-checkout">GUARDAR TODOS LOS AJUSTES</button>
+                <button onclick="guardarAjustes()" class="btn-checkout" style="width: 100%; margin-top: 10px;">GUARDAR TODOS LOS AJUSTES</button>
             </div>
-
         </div>
     </div>
-</div>
+
+    <div id="modal-producto-admin" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--amber-premium); font-family:var(--fuente-titulo); margin-top:0;">NUEVO PRODUCTO</h2>
+            
+            <input type="text" id="prod-nombre" class="admin-input" placeholder="Nombre del Producto">
+            
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="prod-precio" class="admin-input" placeholder="Precio ($)">
+                <input type="number" id="prod-stock" class="admin-input" placeholder="Stock">
+            </div>
+            
+            <input type="text" id="prod-categoria" class="admin-input" placeholder="Categoría">
+            <textarea id="prod-desc" class="admin-input" placeholder="Descripción..." style="height:80px;"></textarea>
+            
+            <h4 style="color:var(--cian-pro); margin-bottom:10px;">VARIANTES AVANZADAS</h4>
+            <input type="text" id="prod-sabor" class="admin-input" placeholder="Variante 1 (Ej: Sabor, Material)">
+            <input type="text" id="prod-color" class="admin-input" placeholder="Variante 2 (Ej: Colores separados por coma)">
+            <input type="text" id="prod-tamano" class="admin-input" placeholder="Variante 3 (Ej: S, M, L)">
+
+            <label style="display:block; margin-bottom:5px; color:#888; font-size:0.8rem;">FOTO PRINCIPAL (Se subirá a Google Drive):</label>
+            <input type="file" id="prod-foto" accept="image/*" style="margin-bottom:20px; color:white;">
+            
+            <div style="display:flex; gap:10px;">
+                <button id="btn-guardar-prod" onclick="guardarProductoCentral()" class="btn-checkout" style="flex:1;">GUARDAR</button>
+                <button onclick="document.getElementById('modal-producto-admin').style.display='none'" class="btn-back" style="flex:1;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Notificación</div>
+
+    <script>
+        // ¡¡IMPORTANTE!! PEGA AQUÍ LA URL DE TU GOOGLE APPS SCRIPT
+        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+
+        // Motor Fetch API para comunicarse con Apps Script
+        async function apiCall(action, payload = null) {
+            let url = API_URL + "?action=" + action;
+            if (payload) payload.action = action;
+            let options = {
+                method: action === "getInitialData" ? "GET" : "POST",
+                body: action === "getInitialData" ? null : JSON.stringify(payload)
+            };
+            try {
+                const res = await fetch(url, options);
+                return await res.json();
+            } catch (e) {
+                mostrarToast("Error de conexión");
+                console.error(e);
+            }
+        }
+
+        // Utilidad: Mensajes
+        function mostrarToast(mensaje) {
+            const t = document.getElementById("toast");
+            t.innerText = mensaje;
+            t.className = "toast show";
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        }
+
+        // Lógica Login
+        function loginAdmin() {
+            const u = document.getElementById('admin-user').value;
+            const p = document.getElementById('admin-pass').value;
+            mostrarToast("Verificando credenciales...");
+            
+            apiCall("validarAdmin", { user: u, pass: p }).then(res => {
+                // Asumiendo que tu backend devuelve un objeto { success: true/false } o boolean
+                if (res === true || (res && res.success)) {
+                    document.getElementById('admin-login-view').style.display = 'none';
+                    document.getElementById('admin-menu-view').style.display = 'block';
+                    mostrarToast("Acceso concedido");
+                } else {
+                    mostrarToast("Acceso denegado");
+                }
+            });
+        }
+
+        // Navegación Pestañas
+        function showAdminTab(tabId, btn) {
+            document.querySelectorAll('.admin-tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                b.style.borderColor = '#444'; b.style.color = 'white';
+            });
+            document.getElementById('tab-' + tabId).style.display = 'block';
+            btn.style.borderColor = 'var(--cian-pro)';
+            btn.style.color = 'var(--cian-pro)';
+        }
+
+        // Lógica Guardar Producto con Imagen (Base64)
+        function guardarProductoCentral() {
+            const btn = document.getElementById('btn-guardar-prod');
+            const payload = {
+                nombre: document.getElementById('prod-nombre').value,
+                precio: document.getElementById('prod-precio').value,
+                stock: document.getElementById('prod-stock').value,
+                categoria: document.getElementById('prod-categoria').value,
+                descripcion: document.getElementById('prod-desc').value,
+                sabor: document.getElementById('prod-sabor').value,
+                color: document.getElementById('prod-color').value,
+                tamano: document.getElementById('prod-tamano').value,
+                fotosUrlArr: []
+            };
+
+            if(!payload.nombre || !payload.precio) return mostrarToast("Nombre y Precio obligatorios");
+
+            btn.innerText = "SUBIENDO IMAGEN...";
+            btn.disabled = true;
+
+            const fileInput = document.getElementById('prod-foto');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    payload.fotosUrlArr.push(e.target.result);
+                    apiCall("crearProductoAdmin", payload).then(res => postGuardarProducto(res, btn));
+                };
+                reader.readAsDataURL(file);
+            } else {
+                apiCall("crearProductoAdmin", payload).then(res => postGuardarProducto(res, btn));
+            }
+        }
+
+        function postGuardarProducto(res, btn) {
+            mostrarToast("Producto subido al Excel!");
+            document.getElementById('modal-producto-admin').style.display = 'none';
+            btn.innerText = "GUARDAR";
+            btn.disabled = false;
+        }
+
+        // Lógica Guardar Ajustes (Avanzado)
+        function guardarAjustes() {
+            mostrarToast("Guardando configuración global...");
+            const payload = {
+                logo: document.getElementById('est-logo').value,
+                colorNeon: document.getElementById('est-color-neon').value,
+                colorAmber: document.getElementById('est-color-amber').value,
+                fontTitulos: document.getElementById('est-font-titulos').value,
+                efectoFondo: document.getElementById('est-efecto-fondo').value,
+                wa: document.getElementById('aj_wa').value,
+                ig: document.getElementById('aj_ig').value
+            };
+            
+            apiCall("actualizarEstilosGlobales", payload).then(res => {
+                mostrarToast("Estilos guardados exitosamente.");
+            });
+        }
+    </script>
+</body>
+</html>
