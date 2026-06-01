@@ -1026,6 +1026,8 @@ button {
     </div>
 </main>
 
+    
+
     <div class="cart-float-bubble" onclick="toggleCart()" title="Ver mi pedido">
       <i class="fas fa-shopping-basket"></i>
       <span id="cart-count-bubble" class="cart-badge-float">0</span>
@@ -1091,8 +1093,10 @@ button {
             <input type="text" id="ag-nombre" placeholder="Tu Nombre" style="width:100%; padding:15px; margin-bottom:12px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px;">
             <input type="email" id="ag-correo" placeholder="Tu Correo" style="width:100%; padding:15px; margin-bottom:12px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px;">
             <select id="ag-servicio" style="width:100%; padding:15px; margin-bottom:12px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px;">
-                <option value="E-Commerce Propio">Quiero mi propio E-Commerce</option>
-                <option value="Solución Tecnológica">Otra solución tecnológica</option>
+                <option value="" disabled selected>Selecciona una opción...</option>
+                <option value="Quiero mi propia pagina web o ecommerce.">Quiero mi propia página web o ecommerce.</option>
+                <option value="Cotizar solución tecnológica y/o automatización.">Quisiera cotizar otro tipo de solución tecnológica y/o automatización.</option>
+                <option value="Curso/taller de uso de IA.">Quisiera curso/taller de uso de IA personalizado o grupal.</option>
             </select>
             <textarea id="ag-mensaje" placeholder="Detalles de tu proyecto..." style="width:100%; padding:15px; margin-bottom:20px; background:#0a0a0a; border:1px solid #222; color:white; border-radius:8px; height: 100px;"></textarea>
             
@@ -2201,22 +2205,41 @@ function enviarLeadAgencia() {
     const btn = document.getElementById('btn-agencia');
     const payload = {
         nombre: document.getElementById('ag-nombre').value,
-        correo: document.getElementById('ag-correo').value,
+        correo: document.getElementById('ag-correo').value.trim(),
         servicio: document.getElementById('ag-servicio').value,
         mensaje: document.getElementById('ag-mensaje').value
     };
     
-    if(!payload.nombre || !payload.correo) return mostrarToast("Ingresa nombre y correo");
+    if(!payload.nombre || !payload.correo || !payload.servicio) {
+        return mostrarToast("Ingresa nombre, correo y selecciona un servicio.");
+    }
+    
+    // BLINDAJE: Si el correo no tiene @ o ., aborta antes de colapsar el servidor
+    if(!payload.correo.includes("@") || !payload.correo.includes(".")) {
+        return mostrarToast("Por favor, ingresa un correo electrónico válido.");
+    }
     
     btn.innerText = "ENVIANDO...";
     btn.disabled = true;
     
-    apiCall("enviarCorreoAgencia", payload).then(res => {
+    google.script.run
+    .withSuccessHandler(()=>{
         mostrarToast("Solicitud enviada a Coach 3D Latam");
         document.getElementById('modal-agencia').style.display = 'none';
         btn.innerText = "ENVIAR SOLICITUD";
         btn.disabled = false;
-    });
+        // Limpiar campos tras enviar
+        document.getElementById('ag-nombre').value = '';
+        document.getElementById('ag-correo').value = '';
+        document.getElementById('ag-mensaje').value = '';
+        document.getElementById('ag-servicio').selectedIndex = 0;
+    })
+    .withFailureHandler((err)=>{
+        mostrarToast("Error de conexión. Intenta de nuevo.");
+        btn.innerText = "ENVIAR SOLICITUD";
+        btn.disabled = false;
+    })
+    .enviarCorreoAgencia(payload);
 }
 
 // 4. Guardar Ajustes Visuales
