@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">/
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>El Rincón de Cauquenes</title>
+    <title>El Rincón de Cauqfuenes</title>
     
     <link rel="icon" href="https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -967,7 +967,7 @@ button {
               <i class="fas fa-headset"></i>
               <span>SOPORTE TÉCNICO</span>
             </div>
-            <div class="trust-card" onclick="abrirLoginAdmin()" style="cursor:pointer; border-color: rgba(241, 196, 15, 0.3);">
+            <div class="trust-card" onclick="window.location.href='admin.html'" style="cursor:pointer; border-color: rgba(241, 196, 15, 0.3);">
               <i class="fas fa-user-cog"></i> <span style="font-size: 0.6rem; opacity: 0.8;">ADMIN</span>
             </div>
         </div>
@@ -2214,7 +2214,6 @@ function enviarLeadAgencia() {
         return mostrarToast("Ingresa nombre, correo y selecciona un servicio.");
     }
     
-    // BLINDAJE: Si el correo no tiene @ o ., aborta antes de colapsar el servidor
     if(!payload.correo.includes("@") || !payload.correo.includes(".")) {
         return mostrarToast("Por favor, ingresa un correo electrónico válido.");
     }
@@ -2222,24 +2221,20 @@ function enviarLeadAgencia() {
     btn.innerText = "ENVIANDO...";
     btn.disabled = true;
     
-    google.script.run
-    .withSuccessHandler(()=>{
+    apiCall("enviarCorreoAgencia", payload).then(res => {
         mostrarToast("Solicitud enviada a Coach 3D Latam");
         document.getElementById('modal-agencia').style.display = 'none';
         btn.innerText = "ENVIAR SOLICITUD";
         btn.disabled = false;
-        // Limpiar campos tras enviar
         document.getElementById('ag-nombre').value = '';
         document.getElementById('ag-correo').value = '';
         document.getElementById('ag-mensaje').value = '';
         document.getElementById('ag-servicio').selectedIndex = 0;
-    })
-    .withFailureHandler((err)=>{
+    }).catch(err => {
         mostrarToast("Error de conexión. Intenta de nuevo.");
         btn.innerText = "ENVIAR SOLICITUD";
         btn.disabled = false;
-    })
-    .enviarCorreoAgencia(payload);
+    });
 }
 
 // 4. Guardar Ajustes Visuales
