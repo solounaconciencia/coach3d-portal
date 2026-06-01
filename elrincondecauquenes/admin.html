@@ -372,13 +372,18 @@
         }
 
         // LÓGICA BÁSICA DE LOGIN COMPATIBLE
+        const API_URL = "https://script.google.com/macros/s/AKfycbxPr3a8zgZcYwAIisYn8aFBvyJ_i2GdUvu3wz2HZmfN8QkhTFnY8ybCmH21yL-WUKJ32Q/exec"; 
+
         async function ejecutarLoginAdmin() {
             const u = document.getElementById('admin-user').value;
             const p = document.getElementById('admin-pass').value;
             if (!u || !p) return mostrarToast("Ingresa credenciales.");
             mostrarToast("Verificando en la matriz...");
             
-            const res = await apiCall("validarAdmin", { user: u, pass: p });
+            sessionUser = u;
+            sessionPass = p;
+            
+            const res = await apiCall("loginAdmin"); // ESTE ERA EL ERROR. Debe ser loginAdmin
             if (res === true || (res && res.success)) {
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('admin-dashboard').style.display = 'block';
