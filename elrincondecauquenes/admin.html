@@ -265,6 +265,11 @@
                     <label style="font-size:0.7rem; color:var(--cian);">NOMBRE:</label><input type="text" id="np-nombre" class="nave-input">
                     <label style="font-size:0.7rem; color:var(--cian);">CATEGORÍA:</label><input type="text" id="np-categoria" class="nave-input">
                     <label style="font-size:0.7rem; color:var(--cian);">MARCA:</label><input type="text" id="np-marca" class="nave-input" value="Original">
+                    <label style="font-size:0.7rem; color:var(--cian);">ESTADO:</label>
+                    <select id="np-estado" class="nave-input">
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="PAUSA">PAUSADO</option>
+                    </select>
                 </div>
                 <div>
                     <div style="display:flex; gap:10px;">
@@ -337,20 +342,25 @@
     <div id="toast" class="toast-weed" style="display:none;">Notificación</div>
 
     <script>
-        // ==========================================
-        // REEMPLAZA CON TU URL DE APPS SCRIPT
-        // ==========================================
-        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbxPr3a8zgZcYwAIisYn8aFBvyJ_i2GdUvu3wz2HZmfN8QkhTFnY8ybCmH21yL-WUKJ32Q/exec"; 
 
         let globalStock = [];
         let miGrafico = null;
         let fotosNuevo = [];
         let fotosEditando = [];
         let auspiciadoresActivos = [];
+        let sessionUser = "";
+        let sessionPass = "";
 
         async function apiCall(action, payload = null) {
             let url = API_URL + "?action=" + action;
-            if (payload) payload.action = action;
+            payload = payload || {};
+            payload.action = action;
+            
+            // Inyección automática de credenciales para pasar el filtro de seguridad de Coordenadas del backend
+            payload.u = sessionUser;
+            payload.p = sessionPass;
+
             let options = {
                 method: action === "getInitialData" ? "GET" : "POST",
                 body: action === "getInitialData" ? null : JSON.stringify(payload)
@@ -371,9 +381,6 @@
             setTimeout(() => { t.style.display = "none"; }, 3000);
         }
 
-        // LÓGICA BÁSICA DE LOGIN COMPATIBLE
-        const API_URL = "https://script.google.com/macros/s/AKfycbxPr3a8zgZcYwAIisYn8aFBvyJ_i2GdUvu3wz2HZmfN8QkhTFnY8ybCmH21yL-WUKJ32Q/exec"; 
-
         async function ejecutarLoginAdmin() {
             const u = document.getElementById('admin-user').value;
             const p = document.getElementById('admin-pass').value;
@@ -383,7 +390,7 @@
             sessionUser = u;
             sessionPass = p;
             
-            const res = await apiCall("loginAdmin"); // ESTE ERA EL ERROR. Debe ser loginAdmin
+            const res = await apiCall("loginAdmin"); 
             if (res === true || (res && res.success)) {
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('admin-dashboard').style.display = 'block';
@@ -584,7 +591,6 @@
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CAMBIOS'; btn.disabled=false;
         }
 
-        // REDES Y BANCOS
         async function cargarAjustesPanel() {
             try {
                 const conf = await apiCall("getConfig");
@@ -620,7 +626,6 @@
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CONFIGURACIÓN'; btn.disabled = false;
         }
 
-        // ESTILOS 18 PARÁMETROS INTACTOS
         async function cargarEstilosPanel() {
             try {
                 document.getElementById('est-logo').value = "Conectando...";
