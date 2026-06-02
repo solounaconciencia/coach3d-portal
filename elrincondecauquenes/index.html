@@ -2222,6 +2222,14 @@ function enviarLeadAgencia() {
     btn.disabled = true;
     
     apiCall("enviarCorreoAgencia", payload).then(res => {
+        // CONTROL DE ERRORES SUTIL: Si el servidor rechaza el envío, frena el flujo y avisa
+        if (res && res.error) {
+            mostrarToast("Error de envío: " + res.error);
+            btn.innerText = "ENVIAR SOLICITUD";
+            btn.disabled = false;
+            return;
+        }
+        
         mostrarToast("Solicitud enviada a Coach 3D Latam");
         document.getElementById('modal-agencia').style.display = 'none';
         btn.innerText = "ENVIAR SOLICITUD";
