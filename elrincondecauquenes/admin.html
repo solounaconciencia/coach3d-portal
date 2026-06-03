@@ -604,11 +604,12 @@
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CAMBIOS'; btn.disabled=false;
         }
 
+
+        // REDES Y BANCOS - CORE DE LECTURA Y ESCRITURA PERSISTENTE
         async function cargarAjustesPanel() {
             try {
                 const conf = await apiCall("getConfig");
                 document.getElementById('aj_wa').value = conf['WHATSAPP'] || '';
-                document.getElementById('aj_wa_admin').value = conf['WHATSAPP_ADMIN'] || '';
                 document.getElementById('aj_ig').value = conf['LINK_INSTAGRAM'] || '';
                 document.getElementById('aj_fb').value = conf['LINK_FACEBOOK'] || '';
                 document.getElementById('aj_tk').value = conf['LINK_TIKTOK'] || '';
@@ -617,14 +618,13 @@
                 document.getElementById('aj_banco_rut').value = conf['BANCO_RUT'] || '';
                 document.getElementById('aj_banco_numero').value = conf['BANCO_NUMERO'] || '';
                 document.getElementById('aj_banco_correo').value = conf['BANCO_CORREO'] || '';
-            } catch(e) { console.error("Error Config", e); }
+            } catch(e) { console.error("Error al cargar configuraciones", e); }
         }
 
         async function guardarAjustesPanel(btn) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...'; btn.disabled = true;
             const nuevos = {
                 'WHATSAPP': document.getElementById('aj_wa').value,
-                'WHATSAPP_ADMIN': document.getElementById('aj_wa_admin').value,
                 'LINK_INSTAGRAM': document.getElementById('aj_ig').value,
                 'LINK_FACEBOOK': document.getElementById('aj_fb').value,
                 'LINK_TIKTOK': document.getElementById('aj_tk').value,
@@ -634,10 +634,16 @@
                 'BANCO_NUMERO': document.getElementById('aj_banco_numero').value,
                 'BANCO_CORREO': document.getElementById('aj_banco_correo').value
             };
-            try { await apiCall("guardarAjustes", nuevos); mostrarToast("Configuración guardada."); } 
-            catch(e) { mostrarToast("Error al guardar."); }
+            try { 
+                await apiCall("guardarAjustes", nuevos); 
+                mostrarToast("Configuración guardada en CONFIG_APP."); 
+            } catch(e) { 
+                mostrarToast("Error al guardar configuraciones."); 
+            }
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CONFIGURACIÓN'; btn.disabled = false;
         }
+
+        
 
         async function cargarEstilosPanel() {
             try {
