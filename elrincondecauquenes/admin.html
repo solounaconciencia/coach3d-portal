@@ -424,29 +424,43 @@
         }
 
         async function actualizarGrafico() {
-            const meses = document.getElementById('periodo-selector').value;
-            try {
-                const listaData = await apiCall("getHistoricalData", {meses: meses});
-                if(!listaData || listaData.length === 0) return;
-                const ctx = document.getElementById('ventasChart').getContext('2d');
-                const etiquetas = listaData.map(item => item.label);
-                const datosTotal = listaData.map(item => item.fisico + item.online);
-
-                if (miGrafico) miGrafico.destroy();
-                miGrafico = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: etiquetas,
-                        datasets: [{ 
-                            label: 'Ventas Neta', data: datosTotal, 
-                            borderColor: '#00ffff', backgroundColor: 'rgba(0, 255, 255, 0.1)', 
-                            fill: true, tension: 0.3, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#00ffff'
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#1a1a1a' } }, x: { grid: { display: false } } } }
-                });
-            } catch(e) { console.error("Error Gráfico", e); }
+    const meses = document.getElementById('periodo-selector').value;
+    try {
+        const listaData = await apiCall("getHistoricalData", {meses: meses});
+        
+        // BLINDAJE FOCUS: Si el servidor no devuelve un Array válido, aborta limpiamente sin arrojar TypeError
+        if(!listaData || !Array.isArray(listaData) || listaData.length === 0) {
+            console.warn("No se recibieron datos estructurados para el gráfico.");
+            return;
         }
+        
+        const ctx = document.getElementById('ventasChart').getContext('2d');
+        const etiquetas = listaData.map(item => item.label);
+        const datosTotal = listaData.map(item => Number(item.fisico) + Number(item.online));
+
+        if (miGrafico) miGrafico.destroy();
+        miGrafico = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: etiquetas,
+                datasets: [{ 
+                    label: 'Ventas Neta', 
+                    data: datosTotal, 
+                    borderColor: '#00ffff', 
+                    backgroundColor: 'rgba(0, 255, 255, 0.1)', 
+                    fill: true, 
+                    tension: 0.3, 
+                    borderWidth: 2, 
+                    pointRadius: 4, 
+                    pointBackgroundColor: '#00ffff'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: '#1a1a1a' } }, x: { grid: { display: false } } } }
+        });
+    } catch(e) { 
+        console.error("Error Gráfico", e); 
+    }
+}
 
         function renderCatalogo(lista) {
             const tbody = document.getElementById('tbody-catalogo');
