@@ -85,6 +85,17 @@
                         <option value="12">Último Año</option>
                     </select>
                 </div>
+
+                <!-- ACCIONES DE CAJA DIRECTA (PROTOCOL FOCUS) -->
+                <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-nave-main" style="width:auto; padding:10px 20px; margin:0; background:var(--cian);" onclick="abrirModalPresencial()">
+                        <i class="fas fa-cash-register"></i> INFORMAR VENTA PRESENCIAL
+                    </button>
+                    <button class="btn-nave-main" style="width:auto; padding:10px 20px; margin:0; background:var(--amber);" onclick="abrirModalPendientes()">
+                        <i class="fas fa-clock"></i> ESTADO DE VENTAS
+                    </button>
+                </div>
+                
                 <div class="metric-card" style="margin-top:15px; padding:10px; height:350px;">
                     <canvas id="ventasChart"></canvas>
                 </div>
@@ -336,6 +347,44 @@
             <label for="ed-nueva-foto" class="custom-file-upload" id="lbl-ed-foto"><i class="fas fa-upload"></i> AGREGAR FOTO</label>
             <input type="file" id="ed-nueva-foto" accept="image/*" class="hidden-file">
             <button id="btn-guardar-edicion" class="btn-nave-main" onclick="guardarEdicionProducto()"><i class="fas fa-save"></i> GUARDAR CAMBIOS</button>
+        </div>
+    </div>
+
+    <!-- MODAL VENTA PRESENCIAL -->
+    <div id="modal-venta-presencial" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close-nave" onclick="cerrarModalPresencial()">×</span>
+            <h2 class="cian" style="font-family:var(--font-brand); margin-top:0; font-size:1.2rem;"><i class="fas fa-cash-register"></i> REGISTRAR VENTA LOCAL</h2>
+            
+            <label style="font-size:0.7rem; color:var(--cian); display:block; margin-bottom:5px;">CLIENTE (OPCIONAL):</label>
+            <input type="text" id="vp-cliente" class="nave-input" value="Venta Presencial">
+            
+            <label style="font-size:0.7rem; color:var(--cian); display:block; margin-bottom:5px;">DETALLE DE PRODUCTOS CONCRETADOS:</label>
+            <input type="text" id="vp-productos" class="nave-input" placeholder="Ej: 2x Producto Alfa, 1x Sustrato">
+            
+            <label style="font-size:0.7rem; color:var(--cian); display:block; margin-bottom:5px;">MONTO TOTAL COBRADO ($):</label>
+            <input type="number" id="vp-total" class="nave-input" placeholder="Ej: 25000">
+            
+            <button class="btn-nave-main" onclick="procesarVentaPresencial()" style="background:var(--cian);">COMPLEMETAR REGISTRO PAGADO</button>
+        </div>
+    </div>
+
+    <!-- MODAL VENTAS PENDIENTES -->
+    <div id="modal-ventas-pendientes" class="modal">
+        <div class="modal-content" style="max-width: 750px; max-height:85vh; overflow-y:auto;">
+            <span class="close-nave" onclick="cerrarModalPendientes()">×</span>
+            <h2 class="amber" style="font-family:var(--font-brand); margin-top:0; font-size:1.2rem;"><i class="fas fa-clock"></i> VENTAS EN ESTADO PENDIENTE</h2>
+            
+            <div style="overflow-x: auto; margin-top: 15px; background:rgba(0,0,0,0.5); border-radius:10px; border:1px solid #222;">
+                <table class="admin-table">
+                    <thead>
+                        <tr><th>ID / FECHA</th><th>CLIENTE</th><th>PRODUCTOS</th><th>TOTAL</th><th>ACCIÓN</th></tr>
+                    </thead>
+                    <tbody id="tbody-pendientes">
+                        <tr><td colspan="5" style="text-align:center; padding:15px; color:#666;">Buscando registros pendientes...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -719,6 +768,75 @@
             };
             try { mostrarToast("Transfiriendo ADN Visual..."); await apiCall("actualizarEstilosGlobales", payload); mostrarToast("¡Estilos blindados!"); } 
             catch(e) { mostrarToast("Error al guardar estilos."); }
+        }
+
+        // =======================================================
+        // FOCUS: GESTIÓN DE CAJA REGISTRADORA Y PENDIENTES
+        // =======================================================
+        function abrirModalPresencial() {
+            document.getElementById('vp-cliente').value = "Venta Presencial";
+            document.getElementById('vp-productos').value = "";
+            document.getElementById('vp-total').value = "";
+            document.getElementById('modal-venta-presencial').style.display = 'flex';
+        }
+        function cerrarModalPresencial() {
+            document.getElementById('modal-venta-presencial').style.display = 'none';
+        }
+        async function procesarVentaPresencial() {
+            const client = document.getElementById('vp-cliente').value.trim();
+            const prods = document.getElementById('vp-productos').value.trim();
+            const money = document.getElementById('vp-total').value.trim();
+            
+            if(!prods || !money) return mostrarToast("Asigna productos y monto total.");
+            
+            try {
+                const res = await apiCall("registrarVentaPresencial", { cliente: client, productos: prods, total: money });
+                if(res && res.success) {
+                    mostrarToast("Venta presencial inyectada con éxito.");
+                    cerrarModalPresencial();
+                    iniciarPanelAdmin(); // Recarga inmediata de tarjetas y gráficos
+                } else { mostrarToast("Error al procesar la celda."); }
+            } catch(e) { mostrarToast("Fallo de comunicación de red."); }
+        }
+
+        function abrirModalPendientes() {
+            document.getElementById('modal-ventas-pendientes').style.display = 'flex';
+            cargarVentasPendientesFiltro();
+        }
+        function cerrarModalPendientes() {
+            document.getElementById('modal-ventas-pendientes').style.display = 'none';
+        }
+        async function cargarVentasPendientesFiltro() {
+            const tbody = document.getElementById('tbody-pendientes');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:var(--cian);">Escaneando el Spreadsheet...</td></tr>';
+            try {
+                const res = await apiCall("obtenerVentasPendientes");
+                if(res && res.datos && res.datos.length > 0) {
+                    tbody.innerHTML = res.datos.map(v => `
+                        <tr>
+                            <td><strong class="cian">${v.id}</strong><br><small style="color:#666;">${v.fecha}</small></td>
+                            <td>${v.cliente}</td>
+                            <td style="max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${v.productos}">${v.productos}</td>
+                            <td class="amber">$${Number(v.total).toLocaleString('es-CL')}</td>
+                            <td>
+                                <button class="btn-nave-main" style="padding:6px 12px; margin:0; font-size:0.65rem; background:var(--neon-green); color:black;" onclick="mutarEstadoAPagado('${v.id}')">CONCRETAR</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#666;">Excelente: 0 ventas pendientes en cola.</td></tr>';
+                }
+            } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px; color:#ff4444;">Fallo al procesar matriz.</td></tr>'; }
+        }
+        async function mutarEstadoAPagado(id) {
+            try {
+                const res = await apiCall("cambiarEstadoVenta", { id: id });
+                if(res && res.success) {
+                    mostrarToast("¡Venta liberada! Estado cambiado a PAGADO.");
+                    cargarVentasPendientesFiltro();
+                    iniciarPanelAdmin(); // Re-renderiza el gráfico en vivo
+                } else { mostrarToast("Error al reescribir celda."); }
+            } catch(e) { mostrarToast("Fallo de sincronización."); }
         }
     </script>
 </body>
