@@ -281,6 +281,27 @@
         </div>
     </div>
 
+    <!-- MODAL AUTOMATIZADO DESTACADOS (PROTOCOL FOCUS) -->
+    <div id="modal-destacados-admin" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close-nave" onclick="cerrarModalDestacados()">×</span>
+            <h2 class="amber" style="font-family:var(--font-brand); margin-top:0; font-size:1.3rem;"><i class="fas fa-star"></i> SELECCIÓN DE DESTACADOS</h2>
+            <p style="font-size:0.75rem; color:#888; margin-bottom:15px;">Administra hasta 5 productos del catálogo para el slider de la vitrina.</p>
+            
+            <div id="lista-destacados-actuales" style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; border: 1px solid #222; margin-bottom: 20px; display:flex; flex-direction:column; gap:8px;">
+                <!-- Miniaturas dinámicas -->
+            </div>
+
+            <label style="font-size:0.7rem; color:var(--cian); display:block; margin-bottom:5px; font-weight:bold; letter-spacing:1px;">VINCULAR NUEVO PRODUCTO PUBLICADO:</label>
+            <select id="dest-producto-select" class="nave-input" onchange="agregarDestacadoDirecto(this.value)" style="padding:12px; border-color:var(--amber);">
+                <!-- Poblado por JavaScript -->
+            </select>
+
+            <button id="btn-guardar-destacados" class="btn-nave-main" style="margin-top:20px; padding:14px; font-size:0.9rem;" onclick="procesarGuardarDestacados()"><i class="fas fa-save"></i> FIJAR COMPONENTES SLIDER</button>
+        </div>
+    </div>
+
+    
     <div id="modal-nuevo-producto" class="modal">
         <div class="modal-content">
             <span class="close-nave" onclick="cerrarModalNuevoProducto()">×</span>
@@ -943,6 +964,8 @@
                 } else { mostrarToast("Error al reescribir celda."); }
             } catch(e) { mostrarToast("Fallo de sincronización."); }
         }
+
+        
     </script>
 </body>
 </html>
