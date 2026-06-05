@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">/
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>El Rincón de Cauqfuenes</title>
     
@@ -996,6 +996,8 @@ button {
                   </a>
                 </li>
                 
+                <li><a href="javascript:void(0)" onclick="abrirModalPagos()">PAGO</a></li>
+                
             </ul>
 
 
@@ -1148,6 +1150,25 @@ button {
         <button class="btn-checkout" onclick="enviarSolicitudSoporte()" id="btn-envio-soporte" style="margin-top:10px;">
             ENVIAR SOLICITUD
         </button>
+    </div>
+</div>
+
+<!-- MODAL DE MEDIOS DE PAGO Y TRANSFERENCIA (PROTOCOL FOCUS) -->
+<div id="modal-pagos" class="modal" style="display:none; align-items:center; justify-content:center;">
+    <div class="modal-content" style="max-width: 450px; text-align: center; padding: 35px 25px;">
+        <span class="close-modal" onclick="cerrarModalPagos()">&times;</span>
+        <h2 style="font-family: var(--fuente-titulo); color: var(--cian-pro); margin-bottom: 15px; font-size:1.4rem;"><i class="fas fa-university"></i> MEDIOS DE PAGO</h2>
+        <p style="font-size:0.85rem; color:var(--gris-tenue); margin-bottom:20px; line-height:1.5; font-family: var(--fuente-texto);">
+            Puedes realizar tus pagos de forma segura mediante <strong>Transferencia Electrónica</strong> o en <strong>Efectivo</strong> al momento de retirar tus artículos de manera presencial.
+        </p>
+        <div style="background: #000; border: 1px solid #222; padding: 20px; border-radius: 12px; text-align: left; font-size: 0.85rem; line-height: 1.8; font-family: var(--fuente-texto);">
+            <div><strong style="color:var(--amber-premium);">BANCO:</strong> <span id="pago-banco" style="color:white; font-weight:600;">-</span></div>
+            <div><strong style="color:var(--amber-premium);">TIPO CUENTA:</strong> <span id="pago-tipo" style="color:white; font-weight:600;">-</span></div>
+            <div><strong style="color:var(--amber-premium);">RUT:</strong> <span id="pago-rut" style="color:white; font-weight:600;">-</span></div>
+            <div><strong style="color:var(--amber-premium);">NÚMERO CUENTA:</strong> <span id="pago-numero" style="color:white; font-weight:600;">-</span></div>
+            <div><strong style="color:var(--amber-premium);">CORREO ELECTRÓNICO:</strong> <span id="pago-correo" style="color:white; font-weight:600;">-</span></div>
+        </div>
+        <button class="btn-checkout" onclick="cerrarModalPagos()" style="margin-top: 25px; margin-bottom:0;">ENTENDIDO</button>
     </div>
 </div>
 
@@ -1990,12 +2011,16 @@ function cambiarImagenDinamica(selectElement, fotoOriginal) {
 window.onclick = function(event) {
   const modal = document.getElementById('modal-detalle');
   const modalAdmin = document.getElementById('modal-admin');
+  const modalPagos = document.getElementById('modal-pagos');
   
   if (event.target == modal) {
     modal.style.display = "none";
   }
   if (event.target == modalAdmin) {
     modalAdmin.style.display = "none";
+  }
+  if (event.target == modalPagos) {
+    modalPagos.style.display = "none";
   }
 }
 
@@ -2005,6 +2030,20 @@ function cerrarModal() {
 
 function abrirSoporte() { document.getElementById('modal-soporte').style.display = 'block'; }
 function cerrarSoporte() { document.getElementById('modal-soporte').style.display = 'none'; }
+
+// CONTROLADORES DE EXTRACCIÓN Y DESPLIEGUE DE CONFIG_APP (FOCUS)
+function abrirModalPagos() {
+    if(!configGlobal) return;
+    document.getElementById('pago-banco').innerText = configGlobal['BANCO_NOMBRE'] || 'No registrado';
+    document.getElementById('pago-tipo').innerText = configGlobal['BANCO_TIPO'] || 'No registrado';
+    document.getElementById('pago-rut').innerText = configGlobal['BANCO_RUT'] || 'No registrado';
+    document.getElementById('pago-numero').innerText = configGlobal['BANCO_NUMERO'] || 'No registrado';
+    document.getElementById('pago-correo').innerText = configGlobal['BANCO_CORREO'] || 'No registrado';
+    document.getElementById('modal-pagos').style.display = 'flex';
+}
+function cerrarModalPagos() {
+    document.getElementById('modal-pagos').style.display = 'none';
+}
 
 function enviarSolicitudSoporte() {
   const mensaje = document.getElementById('soporte-mensaje').value;
