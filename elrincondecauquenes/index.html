@@ -130,6 +130,7 @@ body {
     font-weight: 600;
     letter-spacing: 2px;
     transition: var(--transicion-suave);
+    font-family: var(--fuente-menu, var(--fuente-texto)); /* FOCUS: Enlace con el motor dinámico */
 }
 
 .nav-links a:hover {
@@ -2345,7 +2346,8 @@ function aplicarEstilosDinamicos(config) {
     if (config['COLOR_BG']) root.style.setProperty('--bg-base', config['COLOR_BG']);
     
     root.style.setProperty('--fuente-titulo', fontTitulos);
-    root.style.setProperty('--fuente-cuerpo', fontCuerpo);
+    root.style.setProperty('--fuente-texto', fontCuerpo); // FOCUS: Cambiado a --fuente-texto para acoplar con tu CSS real
+    root.style.setProperty('--fuente-menu', fontMenu);    // FOCUS: Activación de la variable faltante para el menú
 
     if (config['LOGO_PRINCIPAL']) {
         const logoImg = document.querySelector('.main-logo');
