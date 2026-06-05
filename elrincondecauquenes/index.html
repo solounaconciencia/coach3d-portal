@@ -1918,10 +1918,11 @@ function mostrarToast(msj) {
 
 function cerrarModal() { document.getElementById('modal-detalle').style.display = 'none'; }
 
+// CORRECCIÓN BUBBLE WHATSAPP (PROTOCOL FOCUS)
 function irWhatsApp() {
-  // FOCUS: Prioriza la celda WHATSAPP de la fila 16 antes de pasar al respaldo administrativo
-  const num = (configGlobal['WHATSAPP'] || configGlobal['WHATSAPP_ADMIN'] || '569').toString().replace(/\D/g, '');
-  const msg = encodeURIComponent("Hola! Tengo una duda sobre los productos de El Rincón de Cauquenes.");
+  // Prioriza la llave 'WHATSAPP' (Fila 16 de tu Excel) que es donde está tu número real
+  const num = (configGlobal['WHATSAPP'] || configGlobal['WHATSAPP_ADMIN'] || '56956242359').toString().replace(/\D/g, '');
+  const msg = encodeURIComponent("¡Hola! Tengo una consulta sobre los productos de El Rincón de Cauquenes.");
   window.open('https://wa.me/' + num + '?text=' + msg, '_blank');
 }
 
