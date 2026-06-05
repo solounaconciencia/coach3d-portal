@@ -104,9 +104,14 @@
             <div id="productos_manager" class="section">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                     <h2 class="cian" style="font-family:var(--font-brand);"><i class="fas fa-box-open"></i> GESTIÓN DE CATÁLOGO</h2>
-                    <button class="btn-nave-main" style="width: auto; padding: 10px 20px; margin: 0;" onclick="abrirModalNuevoProducto()">
-                        <i class="fas fa-plus"></i> NUEVO PRODUCTO
-                    </button>
+                    <div style="display: flex; gap: 10px; align-items: center;" id="contenedor-acciones-productos">
+                        <button class="btn-nave-main" id="btn-master-eliminar" style="width: auto; padding: 10px 20px; margin: 0; background: #111; color: #ff4444; border: 1px solid #ff4444;" onclick="toggleModoEliminar()">
+                            <i class="fas fa-trash-alt"></i> ELIMINAR
+                        </button>
+                        <button class="btn-nave-main" style="width: auto; padding: 10px 20px; margin: 0;" onclick="abrirModalNuevoProducto()">
+                            <i class="fas fa-plus"></i> NUEVO PRODUCTO
+                        </button>
+                    </div>
                 </div>
                 <div style="margin-top: 20px;">
                     <input type="text" id="search-catalogo" class="nave-input" placeholder="Buscar por Nombre o SKU..." onkeyup="filtrarCatalogo()" style="max-width: 400px;">
@@ -510,6 +515,8 @@
     }
 }
 
+        let modoEliminarActivo = false;
+
         function renderCatalogo(lista) {
             const tbody = document.getElementById('tbody-catalogo');
             if(!tbody) return;
@@ -517,7 +524,12 @@
                 let imgPortada = Array.isArray(p.IMAGEN_URL) ? p.IMAGEN_URL[0] : (typeof p.IMAGEN_URL === 'string' ? p.IMAGEN_URL.split(',')[0] : 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png');
                 return `
                 <tr>
-                    <td><img src="${imgPortada}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;"></td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px; justify-content:center;">
+                            ${modoEliminarActivo ? `<input type="checkbox" class="chk-eliminar-prod" value="${p.SKU}" onchange="actualizarContadorEliminar()" style="accent-color:#ff4444; transform:scale(1.3); cursor:pointer;">` : ''}
+                            <img src="${imgPortada}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">
+                        </div>
+                    </td>
                     <td><strong class="cian">${p.NOMBRE}</strong><br><small style="color:#888;">${p.SKU}</small></td>
                     <td>${p.CATEGORIA || '-'}</td>
                     <td>
@@ -653,6 +665,90 @@
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR CAMBIOS'; btn.disabled=false;
         }
 
+        // =======================================================
+        // FOCUS: MAQUINARIA DE SELECCIÓN Y ELIMINACIÓN DE ÍTEMS
+        // =======================================================
+        function toggleModoEliminar() {
+            modoEliminarActivo = !modoEliminarActivo;
+            const btn = document.getElementById('btn-master-eliminar');
+            if(modoEliminarActivo) {
+                btn.innerHTML = '<i class="fas fa-trash-alt"></i> ELIMINAR (0)';
+                btn.style.background = "#ff4444";
+                btn.style.color = "white";
+                btn.onclick = verificarSeleccionPrevioBorrado;
+            } else {
+                restablecerBotonEliminarBase();
+            }
+            renderCatalogo(globalStock);
+        }
+
+        function restablecerBotonEliminarBase() {
+            modoEliminarActivo = false;
+            const btn = document.getElementById('btn-master-eliminar');
+            btn.innerHTML = '<i class="fas fa-trash-alt"></i> ELIMINAR';
+            btn.style.background = "#111";
+            btn.style.color = "#ff4444";
+            btn.onclick = toggleModoEliminar;
+        }
+
+        function actualizarContadorEliminar() {
+            const seleccionados = document.querySelectorAll('.chk-eliminar-prod:checked').length;
+            document.getElementById('btn-master-eliminar').innerHTML = `<i class="fas fa-trash-alt"></i> ELIMINAR (${seleccionados})`;
+        }
+
+        function verificarSeleccionPrevioBorrado() {
+            const chks = document.querySelectorAll('.chk-eliminar-prod:checked');
+            if(chks.length === 0) {
+                restablecerBotonEliminarBase();
+                renderCatalogo(globalStock);
+                return mostrarToast("Operación cancelada: No seleccionaste ningún producto.");
+            }
+            
+            // Reemplazo temporal del contenedor de acciones para mostrar la confirmación obligatoria
+            const contenedor = document.getElementById('contenedor-acciones-productos');
+            contenedor.innerHTML = `
+                <span style="color:#ff4444; font-weight:bold; font-size:0.75rem; font-family:var(--font-brand);">¿CONFIRMAS BORRAR ${chks.length} PRODUCTOS?</span>
+                <button class="btn-nave-main" style="width:auto; padding:8px 15px; margin:0; background:var(--neon-green); color:black;" onclick="ejecutarBorradoSpreadsheet()">ACEPTAR</button>
+                <button class="btn-nave-main" style="width:auto; padding:8px 15px; margin:0; background:#333; color:white; border:1px solid #444;" onclick="abortarBorradoPasoAtras()">CANCELAR</button>
+            `;
+        }
+
+        function abortarBorradoPasoAtras() {
+            mostrarToast("Operación revertida.");
+            reconstruirBarraAccionesBase();
+            restablecerBotonEliminarBase();
+            renderCatalogo(globalStock);
+        }
+
+        function reconstruirBarraAccionesBase() {
+            const contenedor = document.getElementById('contenedor-acciones-productos');
+            contenedor.innerHTML = `
+                <button class="btn-nave-main" id="btn-master-eliminar" style="width: auto; padding: 10px 20px; margin: 0; background: #111; color: #ff4444; border: 1px solid #ff4444;" onclick="toggleModoEliminar()">
+                    <i class="fas fa-trash-alt"></i> ELIMINAR
+                </button>
+                <button class="btn-nave-main" style="width: auto; padding: 10px 20px; margin: 0;" onclick="abrirModalNuevoProducto()">
+                    <i class="fas fa-plus"></i> NUEVO PRODUCTO
+                </button>
+            `;
+        }
+
+        async function ejecutarBorradoSpreadsheet() {
+            const chks = document.querySelectorAll('.chk-eliminar-prod:checked');
+            const skusAEliminar = Array.from(chks).map(input => input.value);
+            
+            mostrarToast("Eliminando de la bodega...");
+            try {
+                const res = await apiCall("eliminarProductosMasivo", { skus: skusAEliminar });
+                if(res && res.success) {
+                    mostrarToast("Productos borrados correctamente.");
+                    reconstruirBarraAccionesBase();
+                    restablecerBotonEliminarBase();
+                    iniciarPanelAdmin(); // Recarga de catálogo actualizada en vivo
+                } else { mostrarToast("Error al procesar la baja en el servidor."); }
+            } catch(e) { mostrarToast("Fallo de comunicación de red."); }
+        }
+
+        
 
         // REDES Y BANCOS - CORE DE LECTURA Y ESCRITURA PERSISTENTE
         async function cargarAjustesPanel() {
