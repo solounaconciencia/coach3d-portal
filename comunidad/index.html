@@ -1058,22 +1058,17 @@
 
 
 .sidebar-menu {
-
     position: fixed; top: 0; left: -300px; /* Escondido */
-
-    width: 280px; height: 100vh;
-
+    width: 280px; height: 100dvh; /* 🛡️ dvh evita que el menú se corte en celulares */
     background: rgba(10, 15, 30, 0.98); backdrop-filter: blur(20px);
-
     border-right: 2px solid var(--neon-n);
-
     z-index: 2000000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
     box-shadow: 10px 0 30px rgba(0,0,0,0.8);
-
     padding: 20px; box-sizing: border-box;
-
+    overflow-y: auto; /* 🛡️ Permite scroll interno si añades muchísimos items */
 }
+/* 🛡️ Oculta la barra desplazadora visualmente para mantener elegancia, pero mantiene la funcionalidad táctil */
+.sidebar-menu::-webkit-scrollbar { display: none; }
 
 .sidebar-menu.abierto { left: 0; }
 
@@ -2121,8 +2116,10 @@
 
     <div class="logout-btn btn-m" onclick="logout()" style="position: absolute; top: 10px; right: 10px; font-size: 0.7em; padding: 5px 10px;">Cerrar Sesión</div>
 
-    <div id="btn-admin-maestro" class="hidden" onclick="abrirCentroComando()" style="position: fixed; bottom: 20px; left: 20px; width: 60px; height: 60px; background: var(--glass); border: 2px solid var(--neon-m); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 2000000; box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);">
-        <span style="font-size: 28px;">👑</span>
+    <!-- ⚙️ BARRA ADMIN MAESTRO SUPERIOR -->
+    <div id="btn-admin-maestro" class="hidden" style="position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 2000000; background: rgba(10, 15, 30, 0.98); border: 1px solid var(--neon-m); border-top: none; border-radius: 0 0 15px 15px; padding: 10px 25px; box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4); display: flex; gap: 15px; align-items: center; backdrop-filter: blur(10px);">
+        <span style="color: var(--neon-m); font-family: 'Orbitron'; font-size: 0.85em; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">👑 Admin</span>
+        <button class="btn btn-m" style="padding: 6px 15px; font-size: 0.7em;" onclick="abrirCentroComando()">CENTRO DE COMANDO</button>
     </div>
 
     <div id="modal-centro-comando" class="hidden glass-panel" style="max-width: 900px; height: 85vh; overflow-y: auto; padding: 0;">
@@ -2133,7 +2130,7 @@
 
         <div style="display: flex; background: rgba(255,255,255,0.02); border-bottom: 1px solid #333; overflow-x: auto;">
             <button class="tab-admin active" onclick="cambiarTabAdmin('tab-admin-productos')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:var(--neon-m); font-weight:bold; cursor:pointer; border-bottom: 2px solid var(--neon-m);">📦 PRODUCTOS</button>
-            <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-cursos')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🎬 CURSOS</button>
+            <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-cursos'); cargarAdminCursos();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🎬 CURSOS</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-servicios')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🤝 SERVICIOS</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-herramientas')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🛠️ HERRAMIENTAS</button>
         </div>
@@ -2160,7 +2157,82 @@
 
         </div>
 
-        <div id="tab-admin-cursos" class="hidden" style="padding: 20px; text-align: center; color: #94a3b8;">Construyendo Arquitectura Audiovisual...</div>
+        <div id="tab-admin-cursos" class="hidden" style="padding: 20px;">
+            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">🎬</span> CREAR / EDITAR CURSO</h3>
+            
+            <form id="form-admin-curso" onsubmit="event.preventDefault(); guardarCursoAdmin();" style="display: flex; flex-direction: column; gap: 15px; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border: 1px solid var(--neon-m);">
+                <input type="hidden" id="admin-curso-sku"> <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label style="font-size: 0.8em; color: var(--neon-m); font-weight: bold;">Pilar Fundamental *</label>
+                        <select id="admin-curso-pilar" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                            <option value="FINANZAS">FINANZAS</option>
+                            <option value="NUTRICION">NUTRICIÓN</option>
+                            <option value="MENTALIDAD">MENTALIDAD</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <label style="font-size: 0.8em; color: var(--neon-m); font-weight: bold;">Acción (Comportamiento del Video) *</label>
+                        <select id="admin-curso-accion" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                            <option value="GRATIS">GRATIS (1 Video de Libre Acceso)</option>
+                            <option value="VENTA">VENTA (1 Video - Guillotina de 30 seg)</option>
+                            <option value="MODULOS">MÓDULOS (Varios Videos Gratis)</option>
+                            <option value="MODULOSPAGO">MÓDULOS PAGO (Varios Videos - Guillotina y Candados)</option>
+                            <option value="GRUPAL">GRUPAL (Evento en Vivo / Sin Video)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label style="font-size: 0.8em; color: #cbd5e1;">Título de la Clase/Programa *</label>
+                <input type="text" id="admin-curso-nombre" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+
+                <label style="font-size: 0.8em; color: #cbd5e1;">Descripción Persuasiva *</label>
+                <textarea id="admin-curso-desc" required rows="2" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;"></textarea>
+
+                <label style="font-size: 0.8em; color: #cbd5e1;">URL Imagen Portada (Miniatura) *</label>
+                <input type="text" id="admin-curso-portada" required placeholder="https://..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+
+                <label style="font-size: 0.8em; color: #cbd5e1;">URL Video de YouTube (Separar por comas si usas la opción "MÓDULOS") *</label>
+                <textarea id="admin-curso-video" required rows="2" placeholder="https://youtube.com/embed/A, https://youtube.com/embed/B" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;"></textarea>
+
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 0.8em; color: #cbd5e1;">Precio Público ($)</label>
+                        <input type="number" id="admin-curso-precio" value="0" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 0.8em; color: #cbd5e1;">Precio Suscriptor VIP ($)</label>
+                        <input type="number" id="admin-curso-susc" value="0" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <label style="font-size: 0.8em; color: #cbd5e1;">Link Checkout de Pago (Vacío si es GRATIS o GRUPAL)</label>
+                <input type="text" id="admin-curso-pago" placeholder="https://mercadopago..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label style="font-size: 0.8em; color: #cbd5e1;">Material PDF Complementario (Separar por comas)</label>
+                        <input type="text" id="admin-curso-pdf" placeholder="https://drive..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <label style="font-size: 0.8em; color: #cbd5e1;">Síntesis Kairo Explica (URL Video Corto)</label>
+                        <input type="text" id="admin-curso-kairo" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn btn-m" style="flex: 2; padding: 12px; font-size: 1.1em;">💾 GUARDAR PROGRAMA</button>
+                    <button type="button" class="btn btn-f" style="flex: 1; padding: 12px; font-size: 1.1em; background: transparent; border-color: #cbd5e1; color: #cbd5e1;" onclick="limpiarFormularioCurso()"> LIMPIAR / NUEVO</button>
+                </div>
+            </form>
+
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+
+            <h3 style="color: var(--neon-n); font-family: 'Orbitron';"><span style="font-size: 1.2em;">🗂️</span> BIBLIOTECA AUDIOVISUAL</h3>
+            <input type="text" id="buscador-admin-cursos" placeholder="🔍 Buscar masterclass por nombre o pilar..." style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;" onkeyup="renderizarAdminCursos()">
+            
+            <div id="admin-lista-cursos" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+                </div>
+        </div>
         <div id="tab-admin-servicios" class="hidden" style="padding: 20px; text-align: center; color: #94a3b8;">Construyendo Arquitectura de Servicios...</div>
         <div id="tab-admin-herramientas" class="hidden" style="padding: 20px; text-align: center; color: #94a3b8;">Construyendo Inyector de Ecosistema...</div>
 
@@ -8174,26 +8246,25 @@ function renderizarProductosRecomendados() {
     });
 }
 
-
-// =========================================================
-// 🧠 MOTOR: CENTRO DE COMANDO ADMIN
-// =========================================================
-function abrirCentroComando() {
+async function abrirCentroComando() {
     const modal = document.getElementById('modal-centro-comando');
     document.body.appendChild(modal); // Inmunidad a la Matrix
     modal.classList.remove('hidden');
     modal.style.display = 'block';
     
-    // Si somos Admin, descargamos el inventario fresco para llenar las tablas (Próxima cirugía)
     mostrarLoading("Cargando base de datos...");
-    google.script.run.withSuccessHandler(function(res) {
-        ocultarLoading();
-        if(res.success) {
-            inventarioEcommerce = res.productos; // Actualizamos caché global
-            if (typeof renderizarAdminInventario === 'function') renderizarAdminInventario();
-            if (typeof renderizarAdminDestacados === 'function') renderizarAdminDestacados();
-        }
-    }).obtenerInventarioAdmin();
+    
+    // 🛡️ CORRECCIÓN FOCUS: Llamada a la API externa (Fetch), NO a Google Script interno
+    const res = await apiCall("obtenerInventarioAdmin");
+    ocultarLoading();
+    
+    if (res && res.success) {
+        inventarioEcommerce = res.productos; // Actualizamos caché global
+        if (typeof renderizarAdminInventario === 'function') renderizarAdminInventario();
+        if (typeof renderizarAdminDestacados === 'function') renderizarAdminDestacados();
+    } else {
+        notify("Kairo Alerta: Error al sincronizar el inventario del Centro de Comando.");
+    }
 }
 
 function cerrarCentroComando() {
@@ -8233,6 +8304,280 @@ function mostrarLoading(msg) {
 function ocultarLoading() {
     const loader = document.getElementById('kairo-loader-global');
     if(loader) loader.style.display = 'none';
+}
+
+// =========================================================
+// 📦 LÓGICA DEL PANEL ADMIN: PRODUCTOS
+// =========================================================
+
+function renderizarAdminInventario() {
+    const query = document.getElementById('buscador-admin-productos').value.toLowerCase().trim();
+    const contenedor = document.getElementById('admin-lista-inventario');
+    contenedor.innerHTML = '';
+
+    if (!inventarioEcommerce || inventarioEcommerce.length === 0) return;
+
+    let filtrados = inventarioEcommerce.filter(p => 
+        p.nombre.toLowerCase().includes(query) || 
+        p.sku.toLowerCase().includes(query)
+    );
+
+    filtrados.forEach(p => {
+        contenedor.innerHTML += `
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="flex: 1; min-width: 200px;">
+                    <span style="font-size: 0.7em; color: var(--neon-n); font-family: 'Orbitron';">${p.sku}</span><br>
+                    <strong style="font-size: 0.95em; color: white;">${p.nombre}</strong>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+                    <label style="font-size: 0.7em; color: #cbd5e1;">Normal $<br>
+                        <input type="number" id="adm-precio-${p.sku}" value="${p.precioNormal}" style="width: 80px; padding: 8px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                    </label>
+                    <label style="font-size: 0.7em; color: #cbd5e1;">Susc. $<br>
+                        <input type="number" id="adm-susc-${p.sku}" value="${p.precioSusc}" style="width: 80px; padding: 8px; background: rgba(0,0,0,0.8); color: white; border: 1px solid var(--neon-m); border-radius: 4px;">
+                    </label>
+                    <label style="font-size: 0.7em; color: #cbd5e1;">Stock<br>
+                        <input type="number" id="adm-stock-${p.sku}" value="${p.stock}" style="width: 60px; padding: 8px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
+                    </label>
+                    <button class="btn btn-n" style="padding: 8px 15px; height: 35px;" onclick="guardarEdicionRapidaProducto('${p.sku}')">💾 GUARDAR</button>
+                    <button class="btn btn-f" style="padding: 8px; height: 35px; background: transparent; border-color: #cbd5e1; color: #cbd5e1;" onclick="abrirModalEcommerce('${p.sku}')">👁️</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+async function guardarEdicionRapidaProducto(sku) {
+    const precio = document.getElementById(`adm-precio-${sku}`).value;
+    const precioSusc = document.getElementById(`adm-susc-${sku}`).value;
+    const stock = document.getElementById(`adm-stock-${sku}`).value;
+
+    mostrarLoading("Hackeando la Matrix (Guardando)...");
+    const res = await apiCall("adminActualizarProductoRapido", { sku, precio, precioSusc, stock });
+    ocultarLoading();
+
+    if (res && res.success) {
+        notify("✅ Producto actualizado con éxito.");
+        // Actualizar caché local
+        let prod = inventarioEcommerce.find(p => p.sku === sku);
+        if (prod) {
+            prod.precioNormal = Number(precio);
+            prod.precioSusc = Number(precioSusc);
+            prod.stock = Number(stock);
+        }
+        // Refrescar tienda si está abierta
+        if (typeof renderizarTiendaGrilla === 'function') renderizarTiendaGrilla(inventarioEcommerce);
+    } else {
+        notify("❌ Error de comunicación con la Base de Datos.");
+    }
+}
+
+function renderizarAdminDestacados() {
+    const contenedor = document.getElementById('admin-lista-destacados');
+    contenedor.innerHTML = '';
+
+    if (!inventarioEcommerce) return;
+
+    // Filtramos los que dicen "SI" y los ordenamos por el número de la columna T
+    let destacados = inventarioEcommerce.filter(p => p.destacado === "SI").sort((a, b) => a.orden - b.orden);
+
+    if (destacados.length === 0) {
+        contenedor.innerHTML = '<p style="color: #94a3b8; font-size: 0.9em; font-style: italic;">No hay productos destacados. Para agregar uno, búscalo en el inventario, edítalo desde el botón 👁️ y cambia la columna Q en tu Excel, o créalo desde cero.</p>';
+        return;
+    }
+
+    destacados.forEach((p, index) => {
+        const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
+        const portada = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png";
+
+        contenedor.innerHTML += `
+            <div style="background: rgba(251, 191, 36, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #fbbf24; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <img src="${portada}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px; border: 1px solid #fbbf24;">
+                <div style="flex: 1; min-width: 200px;">
+                    <strong style="color: #fbbf24; font-size: 0.95em;">${p.nombre}</strong><br>
+                    <input type="text" id="adm-promo-titulo-${p.sku}" value="${p.tituloPromo || ''}" placeholder="Escribe un Título Promocional (Opcional)" style="width: 100%; padding: 6px; margin-top: 6px; font-size: 0.85em; background: rgba(0,0,0,0.7); color: white; border: 1px solid #666; border-radius: 4px;">
+                    <input type="text" id="adm-promo-sub-${p.sku}" value="${p.subPromo || ''}" placeholder="Escribe un Subtítulo Promocional (Opcional)" style="width: 100%; padding: 6px; margin-top: 6px; font-size: 0.85em; background: rgba(0,0,0,0.7); color: white; border: 1px solid #666; border-radius: 4px;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <button style="background: #334155; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px;" onclick="moverDestacadoAdmin('${p.sku}', -1)" ${index === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>⬆️</button>
+                    <button style="background: #334155; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px;" onclick="moverDestacadoAdmin('${p.sku}', 1)" ${index === destacados.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>⬇️</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button class="btn" style="padding: 6px 12px; font-size: 0.7em; background: #fbbf24; color: black; font-weight: bold; border: none;" onclick="guardarDestacadoAdmin('${p.sku}', ${p.orden || index + 1})">APLICAR TEXTOS</button>
+                    <button class="btn" style="padding: 6px 12px; font-size: 0.7em; background: transparent; border-color: #ef4444; color: #ef4444;" onclick="quitarDestacadoAdmin('${p.sku}')">❌ QUITAR</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+async function guardarDestacadoAdmin(sku, ordenActual) {
+    const tituloPromo = document.getElementById(`adm-promo-titulo-${sku}`).value.trim();
+    const subPromo = document.getElementById(`adm-promo-sub-${sku}`).value.trim();
+
+    mostrarLoading("Sincronizando Promoción...");
+    const res = await apiCall("adminGuardarDestacado", { sku, destacado: "SI", tituloPromo, subPromo, orden: ordenActual });
+    ocultarLoading();
+
+    if (res && res.success) {
+        notify("✅ Textos promocionales aplicados.");
+        let prod = inventarioEcommerce.find(p => p.sku === sku);
+        if (prod) {
+            prod.tituloPromo = tituloPromo;
+            prod.subPromo = subPromo;
+        }
+        if (typeof renderizarProductosRecomendados === 'function') renderizarProductosRecomendados(); 
+    } else { notify("❌ Error interno 13."); }
+}
+
+async function quitarDestacadoAdmin(sku) {
+    if(!confirm("¿Estás seguro de quitar este producto de la fila de Recomendados?")) return;
+    
+    mostrarLoading("Removiendo de la fila...");
+    const res = await apiCall("adminGuardarDestacado", { sku, destacado: "NO", tituloPromo: "", subPromo: "", orden: 99 });
+    ocultarLoading();
+    
+    if (res && res.success) {
+        let prod = inventarioEcommerce.find(p => p.sku === sku);
+        if (prod) { prod.destacado = "NO"; }
+        renderizarAdminDestacados();
+        if (typeof renderizarProductosRecomendados === 'function') renderizarProductosRecomendados();
+    }
+}
+
+async function moverDestacadoAdmin(sku, direccion) {
+    let destacados = inventarioEcommerce.filter(p => p.destacado === "SI").sort((a, b) => a.orden - b.orden);
+    let index = destacados.findIndex(p => p.sku === sku);
+    if (index === -1) return;
+
+    let swapIndex = index + direccion;
+    if (swapIndex < 0 || swapIndex >= destacados.length) return;
+
+    // Aseguramos que tengan un orden base válido
+    if(destacados[index].orden === 99) destacados[index].orden = index + 1;
+    if(destacados[swapIndex].orden === 99) destacados[swapIndex].orden = swapIndex + 1;
+
+    // Intercambiamos el orden en la memoria del navegador
+    let tempOrden = destacados[index].orden;
+    destacados[index].orden = destacados[swapIndex].orden;
+    destacados[swapIndex].orden = tempOrden;
+
+    // Redibujamos instantáneamente para el usuario (sensación de velocidad)
+    renderizarAdminDestacados(); 
+    
+    // Guardamos silenciosamente en la Matrix
+    mostrarLoading("Reordenando Matrix...");
+    await apiCall("adminGuardarDestacado", { sku: destacados[index].sku, destacado: "SI", tituloPromo: destacados[index].tituloPromo, subPromo: destacados[index].subPromo, orden: destacados[index].orden });
+    await apiCall("adminGuardarDestacado", { sku: destacados[swapIndex].sku, destacado: "SI", tituloPromo: destacados[swapIndex].tituloPromo, subPromo: destacados[swapIndex].subPromo, orden: destacados[swapIndex].orden });
+    ocultarLoading();
+    
+    if (typeof renderizarProductosRecomendados === 'function') renderizarProductosRecomendados();
+}
+
+// =========================================================
+// 🎬 LÓGICA DEL PANEL ADMIN: CURSOS
+// =========================================================
+
+async function cargarAdminCursos() {
+    mostrarLoading("Sincronizando Videoteca...");
+    const res = await apiCall("obtenerCatalogoCursos", { email: "admin_master" }); // Llamada a la API
+    ocultarLoading();
+    
+    if(res && res.success) {
+        inventarioCursos = res.cursos; // Actualizamos la memoria de la Matrix
+        renderizarAdminCursos();
+    }
+}
+
+function renderizarAdminCursos() {
+    const query = (document.getElementById('buscador-admin-cursos').value || '').toLowerCase().trim();
+    const contenedor = document.getElementById('admin-lista-cursos');
+    if(!contenedor) return;
+    contenedor.innerHTML = '';
+
+    if (!inventarioCursos || inventarioCursos.length === 0) return;
+
+    let filtrados = inventarioCursos.filter(c => 
+        c.nombre.toLowerCase().includes(query) || 
+        c.pilar.toLowerCase().includes(query) ||
+        c.sku.toLowerCase().includes(query)
+    );
+
+    filtrados.forEach(c => {
+        contenedor.innerHTML += `
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; border: 1px solid rgba(168, 85, 247, 0.3);">
+                <img src="${c.portada}" style="width: 90px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--neon-m);">
+                <div style="flex: 1; min-width: 200px;">
+                    <span style="font-size: 0.7em; color: var(--neon-m); font-family: 'Orbitron';">${c.pilar} | ${c.accion} | SKU: ${c.sku}</span><br>
+                    <strong style="font-size: 0.95em; color: white;">${c.nombre}</strong>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn btn-m" style="padding: 8px 15px;" onclick="editarCursoAdmin('${c.sku}')">✏️ EDITAR DETALLES</button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function editarCursoAdmin(sku) {
+    const c = inventarioCursos.find(x => x.sku === sku);
+    if(!c) return;
+    
+    // Inyectar datos en el formulario
+    document.getElementById('admin-curso-sku').value = c.sku;
+    document.getElementById('admin-curso-pilar').value = c.pilar;
+    document.getElementById('admin-curso-accion').value = c.accion;
+    document.getElementById('admin-curso-nombre').value = c.nombre;
+    document.getElementById('admin-curso-desc').value = c.descripcion;
+    document.getElementById('admin-curso-portada').value = c.portada;
+    document.getElementById('admin-curso-video').value = c.video;
+    document.getElementById('admin-curso-precio').value = c.precioNormal;
+    document.getElementById('admin-curso-susc').value = c.precioSusc;
+    document.getElementById('admin-curso-pago').value = c.linkPago;
+    document.getElementById('admin-curso-pdf').value = c.pdf;
+    document.getElementById('admin-curso-kairo').value = c.kairoExplica;
+    
+    // Auto-Scroll hacia arriba para editar
+    document.getElementById('modal-centro-comando').scrollTo({top: 0, behavior: 'smooth'});
+    notify("Cargado para edición: " + c.nombre);
+}
+
+function limpiarFormularioCurso() {
+    document.getElementById('form-admin-curso').reset();
+    document.getElementById('admin-curso-sku').value = "";
+    notify("Lienzo en blanco. Listo para crear nuevo curso.");
+}
+
+async function guardarCursoAdmin() {
+    // Recopilar la data del formulario
+    const payload = {
+        sku: document.getElementById('admin-curso-sku').value,
+        pilar: document.getElementById('admin-curso-pilar').value,
+        accion: document.getElementById('admin-curso-accion').value,
+        nombre: document.getElementById('admin-curso-nombre').value.trim(),
+        descripcion: document.getElementById('admin-curso-desc').value.trim(),
+        portada: document.getElementById('admin-curso-portada').value.trim(),
+        video: document.getElementById('admin-curso-video').value.trim(),
+        precioNormal: Number(document.getElementById('admin-curso-precio').value) || 0,
+        precioSusc: Number(document.getElementById('admin-curso-susc').value) || 0,
+        linkPago: document.getElementById('admin-curso-pago').value.trim(),
+        pdf: document.getElementById('admin-curso-pdf').value.trim(),
+        kairoExplica: document.getElementById('admin-curso-kairo').value.trim()
+    };
+
+    mostrarLoading("Compilando Masterclass en la Matrix...");
+    const res = await apiCall("adminGuardarCurso", payload);
+    ocultarLoading();
+
+    if (res && res.success) {
+        notify("✅ Programa Audiovisual procesado correctamente.");
+        limpiarFormularioCurso();
+        cargarAdminCursos(); // Refrescar la lista de abajo automáticamente
+    } else {
+        notify("❌ Error interno: No se pudo subir el curso.");
+    }
 }
     </script>
 </body>
