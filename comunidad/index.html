@@ -1998,6 +1998,16 @@
 </head>
 <body onload="checkSession()">
 
+    <div id="modal-seguridad-coach" class="hidden glass-panel" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000000; display: flex; align-items: center; justify-content: center; background: rgba(5,7,15,0.98); backdrop-filter: blur(15px);">
+        <div style="background: rgba(0,0,0,0.8); padding: 40px; border-radius: 12px; border: 1px solid var(--neon-m); text-align: center; max-width: 400px; width: 90%; box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);">
+            <span style="font-size: 3em;">🛡️</span>
+            <h2 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 10px;">VALIDACIÓN DE COACH</h2>
+            <p style="color: #cbd5e1; font-size: 0.9em; margin-bottom: 25px;">Tu cuenta ha sido ascendida a rango <strong>Coach Oficial</strong>. Para desbloquear tus herramientas exclusivas de agencia y recibir pagos directos, debes registrar tu ID de Herbalife. Este dato se encriptará y será permanente.</p>
+            <input type="text" id="input-id-herbalife" placeholder="Ingresa tu ID de Herbalife" style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--neon-n); color: white; border-radius: 5px; text-align: center; font-weight: bold; font-size: 1.1em; text-transform: uppercase;">
+            <button class="btn btn-m" style="width: 100%; padding: 15px; font-size: 1.1em;" onclick="sellarCredencialCoach()">SELLAR CREDENCIAL</button>
+        </div>
+    </div>
+
     <div id="kairo-loader-global" style="position: fixed; inset: 0; background: #0a0f1e; z-index: 2147483647; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
         <div class="spinner" style="border-left-color: var(--neon-n); width: 50px; height: 50px;"></div>
         <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-n); margin-top: 20px; letter-spacing: 3px; font-size: 0.9em; text-shadow: 0 0 10px var(--neon-n);">Iniciando su viaje de autoconocimiento...</p>
@@ -2133,6 +2143,8 @@
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-cursos'); cargarAdminCursos();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🎬 CURSOS</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-servicios')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🤝 SERVICIOS</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-herramientas')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🛠️ HERRAMIENTAS</button>
+            <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-rangos')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">👥 COACHES</button>
+            <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-agenda'); cargarAdminAgenda();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">📅 AGENDAS</button>
         </div>
 
         <div id="tab-admin-productos" style="padding: 20px;">
@@ -2235,6 +2247,37 @@
         </div>
         <div id="tab-admin-servicios" class="hidden" style="padding: 20px; text-align: center; color: #94a3b8;">Construyendo Arquitectura de Servicios...</div>
         <div id="tab-admin-herramientas" class="hidden" style="padding: 20px; text-align: center; color: #94a3b8;">Construyendo Inyector de Ecosistema...</div>
+        
+        <div id="tab-admin-rangos" class="hidden" style="padding: 20px;">
+            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">👥</span> GESTIÓN DE RANGOS Y EQUIPO</h3>
+            <p style="font-size: 0.85em; color: #94a3b8; margin-top:-5px;">Busca a un usuario de la comunidad para ascenderlo a Coach o actualizar su perfil público.</p>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="email" id="admin-busqueda-email" placeholder="Correo electrónico del integrante..." style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+                <button class="btn btn-n" onclick="buscarUsuarioParaRango()">🔍 BUSCAR</button>
+            </div>
+
+            <div id="admin-resultado-rango" class="hidden" style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border: 1px solid var(--neon-m);">
+                 </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MÓDULO 6: PANEL DE CONTROL DE AGENDA           -->
+        <!-- ============================================== -->
+        <div id="tab-admin-agenda" class="hidden" style="padding: 20px;">
+            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">📅</span> CONTROL DE TURNOS MULTI-COACH</h3>
+            <p style="font-size: 0.85em; color: #94a3b8; margin-top:-5px;">Selecciona una fecha para visualizar y habilitar/bloquear las horas de atención de tu equipo.</p>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                <input type="date" id="admin-agenda-fecha" style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+                <button class="btn btn-n" onclick="cargarAdminAgenda()">🔄 ACTUALIZAR</button>
+            </div>
+
+            <div id="admin-matriz-agenda" style="background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--neon-m); overflow-x: auto;">
+                 <!-- JS inyectará la cuadrícula aquí -->
+            </div>
+            <p style="font-size: 0.7em; color: #666; margin-top: 10px; text-align: center;">Para agregar nuevos días y horas, debes insertar filas en tu Excel HORARIOS_LOG.</p>
+        </div>
 
     </div>
 
@@ -4166,6 +4209,7 @@ function checkSession() {
     document.getElementById('view-welcome').classList.remove('hidden');
     document.getElementById('kairo-loader-global').style.display = 'none';
   }
+  validarMuroCoach();
 }
 
         
@@ -6843,7 +6887,7 @@ async function ejecutarAccionComercialServicio() {
         await apiCall("registrarVarianteGratuitaBD", { token: tokenCompra, email: emailUser, sku: s.sku, detalle: detalleString });
     }
 
-    // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago (Exceptuando WHATSAPP que ya salió arriba)
+    // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago
     if (precioFinalACobrar > 0) {
         localStorage.setItem('kairo_ecommerce_sku', s.sku);
         localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
@@ -6856,12 +6900,22 @@ async function ejecutarAccionComercialServicio() {
         if (s.accion === "RESERVA") localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoCacheId);
         if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
 
-        if (s.linkPago && s.linkPago !== "" && s.linkPago !== "#") {
+        // 🛡️ ENRUTADOR DINÁMICO DE PAGO: Extraemos el link del Coach si es Reserva, o el del Servicio por defecto
+        let linkFinalDePago = s.linkPago; // Por defecto el del servicio
+        
+        if (s.accion === "RESERVA") {
+            const selectorCoach = document.getElementById('ser-coach-elegido');
+            if (selectorCoach && selectorCoach.value && selectorCoach.value.trim() !== "") {
+                linkFinalDePago = selectorCoach.value.trim(); // Link personal del Coach
+            }
+        }
+
+        if (linkFinalDePago && linkFinalDePago !== "" && linkFinalDePago !== "#") {
             cerrarDetalleServicio();
-            window.location.href = s.linkPago;
+            window.location.href = linkFinalDePago;
             return;
         } else {
-            return notify("Kairo Alerta: Este servicio requiere un enlace de MercadoPago activo en la columna J.");
+            return notify("Kairo Alerta: El Coach seleccionado no tiene un enlace de pago activo configurado.");
         }
     }
 
@@ -6972,6 +7026,10 @@ function desplegarHorasDelDiaElegido(fechaFiltro) {
     contenedorBotones.innerHTML = "";
     bloqueHoras.classList.remove('hidden');
 
+    // Limpiamos selector previo si existía
+    let boxCoachExistente = document.getElementById('ser-selector-coach-box');
+    if (boxCoachExistente) boxCoachExistente.remove();
+
     let slotsDelDia = databaseHorariosCache.filter(h => h.fecha === fechaFiltro);
 
     slotsDelDia.forEach(slot => {
@@ -6989,6 +7047,25 @@ function desplegarHorasDelDiaElegido(fechaFiltro) {
             btnHora.style.color = "#000";
 
             slotSeleccionadoCacheId = slot.id; // Amarramos el ID Horario elegido
+            
+            // 🛡️ INYECTAR SELECTOR DINÁMICO DE COACHES
+            let boxCoach = document.getElementById('ser-selector-coach-box');
+            if(!boxCoach) {
+                boxCoach = document.createElement('div');
+                boxCoach.id = 'ser-selector-coach-box';
+                boxCoach.style = "margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.5); border: 1px dashed var(--neon-m); border-radius: 8px; animation: fadeIn 0.3s;";
+                document.getElementById('ser-contenedor-reserva').appendChild(boxCoach);
+            }
+            
+            let opcionesHTML = slot.coaches.map(c => `<option value="${c.linkPago}">${c.nombre}</option>`).join('');
+            
+            boxCoach.innerHTML = `
+                <label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 8px;">👤 SELECCIONA TU COACH PARA ESTA SESIÓN:</label>
+                <select id="ser-coach-elegido" style="width: 100%; padding: 10px; background: #000; color: white; border: 1px solid var(--neon-m); border-radius: 4px; font-family:'Orbitron';">
+                    ${opcionesHTML}
+                </select>
+                <p style="font-size: 0.65em; color: #94a3b8; margin: 8px 0 0 0;">El pago y la atención se derivarán al profesional seleccionado.</p>
+            `;
             
             const btnAccionPrincipal = document.getElementById('ser-btn-accion');
             btnAccionPrincipal.style.opacity = "1";
@@ -8577,6 +8654,188 @@ async function guardarCursoAdmin() {
         cargarAdminCursos(); // Refrescar la lista de abajo automáticamente
     } else {
         notify("❌ Error interno: No se pudo subir el curso.");
+    }
+}
+
+// =========================================================
+// 🛡️ LÓGICA: MURO HERBALIFE Y GESTOR DE RANGOS
+// =========================================================
+
+async function validarMuroCoach() {
+    if (sessionUser && sessionUser.rango === "Coach") {
+        mostrarLoading("Validando Credenciales Oficiales...");
+        const res = await apiCall("verificarIdHerbalife", { email: sessionUser.email });
+        ocultarLoading();
+        
+        if (res && res.success) {
+            if (!res.tieneId) {
+                document.getElementById('modal-seguridad-coach').classList.remove('hidden');
+            } else {
+                sessionUser.idHerbalife = res.id; // Guardamos en memoria
+            }
+        }
+    }
+}
+
+async function sellarCredencialCoach() {
+    const input = document.getElementById('input-id-herbalife');
+    const idHerbalife = input.value.trim().toUpperCase();
+    
+    if (idHerbalife === "") return notify("Debes ingresar un ID válido para continuar.");
+    
+    mostrarLoading("Encriptando y Sellando ID...");
+    const res = await apiCall("guardarIdHerbalifeCoach", { email: sessionUser.email, idHerbalife: idHerbalife });
+    ocultarLoading();
+    
+    if (res && res.success) {
+        notify("✅ Credencial verificada. Bienvenido al equipo Coach.");
+        sessionUser.idHerbalife = idHerbalife;
+        document.getElementById('modal-seguridad-coach').classList.add('hidden');
+    } else {
+        notify("❌ Hubo un error al sellar la credencial.");
+    }
+}
+
+// --- PANEL DE ADMIN: ASCENSO DE RANGOS ---
+
+async function buscarUsuarioParaRango() {
+    const email = document.getElementById('admin-busqueda-email').value.trim();
+    if (!email) return notify("Ingresa el correo del integrante.");
+    
+    mostrarLoading("Buscando en la Matrix...");
+    const res = await apiCall("adminBuscarUsuarioComunidad", { email });
+    ocultarLoading();
+    
+    if (res && res.success) {
+        renderizarGestorRango(res.usuario);
+    } else {
+        notify(res.msg);
+    }
+}
+
+function renderizarGestorRango(u) {
+    const box = document.getElementById('admin-resultado-rango');
+    box.classList.remove('hidden');
+    
+    let html = `
+        <h4 style="color: white; margin: 0 0 5px 0; font-family:'Orbitron'; font-size:1.1em;">${u.nombre} ${u.apellido}</h4>
+        <p style="color: var(--neon-n); font-size: 0.85em; margin: 0 0 15px 0;">ID Herbalife: <strong style="color:white;">${u.idHerbalife || 'Sin Registrar'}</strong></p>
+        
+        <label style="font-size: 0.8em; color: #cbd5e1;">Rango Operativo</label>
+        <select id="admin-edit-rango" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 15px;" onchange="toggleCoachFields(this.value)">
+            <option value="Usuario" ${u.rango === 'Usuario' ? 'selected' : ''}>1. Usuario Normal</option>
+            <option value="Suscriptor" ${u.rango === 'Suscriptor' ? 'selected' : ''}>2. Suscriptor VIP</option>
+            <option value="Coach" ${u.rango === 'Coach' ? 'selected' : ''}>3. Coach Oficial</option>
+        </select>
+
+        <div id="admin-campos-coach" style="display: ${u.rango === 'Coach' ? 'block' : 'none'}; border-left: 3px solid var(--neon-m); padding-left: 15px; margin-bottom: 15px;">
+            <label style="font-size: 0.8em; color: var(--neon-m);">Link de Pago Directo (MercadoPago/PayPal)</label>
+            <input type="text" id="admin-edit-link" value="${u.linkPago || ''}" placeholder="Ej: https://mpago.la/..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px; margin-bottom: 10px;">
+            
+            <label style="font-size: 0.8em; color: var(--neon-m);">Logros Destacados (Separados por coma)</label>
+            <textarea id="admin-edit-logros" rows="2" placeholder="Ej: Especialista en Nutrición, Nivel Master..." style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">${u.logros || ''}</textarea>
+        </div>
+        
+        <button class="btn btn-m" style="width: 100%; padding: 12px; font-size:1.05em;" onclick="guardarEdicionRango('${u.email}')">💾 EJECUTAR ASCENSO / CAMBIOS</button>
+    `;
+    box.innerHTML = html;
+}
+
+function toggleCoachFields(rango) {
+    document.getElementById('admin-campos-coach').style.display = (rango === 'Coach') ? 'block' : 'none';
+}
+
+async function guardarEdicionRango(email) {
+    const rango = document.getElementById('admin-edit-rango').value;
+    const linkPago = document.getElementById('admin-edit-link') ? document.getElementById('admin-edit-link').value.trim() : "";
+    const logros = document.getElementById('admin-edit-logros') ? document.getElementById('admin-edit-logros').value.trim() : "";
+
+    mostrarLoading("Aplicando directrices en la Matrix...");
+    const res = await apiCall("adminGuardarPerfilComunidad", { email, rango, linkPago, logros });
+    ocultarLoading();
+    
+    if (res && res.success) {
+        notify("✅ Perfil actualizado exitosamente. El usuario ha sido notificado.");
+        document.getElementById('admin-resultado-rango').classList.add('hidden');
+        document.getElementById('admin-busqueda-email').value = "";
+    } else {
+        notify("❌ Error: " + res.msg);
+    }
+}
+
+// =========================================================
+// 📅 LÓGICA: PANEL DE AGENDA
+// =========================================================
+
+async function cargarAdminAgenda() {
+    var fechaInput = document.getElementById('admin-agenda-fecha').value;
+    
+    // Si no ha elegido fecha, ponemos la de hoy
+    if(!fechaInput) {
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        fechaInput = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+        document.getElementById('admin-agenda-fecha').value = fechaInput;
+    }
+
+    mostrarLoading("Cargando matriz de horarios...");
+    const res = await apiCall("adminObtenerAgenda", { fecha: fechaInput });
+    ocultarLoading();
+
+    if(res && res.success) {
+        renderizarTablaAgenda(res.coaches, res.horarios);
+    } else {
+        notify("❌ Error al cargar agenda: " + (res ? res.msg : "Falló conexión"));
+    }
+}
+
+function renderizarTablaAgenda(coaches, horarios) {
+    const contenedor = document.getElementById('admin-matriz-agenda');
+    contenedor.innerHTML = "";
+
+    if (horarios.length === 0) {
+        contenedor.innerHTML = "<p style='color:#94a3b8; padding: 20px; text-align: center;'>No hay bloques de horario creados para esta fecha.</p>";
+        return;
+    }
+
+    // Cabecera Dinámica (Hora + Nombres de los Coaches extraídos del Excel)
+    let thead = `<div style="display:flex; background:rgba(0,0,0,0.8); padding:15px; border-bottom:1px solid var(--neon-m); font-weight:bold; font-size:0.8em; color:var(--neon-m);">
+        <div style="flex:1; min-width: 80px;">HORA</div>`;
+    coaches.forEach(c => {
+        thead += `<div style="flex:1; min-width: 100px; text-align:center;">${c.toUpperCase()}</div>`;
+    });
+    thead += `</div>`;
+    contenedor.innerHTML += thead;
+
+    // Filas (Horas)
+    horarios.forEach(h => {
+        let row = `<div style="display:flex; padding:10px 15px; border-bottom:1px solid rgba(255,255,255,0.05); align-items:center;">
+            <div style="flex:1; min-width: 80px; color:white; font-family:'Orbitron'; font-size: 1.1em;">${h.hora}</div>`;
+
+        // Botones por cada coach
+        coaches.forEach(c => {
+            let estado = h.estados[c] ? h.estados[c].toString().toUpperCase().trim() : "NO DISPONIBLE";
+            let isLibre = (estado === "LIBRE");
+            let colorBtn = isLibre ? "var(--neon-f)" : "#ef4444";
+            let textBtn = isLibre ? "LIBRE" : "NO DISP";
+
+            row += `<div style="flex:1; min-width: 100px; text-align:center;">
+                <button onclick="alternarEstadoCoach('${h.id}', '${c}', '${isLibre ? 'NO DISPONIBLE' : 'LIBRE'}')" style="background:transparent; border:1px solid ${colorBtn}; color:${colorBtn}; padding:8px 12px; border-radius:4px; font-size:0.75em; cursor:pointer; width:90%; transition:0.3s; font-weight:bold;" onmouseover="this.style.background='${colorBtn}'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='${colorBtn}';">${textBtn}</button>
+            </div>`;
+        });
+        row += `</div>`;
+        contenedor.innerHTML += row;
+    });
+}
+
+async function alternarEstadoCoach(idHorario, coach, nuevoEstado) {
+    mostrarLoading("Hackeando Agenda...");
+    const res = await apiCall("adminAlternarHorario", { idHorario, coach, nuevoEstado });
+    ocultarLoading();
+
+    if(res && res.success) {
+        cargarAdminAgenda(); // Recargar la tabla para mostrar el color cambiado
+    } else {
+        notify("❌ Error al modificar el horario en la Matrix.");
     }
 }
     </script>
