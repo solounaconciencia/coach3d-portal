@@ -8,6 +8,8 @@
     <link rel="icon" href="https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
 :root {
@@ -998,6 +1000,7 @@ button {
                 </li>
                 
                 <li><a href="javascript:void(0)" onclick="abrirModalPagos()">PAGO</a></li>
+                <li><a href="javascript:void(0)" onclick="abrirModalUbicacion()">UBICACIÓN</a></li>
                 
             </ul>
 
@@ -1154,6 +1157,26 @@ button {
     </div>
 </div>
 
+<!-- MODAL DE UBICACIÓN COMERCIAL (PROTOCOL FOCUS) -->
+<div id="modal-ubicacion" class="modal" style="display:none; align-items:center; justify-content:center;">
+    <div class="modal-content" style="max-width: 480px; padding: 25px; text-align: center;">
+        <span class="close-modal" onclick="cerrarModalUbicacion()">&times;</span>
+        <h2 style="font-family: var(--fuente-titulo); color: var(--cian-pro); margin-bottom: 10px; font-size:1.3rem;"><i class="fas fa-map-marker-alt"></i> ENCUÉNTRANOS AQUÍ</h2>
+        <p id="txt-ubicacion-direccion" style="font-size:0.85rem; color:var(--gris-tenue); margin-bottom:15px; font-family: var(--fuente-texto);"></p>
+        
+        <div id="publico-mapa" style="width:100%; height:240px; border-radius:12px; border:1px solid rgba(0,255,255,0.2); background:#000; margin-bottom:20px; z-index:1;"></div>
+        
+        <div style="display:flex; gap:12px;">
+            <button class="btn-checkout" style="margin-top:0; flex:1; font-size:0.75rem; padding:14px;" onclick="iniciarRutaGPS()">
+                <i class="fas fa-location-arrow"></i> INICIAR VIAJE
+            </button>
+            <button class="btn-checkout" style="margin-top:0; flex:1; font-size:0.75rem; padding:14px; background: #25d366; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);" onclick="irWhatsApp()">
+                <i class="fab fa-whatsapp"></i> WHATSAPP
+            </button>
+        </div>
+    </div>
+</div>
+    
 <!-- MODAL DE MEDIOS DE PAGO Y TRANSFERENCIA (PROTOCOL FOCUS) -->
 <div id="modal-pagos" class="modal" style="display:none; align-items:center; justify-content:center;">
     <div class="modal-content" style="max-width: 450px; text-align: center; padding: 35px 25px;">
@@ -2025,6 +2048,9 @@ window.onclick = function(event) {
   if (event.target == modalPagos) {
     modalPagos.style.display = "none";
   }
+  if (event.target == document.getElementById('modal-ubicacion')) {
+    document.getElementById('modal-ubicacion').style.display = "none";
+  }
 }
 
 function cerrarModal() {
@@ -2034,6 +2060,34 @@ function cerrarModal() {
 function abrirSoporte() { document.getElementById('modal-soporte').style.display = 'block'; }
 function cerrarSoporte() { document.getElementById('modal-soporte').style.display = 'none'; }
 
+// CONTROLADOR CARTOGRÁFICO PÚBLICO (PROTOCOL FOCUS)
+function abrirModalUbicacion() {
+    if(!configGlobal) return;
+    const dirTexto = configGlobal['DIRECCION_TEXTO'] || 'Dirección no registrada';
+    const latlngStr = configGlobal['DIRECCION_LATLNG'] || "-33.4489,-70.6693";
+    const coords = latlngStr.split(',').map(Number);
+    
+    document.getElementById('txt-ubicacion-direccion').innerText = dirTexto;
+    document.getElementById('modal-ubicacion').style.display = 'flex';
+
+    setTimeout(() => {
+        if (window.publicMapObj) { window.publicMapObj.remove(); }
+        window.publicMapObj = L.map('publico-mapa').setView(coords, 15);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }).addTo(window.publicMapObj);
+        L.marker(coords).addTo(window.publicMapObj).bindPopup(dirTexto).openPopup();
+    }, 250);
+}
+
+function cerrarModalUbicacion() {
+    document.getElementById('modal-ubicacion').style.display = 'none';
+}
+
+function iniciarRutaGPS() {
+    const latlngStr = configGlobal['DIRECCION_LATLNG'] || "-33.4489,-70.6693";
+    // Dispara la app nativa de Google Maps calculando la ruta desde la posición actual del usuario
+    window.open('https://www.google.com/maps/dir/?api=1&destination=' + latlngStr, '_blank');
+}
+        
 // CONTROLADORES DE EXTRACCIÓN Y DESPLIEGUE DE CONFIG_APP (FOCUS)
 function abrirModalPagos() {
     if(!configGlobal) return;
