@@ -1983,6 +1983,19 @@
     .modal-ecommerce-layout { flex-direction: column; gap: 15px; }
     .modal-ecommerce-gallery, .modal-ecommerce-info { width: 100%; }
 }
+
+/* Carruseles Destacados C3D */
+.carrusel-destacados {
+    display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+}
+.carrusel-destacados::-webkit-scrollbar { height: 6px; }
+.carrusel-destacados::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.4); border-radius: 10px; }
+.card-destacada {
+    flex: 0 0 320px; scroll-snap-align: start;
+}
+@media (max-width: 768px) {
+    .card-destacada { flex: 0 0 88%; }
+}
   </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
@@ -2527,6 +2540,12 @@
         <div class="filter-tab-premium" style="border-color: #eab308; color: #eab308; font-weight: bold; margin-left: 10px;" id="btn-mis-cursos-tab" onclick="conmutarVistaMisCursos(this)">🎬 MIS CURSOS</div>
     </div>
 
+<!-- 🎬 CARRUSEL DESTACADOS: ÚLTIMOS VIDEOS -->
+    <div id="cursos-destacados-wrapper" style="margin-bottom: 30px; text-align: left; display: none;">
+        <h3 style="color: var(--white); font-family: 'Orbitron'; margin: 0 0 15px 10px; font-size: 1.1em;">🔥 ÚLTIMOS ESTRENOS</h3>
+        <div id="cursos-destacados-grid" class="carrusel-destacados"></div>
+    </div>
+    
     <div id="cursos-netflix-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 20px;"></div>
 
     <div style="margin-top: 60px; background: rgba(168, 85, 247, 0.05); border: 1px dashed var(--neon-m); border-radius: 15px; padding: 25px; text-align: center;">
@@ -3649,12 +3668,6 @@ function filtrarUrlImagen(url) {
     id = url.split("/d/")[1].split("/")[0];
 
   }
-
-
-
-  // FOCUS: Usamos el motor de renderizado directo de Google (lh3)
-
-  // s400 indica que queremos la imagen a 400px (calidad óptima)
 
   return id ? "https://lh3.googleusercontent.com/d/" + id + "=s400" : url;
 
@@ -7238,6 +7251,7 @@ async function iniciarproductos() {
 
         cambiarPilarTienda('NUTRICION'); // Carga por defecto
         cargarCarritoLocal();
+        renderizarProductosRecomendados();
         document.getElementById('cart-float-bubble').style.display = "flex";
     } else {
         document.getElementById('ecommerce-store-grid').innerHTML = "<p style='color:#ff4444; text-align:center; grid-column:1/-1;'>Error de conexión con la tienda.</p>";
@@ -7736,6 +7750,7 @@ async function iniciarcursos() {
         if(btnMisCursos) { btnMisCursos.innerText = "🎬 MIS CURSOS ADQUIRIDOS"; btnMisCursos.className = "btn btn-m"; }
         
         cambiarPilarCursos('NUTRICION');
+        renderizarUltimosCursos();
     } else {
         document.getElementById('cursos-netflix-grid').innerHTML = "<p style='color:#ff4444; text-align:center; grid-column:1/-1;'>Kairo no pudo sincronizar la videoteca.</p>";
     }
@@ -8073,7 +8088,81 @@ salirDelModulo = function() {
     const mod = document.getElementById('modulo-cursos-netflix');
     if(mod) mod.classList.add('hidden');
 }
+
+function renderizarUltimosCursos() {
+    const grid = document.getElementById('cursos-destacados-grid');
+    const wrapper = document.getElementById('cursos-destacados-wrapper');
+    grid.innerHTML = "";
     
+    // Tomamos los últimos 3 cursos agregados a la base de datos y los invertimos para que el más nuevo salga primero
+    const ultimos = [...inventarioCursos].slice(-3).reverse();
+    
+    if(ultimos.length === 0) return wrapper.style.display = 'none';
+    wrapper.style.display = 'block';
+
+    ultimos.forEach(c => {
+        const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
+        let precioLabel = (c.accion === "GRATIS" || c.accion === "MODULOS" || c.precioNormal === 0) ? "LIBRE" : 
+                          (c.accion === "GRUPAL" ? "GRUPAL" : `$${(esSusc ? c.precioSusc : c.precioNormal).toLocaleString()}`);
+        
+        const card = document.createElement('div');
+        card.className = "store-card card-destacada";
+        card.style.border = "1px solid var(--neon-m)"; // Destacado Neón
+        card.innerHTML = `
+            <div style="position:relative; width:100%; padding-top:56.25%; overflow:hidden; background:#000; cursor:pointer;" onclick="abrirModalCinemaPlay('${c.sku}')">
+                <img src="${c.portada}" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+                <div style="position:absolute; top:10px; left:10px; background:var(--neon-m); color:#000; font-size:0.65em; font-weight:bold; padding:4px 8px; border-radius:4px; font-family:'Orbitron';">NUEVO</div>
+            </div>
+            <div style="padding:15px; text-align:left; display:flex; flex-direction:column; flex-grow:1;">
+                <h3 style="font-size:1rem; font-family:'Orbitron'; color:white; margin:0 0 5px 0;">${c.nombre}</h3>
+                <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.85em; font-weight:bold; font-family:'Orbitron'; color:var(--neon-m);">${precioLabel}</span>
+                    <button class="btn btn-m" style="padding:5px 12px; font-size:0.7em;" onclick="abrirModalCinemaPlay('${c.sku}')">VER AHORA</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function renderizarProductosRecomendados() {
+    const grid = document.getElementById('tienda-destacados-grid');
+    const wrapper = document.getElementById('tienda-destacados-wrapper');
+    grid.innerHTML = "";
+    
+    // Filtramos los que dicen "SI" en la Columna Q, y tomamos solo los primeros 5
+    const recomendados = inventarioEcommerce.filter(p => p.destacado === "SI").slice(0, 5);
+    
+    if(recomendados.length === 0) return wrapper.style.display = 'none';
+    wrapper.style.display = 'block';
+
+    recomendados.forEach(p => {
+        const fotosArray = p.imagenes ? p.imagenes.split(',') : [];
+        const portada = fotosArray.length > 0 ? fotosArray[0] : "https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png";
+        
+        // Usamos los títulos promocionales si existen, si no, los originales
+        const tituloMostrar = p.tituloPromo !== "" ? p.tituloPromo : p.nombre;
+        const subMostrar = p.subPromo !== "" ? p.subPromo : p.pilar;
+
+        const card = document.createElement('div');
+        card.className = "store-card card-destacada";
+        card.style.border = "1px solid #fbbf24"; // Borde Dorado
+        card.innerHTML = `
+            <div class="store-card-img-wrapper" style="cursor:pointer;" onclick="abrirModalEcommerce('${p.sku}')">
+                <img class="store-card-img" src="${portada}">
+                <div style="position:absolute; top:10px; right:10px; background:#fbbf24; color:#000; font-size:0.65em; font-weight:bold; padding:4px 8px; border-radius:4px; font-family:'Orbitron';">⭐ DESTACADO</div>
+            </div>
+            <div class="store-card-content">
+                <div class="store-card-brand" style="color:#fbbf24;">${subMostrar}</div>
+                <h3 class="store-card-title" style="cursor:pointer;" onclick="abrirModalEcommerce('${p.sku}')">${tituloMostrar}</h3>
+                <div class="store-card-price-row" style="margin-top: 15px;">
+                    <button class="btn btn-n" style="width: 100%; font-size: 0.8em; border-color: #fbbf24; color: #fbbf24;" onclick="abrirModalEcommerce('${p.sku}')">VER DETALLES</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
     </script>
 </body>
 
