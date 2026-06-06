@@ -278,20 +278,6 @@
                         <label style="font-size:0.7rem; color:#ccc; display:block;">ID VIDEO DE PRESENTACIÓN (Google Drive):</label>
                         <input type="text" id="est-video-id" class="nave-input" placeholder="Ej: 1f_LD_zdHRSa3wYCm3_IdwoHTe2nrIr89">
                     </div>
-
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(0,255,255,0.2); padding: 20px; border-radius: 10px; grid-column: 1 / -1;">
-                        <h3 class="cian" style="font-size:0.9rem; margin-top:0; border-bottom:1px solid rgba(0,255,255,0.2); padding-bottom:10px;"><i class="fas fa-handshake"></i> MARCAS CARRUSEL</h3>
-                        <div id="est-auspiciadores-container" style="display:flex; gap:10px; overflow-x:auto; padding:15px 5px; border-bottom: 1px dashed rgba(0,255,255,0.2); margin-bottom: 15px;"></div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <div><label style="font-size:0.65rem; color:#ccc;">NOMBRE:</label><input type="text" id="ausp-nombre" class="nave-input"></div>
-                            <div><label style="font-size:0.65rem; color:#ccc;">TXT BOTÓN:</label><input type="text" id="ausp-btn" class="nave-input"></div>
-                            <div style="grid-column: 1 / -1;"><label style="font-size:0.65rem; color:#ccc;">URL (Link):</label><input type="text" id="ausp-url" class="nave-input"></div>
-                        </div>
-                        <div style="margin-top:10px;">
-                            <label for="est-nuevo-auspiciador" class="custom-file-upload" id="lbl-est-ausp"><i class="fas fa-upload"></i> SUBIR LOGO DE MARCA</label>
-                            <input type="file" id="est-nuevo-auspiciador" accept="image/*" class="hidden-file">
-                        </div>
-                    </div>
                 </div>
                 <button class="btn-nave-main" style="margin-top:30px; font-size:1.1rem; padding:15px;" onclick="guardarEstilos()"><i class="fas fa-save"></i> GUARDAR Y MUTAR NAVE</button>
             </div>
@@ -521,6 +507,7 @@
                 document.getElementById('ventas-mes').innerText = "$" + (res.mes || 0).toLocaleString('es-CL');
                 renderCatalogo(globalStock);
                 actualizarGrafico();
+                window.destacadosGlobal = res.destacados || []; // Caché persistente para modal (PROTOCOL FOCUS)
             }
         }
 
@@ -609,6 +596,161 @@
         function filtrarCatalogo() {
             const txt = document.getElementById('search-catalogo').value.toLowerCase();
             renderCatalogo(globalStock.filter(p => (p.NOMBRE && p.NOMBRE.toLowerCase().includes(txt)) || (p.SKU && p.SKU.toLowerCase().includes(txt))));
+        }
+
+        // =======================================================
+        // LÓGICA DE DESTACADOS CMS FLOTANTE (PROTOCOL FOCUS)
+        // =======================================================
+        var destacadosLocal = [];
+
+        async function abrirModalDestacados() {
+            if (!window.destacadosGlobal) {
+                mostrarToast("Sincronizando con Spreadsheet...");
+                const res = await apiCall("getAdminDashboardData");
+                window.destacadosGlobal = res ? res.destacados || [] : [];
+            }
+            
+            // Clonamos la información para manipular de forma segura sin romper la producción en caliente
+            destacadosLocal = JSON.parse(JSON.stringify(window.destacadosGlobal));
+            
+            // Poblamos el selector inferior con los productos del catálogo principal
+            const select = document.getElementById('dest-producto-select');
+            if (select) {
+                select.innerHTML = '<option value="" selected disabled>-- Selecciona un producto para añadir (Máx 5) --</option>' + 
+                    globalStock.map(p => `<option value="${p.SKU}">${p.NOMBRE} [${p.SKU}]</option>`).join('');
+            }
+            
+            renderDestacadosAdmin();
+            document.getElementById('modal-destacados-admin').style.display = 'flex';
+        }
+
+        function cerrarModalDestacados() {
+            document.getElementById('modal-destacados-admin').style.display = 'none';
+        }
+
+        function renderDestacadosAdmin() {
+            const container = document.getElementById('lista-destacados-actuales');
+            if (!container) return;
+            
+            if (destacadosLocal.length === 0) {
+                container.innerHTML = '<p style="color:#666; text-align:center; margin:15px 0; font-size:0.8rem;">No hay productos destacados en el slider.</p>';
+                return;
+            }
+            
+            container.innerHTML = destacadosLocal.map((d, index) => {
+                // Validación cruzada de fallbacks automáticos si los campos opcionales vienen vacíos
+                const pBase = globalStock.find(p => p.SKU == d.sku) || {};
+                const imgShow = d.img || pBase.IMAGEN_URL || 'https://i.postimg.cc/hPf8Py3B/Logo-sin-fondo.png';
+                const nameShow = pBase.NOMBRE || d.nombre || 'Producto no identificado';
+                
+                return `
+                <div style="background:rgba(0,0,0,0.6); border:1px solid #222; padding:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; margin-bottom:5px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="${imgShow}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #333;">
+                            <div>
+                                <strong style="color:white; font-size:0.85rem; display:block;">${nameShow}</strong>
+                                <small style="color:var(--cian); font-weight:bold; font-size:0.7rem;">SKU: ${d.sku}</small>
+                            </div>
+                        </div>
+                        <!-- Controles de reordenamiento e integridad secuencial -->
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="moverDestacado(${index}, -1)" style="background:#111; color:white; border:1px solid #333; padding:6px 10px; border-radius:6px; cursor:pointer;" title="Subir posición"><i class="fas fa-chevron-up"></i></button>
+                            <button onclick="moverDestacado(${index}, 1)" style="background:#111; color:white; border:1px solid #333; padding:6px 10px; border-radius:6px; cursor:pointer;" title="Bajar posición"><i class="fas fa-chevron-down"></i></button>
+                            <button onclick="eliminarDestacado(${index})" style="background:rgba(231,76,60,0.1); color:#e74c3c; border:1px solid #e74c3c; padding:6px 10px; border-radius:6px; cursor:pointer;" title="Remover destacado"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario de Campos Opcionales de Mutación del Slider -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div>
+                            <label style="font-size:0.65rem; color:#888; display:block; margin-bottom:3px;">TÍTULO PROMO (Opcional):</label>
+                            <input type="text" value="${d.titulo || ''}" oninput="actualizarTextoDestacado(${index}, 'titulo', this.value)" class="input-admin" style="padding:8px; margin:0; font-size:0.8rem;" placeholder="Por defecto base">
+                        </div>
+                        <div>
+                            <label style="font-size:0.65rem; color:#888; display:block; margin-bottom:3px;">URL IMAGEN SLIDER (Opcional):</label>
+                            <input type="text" value="${d.img || ''}" oninput="actualizarTextoDestacado(${index}, 'img', this.value)" class="input-admin" style="padding:8px; margin:0; font-size:0.8rem;" placeholder="Por defecto base">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:0.65rem; color:#888; display:block; margin-bottom:3px;">DESCRIPCIÓN COMERCIAL SLIDER (Opcional):</label>
+                        <input type="text" value="${d.desc || ''}" oninput="actualizarTextoDestacado(${index}, 'desc', this.value)" class="input-admin" style="padding:8px; margin:0; font-size:0.8rem;" placeholder="Por defecto de catálogo">
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function actualizarTextoDestacado(index, campo, valor) {
+            if (destacadosLocal[index]) {
+                destacadosLocal[index][campo] = valor;
+            }
+        }
+
+        function agregarDestacadoDirecto(sku) {
+            if (!sku) return;
+            if (destacadosLocal.length >= 5) {
+                mostrarToast("Límite alcanzado: Máximo 5 banners destacados.");
+                document.getElementById('dest-producto-select').value = "";
+                return;
+            }
+            if (destacadosLocal.some(d => d.sku.toString().trim() === sku.toString().trim())) {
+                mostrarToast("El ítem ya se encuentra en destacados.");
+                document.getElementById('dest-producto-select').value = "";
+                return;
+            }
+            
+            const pBase = globalStock.find(p => p.SKU == sku);
+            if (pBase) {
+                destacadosLocal.push({
+                    sku: pBase.SKU,
+                    nombre: pBase.NOMBRE,
+                    titulo: "",
+                    desc: "",
+                    img: ""
+                });
+                renderDestacadosAdmin();
+            }
+            document.getElementById('dest-producto-select').value = "";
+        }
+
+        function moverDestacado(index, direccion) {
+            const destino = index + direccion;
+            if (destino < 0 || destino >= destacadosLocal.length) return;
+            
+            // Swap aritmético seguro de posiciones
+            const temp = destacadosLocal[index];
+            destacadosLocal[index] = destacadosLocal[destino];
+            destacadosLocal[destino] = temp;
+            
+            renderDestacadosAdmin();
+        }
+
+        function eliminarDestacado(index) {
+            destacadosLocal.splice(index, 1);
+            renderDestacadosAdmin();
+        }
+
+        async function procesarGuardarDestacados() {
+            const btn = document.getElementById('btn-guardar-destacados');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ESCRIBIENDO SPREADSHEET...';
+            btn.disabled = true;
+            
+            try {
+                const res = await apiCall("guardarDestacados", { destacados: destacadosLocal });
+                if (res && res.success) {
+                    mostrarToast("¡Matriz de destacados guardada e indexada!");
+                    window.destacadosGlobal = [...destacadosLocal];
+                    cerrarModalDestacados();
+                    iniciarPanelAdmin(); // Re-renderizado reflectivo completo
+                } else {
+                    mostrarToast("Error de validación en el canal del servidor.");
+                }
+            } catch(e) {
+                mostrarToast("Error crítico de persistencia de red.");
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i> FIJAR COMPONENTES SLIDER';
+                btn.disabled = false;
+            }
         }
 
         function limpiarEtiquetas(texto) {
