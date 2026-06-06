@@ -4896,47 +4896,52 @@ document.onmousemove = resetearVigilante;
 document.onkeypress = resetearVigilante;
 
 async function dispararAlertaCierre() {
-    // 🛡️ ESCUDO FOCUS CRÍTICO: Apagamos temporalmente los rastreadores del mouse y teclado
-    // para que mover el puntero hacia los botones NO mate el intervalo del reloj antes de tiempo
+    // 🛡️ ESCUDO FOCUS CRÍTICO: Apagamos temporalmente los rastreadores
     document.onmousemove = null;
     document.onkeypress = null;
 
-    let tiempoRestante = 58; // El primer segundo nacerá mostrando 59s en la llamada base
-    clearInterval(timerVerdugo); // Aseguramos que no existan hilos duplicados
+    clearInterval(timerVerdugo);
     
-    // MOTOR DEL CRONÓMETRO: Actualiza el texto neón del modal segundo a segundo
+    // ⏱️ RELOJ ABSOLUTO: Grabamos la hora exacta en la que nace la alerta
+    const tiempoInicioMatrix = Date.now(); 
+
     timerVerdugo = setInterval(() => {
+        // Calculamos tiempo real basado en el reloj del servidor interno del PC, no en "ticks" de JS
+        let segundosPasados = Math.floor((Date.now() - tiempoInicioMatrix) / 1000);
+        let tiempoRestante = 60 - segundosPasados;
+
         const msgElemento = document.getElementById('alert-message');
-        if (msgElemento) {
+        if (msgElemento && tiempoRestante > 0) {
             msgElemento.innerHTML = `Kairo detecta inactividad en la Matrix. Tu sesión se cerrará automáticamente por seguridad en:<br><b style="color: #ff4444; font-size: 2.3rem; display: block; margin-top: 15px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(255, 68, 68, 0.6);">${tiempoRestante}s</b>`;
         }
         
-        // Si el cronómetro llega a cero, el verdugo ejecuta el cierre forzado de sesión
+        // Si el tiempo real superó los 60s (ej. PC suspendido y despertado horas después), CORTAMOS DE RAÍZ
         if (tiempoRestante <= 0) {
             clearInterval(timerVerdugo);
             cerrarKairoMsg();
             logout();
         }
-        tiempoRestante--;
     }, 1000);
 
-    // Lanzamos el modal con el segundo inicial renderizado de forma premium
+    // Lanzamos el modal con el segundo inicial
     const seguir = await kairoMessage({ 
-        mensaje: `Kairo detecta inactividad en la Matrix. Tu sesión se cerrará automáticamente por seguridad en:<br><b style="color: #ff4444; font-size: 2.3rem; display: block; margin-top: 15px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(255, 68, 68, 0.6);">59s</b>`, 
+        mensaje: `Kairo detecta inactividad en la Matrix. Tu sesión se cerrará automáticamente por seguridad en:<br><b style="color: #ff4444; font-size: 2.3rem; display: block; margin-top: 15px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(255, 68, 68, 0.6);">60s</b>`, 
         tipo: 'confirmar',
         icon: '⏳'
     });
     
-    // Apagamos el cronómetro de inmediato al recibir una respuesta de los botones
     clearInterval(timerVerdugo); 
     
-    if (seguir) {
-        // 🛡️ RESTAURAMOS los escuchas del mouse y teclado únicamente si decide quedarse conectado
+    // 🛡️ DOBLE CANDADO C3D: Si el usuario hizo clic en "Mantener" pero su PC estuvo suspendido más de 60s, el clic es nulo.
+    let tiempoTotalReal = Math.floor((Date.now() - tiempoInicioMatrix) / 1000);
+    
+    if (seguir && tiempoTotalReal <= 60) {
         document.onmousemove = resetearVigilante;
         document.onkeypress = resetearVigilante;
-        resetearVigilante(); // Conexión salvada, reinicia el ciclo de 10 minutos
+        resetearVigilante(); // Conexión salvada legítimamente
     } else {
-        logout(); // El usuario decide salir manualmente
+        cerrarKairoMsg();
+        logout(); // Ejecución implacable
     }
 }
 
