@@ -2575,6 +2575,134 @@
         </div>
     </div>
 </div>
+
+<div id="modulo-productos-ecommerce" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
+
+    
+
+    <div style="background: rgba(0,0,0,0.5); border-top: 1px solid var(--neon-n); border-bottom: 1px solid var(--neon-n); padding: 15px 0; margin-bottom: 25px; overflow: hidden; position: relative;">
+
+        <div style="display: flex; width: 200%; animation: scroll-marquee-patrocinadores 20s linear infinite;" id="marquee-patrocinadores">
+
+            </div>
+
+    </div>
+
+
+
+    <div style="text-align: center; margin-bottom: 25px;">
+
+        <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Tienda C3D Premium</h2>
+
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Suplementación, Accesorios y Herramientas Tridimensionales</p>
+
+    </div>
+
+
+
+    <div class="pilar-filter-bar" id="tienda-tabs-selector">
+
+        <div class="filter-tab-premium" onclick="cambiarPilarTienda('FINANZAS')">FINANZAS</div>
+
+        <div class="filter-tab-premium active" onclick="cambiarPilarTienda('NUTRICION')">NUTRICIÓN</div>
+
+        <div class="filter-tab-premium" onclick="cambiarPilarTienda('MENTALIDAD')">MENTALIDAD</div>
+
+    </div>
+
+
+
+    <div style="text-align: center; margin-bottom: 20px;">
+
+        <button class="btn btn-m" style="font-size: 0.7em; padding: 8px 20px;" onclick="cambiarPilarTienda('TODOS')">VER TODOS LOS PRODUCTOS</button>
+
+    </div>
+
+
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 30px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+
+        <div>
+
+            <label style="font-size: 0.7em; color: var(--neon-admin); display: block; margin-bottom: 5px;">Categoría</label>
+
+            <select id="filtro-categoria" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
+
+                <option value="TODAS">Todas las Categorías</option>
+
+            </select>
+
+        </div>
+
+        <div>
+
+            <label style="font-size: 0.7em; color: #fbbf24; display: block; margin-bottom: 5px;">Recomendación</label>
+
+            <select id="filtro-recomendacion" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
+
+                <option value="0">Todos (Nuevos)</option>
+
+                <option value="2.0">★ 2.0 o más</option>
+
+                <option value="3.0">★ 3.0 o más</option>
+
+                <option value="4.0">★ 4.0 o más</option>
+
+                <option value="5.0">★ 5.0 (Máxima)</option>
+
+            </select>
+
+        </div>
+
+        <div>
+
+            <label style="font-size: 0.7em; color: var(--neon-f); display: block; margin-bottom: 5px;">Rango de Precio</label>
+
+            <select id="filtro-precio" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
+
+                <option value="TODOS">Todos los precios</option>
+
+                <option value="0-10000">$0 - $10.000</option>
+
+                <option value="10001-30000">$10.001 - $30.000</option>
+
+                <option value="30001-60000">$30.001 - $60.000</option>
+
+                <option value="60001-100000">$60.001 - $100.000</option>
+
+                <option value="100001-300000">$100.001 - $300.000</option>
+
+                <option value="300001-9999999">$300.001 o más</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="store-grid" id="ecommerce-store-grid"></div>
+
+
+
+    <div style="margin-top: 50px; background: rgba(34, 211, 238, 0.05); border: 1px dashed var(--neon-n); border-radius: 15px; padding: 25px; text-align: center;">
+
+        <h3 style="color: var(--neon-n); margin-top: 0; font-family: 'Orbitron';">¿Quieres tu propia tienda E-Commerce GRATIS?</h3>
+
+        <p style="font-size: 0.85em; color: #cbd5e1; max-width: 600px; margin: 0 auto 20px; line-height: 1.5;">
+            Si eres parte de la comunidad, puedes solicitar un ecosistema de ventas exactamente igual a este para tu propio negocio. Un Coach 3D te contactará para guiarte en el proceso.
+        </p>
+        <button class="btn btn-n" onclick="document.getElementById('form-cta-tienda').classList.toggle('hidden')">SOLICITAR MI TIENDA AHORA</button>
+        <form id="form-cta-tienda" class="hidden" style="margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto; text-align: left;" onsubmit="event.preventDefault(); solicitarTiendaEcom();">
+            <input type="text" id="cta-tienda-nombre" class="nave-input" placeholder="Tu Nombre Completo" required>
+            <input type="text" id="cta-tienda-rubro" class="nave-input" placeholder="¿De qué trata tu negocio?" required>
+            <button type="submit" class="btn btn-f" style="width: 100%; padding: 12px; margin-top: 10px;">SOLICITAR POR WHATSAPP 🚀</button>
+        </form>
+    </div>
+    <button class="btn" style="width: 100%; margin-top: 25px; opacity: 0.7;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+</div> 
+</div></div>           
             
 <div id="modal-perfil" class="hidden glass-panel">
     <h3 style="color: var(--neon-n); text-align: center;">Editar Perfil</h3>
@@ -3039,77 +3167,7 @@
     </div>
 </div>
 
-    <div id="modulo-productos-ecommerce" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
     
-    <div style="background: rgba(0,0,0,0.5); border-top: 1px solid var(--neon-n); border-bottom: 1px solid var(--neon-n); padding: 15px 0; margin-bottom: 25px; overflow: hidden; position: relative;">
-        <div style="display: flex; width: 200%; animation: scroll-marquee-patrocinadores 20s linear infinite;" id="marquee-patrocinadores">
-            </div>
-    </div>
-
-    <div style="text-align: center; margin-bottom: 25px;">
-        <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Tienda C3D Premium</h2>
-        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Suplementación, Accesorios y Herramientas Tridimensionales</p>
-    </div>
-
-    <div class="pilar-filter-bar" id="tienda-tabs-selector">
-        <div class="filter-tab-premium" onclick="cambiarPilarTienda('FINANZAS')">FINANZAS</div>
-        <div class="filter-tab-premium active" onclick="cambiarPilarTienda('NUTRICION')">NUTRICIÓN</div>
-        <div class="filter-tab-premium" onclick="cambiarPilarTienda('MENTALIDAD')">MENTALIDAD</div>
-    </div>
-
-    <div style="text-align: center; margin-bottom: 20px;">
-        <button class="btn btn-m" style="font-size: 0.7em; padding: 8px 20px;" onclick="cambiarPilarTienda('TODOS')">VER TODOS LOS PRODUCTOS</button>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 30px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-        <div>
-            <label style="font-size: 0.7em; color: var(--neon-admin); display: block; margin-bottom: 5px;">Categoría</label>
-            <select id="filtro-categoria" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
-                <option value="TODAS">Todas las Categorías</option>
-            </select>
-        </div>
-        <div>
-            <label style="font-size: 0.7em; color: #fbbf24; display: block; margin-bottom: 5px;">Recomendación</label>
-            <select id="filtro-recomendacion" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
-                <option value="0">Todos (Nuevos)</option>
-                <option value="2.0">★ 2.0 o más</option>
-                <option value="3.0">★ 3.0 o más</option>
-                <option value="4.0">★ 4.0 o más</option>
-                <option value="5.0">★ 5.0 (Máxima)</option>
-            </select>
-        </div>
-        <div>
-            <label style="font-size: 0.7em; color: var(--neon-f); display: block; margin-bottom: 5px;">Rango de Precio</label>
-            <select id="filtro-precio" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
-                <option value="TODOS">Todos los precios</option>
-                <option value="0-10000">$0 - $10.000</option>
-                <option value="10001-30000">$10.001 - $30.000</option>
-                <option value="30001-60000">$30.001 - $60.000</option>
-                <option value="60001-100000">$60.001 - $100.000</option>
-                <option value="100001-300000">$100.001 - $300.000</option>
-                <option value="300001-9999999">$300.001 o más</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="store-grid" id="ecommerce-store-grid"></div>
-
-    <div style="margin-top: 50px; background: rgba(34, 211, 238, 0.05); border: 1px dashed var(--neon-n); border-radius: 15px; padding: 25px; text-align: center;">
-        <h3 style="color: var(--neon-n); margin-top: 0; font-family: 'Orbitron';">¿Quieres tu propia tienda E-Commerce GRATIS?</h3>
-        <p style="font-size: 0.85em; color: #cbd5e1; max-width: 600px; margin: 0 auto 20px; line-height: 1.5;">
-            Si eres parte de la comunidad, puedes solicitar que Kairo clone un ecosistema de ventas exactamente igual a este para tu propio negocio. Un Coach 3D te contactará para guiarte en el proceso.
-        </p>
-        <button class="btn btn-n" onclick="document.getElementById('form-cta-tienda').classList.toggle('hidden')">SOLICITAR MI TIENDA AHORA</button>
-        
-        <form id="form-cta-tienda" class="hidden" style="margin-top: 20px; max-width: 400px; margin-left: auto; margin-right: auto; text-align: left;" onsubmit="event.preventDefault(); solicitarTiendaEcom();">
-            <input type="text" id="cta-tienda-nombre" class="nave-input" placeholder="Tu Nombre Completo" required>
-            <input type="text" id="cta-tienda-rubro" class="nave-input" placeholder="¿De qué trata tu negocio?" required>
-            <button type="submit" class="btn btn-f" style="width: 100%; padding: 12px; margin-top: 10px;">SOLICITAR POR WHATSAPP 🚀</button>
-        </form>
-    </div>
-
-    <button class="btn" style="width: 100%; margin-top: 25px; opacity: 0.7;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
-</div>
 
 <div id="modal-patrocinador" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000050 !important; width: 90% !important; max-width: 450px !important; padding: 30px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-admin) !important; text-align: center;">
     <button onclick="cerrarPatrocinador()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
