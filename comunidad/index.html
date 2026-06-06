@@ -2509,14 +2509,22 @@
         <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Formación, Mentorías y Clases Tridimensionales de Alta Velocidad</p>
     </div>
 
-    <div class="pilar-filter-bar" id="cursos-tabs-selector">
+    <!-- 🔍 BUSCADOR ESTILO NETFLIX -->
+    <div style="max-width: 500px; margin: 0 auto 20px auto; position: relative;">
+        <input type="text" id="buscador-cursos" placeholder="🔍 Buscar por nombre, tema o palabra clave..." 
+               style="width: 100%; padding: 15px 20px; border-radius: 30px; background: rgba(0,0,0,0.6); border: 1px solid var(--neon-m); color: white; font-size: 0.9em; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);" 
+               onkeyup="aplicarFiltrosNetflix()">
+    </div>
+
+    <!-- 🎛️ FILTROS DE PILARES Y MIS CURSOS INTEGADOS -->
+    <div class="pilar-filter-bar" id="cursos-tabs-selector" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 30px;">
+        <div class="filter-tab-premium" onclick="cambiarPilarCursos('TODOS')">🔥 TODOS</div>
         <div class="filter-tab-premium" onclick="cambiarPilarCursos('FINANZAS')">FINANZAS</div>
         <div class="filter-tab-premium active" onclick="cambiarPilarCursos('NUTRICION')">NUTRICIÓN</div>
         <div class="filter-tab-premium" onclick="cambiarPilarCursos('MENTALIDAD')">MENTALIDAD</div>
-    </div>
-
-    <div style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
-        <button class="btn btn-m" style="font-size: 0.75em; padding: 10px 25px; font-family:'Orbitron';" onclick="conmutarVistaMisCursos(this)">🎬 MIS CURSOS ADQUIRIDOS</button>
+        
+        <!-- Botón Especial: Mis Cursos -->
+        <div class="filter-tab-premium" style="border-color: #eab308; color: #eab308; font-weight: bold; margin-left: 10px;" id="btn-mis-cursos-tab" onclick="conmutarVistaMisCursos(this)">🎬 MIS CURSOS</div>
     </div>
 
     <div id="cursos-netflix-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 20px;"></div>
@@ -2542,15 +2550,34 @@
     
     <button onclick="cerrarModalCinemaPlay()" style="position: absolute; top: 12px; right: 20px; background: transparent; border: none; color: #fff; font-size: 32px; cursor: pointer; z-index: 2000120; font-weight: bold;">×</button>
     
-    <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin-top: 15px;" id="wrapper-cinema-video">
-        <iframe id="cinema-video-frame" src="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <!-- ZONA REPRODUCTOR Y PLAYLIST (LAYOUT SPLIT) -->
+    <div id="cinema-split-layout" style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 15px; align-items: flex-start;">
         
-        <div id="cinema-muro-pago" class="hidden" style="position: absolute; inset: 0; background: rgba(5,7,15,0.97); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; z-index: 2000110;">
-            <div style="font-size: 3.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--neon-m));">🔒</div>
-            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin: 0 0 10px 0; letter-spacing: 1px;">FIN DEL PREVIEW GRATUITO</h3>
-            <p id="muro-pago-texto" style="font-size: 0.9rem; color: #cbd5e1; max-width: 480px; line-height: 1.5; margin-bottom: 20px;"></p>
-            <button id="btn-muro-pago-checkout" class="btn btn-m" style="padding: 14px 40px; font-weight: bold; font-family:'Orbitron';" onclick="desviarAPagoCurso()">DESBLOQUEAR ACCESO MAESTRO</button>
+        <!-- COLUMNA PRINCIPAL (VIDEO) -->
+        <div id="cinema-main-col" style="flex: 1 1 400px; width: 100%;">
+            <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);" id="wrapper-cinema-video">
+                <iframe id="cinema-video-frame" src="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                
+                <!-- 🔒 OVERLAY MURO DE PAGO GUILLOTINA -->
+                <div id="cinema-muro-pago" class="hidden" style="position: absolute; inset: 0; background: rgba(5,7,15,0.97); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; z-index: 2000110;">
+                    <div style="font-size: 3.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--neon-m));">🔒</div>
+                    <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin: 0 0 10px 0; letter-spacing: 1px;">ACCESO RESTRINGIDO</h3>
+                    <p id="muro-pago-texto" style="font-size: 0.9rem; color: #cbd5e1; max-width: 480px; line-height: 1.5; margin-bottom: 20px;"></p>
+                    <button id="btn-muro-pago-checkout" class="btn btn-m" style="padding: 14px 40px; font-weight: bold; font-family:'Orbitron';" onclick="desviarAPagoCurso()">DESBLOQUEAR PROGRAMA COMPLETO</button>
+                </div>
+            </div>
         </div>
+
+        <!-- COLUMNA LATERAL (PLAYLIST MODULAR) -->
+        <div id="cinema-playlist-col" class="hidden" style="flex: 1 1 300px; max-width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; display: flex; flex-direction: column; max-height: 450px;">
+            <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left;">
+                <h4 style="color: var(--white); margin: 0; font-family: 'Orbitron', sans-serif; font-size: 0.95em; letter-spacing: 1px;">Contenido del Programa</h4>
+            </div>
+            <div id="cinema-playlist-items" style="flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Kairo inyectará las sesiones aquí -->
+            </div>
+        </div>
+
     </div>
 
     <div style="margin-top: 20px; text-align: left;">
@@ -7714,38 +7741,73 @@ async function iniciarcursos() {
     }
 }
 
+
 function cambiarPilarCursos(pilar) {
     pilarCursosActivo = pilar;
+    vistaSoloMisCursos = false; // Si toca un pilar, apagamos el modo "Mis Cursos"
+    
     document.querySelectorAll('#cursos-tabs-selector .filter-tab-premium').forEach(t => t.classList.remove('active'));
     if(event && event.target) event.target.classList.add('active');
+    
+    // Restauramos el aspecto del botón de Mis Cursos por si estaba encendido
+    const btnMisCursos = document.getElementById('btn-mis-cursos-tab');
+    if(btnMisCursos) {
+        btnMisCursos.style.background = "transparent";
+        btnMisCursos.style.color = "#eab308";
+        btnMisCursos.innerText = "🎬 MIS CURSOS";
+    }
+    
     aplicarFiltrosNetflix();
 }
 
 function conmutarVistaMisCursos(btn) {
     vistaSoloMisCursos = !vistaSoloMisCursos;
+    pilarCursosActivo = "TODOS"; // Ignoramos pilares si quiere ver su biblioteca
+    
+    // Apagamos los botones de pilares
+    document.querySelectorAll('#cursos-tabs-selector .filter-tab-premium').forEach(t => t.classList.remove('active'));
+    
     if(vistaSoloMisCursos) {
-        btn.innerText = "👁️ VER TODOS LOS VIDEOS";
-        btn.className = "btn btn-n";
+        btn.classList.add('active');
+        btn.style.background = "rgba(234, 179, 8, 0.15)";
+        btn.style.color = "#eab308";
+        btn.innerText = "👁️ MOSTRANDO MIS CURSOS";
     } else {
-        btn.innerText = "🎬 MIS CURSOS ADQUIRIDOS";
-        btn.className = "btn btn-m";
+        btn.classList.remove('active');
+        btn.style.background = "transparent";
+        btn.style.color = "#eab308";
+        btn.innerText = "🎬 MIS CURSOS";
+        // Si apaga "Mis Cursos", vuelve a mostrar TODOS
+        cambiarPilarCursos('TODOS');
+        return; 
     }
     aplicarFiltrosNetflix();
 }
 
 function aplicarFiltrosNetflix() {
     let filtrados = inventarioCursos;
+    
+    // 1. Filtro Texto (Buscador reactivo)
+    const textoBuscado = document.getElementById('buscador-cursos').value.toLowerCase().trim();
+    if (textoBuscado !== "") {
+        filtrados = filtrados.filter(c => 
+            c.nombre.toLowerCase().includes(textoBuscado) || 
+            c.descripcion.toLowerCase().includes(textoBuscado)
+        );
+    }
 
+    // 2. Filtro Estado: Mis Cursos vs Pilares
     if (vistaSoloMisCursos) {
-        // Modo Mis Cursos: Dejamos solo los que tienen el SKU en la billetera virtual
         filtrados = filtrados.filter(c => cursosCompradosCache.includes(c.sku.trim().toUpperCase()));
     } else {
-        // Modo Normal: Filtramos por pilar seleccionado
-        filtrados = filtrados.filter(c => c.pilar === pilarCursosActivo);
+        if (pilarCursosActivo !== "TODOS") {
+            filtrados = filtrados.filter(c => c.pilar === pilarCursosActivo);
+        }
     }
 
     renderizarGrillaNetflix(filtrados);
 }
+
 
 function renderizarGrillaNetflix(lista) {
     const grid = document.getElementById('cursos-netflix-grid');
@@ -7763,7 +7825,7 @@ function renderizarGrillaNetflix(lista) {
         let badgHTML = "";
         let precioLabel = "";
         
-        if (c.accion === "GRATIS" || c.precioNormal === 0) {
+        if (c.accion === "GRATIS" || c.accion === "MODULOS" || c.precioNormal === 0) {
             badgHTML = `<div style="position:absolute; top:10px; left:10px; background:#10b981; color:#000; font-size:0.65em; font-weight:bold; padding:4px 8px; border-radius:4px; font-family:'Orbitron';">FREE ACCESS</div>`;
             precioLabel = "LIBRE";
         } else if (c.accion === "GRUPAL") {
@@ -7801,6 +7863,33 @@ function renderizarGrillaNetflix(lista) {
     });
 }
 
+
+
+function desviarAPagoCurso() {
+    if(!cursoActivoCinema) return;
+    
+    if (cursoActivoCinema.accion === "GRUPAL") {
+        const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Integrante";
+        const mensajeWA = `¡Hola Coach! Me interesa participar en la sesión grupal del curso:\n\n🎥 *Curso:* ${cursoActivoCinema.nombre}\n🔑 *SKU:* ${cursoActivoCinema.sku}\n\nCoordinemos el evento y los accesos.`;
+        window.open(`https://wa.me/56976003402?text=${encodeURIComponent(mensajeWA)}`, '_blank');
+        cerrarModalCinemaPlay();
+    } else {
+        // Caso Venta: Si tiene link en el Excel, lo manda; si no, levanta error
+        if(cursoActivoCinema.linkPago && cursoActivoCinema.linkPago.trim() !== "" && cursoActivoCinema.linkPago !== "#") {
+            // Congelamos variables comerciales por si el checkout causa redirección
+            localStorage.setItem('kairo_ecommerce_sku', cursoActivoCinema.sku);
+            localStorage.setItem('kairo_ecommerce_nombre', cursoActivoCinema.nombre);
+            localStorage.setItem('kairo_ecommerce_tipo', "CURSOS");
+            if(sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
+            
+            cerrarModalCinemaPlay();
+            window.location.href = cursoActivoCinema.linkPago.trim();
+        } else {
+            notify("Kairo Alerta: Este curso premium no tiene un link de MercadoPago configurado en la columna M.");
+        }
+    }
+}
+
 function abrirModalCinemaPlay(sku) {
     const c = inventarioCursos.find(x => x.sku === sku);
     if (!c) return;
@@ -7829,7 +7918,6 @@ function abrirModalCinemaPlay(sku) {
         boxPdf.style.display = "none";
     }
 
-    // Resiliencia Kairo Explica
     const boxKairo = document.getElementById('box-recursos-kairo-explica');
     if (c.kairoExplica && c.kairoExplica.trim() !== "") {
         boxKairo.style.display = "block";
@@ -7838,74 +7926,120 @@ function abrirModalCinemaPlay(sku) {
         boxKairo.style.display = "none";
     }
 
-    const overlayMuro = document.getElementById('cinema-muro-pago');
-    const btnAccionVideo = document.getElementById('btn-muro-pago-checkout');
-    overlayMuro.classList.add('hidden');
+    const modal = document.getElementById('modal-cinema-play');
+    document.body.appendChild(modal); 
+    modal.classList.remove('hidden');
+    modal.style.display = "block";
+
+    // 🎬 CONSTRUCCIÓN DE LA PLAYLIST MODULAR
+    let urlsVideo = c.video.split(',').map(v => v.trim()).filter(v => v !== "");
+    window.cursoActivoVideos = urlsVideo; // Guardamos en memoria global del navegador
+    
+    const playlistCol = document.getElementById('cinema-playlist-col');
+    const playlistItems = document.getElementById('cinema-playlist-items');
+    
+    if (c.accion.includes("MODULOS") || urlsVideo.length > 1) {
+        playlistCol.classList.remove('hidden');
+        playlistItems.innerHTML = "";
+        
+        urlsVideo.forEach((url, idx) => {
+            let tituloClase = `Sesión ${idx + 1}`;
+            playlistItems.innerHTML += `
+                <div onclick="reproducirVideoModulo(${idx})" id="playlist-item-${idx}" style="padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid transparent; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: var(--neon-m); font-family: 'Orbitron'; font-size: 0.8em; font-weight: bold;">${idx + 1}</span>
+                    <span style="color: #cbd5e1; font-size: 0.85em; flex-grow: 1; text-align: left;">${tituloClase}</span>
+                    <span id="playlist-icon-${idx}" style="font-size: 0.8em;">▶️</span>
+                </div>
+            `;
+        });
+    } else {
+        playlistCol.classList.add('hidden'); // Ocultar si es solo 1 video
+    }
+
+    // Auto-arranque del primer video
+    reproducirVideoModulo(0);
+}
+
+// 🧠 CEREBRO DEL REPRODUCTOR Y LA GUILLOTINA INTELIGENTE
+function reproducirVideoModulo(idx) {
+    if(!cursoActivoCinema) return;
+    const c = cursoActivoCinema;
+    const yaComprado = cursosCompradosCache.includes(c.sku.trim().toUpperCase());
+    const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
+    let precioActual = esSusc ? c.precioSusc : c.precioNormal;
 
     const iframe = document.getElementById('cinema-video-frame');
-    iframe.style.display = "block";
+    const overlayMuro = document.getElementById('cinema-muro-pago');
+    const btnAccionVideo = document.getElementById('btn-muro-pago-checkout');
     
-    // AutoPlay inyectado al link de Drive o Youtube
-    let urlVideoFinal = c.video;
-    if(urlVideoFinal.includes("?")) urlVideoFinal += "&autoplay=1";
-    else urlVideoFinal += "?autoplay=1";
-    iframe.src = urlVideoFinal;
+    clearTimeout(cronometroGuillotinaC3D);
+    iframe.src = "";
+    iframe.style.display = "block";
+    overlayMuro.classList.add('hidden');
 
-    const yaComprado = cursosCompradosCache.includes(c.sku.trim().toUpperCase());
+    // 🎨 ACTUALIZAR DISEÑO DE LA PLAYLIST
+    if(window.cursoActivoVideos && window.cursoActivoVideos.length > 1) {
+        window.cursoActivoVideos.forEach((v, i) => {
+            let el = document.getElementById(`playlist-item-${i}`);
+            if(el) {
+                if(i === idx) {
+                    el.style.background = "rgba(168, 85, 247, 0.1)";
+                    el.style.borderColor = "var(--neon-m)";
+                    document.getElementById(`playlist-icon-${i}`).innerText = "🎬";
+                } else {
+                    el.style.background = "rgba(255,255,255,0.02)";
+                    el.style.borderColor = "transparent";
+                    
+                    // Mensaje subliminal de ventas: Poner candados a los videos que no puede ver
+                    let icon = "▶️";
+                    if ((c.accion === "MODULOSPAGO" || c.accion === "VENTA") && !yaComprado && i > 0) {
+                        icon = "🔒";
+                    }
+                    document.getElementById(`playlist-icon-${i}`).innerText = icon;
+                }
+            }
+        });
+    }
 
-    // 🛡️ LÓGICA DE FILTRADO CONDICIONAL DE ACCIONES
+    // 🛡️ LÓGICA DE BLOQUEOS (Grupal, Módulos Pagos, Venta Única)
     if (c.accion === "GRUPAL") {
-        // Caso Grupal: Muro instantáneo sobre el video
-        iframe.src = ""; iframe.style.display = "none";
+        iframe.style.display = "none";
         overlayMuro.classList.remove('hidden');
         document.getElementById('muro-pago-texto').innerText = "Este programa se imparte exclusivamente en vivo y en formato grupal vía streaming privado. Coordina tu acceso con un Coach.";
         btnAccionVideo.innerText = "COORDINAR EVENTO 🚀";
         btnAccionVideo.className = "btn btn-n";
-    } 
-    else if (c.accion === "VENTA" && !yaComprado) {
-        // Caso Venta (No adquirido): Dispara el cronómetro de 30 segundos
-        const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
-        let precioActual = esSusc ? c.precioSusc : c.precioNormal;
-        
-        document.getElementById('muro-pago-texto').innerText = `Adquiere el acceso permanente y completo a esta clase magistral por solo $${precioActual.toLocaleString()}`;
-        btnAccionVideo.innerText = "DESBLOQUEAR CURSO COMPLETO";
+        return;
+    }
+
+    let requierePago = (c.accion === "VENTA" || c.accion === "MODULOSPAGO") && !yaComprado;
+
+    // Si es un curso pago modular y hace clic del video 2 en adelante: BLOQUEO INMEDIATO
+    if (requierePago && idx > 0) {
+        iframe.style.display = "none";
+        overlayMuro.classList.remove('hidden');
+        document.getElementById('muro-pago-texto').innerText = `Esta lección está bloqueada. Adquiere el programa completo y permanente por solo $${precioActual.toLocaleString()}`;
+        btnAccionVideo.innerText = "DESBLOQUEAR PROGRAMA COMPLETO";
+        btnAccionVideo.className = "btn btn-m";
+        return;
+    }
+
+    // Si pasó los filtros, inyectamos el video
+    let urlVideoFinal = window.cursoActivoVideos[idx];
+    if(urlVideoFinal.includes("?")) urlVideoFinal += "&autoplay=1";
+    else urlVideoFinal += "?autoplay=1";
+    iframe.src = urlVideoFinal;
+
+    // Si es un curso de pago y es el video 1 (o video único): GUILLOTINA 30 SEG
+    if (requierePago && idx === 0) {
+        document.getElementById('muro-pago-texto').innerText = `Adquiere el acceso permanente y completo a esta masterclass por solo $${precioActual.toLocaleString()}`;
+        btnAccionVideo.innerText = "DESBLOQUEAR ACCESO MAESTRO";
         btnAccionVideo.className = "btn btn-m";
 
         cronometroGuillotinaC3D = setTimeout(function() {
-            // Cae la guillotina: destruimos el link para cortar audio/video y tapamos
             iframe.src = "";
             iframe.style.display = "none";
             overlayMuro.classList.remove('hidden');
-        }, 30000); // 30 Segundos exactos
-    }
-
-    const modal = document.getElementById('modal-cinema-play');
-    modal.classList.remove('hidden');
-    modal.style.display = "block";
-}
-
-function desviarAPagoCurso() {
-    if(!cursoActivoCinema) return;
-    
-    if (cursoActivoCinema.accion === "GRUPAL") {
-        const nombreUser = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Integrante";
-        const mensajeWA = `¡Hola Coach! Me interesa participar en la sesión grupal del curso:\n\n🎥 *Curso:* ${cursoActivoCinema.nombre}\n🔑 *SKU:* ${cursoActivoCinema.sku}\n\nCoordinemos el evento y los accesos.`;
-        window.open(`https://wa.me/56976003402?text=${encodeURIComponent(mensajeWA)}`, '_blank');
-        cerrarModalCinemaPlay();
-    } else {
-        // Caso Venta: Si tiene link en el Excel, lo manda; si no, levanta error
-        if(cursoActivoCinema.linkPago && cursoActivoCinema.linkPago.trim() !== "" && cursoActivoCinema.linkPago !== "#") {
-            // Congelamos variables comerciales por si el checkout causa redirección
-            localStorage.setItem('kairo_ecommerce_sku', cursoActivoCinema.sku);
-            localStorage.setItem('kairo_ecommerce_nombre', cursoActivoCinema.nombre);
-            localStorage.setItem('kairo_ecommerce_tipo', "CURSOS");
-            if(sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
-            
-            cerrarModalCinemaPlay();
-            window.location.href = cursoActivoCinema.linkPago.trim();
-        } else {
-            notify("Kairo Alerta: Este curso premium no tiene un link de MercadoPago configurado en la columna M.");
-        }
+        }, 30000); 
     }
 }
 
@@ -7916,7 +8050,9 @@ function cerrarModalCinemaPlay() {
     document.getElementById('modal-cinema-play').style.display = 'none';
     document.getElementById('modulo-cursos-netflix').classList.remove('blur-effect');
     cursoActivoCinema = null;
+    window.cursoActivoVideos = [];
 }
+        
 
 function solicitarCrearCurso() {
     const nombre = document.getElementById('cta-curso-nombre').value.trim();
