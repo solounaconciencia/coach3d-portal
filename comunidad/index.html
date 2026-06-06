@@ -3357,6 +3357,7 @@
 function kairoMessage({ mensaje, tipo = 'alerta', icon = '🛡️' }) {
     return new Promise((resolve) => {
         const modal = document.getElementById('custom-alert');
+        document.body.appendChild(modal); // 🛡️ ESCUDO: Saca la alerta del fondo borroso
         const txt = document.getElementById('alert-message');
         const btnContainer = document.getElementById('alert-buttons');
         const iconContainer = document.getElementById('alert-icon');
@@ -3912,6 +3913,7 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           document.getElementById('main-content').classList.add('blur-effect');
           const modalAlerta = document.getElementById('modal-alerta-clave');
           if (modalAlerta) {
+              document.body.appendChild(modalAlerta); // 🛡️ ESCUDO: Saca la alerta del fondo borroso
               modalAlerta.classList.remove('hidden');
               modalAlerta.style.setProperty('display', 'block', 'important');
               modalAlerta.style.setProperty('visibility', 'visible', 'important');
@@ -4067,6 +4069,7 @@ function abrirPerfil() {
   
   // 2. Activar el modal
   const modal = document.getElementById('modal-perfil');
+  document.body.appendChild(modal); // 🛡️ ESCUDO: Saca el perfil del fondo borroso
   modal.classList.remove('hidden');
   modal.style.display = 'block'; // Fuerza la aparición
 
@@ -4267,6 +4270,7 @@ function iniciarKairo() {
     // 2. Localizar y mostrar (Aseguramos con las dos formas)
 
     const modal = document.getElementById('modal-verificacion');
+    document.body.appendChild(modal); // 🛡️ ESCUDO: Saca el PIN del fondo borroso
 
     modal.classList.remove('hidden'); // Quita la clase de ocultar
 
