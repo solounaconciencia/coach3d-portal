@@ -116,12 +116,17 @@ button{ padding:6px 10px; cursor:pointer; }
         <input type="hidden" id="ci_id">
         <p><strong>Para:</strong> <span id="ci_correo_txt"></span></p>
         <input type="hidden" id="ci_correo">
+        
+        <label style="font-size:12px; font-weight:bold;">Remitente (Aparecerá en su bandeja):</label>
+        <input type="text" id="ci_remitente" placeholder="Ej: Diego de Coach3D" style="width:90%; padding:8px; margin-bottom:10px;">
+        
         <input type="text" id="ci_asunto" placeholder="Asunto" style="width:90%; padding:8px; margin-bottom:10px;">
         <textarea id="ci_mensaje" placeholder="Aplica aquí tu texto persuasivo..." style="width:90%; padding:8px; margin-bottom:15px; height:100px;"></textarea>
-        <button onclick="enviarCorreoIndividual()" style="background:#7f8c8d; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Añadir a Cola de Envío</button>
+        <button onclick="enviarCorreoIndividual()" style="background:#7f8c8d; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:4px;">Añadir a Cola de Envío</button>
     </div>
 </div>
 
+<!-- Modal Correo Masivo -->
 <div id="modalCorreoMasivo" class="modal">
     <div class="modal-content" style="max-width: 600px;">
         <span class="close-btn" onclick="document.getElementById('modalCorreoMasivo').style.display='none'">X</span>
@@ -139,6 +144,9 @@ button{ padding:6px 10px; cursor:pointer; }
             </label>
             <div id="cm_lista_destinatarios"></div>
         </div>
+
+        <label style="font-size:12px; font-weight:bold;">Remitente (Aparecerá en su bandeja):</label>
+        <input type="text" id="cm_remitente" placeholder="Ej: Equipo Coach3D" style="width:90%; padding:8px; margin-bottom:10px;">
 
         <input type="text" id="cm_asunto" placeholder="Asunto" style="width:90%; padding:8px; margin-bottom:10px;">
         <textarea id="cm_mensaje" placeholder="Mensaje base para todos..." style="width:90%; padding:8px; margin-bottom:15px; height:100px;"></textarea>
@@ -420,6 +428,8 @@ function prepararCorreoIndividual(id, correo) {
     document.getElementById('ci_id').value = id;
     document.getElementById('ci_correo').value = correo;
     document.getElementById('ci_correo_txt').innerText = correo;
+    
+    document.getElementById('ci_remitente').value = "Diego de Coach3D"; // Por defecto
     document.getElementById('ci_asunto').value = "";
     document.getElementById('ci_mensaje').value = "";
     document.getElementById('modalCorreoIndividual').style.display = 'flex';
@@ -428,11 +438,12 @@ function prepararCorreoIndividual(id, correo) {
 function enviarCorreoIndividual() {
     const id = document.getElementById('ci_id').value;
     const correo = document.getElementById('ci_correo').value;
+    const remitente = document.getElementById('ci_remitente').value;
     const asunto = document.getElementById('ci_asunto').value;
     const mensaje = document.getElementById('ci_mensaje').value;
 
-    if(!asunto || !mensaje) {
-        alert("El asunto y el mensaje son obligatorios.");
+    if(!asunto || !mensaje || !remitente) {
+        alert("El remitente, el asunto y el mensaje son obligatorios.");
         return;
     }
 
@@ -444,6 +455,7 @@ function enviarCorreoIndividual() {
             action: "queueEmail",
             prospectoId: id,
             correo: correo,
+            remitente: remitente,
             asunto: asunto,
             mensaje: mensaje
         })
@@ -456,21 +468,18 @@ function enviarCorreoIndividual() {
     .catch(error => console.log("Error:", error));
 }
 
-
-// --- FUNCIONES CORREO MASIVO ---
 function modalCorreoMasivo() {
+    document.getElementById('cm_remitente').value = "Equipo Coach3D Latam"; // Por defecto
     document.getElementById('cm_asunto').value = "";
     document.getElementById('cm_mensaje').value = "";
     document.getElementById('cm_seleccionar_todos').checked = false;
     
-    // Llenamos el filtro desplegable con tus columnas actuales
     const selectCol = document.getElementById('cm_filtro_columna');
     selectCol.innerHTML = '<option value="ALL">Todas las Columnas</option>';
     columnas.sort((a,b) => a.orden - b.orden).forEach(col => {
         selectCol.innerHTML += `<option value="${col.id}">${col.nombre}</option>`;
     });
 
-    // Dibujamos la lista inicial de checkboxes
     filtrarListaCorreos(); 
     document.getElementById('modalCorreoMasivo').style.display = 'flex';
 }
@@ -478,12 +487,10 @@ function modalCorreoMasivo() {
 function filtrarListaCorreos() {
     const colId = document.getElementById('cm_filtro_columna').value;
     const contenedor = document.getElementById('cm_lista_destinatarios');
-    contenedor.innerHTML = ""; // Limpiamos la lista
+    contenedor.innerHTML = ""; 
     document.getElementById('cm_seleccionar_todos').checked = false;
 
-    // Filtramos solo los que tienen correo válido y están activos
     prospectos.filter(p => p.correo && p.correo.trim() !== "" && p.correo !== "undefined" && p.activo !== false).forEach(p => {
-        // Si hay una columna seleccionada y no coincide, saltamos al siguiente
         if(colId !== "ALL" && String(p.estadoId) !== String(colId)) return;
         
         contenedor.innerHTML += `
@@ -496,21 +503,20 @@ function filtrarListaCorreos() {
 }
 
 function toggleTodosCorreos(source) {
-    // Si marcamos "Seleccionar todos", marcamos todos los checkboxes visibles
     const checkboxes = document.querySelectorAll('.cm_checkbox_prospecto');
     checkboxes.forEach(cb => cb.checked = source.checked);
 }
 
 function enviarCorreoMasivo() {
+    const remitente = document.getElementById('cm_remitente').value;
     const asunto = document.getElementById('cm_asunto').value;
     const mensaje = document.getElementById('cm_mensaje').value;
 
-    if(!asunto || !mensaje) {
-        alert("El asunto y el mensaje son obligatorios.");
+    if(!asunto || !mensaje || !remitente) {
+        alert("El remitente, el asunto y el mensaje son obligatorios.");
         return;
     }
 
-    // Recolectamos SOLAMENTE los que el usuario marcó con el check
     const checkboxes = document.querySelectorAll('.cm_checkbox_prospecto:checked');
     const destinatarios = Array.from(checkboxes).map(cb => ({
         id: cb.value,
@@ -528,6 +534,7 @@ function enviarCorreoMasivo() {
         method: 'POST',
         body: JSON.stringify({
             action: "queueBulkEmail",
+            remitente: remitente,
             asunto: asunto,
             mensaje: mensaje,
             destinatarios: destinatarios
