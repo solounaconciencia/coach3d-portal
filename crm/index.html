@@ -38,7 +38,8 @@ button{ padding:6px 10px; cursor:pointer; }
     <button onclick="modalNuevaColumna()" style="background:#3498db; color:white; border:none; border-radius:5px;">+ Nueva Columna</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
     <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes</button>
-    <button onclick="toggleGuion()" style="background:#8e44ad; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🎙️ Ver Guion (Teleprompter)</button>
+    <button onclick="toggleTeleprompter('cajaGuionFase2')" style="background:#8e44ad; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🎙️ Guion Fase 2 (Audio)</button>
+    <button onclick="toggleTeleprompter('cajaGuionCierre')" style="background:#2c3e50; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💻 Guion Videollamada (Cierre)</button>
 </div>
 </header>
 
@@ -70,7 +71,29 @@ Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber 
         </div>
     </div>
 </div>
-    
+
+<div id="cajaGuionFase2" style="display:none; position:fixed; bottom:20px; right:20px; width:340px; background:white; border-left:5px solid #8e44ad; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; border-radius:8px; flex-direction:column;">
+    <div style="background:#ecf0f1; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:#2c3e50; font-size:12px;">🎙️ Guion Fase 2 (Nota de Voz)</strong>
+        <span onclick="toggleTeleprompter('cajaGuionFase2')" style="cursor:pointer; font-weight:bold; color:#e74c3c; font-size:16px;">X</span>
+    </div>
+    <div style="padding:15px;">
+        <textarea id="txtGuionFase2" style="width:100%; height:180px; border:none; resize:none; font-size:13px; font-family:Arial; line-height:1.4; outline:none; color:#34495e;" onchange="guardarConfigAuto('guion_fase2', this.value, 'statusF2')"></textarea>
+        <div style="text-align:right; margin-top:5px;"><small style="color:#7f8c8d; font-style:italic;" id="statusF2">Autoguardado habilitado.</small></div>
+    </div>
+</div>
+
+<div id="cajaGuionCierre" style="display:none; position:fixed; bottom:20px; right:380px; width:340px; background:white; border-left:5px solid #2c3e50; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; border-radius:8px; flex-direction:column;">
+    <div style="background:#ecf0f1; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:#2c3e50; font-size:12px;">💻 Guion Videollamada (Precios)</strong>
+        <span onclick="toggleTeleprompter('cajaGuionCierre')" style="cursor:pointer; font-weight:bold; color:#e74c3c; font-size:16px;">X</span>
+    </div>
+    <div style="padding:15px;">
+        <textarea id="txtGuionCierre" style="width:100%; height:180px; border:none; resize:none; font-size:13px; font-family:Arial; line-height:1.4; outline:none; color:#34495e;" onchange="guardarConfigAuto('guion_cierre', this.value, 'statusCierre')"></textarea>
+        <div style="text-align:right; margin-top:5px;"><small style="color:#7f8c8d; font-style:italic;" id="statusCierre">Autoguardado habilitado.</small></div>
+    </div>
+</div>
+
 <div id="kanban"></div>
     
 <div id="modalDetalle" class="modal">
@@ -189,15 +212,26 @@ Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber 
 
 <!-- Modal Ajustes -->
 <div id="modalAjustes" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 550px;">
         <span class="close-btn" onclick="document.getElementById('modalAjustes').style.display='none'">X</span>
-        <h2>⚙️ Ajustes del Sistema</h2>
+        <h2>⚙️ Ajustes de Campaña</h2>
+        <p style="font-size:11px; color:#7f8c8d; margin-bottom:15px;">En todas las plantillas puedes usar los comodines: <b>{nombre}</b> y <b>{negocio}</b>.</p>
         
-        <label style="font-size:12px; font-weight:bold;">Plantilla WhatsApp (Fase 1):</label>
-        <p style="font-size:11px; color:#7f8c8d;">Usa <b>{nombre}</b> para el contacto y <b>{negocio}</b> para el local.</p>
-        <textarea id="ajuste_wa_template" style="width:90%; padding:8px; margin-bottom:15px; height:120px;"></textarea>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+            <label style="font-size:12px; font-weight:bold; color:#2c3e50;">1. Mensaje Rompehielo (Fase 1):</label>
+            <textarea id="ajuste_msg_f1" style="width:100%; padding:6px; margin-bottom:12px; height:70px; font-size:12px;"></textarea>
+            
+            <label style="font-size:12px; font-weight:bold; color:#8e44ad;">2. Mensaje Envío Encuesta (Fase 3):</label>
+            <textarea id="ajuste_msg_f3" style="width:100%; padding:6px; margin-bottom:12px; height:70px; font-size:12px;"></textarea>
+            
+            <label style="font-size:12px; font-weight:bold; color:#e67e22;">3. Mensaje Envío Prototipo (Fase 5):</label>
+            <textarea id="ajuste_msg_f5" style="width:100%; padding:6px; margin-bottom:12px; height:70px; font-size:12px;"></textarea>
+            
+            <label style="font-size:12px; font-weight:bold; color:#7f8c8d;">4. Mensaje Recordatorio Cita (Fase 6):</label>
+            <textarea id="ajuste_msg_f6" style="width:100%; padding:6px; margin-bottom:15px; height:70px; font-size:12px;"></textarea>
+        </div>
         
-        <button onclick="guardarAjustes()" style="background:#2ecc71; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:4px;">Guardar Ajustes</button>
+        <button onclick="guardarAjustesMaestros()" style="background:#2ecc71; color:white; border:none; padding:12px; width:100%; cursor:pointer; border-radius:4px; font-weight:bold;">Guardar Configuración General</button>
     </div>
 </div>
 
@@ -223,30 +257,47 @@ const API = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8
 
 let columnas = [];
 let prospectos = [];
-let waTemplateGlobal = "Hola {nombre}. Soy Diego, desarrollador independiente. Vengo siguiendo el trabajo de {negocio} acá en Cauquenes y veo mucho potencial. Estoy lanzando una iniciativa llamada Coach3D para digitalizar a solo 15 negocios de la zona. ¿Me permites enviarte un audio corto contándote de qué se trata?";
+let plantillasWA = {
+    f1: "Hola {nombre}. Soy Diego, desarrollador independiente. Vengo siguiendo el trabajo de {negocio} acá en Cauquenes y veo mucho potencial. Estoy lanzando una iniciativa llamada Coach3D para digitalizar a solo 10 negocios de la zona. ¿Me permites enviarte un audio corto contándote de qué se trata?",
+    f3: "¡Excelente {nombre}! Te dejo aquí el link de nuestra plataforma para que Kairo analice tu negocio: coach3dlatam.app/campañadigitalcauquenes . Son 7 preguntas rápidas, complétalo y nos ponemos a trabajar.",
+    f5: "¡Hola {nombre}! Ya tengo lista la Maqueta Digital Premium de {negocio}. Quedó espectacular. Mírala desde tu celular en este enlace privado. Cuéntame si tienes 15 minutos mañana para una videollamada y explicarte la activación.",
+    f6: "Hola {nombre}, te recuerdo que tenemos agendada nuestra videollamada para revisar los planes de activación de la plataforma de {negocio}. ¡Nos vemos en breve!"
+};
 
 async function iniciar(){
     try{
         columnas = await fetch(API + "?action=getColumnas").then(r=>r.json());
         prospectos = await fetch(API + "?action=getProspectos").then(r=>r.json());
         
-        // Descargamos la configuración
         const configData = await fetch(API + "?action=getConfig").then(r=>r.json());
-        if(configData["wa_template"]) {
-            waTemplateGlobal = configData["wa_template"];
+        
+        // Carga de mensajes de WhatsApp
+        if(configData["msg_f1"]) plantillasWA.f1 = configData["msg_f1"];
+        if(configData["msg_f3"]) plantillasWA.f3 = configData["msg_f3"];
+        if(configData["msg_f5"]) plantillasWA.f5 = configData["msg_f5"];
+        if(configData["msg_f6"]) plantillasWA.f6 = configData["msg_f6"];
+        
+        // Carga de Guiones de Teleprompter
+        if(configData["guion_fase2"]) {
+            document.getElementById("txtGuionFase2").value = configData["guion_fase2"];
+        } else {
+            document.getElementById("txtGuionFase2").value = "¡Hola [Nombre], gracias por responder!... (Edita este guion desde aquí)";
+        }
+        
+        if(configData["guion_cierre"]) {
+            document.getElementById("txtGuionCierre").value = configData["guion_cierre"];
+        } else {
+            document.getElementById("txtGuionCierre").value = "Mira [Nombre], una automatización así cuesta más de un millón... (Edita este guion desde aquí)";
         }
 
-        if(configData["guion_audio"]) {
-            document.getElementById("textoGuion").value = configData["guion_audio"];
-        }
-
+        const prospectosActivos = prospectos.filter(p => p.activo !== false);
         if(document.getElementById("dash_total")) {
-            const prospectosActivos = prospectos.filter(p => p.activo !== false);
             document.getElementById("dash_total").innerText = prospectosActivos.length;
         }
+
         renderizar();
     }catch(error){
-        console.log(error);
+        console.error(error);
         alert("Error conectando con Apps Script");
     }
 }
@@ -329,7 +380,7 @@ function renderizar(){
                 <div style="margin-top:2px;">${chipsEtiquetas}</div>
             </div>
             <div style="margin-top: 12px; display: flex; gap: 5px; flex-wrap: wrap;">
-                <button onclick="wa('${p.whatsapp}', '${p.contacto}', '${p.negocio}')" style="background:#25D366; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">WhatsApp</button>
+                <button onclick="wa('${p.whatsapp}', '${p.contacto}', '${p.negocio}', '${p.estadoId}')" style="background:#25D366; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">WhatsApp</button>
                 <button onclick="prepararCorreoIndividual('${p.id}', '${p.correo}')" style="background:#7f8c8d; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Correo</button>
                 <button onclick="moverProspecto('${p.id}')" style="background:#f39c12; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Mover</button>
                 <button onclick="abrirSeguimiento('${p.id}')" style="background:#34495e; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Seguimiento</button>
@@ -361,17 +412,32 @@ function renderizar(){
     }
 }
 
-function wa(numero, contacto, negocio){
+function wa(numero, contacto, negocio, estadoId){
     let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
     let nomNegocio = (negocio && negocio !== "undefined" && negocio !== "") ? negocio : "tu negocio";
     
-    // Reemplazamos las etiquetas {nombre} y {negocio} por los datos reales
-    let mensajeBase = waTemplateGlobal.replace("{nombre}", nombre).replace("{negocio}", nomNegocio);
+    let mensajeBase = "";
+    let columna = String(estadoId);
+
+    // Mapeo Inteligente basado en el ID o Nombre de la columna
+    if (columna === "1" || columna.includes("Contactar") || columna.includes("FASE 1")) { 
+        mensajeBase = plantillasWA.f1;
+    } else if (columna === "3" || columna.includes("Audio") || columna.includes("ESPERANDO") || columna.includes("FASE 3")) { 
+        mensajeBase = plantillasWA.f3;
+    } else if (columna === "5" || columna.includes("Prototipo") || columna.includes("ENVIADO") || columna.includes("FASE 5")) { 
+        mensajeBase = plantillasWA.f5;
+    } else if (columna === "6" || columna.includes("Agendado") || columna.includes("FASE 6")) { 
+        mensajeBase = plantillasWA.f6;
+    } else {
+        mensajeBase = `Hola ${nombre}, te contacto desde Coach3D respecto a los avances de ${nomNegocio}.`;
+    }
     
-    let mensajeFinal = prompt("Edita el mensaje antes de enviarlo por WhatsApp:", mensajeBase);
+    // Reemplazamos los comodines por los datos reales
+    let mensajeFinal = mensajeBase.replace(/{nombre}/g, nombre).replace(/{negocio}/g, nomNegocio);
     
-    if(mensajeFinal !== null){
-        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(mensajeFinal));
+    let promptFinal = prompt("Revisa el mensaje automatizado antes de disparar:", mensajeFinal);
+    if(promptFinal !== null){
+        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(promptFinal));
     }
 }
 
@@ -711,71 +777,63 @@ function guardarSeguimiento() {
     .catch(error => console.log("Error:", error));
 }
 
-function abrirAjustes() {
-    document.getElementById('ajuste_wa_template').value = waTemplateGlobal;
-    document.getElementById('modalAjustes').style.display = 'flex';
+// --- FUNCIONES DE TELEPROMPTER Y AJUSTES MAESTROS ---
+function toggleTeleprompter(idCaja) {
+    const caja = document.getElementById(idCaja);
+    caja.style.display = (caja.style.display === "none" || caja.style.display === "") ? "flex" : "none";
 }
 
-function guardarAjustes() {
-    const nuevoTemplate = document.getElementById('ajuste_wa_template').value;
+function guardarConfigAuto(clave, valor, idStatus) {
+    document.getElementById(idStatus).innerText = "Guardando...";
+    document.getElementById(idStatus).style.color = "#f39c12";
     
-    if(!nuevoTemplate) {
-        alert("La plantilla no puede estar vacía.");
-        return;
-    }
-
-    document.getElementById('modalAjustes').style.display = 'none';
-    waTemplateGlobal = nuevoTemplate; // Actualizamos localmente rápido
-
     fetch(API, {
         method: 'POST',
-        body: JSON.stringify({
-            action: "updateConfig",
-            clave: "wa_template",
-            valor: nuevoTemplate
-        })
-    })
-    .then(r => r.json())
-    .then(res => {
-        if(res.success) alert("¡Ajustes guardados correctamente!");
-        else alert("Error al guardar la configuración.");
-    })
-    .catch(error => console.log("Error:", error));
-}
-
-// --- FUNCIONES DEL TELEPROMPTER ---
-function toggleGuion() {
-    const caja = document.getElementById("cajaGuion");
-    // Alterna entre mostrar u ocultar la caja
-    caja.style.display = caja.style.display === "none" || caja.style.display === "" ? "flex" : "none";
-}
-
-function guardarGuionAuto() {
-    const nuevoGuion = document.getElementById("textoGuion").value;
-    document.getElementById("guionStatus").innerText = "Guardando en la nube...";
-    document.getElementById("guionStatus").style.color = "#f39c12";
-
-    fetch(API, {
-        method: 'POST',
-        body: JSON.stringify({
-            action: "updateConfig",
-            clave: "guion_audio",
-            valor: nuevoGuion
-        })
+        body: JSON.stringify({ action: "updateConfig", clave: clave, valor: valor })
     })
     .then(r => r.json())
     .then(res => {
         if(res.success) {
-            document.getElementById("guionStatus").innerText = "¡Guardado exitoso!";
-            document.getElementById("guionStatus").style.color = "#2ecc71";
-            setTimeout(() => {
-                document.getElementById("guionStatus").innerText = "Si editas el texto, se guarda solo.";
-                document.getElementById("guionStatus").style.color = "#7f8c8d";
-            }, 3000);
+            document.getElementById(idStatus).innerText = "¡Guardado en la nube!";
+            document.getElementById(idStatus).style.color = "#2ecc71";
         }
-    })
-    .catch(error => console.log("Error guardando guion:", error));
+    }).catch(e => console.error(e));
 }
+
+function abrirAjustes() {
+    document.getElementById('ajuste_msg_f1').value = plantillasWA.f1;
+    document.getElementById('ajuste_msg_f3').value = plantillasWA.f3;
+    document.getElementById('ajuste_msg_f5').value = plantillasWA.f5;
+    document.getElementById('ajuste_msg_f6').value = plantillasWA.f6;
+    document.getElementById('modalAjustes').style.display = 'flex';
+}
+
+function guardarAjustesMaestros() {
+    document.getElementById('modalAjustes').style.display = 'none';
+    
+    const claves = ["msg_f1", "msg_f3", "msg_f5", "msg_f6"];
+    const inputs = ["ajuste_msg_f1", "ajuste_msg_f3", "ajuste_msg_f5", "ajuste_msg_f6"];
+    
+    inputs.forEach((id, index) => {
+        const val = document.getElementById(id).value;
+        if(index===0) plantillasWA.f1 = val;
+        if(index===1) plantillasWA.f3 = val;
+        if(index===2) plantillasWA.f5 = val;
+        if(index===3) plantillasWA.f6 = val;
+        
+        fetch(API, {
+            method: 'POST',
+            body: JSON.stringify({ action: "updateConfig", clave: claves[index], valor: val })
+        }).catch(e => console.error(e));
+    });
+    alert("¡Ecosistema de mensajes guardado y sincronizado!");
+}
+
+
+
+
+
+
 
 </script>
 
