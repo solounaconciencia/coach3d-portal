@@ -270,12 +270,20 @@
 
             <div class="step" id="step7">
                 <h3>7. El Toque Final (Imágenes)</h3>
-                <p>Si lo deseas, envíanos tu Logo y un par de fotos a nuestro WhatsApp oficial: <b>+56 9 XXXX XXXX</b>.</p>
-                <p style="color:#cbd5e1; font-size:0.9rem; margin-bottom: 20px;"><i>(Si no tienes ahora, no te preocupes, Kairo usará fotos profesionales de ejemplo).</i></p>
+                <p>Sube tu Logo y una foto de tu producto para personalizar tu maqueta al máximo.</p>
+                
+                <label style="font-size:0.9rem; color:#cbd5e1; display:block; margin-top:15px; margin-bottom:5px;">Tu Logo (Opcional):</label>
+                <input type="file" id="ans_logo" accept="image/*" style="padding:10px; margin-bottom:10px; font-size: 0.9rem;">
+
+                <label style="font-size:0.9rem; color:#cbd5e1; display:block; margin-bottom:5px;">Foto de Producto Estrella (Opcional):</label>
+                <input type="file" id="ans_foto" accept="image/*" style="padding:10px; margin-bottom:10px; font-size: 0.9rem;">
+
+                <p style="color:#cbd5e1; font-size:0.75rem; margin-bottom: 20px;"><i>(Tamaño máx: 2MB por foto. Si no tienes, Kairo usará fotos premium de ejemplo).</i></p>
+                
                 <p style="color:var(--accent); font-weight:bold;">¿Listo para ver la magia?</p>
                 <div class="wizard-controls">
                     <button class="btn-prev" onclick="nextStep(6)">Atrás</button>
-                    <button class="btn-next" style="background:#2ecc71; color:white;" onclick="enviarEncuestaBackend()">🚀 Procesar mi Prototipo</button>
+                    <button class="btn-next" style="background:#2ecc71; color:white;" onclick="procesarArchivosYEnviar()">🚀 Procesar mi Prototipo</button>
                 </div>
             </div>
 
@@ -328,11 +336,49 @@
         }
     }
 
-    function enviarEncuestaBackend() {
+    // Convertidor de archivos a código seguro Base64
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+
+    function resetStep7() {
+        document.getElementById('loader-final').style.display = 'none';
+        document.getElementById('step7').classList.add('active');
+        document.getElementById('progress-text').style.display = 'block';
+    }
+
+    async function procesarArchivosYEnviar() {
         document.getElementById('step7').classList.remove('active');
         document.getElementById('loader-final').style.display = 'block';
         document.getElementById('progress-text').style.display = 'none';
 
+        let logoData = "";
+        let fotoData = "";
+
+        const logoFile = document.getElementById('ans_logo').files[0];
+        const fotoFile = document.getElementById('ans_foto').files[0];
+
+        // Validaciones de peso (2MB = 2000000 bytes)
+        if(logoFile) {
+            if(logoFile.size > 2000000) { 
+                alert("Tu Logo pesa demasiado. Intenta con una imagen más ligera (Máx 2MB)."); 
+                return resetStep7(); 
+            }
+            logoData = await toBase64(logoFile);
+        }
+        
+        if(fotoFile) {
+            if(fotoFile.size > 2000000) { 
+                alert("La foto del producto pesa demasiado. Intenta con una más ligera (Máx 2MB)."); 
+                return resetStep7(); 
+            }
+            fotoData = await toBase64(fotoFile);
+        }
+
+        // Empaquetamos todo
         const data = {
             action: "guardarEncuesta",
             negocio: document.getElementById('ans1').value || 'N/A',
@@ -340,10 +386,12 @@
             colores: document.getElementById('ans3').value || 'N/A',
             productos: document.getElementById('ans4').value || 'N/A',
             whatsapp: document.getElementById('ans5').value || 'N/A',
-            redes: document.getElementById('ans6').value || 'N/A'
+            redes: document.getElementById('ans6').value || 'N/A',
+            logoFile: logoData,
+            fotoFile: fotoData
         };
 
-        // Enviar invisiblemente a tu Google Sheets / Correo
+        // Enviamos invisiblemente a tu Google Sheets / Correo
         fetch(URL_APPS_SCRIPT, {
             method: 'POST',
             body: JSON.stringify(data)
@@ -356,8 +404,7 @@
         .catch(err => {
             console.error(err);
             alert("Hubo un error de conexión, pero no te preocupes, Kairo lo está solucionando.");
-            document.getElementById('loader-final').style.display = 'none';
-            document.getElementById('step7').classList.add('active');
+            resetStep7();
         });
     }
 
