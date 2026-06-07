@@ -37,6 +37,7 @@ button{ padding:6px 10px; cursor:pointer; }
     <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
     <button onclick="modalNuevaColumna()" style="background:#3498db; color:white; border:none; border-radius:5px;">+ Nueva Columna</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
+    <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes</button>
 </div>
 </header>
 
@@ -168,6 +169,20 @@ button{ padding:6px 10px; cursor:pointer; }
     </div>
 </div>
 
+<!-- Modal Ajustes -->
+<div id="modalAjustes" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalAjustes').style.display='none'">X</span>
+        <h2>⚙️ Ajustes del Sistema</h2>
+        
+        <label style="font-size:12px; font-weight:bold;">Plantilla WhatsApp (Fase 1):</label>
+        <p style="font-size:11px; color:#7f8c8d;">Usa <b>{nombre}</b> para el contacto y <b>{negocio}</b> para el local.</p>
+        <textarea id="ajuste_wa_template" style="width:90%; padding:8px; margin-bottom:15px; height:120px;"></textarea>
+        
+        <button onclick="guardarAjustes()" style="background:#2ecc71; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:4px;">Guardar Ajustes</button>
+    </div>
+</div>
+
 <div id="modalSeguimiento" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="document.getElementById('modalSeguimiento').style.display='none'">X</span>
@@ -186,16 +201,27 @@ button{ padding:6px 10px; cursor:pointer; }
     
 <script>
 // ¡IMPORTANTE! Reemplaza este enlace por el nuevo que te dé Google Apps Script al publicar la versión corregida.
-const API = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";    
+const API = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";   
 
 let columnas = [];
 let prospectos = [];
+let waTemplateGlobal = "Hola {nombre}. Soy Diego, desarrollador independiente. Vengo siguiendo el trabajo de {negocio} acá en Cauquenes y veo mucho potencial. Estoy lanzando una iniciativa llamada Coach3D para digitalizar a solo 15 negocios de la zona. ¿Me permites enviarte un audio corto contándote de qué se trata?";
 
 async function iniciar(){
     try{
         columnas = await fetch(API + "?action=getColumnas").then(r=>r.json());
         prospectos = await fetch(API + "?action=getProspectos").then(r=>r.json());
-        document.getElementById("total") ? document.getElementById("total").innerText = prospectos.length : null;
+        
+        // Descargamos la configuración
+        const configData = await fetch(API + "?action=getConfig").then(r=>r.json());
+        if(configData["wa_template"]) {
+            waTemplateGlobal = configData["wa_template"];
+        }
+
+        if(document.getElementById("dash_total")) {
+            const prospectosActivos = prospectos.filter(p => p.activo !== false);
+            document.getElementById("dash_total").innerText = prospectosActivos.length;
+        }
         renderizar();
     }catch(error){
         console.log(error);
@@ -317,7 +343,8 @@ function wa(numero, contacto, negocio){
     let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
     let nomNegocio = (negocio && negocio !== "undefined" && negocio !== "") ? negocio : "tu negocio";
     
-    let mensajeBase = `Hola ${nombre}. Soy Diego, arquitecto de software y director de Coach3D. Vengo siguiendo el trabajo de ${nomNegocio} en Cauquenes y me gusta mucho lo que hacen. Estoy lanzando un programa preferencial de digitalización exclusivo para 10 negocios locales y pensé en ustedes. ¿Me permites enviarte un audio corto contándote cómo esto les ayudaría a recibir clientes en automático?`;
+    // Reemplazamos las etiquetas {nombre} y {negocio} por los datos reales
+    let mensajeBase = waTemplateGlobal.replace("{nombre}", nombre).replace("{negocio}", nomNegocio);
     
     let mensajeFinal = prompt("Edita el mensaje antes de enviarlo por WhatsApp:", mensajeBase);
     
@@ -658,6 +685,38 @@ function guardarSeguimiento() {
         } else {
             alert("Error al guardar el seguimiento.");
         }
+    })
+    .catch(error => console.log("Error:", error));
+}
+
+function abrirAjustes() {
+    document.getElementById('ajuste_wa_template').value = waTemplateGlobal;
+    document.getElementById('modalAjustes').style.display = 'flex';
+}
+
+function guardarAjustes() {
+    const nuevoTemplate = document.getElementById('ajuste_wa_template').value;
+    
+    if(!nuevoTemplate) {
+        alert("La plantilla no puede estar vacía.");
+        return;
+    }
+
+    document.getElementById('modalAjustes').style.display = 'none';
+    waTemplateGlobal = nuevoTemplate; // Actualizamos localmente rápido
+
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "updateConfig",
+            clave: "wa_template",
+            valor: nuevoTemplate
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success) alert("¡Ajustes guardados correctamente!");
+        else alert("Error al guardar la configuración.");
     })
     .catch(error => console.log("Error:", error));
 }
