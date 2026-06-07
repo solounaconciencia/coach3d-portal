@@ -2,66 +2,20 @@
 <html lang="es">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Coach3D CRM</title>
 
 <style>
-
-body{
-    margin:0;
-    font-family:Arial;
-    background:#f4f4f4;
-}
-
-header{
-    background:white;
-    padding:20px;
-    box-shadow:0 2px 4px rgba(0,0,0,.1);
-}
-
-#kanban{
-    display:flex;
-    gap:15px;
-    overflow-x:auto;
-    padding:20px;
-}
-
-.columna{
-    min-width:300px;
-    border-radius:10px;
-    padding:10px;
-    color:white;
-}
-
-.tarjeta{
-    background:white;
-    color:black;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:10px;
-}
-
-button{
-    padding:6px 10px;
-    cursor:pointer;
-}
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    justify-content: center; align-items: center;
-}
-.modal-content {
-    background: white; padding: 20px; border-radius: 8px;
-    width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
-}
-.close-btn {
-    float: right; cursor: pointer; font-weight: bold; font-size: 1.2em;
-}
+body{ margin:0; font-family:Arial; background:#f4f4f4; }
+header{ background:white; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,.1); }
+#kanban{ display:flex; gap:15px; overflow-x:auto; padding:20px; }
+.columna{ min-width:300px; border-radius:10px; padding:10px; color:white; }
+.tarjeta{ background:white; color:black; padding:10px; border-radius:8px; margin-bottom:10px; }
+button{ padding:6px 10px; cursor:pointer; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+.modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+.close-btn { float: right; cursor: pointer; font-weight: bold; font-size: 1.2em; }
 </style>
 
 </head>
@@ -69,18 +23,14 @@ button{
 <body>
 
 <header>
-
 <h1>Coach3D CRM</h1>
 
 <div id="dashboard" style="display:flex; gap:15px; margin-bottom:15px; flex-wrap:wrap; background:#ecf0f1; padding:15px; border-radius:8px;">
-    
     <div style="background:white; padding:10px 15px; border-radius:5px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
         <div style="font-size:12px; color:#7f8c8d; text-transform:uppercase; font-weight:bold;">Total Prospectos</div>
         <div id="dash_total" style="font-size:24px; font-weight:bold; color:#2c3e50;">0</div>
     </div>
-    
     <div id="dash_columnas" style="display:flex; gap:15px; flex-wrap:wrap;"></div>
-
 </div>
 
 <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -88,7 +38,6 @@ button{
     <button onclick="modalNuevaColumna()" style="background:#3498db; color:white; border:none; border-radius:5px;">+ Nueva Columna</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
 </div>
-
 </header>
 
 <!-- Controles de Búsqueda y Filtros -->
@@ -104,7 +53,6 @@ button{
 </div>
 
 <div id="kanban"></div>
-
     
 <div id="modalDetalle" class="modal">
     <div class="modal-content">
@@ -140,7 +88,7 @@ button{
     </div>
 </div>
 
-    <div id="modalNuevoProspecto" class="modal">
+<div id="modalNuevoProspecto" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="document.getElementById('modalNuevoProspecto').style.display='none'">X</span>
         <h2>Nuevo Prospecto</h2>
@@ -161,7 +109,6 @@ button{
     </div>
 </div>
 
-<!-- Modal Correo Individual -->
 <div id="modalCorreoIndividual" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="document.getElementById('modalCorreoIndividual').style.display='none'">X</span>
@@ -175,7 +122,6 @@ button{
     </div>
 </div>
 
-<!-- Modal Correo Masivo -->
 <div id="modalCorreoMasivo" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="document.getElementById('modalCorreoMasivo').style.display='none'">X</span>
@@ -199,7 +145,6 @@ button{
     </div>
 </div>
 
-<!-- Modal Seguimiento -->
 <div id="modalSeguimiento" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="document.getElementById('modalSeguimiento').style.display='none'">X</span>
@@ -215,88 +160,42 @@ button{
         <button onclick="guardarSeguimiento()" style="background:#34495e; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Agendar Seguimiento</button>
     </div>
 </div>
-
     
 <script>
-
-const API =
-"https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";    
+// ¡IMPORTANTE! Reemplaza este enlace por el nuevo que te dé Google Apps Script al publicar la versión corregida.
+const API = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";    
 
 let columnas = [];
 let prospectos = [];
 
 async function iniciar(){
-
     try{
-
-        columnas =
-            await fetch(
-                API + "?action=getColumnas"
-            )
-            .then(r=>r.json());
-
-        prospectos =
-            await fetch(
-                API + "?action=getProspectos"
-            )
-            .then(r=>r.json());
-
-        document.getElementById(
-            "total"
-        ).innerText =
-            prospectos.length;
-
+        columnas = await fetch(API + "?action=getColumnas").then(r=>r.json());
+        prospectos = await fetch(API + "?action=getProspectos").then(r=>r.json());
+        document.getElementById("total") ? document.getElementById("total").innerText = prospectos.length : null;
         renderizar();
-
     }catch(error){
-
         console.log(error);
-
-        alert(
-            "Error conectando con Apps Script"
-        );
-
+        alert("Error conectando con Apps Script");
     }
-
 }
 
 function renderizar(){
-
-    const kanban =
-        document.getElementById(
-            "kanban"
-        );
-
+    const kanban = document.getElementById("kanban");
     kanban.innerHTML = "";
 
-    columnas
-    .sort((a,b)=>a.orden-b.orden)
-    .forEach(col=>{
+    columnas.sort((a,b)=>a.orden-b.orden).forEach(col=>{
+        const div = document.createElement("div");
+        div.className = "columna";
+        div.style.background = col.color;
+        div.innerHTML = `<h2>${col.nombre}</h2>`;
 
-        const div =
-            document.createElement(
-                "div"
-            );
-
-        div.className =
-            "columna";
-
-        div.style.background =
-            col.color;
-
-        div.innerHTML =
-            `<h2>${col.nombre}</h2>`;
-
-        // Leemos los controles de búsqueda y filtro
         const textoBusqueda = document.getElementById("buscadorGlobal") ? document.getElementById("buscadorGlobal").value.toLowerCase() : "";
         const valorPrioridad = document.getElementById("filtroPrioridad") ? document.getElementById("filtroPrioridad").value : "";
 
         prospectos
-        .filter(
-            p => String(p.estadoId) === String(col.id) && p.activo !== false
-        )
+        .filter(p => String(p.estadoId) === String(col.id) && p.activo !== false)
         .filter(p => {
-            // Filtro de Búsqueda Global
             if(textoBusqueda !== "") {
                 const datosProspecto = (
                     (p.negocio || "") + " " + 
@@ -308,34 +207,22 @@ function renderizar(){
                 ).toLowerCase();
                 if(!datosProspecto.includes(textoBusqueda)) return false;
             }
-            
-            // Filtro de Prioridad
             if(valorPrioridad !== "") {
-                // Si la prioridad de la tarjeta no coincide con lo seleccionado, la ocultamos
                 if(String(p.prioridad) !== String(valorPrioridad)) return false;
             }
-            
-            return true; // Si pasa todos los filtros, se dibuja
+            return true; 
         })
         .forEach(p=>{
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
+            const card = document.createElement("div");
             card.className = "tarjeta";
 
-            // 1. Lógica de Color de Prioridad
             let colorPrioridad = "transparent";
-            if(p.prioridad === "Alta") colorPrioridad = "#e74c3c"; // Rojo
-            else if(p.prioridad === "Media") colorPrioridad = "#f1c40f"; // Amarillo
-            else if(p.prioridad === "Baja") colorPrioridad = "#2ecc71"; // Verde
+            if(p.prioridad === "Alta") colorPrioridad = "#e74c3c"; 
+            else if(p.prioridad === "Media") colorPrioridad = "#f1c40f"; 
+            else if(p.prioridad === "Baja") colorPrioridad = "#2ecc71"; 
             
-            // Le aplicamos un borde lateral grueso a la tarjeta
             card.style.borderLeft = `5px solid ${colorPrioridad}`;
 
-            // 2. Lógica de Chips de Etiquetas
             let chipsEtiquetas = "";
             if(p.etiquetas && p.etiquetas.trim() !== "") {
                 p.etiquetas.split(",").forEach(tag => {
@@ -343,7 +230,6 @@ function renderizar(){
                 });
             }
 
-            // 3. Lógica de Alertas de Seguimiento (la que ya teníamos)
             let alertaSeguimiento = "";
             if(p.fechaproximaccion && p.fechaproximaccion !== "") {
                 const fechaSeg = new Date(p.fechaproximaccion);
@@ -360,7 +246,7 @@ function renderizar(){
                 }
             }
 
-            // 4. Dibujo Final de la Tarjeta
+            // CORREGIDO EL ERROR DE SINTAXIS (Comillas duplicadas eliminadas)
             card.innerHTML =
             `
             <div onclick="abrirModal('${p.id}')" style="cursor:pointer;" title="Clic para ver detalles y editar">
@@ -378,56 +264,40 @@ function renderizar(){
                 <button onclick="abrirSeguimiento('${p.id}')" style="background:#34495e; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Seguimiento</button>
             </div>
             `;
-            
-            `;
 
             div.appendChild(card);
-
         });
 
         kanban.appendChild(div);
+    });
 
-    });
-    // --- MOTOR DEL DASHBOARD ---
-    // 1. Contamos los totales activos
     const prospectosActivos = prospectos.filter(p => p.activo !== false);
-    document.getElementById("dash_total").innerText = prospectosActivos.length;
+    if(document.getElementById("dash_total")) {
+        document.getElementById("dash_total").innerText = prospectosActivos.length;
+    }
     
-    // 2. Limpiamos y contamos columna por columna
     const dashCol = document.getElementById("dash_columnas");
-    dashCol.innerHTML = "";
-    
-    columnas.sort((a,b)=>a.orden-b.orden).forEach(col => {
-        // Contamos cuántos prospectos pertenecen a esta columna
-        const count = prospectosActivos.filter(p => String(p.estadoId) === String(col.id)).length;
-        
-        // Dibujamos el cuadrito en el Dashboard con el color respectivo
-        dashCol.innerHTML += `
-        <div style="background:white; padding:10px 15px; border-radius:5px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-bottom: 4px solid ${col.color};">
-            <div style="font-size:12px; color:#7f8c8d; text-transform:uppercase; font-weight:bold;">${col.nombre}</div>
-            <div style="font-size:20px; font-weight:bold; color:#2c3e50;">${count}</div>
-        </div>`;
-    });
+    if(dashCol) {
+        dashCol.innerHTML = "";
+        columnas.sort((a,b)=>a.orden-b.orden).forEach(col => {
+            const count = prospectosActivos.filter(p => String(p.estadoId) === String(col.id)).length;
+            dashCol.innerHTML += `
+            <div style="background:white; padding:10px 15px; border-radius:5px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-bottom: 4px solid ${col.color};">
+                <div style="font-size:12px; color:#7f8c8d; text-transform:uppercase; font-weight:bold;">${col.nombre}</div>
+                <div style="font-size:20px; font-weight:bold; color:#2c3e50;">${count}</div>
+            </div>`;
+        });
+    }
 }
 
 function wa(numero, contacto){
-
-    // Si no hay contacto, usamos un término genérico amigable
     let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
-    
-    // Plantilla de neuroventas basada en tu reporte
     let mensajeBase = `Hola ${nombre}. Vi tu negocio y creo que puedo ayudarte a conseguir más clientes. ¿Te puedo contar?`;
-    
-    // Mostramos un modal nativo para permitir edición antes de enviar
     let mensajeFinal = prompt("Edita el mensaje antes de enviarlo por WhatsApp:", mensajeBase);
     
-    // Si el usuario no cancela el modal, abrimos WhatsApp con el texto codificado
     if(mensajeFinal !== null){
-        window.open(
-            "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensajeFinal)
-        );
+        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(mensajeFinal));
     }
-
 }
 
 iniciar();
@@ -453,7 +323,6 @@ function cerrarModal() {
     document.getElementById("modalDetalle").style.display = "none";
 }
 
-// --- FUNCIONES NUEVO PROSPECTO ---
 function modalNuevoProspecto() {
     document.getElementById('np_negocio').value = "";
     document.getElementById('np_contacto').value = "";
@@ -471,10 +340,8 @@ function guardarProspecto() {
         return;
     }
     
-    // Ocultamos el modal mientras procesa
     document.getElementById('modalNuevoProspecto').style.display = 'none';
     
-    // Enviamos los datos a Apps Script
     fetch(API, {
         method: 'POST',
         body: JSON.stringify({
@@ -487,7 +354,7 @@ function guardarProspecto() {
     .then(r => r.json())
     .then(res => {
         if(res.success){
-            iniciar(); // Recargamos el tablero automáticamente
+            iniciar(); 
         } else {
             alert("Error al guardar el prospecto.");
         }
@@ -495,13 +362,11 @@ function guardarProspecto() {
     .catch(error => console.log("Error:", error));
 }
 
-// --- FUNCIONES MOVER PROSPECTO ---
 function moverProspecto(id) {
     document.getElementById('mover_id').value = id;
     const select = document.getElementById('mover_destino');
-    select.innerHTML = ''; // Limpiamos opciones anteriores
+    select.innerHTML = ''; 
     
-    // Llenamos el select con las columnas dinámicas de tu BD
     columnas.sort((a,b) => a.orden - b.orden).forEach(col => {
         select.innerHTML += `<option value="${col.id}">${col.nombre}</option>`;
     });
@@ -513,10 +378,8 @@ function confirmarMovimiento() {
     const id = document.getElementById('mover_id').value;
     const destinoId = document.getElementById('mover_destino').value;
     
-    // Ocultamos el modal
     document.getElementById('modalMover').style.display = 'none';
 
-    // Enviamos la instrucción de cambio de columna a Apps Script
     fetch(API, {
         method: 'POST',
         body: JSON.stringify({
@@ -528,7 +391,7 @@ function confirmarMovimiento() {
     .then(r => r.json())
     .then(res => {
         if(res.success){
-            iniciar(); // Repintamos el tablero para que la tarjeta salte a su nueva columna
+            iniciar(); 
         } else {
             alert("Error al mover el prospecto.");
         }
@@ -536,7 +399,6 @@ function confirmarMovimiento() {
     .catch(error => console.log("Error:", error));
 }
 
- // --- FUNCIONES CORREO INDIVIDUAL ---
 function prepararCorreoIndividual(id, correo) {
     if(!correo || correo === "undefined" || correo.trim() === "") {
         alert("Este prospecto no tiene un correo registrado válido.");
@@ -581,7 +443,6 @@ function enviarCorreoIndividual() {
     .catch(error => console.log("Error:", error));
 }
 
-// --- FUNCIONES CORREO MASIVO ---
 function modalCorreoMasivo() {
     document.getElementById('cm_asunto').value = "";
     document.getElementById('cm_mensaje').value = "";
@@ -597,7 +458,6 @@ function enviarCorreoMasivo() {
         return;
     }
 
-    // Filtramos inteligentemente a quién enviarle (solo activos y con email)
     const destinatarios = prospectos
         .filter(p => p.correo && p.correo !== "undefined" && p.correo.trim() !== "" && p.activo !== false)
         .map(p => ({ id: p.id, correo: p.correo }));
@@ -626,10 +486,9 @@ function enviarCorreoMasivo() {
     .catch(error => console.log("Error:", error));
 }
 
-// --- FUNCIONES NUEVA COLUMNA ---
 function modalNuevaColumna() {
     document.getElementById('nc_nombre').value = "";
-    document.getElementById('nc_color').value = "#3498db"; // Azul por defecto
+    document.getElementById('nc_color').value = "#3498db"; 
     document.getElementById('modalNuevaColumna').style.display = 'flex';
 }
 
@@ -642,13 +501,10 @@ function guardarColumna() {
         return;
     }
 
-    // Ocultamos el modal
     document.getElementById('modalNuevaColumna').style.display = 'none';
 
-    // Calculamos el orden para ponerla al final
     const nuevoOrden = columnas.length > 0 ? Math.max(...columnas.map(c => c.orden)) + 1 : 1;
 
-    // Enviamos al backend
     fetch(API, {
         method: 'POST',
         body: JSON.stringify({
@@ -661,7 +517,7 @@ function guardarColumna() {
     .then(r => r.json())
     .then(res => {
         if(res.success){
-            iniciar(); // Recargamos para que aparezca la columna al instante
+            iniciar(); 
         } else {
             alert("Error al guardar la columna.");
         }
@@ -669,12 +525,9 @@ function guardarColumna() {
     .catch(error => console.log("Error:", error));
 }
 
-// --- FUNCIÓN ACTUALIZAR PROSPECTO ---
 function guardarCambiosDetalle() {
-    // Ocultamos el modal
     document.getElementById('modalDetalle').style.display = 'none';
 
-    // Enviamos el paquete de datos al backend
     fetch(API, {
         method: 'POST',
         body: JSON.stringify({
@@ -693,7 +546,7 @@ function guardarCambiosDetalle() {
     .then(r => r.json())
     .then(res => {
         if(res.success){
-            iniciar(); // Recargamos para ver los cambios
+            iniciar(); 
         } else {
             alert("Error al actualizar el prospecto.");
         }
@@ -701,7 +554,6 @@ function guardarCambiosDetalle() {
     .catch(error => console.log("Error:", error));
 }
 
-// --- FUNCIONES SEGUIMIENTO ---
 function abrirSeguimiento(id) {
     document.getElementById('seg_id').value = id;
     document.getElementById('seg_accion').value = "";
@@ -719,10 +571,8 @@ function guardarSeguimiento() {
         return;
     }
 
-    // Ocultamos el modal
     document.getElementById('modalSeguimiento').style.display = 'none';
 
-    // Enviamos la agenda al backend
     fetch(API, {
         method: 'POST',
         body: JSON.stringify({
@@ -735,14 +585,13 @@ function guardarSeguimiento() {
     .then(r => r.json())
     .then(res => {
         if(res.success){
-            iniciar(); // Recargamos para refrescar los datos
+            iniciar(); 
         } else {
             alert("Error al guardar el seguimiento.");
         }
     })
     .catch(error => console.log("Error:", error));
 }
-    
 </script>
 
 </body>
