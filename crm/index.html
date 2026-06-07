@@ -119,6 +119,8 @@ button{ padding:6px 10px; cursor:pointer; }
         
         <label style="font-size:12px; font-weight:bold;">Remitente (Aparecerá en su bandeja):</label>
         <input type="text" id="ci_remitente" placeholder="Ej: Diego de Coach3D" style="width:90%; padding:8px; margin-bottom:10px;">
+        <label style="font-size:12px; font-weight:bold;">Programar envío (Opcional. Vacío = Enviar ahora):</label>
+        <input type="datetime-local" id="cm_fecha_envio" style="width:90%; padding:8px; margin-bottom:10px;">
         
         <input type="text" id="ci_asunto" placeholder="Asunto" style="width:90%; padding:8px; margin-bottom:10px;">
         <textarea id="ci_mensaje" placeholder="Aplica aquí tu texto persuasivo..." style="width:90%; padding:8px; margin-bottom:15px; height:100px;"></textarea>
@@ -279,7 +281,7 @@ function renderizar(){
                 <div style="margin-top:2px;">${chipsEtiquetas}</div>
             </div>
             <div style="margin-top: 12px; display: flex; gap: 5px; flex-wrap: wrap;">
-                <button onclick="wa('${p.whatsapp}', '${p.contacto}')" style="background:#25D366; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">WhatsApp</button>
+                <button onclick="wa('${p.whatsapp}', '${p.contacto}', '${p.negocio}')" style="background:#25D366; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">WhatsApp</button>
                 <button onclick="prepararCorreoIndividual('${p.id}', '${p.correo}')" style="background:#7f8c8d; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Correo</button>
                 <button onclick="moverProspecto('${p.id}')" style="background:#f39c12; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Mover</button>
                 <button onclick="abrirSeguimiento('${p.id}')" style="background:#34495e; color:white; border:none; border-radius:4px; flex:1; font-size:12px; cursor:pointer;">Seguimiento</button>
@@ -311,9 +313,12 @@ function renderizar(){
     }
 }
 
-function wa(numero, contacto){
+function wa(numero, contacto, negocio){
     let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
-    let mensajeBase = `Hola ${nombre}. Vi tu negocio y creo que puedo ayudarte a conseguir más clientes. ¿Te puedo contar?`;
+    let nomNegocio = (negocio && negocio !== "undefined" && negocio !== "") ? negocio : "tu negocio";
+    
+    let mensajeBase = `Hola ${nombre}. Soy Diego, arquitecto de software y director de Coach3D. Vengo siguiendo el trabajo de ${nomNegocio} en Cauquenes y me gusta mucho lo que hacen. Estoy lanzando un programa preferencial de digitalización exclusivo para 10 negocios locales y pensé en ustedes. ¿Me permites enviarte un audio corto contándote cómo esto les ayudaría a recibir clientes en automático?`;
+    
     let mensajeFinal = prompt("Edita el mensaje antes de enviarlo por WhatsApp:", mensajeBase);
     
     if(mensajeFinal !== null){
@@ -511,6 +516,7 @@ function enviarCorreoMasivo() {
     const remitente = document.getElementById('cm_remitente').value;
     const asunto = document.getElementById('cm_asunto').value;
     const mensaje = document.getElementById('cm_mensaje').value;
+    const fechaEnvio = document.getElementById('cm_fecha_envio').value;
 
     if(!asunto || !mensaje || !remitente) {
         alert("El remitente, el asunto y el mensaje son obligatorios.");
@@ -537,7 +543,8 @@ function enviarCorreoMasivo() {
             remitente: remitente,
             asunto: asunto,
             mensaje: mensaje,
-            destinatarios: destinatarios
+            destinatarios: destinatarios,
+            fechaEnvio: fechaEnvio
         })
     })
     .then(r => r.json())
