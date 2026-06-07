@@ -48,7 +48,20 @@ button{
     padding:6px 10px;
     cursor:pointer;
 }
-
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center; align-items: center;
+}
+.modal-content {
+    background: white; padding: 20px; border-radius: 8px;
+    width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
+}
+.close-btn {
+    float: right; cursor: pointer; font-weight: bold; font-size: 1.2em;
+}
 </style>
 
 </head>
@@ -66,11 +79,23 @@ button{
 </header>
 
 <div id="kanban"></div>
-
+<div id="modalDetalle" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="cerrarModal()">X</span>
+        <h2 id="modalNegocio">Cargando...</h2>
+        <p><strong>Contacto:</strong> <span id="modalContacto"></span></p>
+        <p><strong>Rubro:</strong> <span id="modalRubro"></span></p>
+        <p><strong>Dirección:</strong> <span id="modalDireccion"></span></p>
+        <p><strong>Correo:</strong> <span id="modalCorreo"></span></p>
+        <p><strong>Prioridad:</strong> <span id="modalPrioridad"></span></p>
+        <p><strong>Etiquetas:</strong> <span id="modalEtiquetas"></span></p>
+        <p><strong>Observaciones:</strong> <span id="modalObservaciones"></span></p>
+    </div>
+</div>
 <script>
 
 const API =
-"https://script.google.com/a/macros/coach3dlatam.app/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";
+"https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";    
 
 let columnas = [];
 let prospectos = [];
@@ -139,9 +164,7 @@ function renderizar(){
 
         prospectos
         .filter(
-            p=>String(p.estadoId)
-            ===
-            String(col.id)
+            p => String(p.estadoId) === String(col.id) && p.activo !== false
         )
         .forEach(p=>{
 
@@ -155,15 +178,15 @@ function renderizar(){
 
             card.innerHTML =
             `
-            <strong>${p.negocio}</strong>
+            <div onclick="abrirModal('${p.id}')" style="cursor:pointer;" title="Ver detalles">
+                <strong>${p.negocio}</strong>
+                <br>
+                ${p.contacto || ""}
+            </div>
             <br>
-            ${p.contacto || ""}
-            <br><br>
-
-            <button onclick="wa('${p.whatsapp}')">
+            <button onclick="wa('${p.whatsapp}', '${p.contacto}')">
             WhatsApp
             </button>
-
             `;
 
             div.appendChild(card);
@@ -176,16 +199,49 @@ function renderizar(){
 
 }
 
-function wa(numero){
+function wa(numero, contacto){
 
-    window.open(
-        "https://wa.me/" + numero
-    );
+    // Si no hay contacto, usamos un término genérico amigable
+    let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
+    
+    // Plantilla de neuroventas basada en tu reporte
+    let mensajeBase = `Hola ${nombre}. Vi tu negocio y creo que puedo ayudarte a conseguir más clientes. ¿Te puedo contar?`;
+    
+    // Mostramos un modal nativo para permitir edición antes de enviar
+    let mensajeFinal = prompt("Edita el mensaje antes de enviarlo por WhatsApp:", mensajeBase);
+    
+    // Si el usuario no cancela el modal, abrimos WhatsApp con el texto codificado
+    if(mensajeFinal !== null){
+        window.open(
+            "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensajeFinal)
+        );
+    }
 
 }
 
 iniciar();
+function abrirModal(id) {
+    // Buscamos el prospecto exacto por su ID
+    const p = prospectos.find(x => String(x.id) === String(id));
+    if(!p) return;
+    
+    // Llenamos el modal con la información
+    document.getElementById("modalNegocio").innerText = p.negocio || "Sin nombre";
+    document.getElementById("modalContacto").innerText = p.contacto || "-";
+    document.getElementById("modalRubro").innerText = p.rubro || "-";
+    document.getElementById("modalDireccion").innerText = p.direccion || "-";
+    document.getElementById("modalCorreo").innerText = p.correo || "-";
+    document.getElementById("modalPrioridad").innerText = p.prioridad || "-";
+    document.getElementById("modalEtiquetas").innerText = p.etiquetas || "-";
+    document.getElementById("modalObservaciones").innerText = p.observaciones || "-";
+    
+    // Mostramos el modal
+    document.getElementById("modalDetalle").style.display = "flex";
+}
 
+function cerrarModal() {
+    document.getElementById("modalDetalle").style.display = "none";
+}
 </script>
 
 </body>
