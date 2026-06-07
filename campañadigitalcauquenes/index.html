@@ -49,18 +49,46 @@
             padding: 40px; margin: 20px auto; max-width: 800px;
         }
 
-        /* Slider Testimonios (Estilo X/Twitter) */
-        .testimonials-wrapper { display: flex; overflow-x: auto; gap: 20px; padding: 20px 0; scroll-behavior: smooth; }
-        .testimonials-wrapper::-webkit-scrollbar { display: none; }
-        .tweet-card {
-            min-width: 300px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px; padding: 20px; text-align: left;
+        /* Carrusel Infinito Premium (Estilo X/Twitter) */
+        .carousel-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding: 30px 0;
+            /* Efecto difuminado en los bordes para que parezca que aparecen de la niebla */
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
-        .tweet-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .tweet-header img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .tweet-user strong { display: block; color: white; font-size: 1rem; }
-        .tweet-user span { color: #8e44ad; font-size: 0.8rem; }
-        .tweet-body { font-size: 0.95rem; color: #e2e8f0; line-height: 1.5; }
+        
+        .carousel-track {
+            display: flex;
+            width: max-content;
+            gap: 20px;
+            /* Velocidad de la pasarela: 60s. Si la quieres más rápida, bájalo a 40s */
+            animation: scroll-carrusel 60s linear infinite; 
+        }
+
+        /* Pausa la pasarela si el cliente pone el mouse encima para leer */
+        .carousel-track:hover { animation-play-state: paused; }
+
+        @keyframes scroll-carrusel {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .tweet-card {
+            width: 320px; background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+            border-radius: 15px; padding: 25px; text-align: left;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: transform 0.3s;
+        }
+        .tweet-card:hover { transform: translateY(-5px); border-color: rgba(0, 210, 255, 0.4); }
+
+        .tweet-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .tweet-header img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        .tweet-user strong { display: block; color: white; font-size: 1.1rem; }
+        .tweet-user span { color: #00d2ff; font-size: 0.85rem; }
+        .tweet-body { font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; }
 
         /* FORMULARIO INTERACTIVO (WIZARD) */
         #wizard-container {
@@ -140,46 +168,16 @@
         <button class="btn-premium" onclick="iniciarEncuesta()" style="padding: 12px 30px; font-size:1rem;">Crear mi Prototipo Gratis</button>
     </section>
 
-    <section style="max-width: 100vw; overflow: hidden;">
+    <section style="max-width: 100vw; overflow: hidden; padding-bottom: 60px;">
         <h2>Lo que dice nuestra red</h2>
-        <div class="testimonials-wrapper">
-            <div class="tweet-card">
-                <div class="tweet-header">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
-                    <div class="tweet-user"><strong>Carlos M.</strong><span>@carlos_mecanica</span></div>
+        <p style="margin-bottom: 10px;">Únete a los negocios que ya dieron el salto.</p>
+        
+        <div class="carousel-container">
+            <div class="carousel-track" id="carrusel-pista">
                 </div>
-                <div class="tweet-body">"Antes perdía horas respondiendo precios. Hoy mi web vende sola mientras duermo. ¡Increíble! Gracias Coach3D."</div>
-            </div>
-            <div class="tweet-card">
-                <div class="tweet-header">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
-                    <div class="tweet-user"><strong>Loreto Pastelería</strong><span>@dulce_loreto</span></div>
-                </div>
-                <div class="tweet-body">"La maqueta me voló la cabeza. Ver mi logo en una plataforma premium me dio el empuje que necesitaba."</div>
-            </div>
-            <div class="tweet-card">
-                <div class="tweet-header">
-                    <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="User">
-                    <div class="tweet-user"><strong>Ferretería El Paso</strong><span>@elpaso_cauq</span></div>
-                </div>
-                <div class="tweet-body">"Nunca pensé que Cauquenes tendría tecnología así. Mis ventas a comunas vecinas explotaron en un mes."</div>
-            </div>
-             <div class="tweet-card">
-                <div class="tweet-header">
-                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
-                    <div class="tweet-user"><strong>Boutique Clara</strong><span>@clara_moda</span></div>
-                </div>
-                <div class="tweet-body">"Mis clientes se sienten VIP al comprar directo en mi página. Profesionalismo al 1000%."</div>
-            </div>
-            <div class="tweet-card">
-                <div class="tweet-header">
-                    <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="User">
-                    <div class="tweet-user"><strong>Juan Pablo (Sushi)</strong><span>@jp_sushi</span></div>
-                </div>
-                <div class="tweet-body">"Ya no pierdo ventas los domingos. El catálogo interactivo hace todo el trabajo pesado por mí."</div>
-            </div>
         </div>
-        <button class="btn-premium" onclick="iniciarEncuesta()">Comenzar encuesta de 7 preguntas</button>
+        
+        <button class="btn-premium" onclick="iniciarEncuesta()" style="margin-top: 30px;">Comenzar encuesta de 7 preguntas</button>
     </section>
 </div>
 
@@ -434,7 +432,64 @@
     }
 
     
+// --- FÁBRICA DE TESTIMONIOS (30 CASOS - CARRUSEL INFINITO) ---
+    const listaTestimonios = [
+        { nombre: "Carlos M.", rubro: "@carlos_mecanica", texto: "Antes perdía horas respondiendo precios por WhatsApp. Hoy mi web vende sola mientras duermo. ¡Increíble! Gracias Coach3D.", img: "32" },
+        { nombre: "Loreto Pastelería", rubro: "@dulce_loreto", texto: "La maqueta me voló la cabeza. Ver mi logo en una plataforma premium me dio el empuje que necesitaba para modernizarme.", img: "44" },
+        { nombre: "Ferretería El Paso", rubro: "@elpaso_cauq", texto: "Nunca pensé que Cauquenes tendría tecnología así. Mis ventas a comunas vecinas explotaron en solo un mes. 100% recomendado.", img: "85" },
+        { nombre: "Boutique Clara", rubro: "@clara_moda", texto: "Mis clientes se sienten VIP al comprar directo en mi página. El diseño es hermoso, nivel internacional. Profesionalismo al 1000%.", img: "68" },
+        { nombre: "Juan Pablo", rubro: "@jp_sushi", texto: "Ya no pierdo ventas los domingos ni los viernes por la noche. El catálogo interactivo hace todo el trabajo pesado por mí.", img: "22" },
+        { nombre: "Dra. Valeria", rubro: "@dental_cauquenes", texto: "La agenda automática cambió mi clínica. Ya no hay choques de hora y mis pacientes reservan desde su celular a cualquier hora.", img: "41" },
+        { nombre: "Vivero El Rosal", rubro: "@elrosal_plantas", texto: "Poder mostrar mi stock de plantas online me salvó. La gente ya llega al local sabiendo exactamente lo que quiere comprar.", img: "50" },
+        { nombre: "Marcos T.", rubro: "@puntonet_libreria", texto: "Pensé que hacer una web costaba un ojo de la cara. Coach3D lo hizo accesible, fácil y súper rápido. El mejor servicio.", img: "12" },
+        { nombre: "Cabañas Valle Sur", rubro: "@vallesur_turismo", texto: "Dejamos de pagar comisiones altísimas a plataformas externas. Ahora tenemos nuestro propio motor de reservas directo.", img: "28" },
+        { nombre: "Barbería The Classic", rubro: "@theclassic_barber", texto: "Los cabros ya no llaman por teléfono. Tienen el link en mi Instagram, eligen la hora, el barbero y listo. Un 7.", img: "61" },
+        { nombre: "Minimarket Los Socios", rubro: "@minimarket_socios", texto: "Integrar el botón directo a WhatsApp ordenó mis deliveries. Todo llega clarito, con nombre, dirección y pedido.", img: "77" },
+        { nombre: "Centro Kine", rubro: "@kine_movimiento", texto: "El prototipo gratuito me demostró que esta gente sabe lo que hace. Cuando lo vi funcionando no dudé en contratar.", img: "38" },
+        { nombre: "Viña Cepa Antigua", rubro: "@cepa_antigua_vinos", texto: "Nuestros vinos ahora llegan a todo Chile. Nos armaron una vitrina de lujo que respeta nuestra historia familiar.", img: "55" },
+        { nombre: "Florería El Edén", rubro: "@floreria_eden", texto: "Para el día de la madre la página no se cayó nunca. Recibimos más de 50 pedidos automáticos. Fue una locura hermosa.", img: "49" },
+        { nombre: "Distribuidora Sur", rubro: "@distribuidora_sur_b2b", texto: "Mis clientes mayoristas hacen sus pedidos 24/7 sin llamarme. Esto es el futuro, Cauquenes necesitaba esto.", img: "91" },
+        { nombre: "Amasandería San Juan", rubro: "@pan_sanjuan", texto: "Yo pensé que esto de las páginas web era para empresas grandes. Ahora vendo pan de masa madre por encargo sin moverme del mostrador.", img: "15" },
+        { nombre: "Estudio Glamour", rubro: "@glamour_salon", texto: "Mis clientas aman agendar directo en la página. Me dicen que me veo súper profesional. El cambio de imagen fue brutal.", img: "64" },
+        { nombre: "Botillería El Paso", rubro: "@boti_elpaso", texto: "Los pedidos de fin de semana eran un caos por teléfono. Ahora la gente compra en el catálogo y yo solo armo las bolsas.", img: "33" },
+        { nombre: "Taller Hermanos Vega", rubro: "@taller_vega", texto: "Antes pasaba todo el día dando presupuestos por teléfono. Ahora tengo los servicios en la web y los clientes llegan listos.", img: "72" },
+        { nombre: "Burger Truck", rubro: "@burgertruck_cauq", texto: "La integración del menú con WhatsApp es una locura. Nadie tiene que preguntar qué trae la hamburguesa, lo ven todo ahí.", img: "25" },
+        { nombre: "VetCenter Cauquenes", rubro: "@vetcenter", texto: "Automatizar la reserva de horas para baños y vacunas nos liberó a la secretaria. Todo fluye mucho mejor en la clínica.", img: "46" },
+        { nombre: "Power Gym", rubro: "@powergym_fit", texto: "Las inscripciones online nos salvaron. Los alumnos ven los planes y pagan la mensualidad directamente. Un lujo.", img: "82" },
+        { nombre: "Repuestos Sur", rubro: "@repuestos_sur", texto: "Subí todo mi inventario y ahora mecánicos de otras comunas me compran. Amplié mi clientela gracias a la digitalización.", img: "19" },
+        { nombre: "Pizzería La Mamma", rubro: "@pizzeria_lamamma", texto: "El sistema de pedidos es súper intuitivo. Hasta los clientes mayores lo usan sin problemas. Nos ahorra muchísimos errores.", img: "53" },
+        { nombre: "Escuela Manejo Seguro", rubro: "@manejo_seguro", texto: "La gente lee toda la información de los cursos y requisitos antes de hablarnos. Ahora solo respondemos para coordinar.", img: "37" },
+        { nombre: "Mascotas Felices", rubro: "@mascotas_felices", texto: "Vendemos sacos de alimento a domicilio. Con la web, los clientes dejan la dirección exacta y no perdemos tiempo preguntando.", img: "62" },
+        { nombre: "Spa Relax", rubro: "@spa_relax", texto: "El diseño de la página transmite mucha paz, tal como quería. Y el botón flotante de WhatsApp es súper útil para dudas rápidas.", img: "47" },
+        { nombre: "Librería Central", rubro: "@libreria_central", texto: "Para la lista de útiles escolares fue una maravilla. Las mamás compraban el pack completo por la web a las 2 de la mañana.", img: "58" },
+        { nombre: "Cerveza del Maule", rubro: "@cerveza_maule", texto: "Mostramos nuestro proceso de elaboración y vendemos packs de degustación. La imagen de marca subió a otro nivel.", img: "21" },
+        { nombre: "Banquetes Doña Rosa", rubro: "@banquetes_rosa", texto: "Mostrar mi galería de fotos con la calidad premium que me hizo Coach3D me ha cerrado contratos gigantes para matrimonios.", img: "69" }
+    ];
 
+    function cargarCarrusel() {
+        const pista = document.getElementById('carrusel-pista');
+        let tarjetasHTML = "";
+
+        // Generamos el HTML para los 15 testimonios
+        listaTestimonios.forEach(t => {
+            tarjetasHTML += `
+            <div class="tweet-card">
+                <div class="tweet-header">
+                    <img src="https://randomuser.me/api/portraits/${parseInt(t.img) % 2 === 0 ? 'women' : 'men'}/${t.img}.jpg" alt="User">
+                    <div class="tweet-user"><strong>${t.nombre}</strong><span>${t.rubro}</span></div>
+                </div>
+                <div class="tweet-body">"${t.texto}"</div>
+            </div>`;
+        });
+
+        // TRUCO DE MAGIA: Duplicamos las tarjetas para que el carrusel sea un ciclo infinito sin cortes
+        pista.innerHTML = tarjetasHTML + tarjetasHTML;
+    }
+
+    // Ejecutar el carrusel apenas cargue la página
+    window.onload = function() {
+        cargarCarrusel();
+    };
     
 
     
