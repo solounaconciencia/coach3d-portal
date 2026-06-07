@@ -88,14 +88,34 @@ button{
 <div id="modalDetalle" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="cerrarModal()">X</span>
-        <h2 id="modalNegocio">Cargando...</h2>
-        <p><strong>Contacto:</strong> <span id="modalContacto"></span></p>
-        <p><strong>Rubro:</strong> <span id="modalRubro"></span></p>
-        <p><strong>Dirección:</strong> <span id="modalDireccion"></span></p>
-        <p><strong>Correo:</strong> <span id="modalCorreo"></span></p>
-        <p><strong>Prioridad:</strong> <span id="modalPrioridad"></span></p>
-        <p><strong>Etiquetas:</strong> <span id="modalEtiquetas"></span></p>
-        <p><strong>Observaciones:</strong> <span id="modalObservaciones"></span></p>
+        <h2>Editar Prospecto</h2>
+        <input type="hidden" id="edit_id">
+        
+        <label style="font-size:12px; font-weight:bold;">Negocio:</label>
+        <input type="text" id="edit_negocio" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Contacto:</label>
+        <input type="text" id="edit_contacto" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Rubro:</label>
+        <input type="text" id="edit_rubro" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Dirección:</label>
+        <input type="text" id="edit_direccion" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Correo:</label>
+        <input type="text" id="edit_correo" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Prioridad (Alta, Media, Baja):</label>
+        <input type="text" id="edit_prioridad" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Etiquetas (separadas por coma):</label>
+        <input type="text" id="edit_etiquetas" style="width:90%; padding:8px; margin-bottom:8px;">
+        
+        <label style="font-size:12px; font-weight:bold;">Observaciones:</label>
+        <textarea id="edit_observaciones" style="width:90%; padding:8px; margin-bottom:15px; height:60px;"></textarea>
+        
+        <button onclick="guardarCambiosDetalle()" style="background:#2ecc71; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:5px;">Guardar Cambios</button>
     </div>
 </div>
 
@@ -119,6 +139,45 @@ button{
         <button onclick="confirmarMovimiento()" style="background:#f39c12; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Confirmar Movimiento</button>
     </div>
 </div>
+
+<!-- Modal Correo Individual -->
+<div id="modalCorreoIndividual" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalCorreoIndividual').style.display='none'">X</span>
+        <h2>Enviar Correo</h2>
+        <input type="hidden" id="ci_id">
+        <p><strong>Para:</strong> <span id="ci_correo_txt"></span></p>
+        <input type="hidden" id="ci_correo">
+        <input type="text" id="ci_asunto" placeholder="Asunto" style="width:90%; padding:8px; margin-bottom:10px;">
+        <textarea id="ci_mensaje" placeholder="Aplica aquí tu texto persuasivo..." style="width:90%; padding:8px; margin-bottom:15px; height:100px;"></textarea>
+        <button onclick="enviarCorreoIndividual()" style="background:#7f8c8d; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Añadir a Cola de Envío</button>
+    </div>
+</div>
+
+<!-- Modal Correo Masivo -->
+<div id="modalCorreoMasivo" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalCorreoMasivo').style.display='none'">X</span>
+        <h2>Correo Masivo</h2>
+        <p>Se enviará un correo individual a todos los prospectos con email registrado.</p>
+        <input type="text" id="cm_asunto" placeholder="Asunto" style="width:90%; padding:8px; margin-bottom:10px;">
+        <textarea id="cm_mensaje" placeholder="Mensaje base para todos..." style="width:90%; padding:8px; margin-bottom:15px; height:100px;"></textarea>
+        <button onclick="enviarCorreoMasivo()" style="background:#e67e22; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Añadir Masivo a Cola</button>
+    </div>
+</div>
+
+<div id="modalNuevaColumna" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalNuevaColumna').style.display='none'">X</span>
+        <h2>Nueva Columna</h2>
+        <input type="text" id="nc_nombre" placeholder="Ej: En Negociación" style="width:90%; padding:8px; margin-bottom:10px;">
+        <br>
+        <label for="nc_color" style="font-weight:bold;">Color de la columna:</label>
+        <input type="color" id="nc_color" value="#3498db" style="margin-bottom:15px; cursor:pointer;">
+        <button onclick="guardarColumna()" style="background:#3498db; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Guardar Columna</button>
+    </div>
+</div>
+    
 <script>
 
 const API =
@@ -248,22 +307,21 @@ function wa(numero, contacto){
 }
 
 iniciar();
+    
 function abrirModal(id) {
-    // Buscamos el prospecto exacto por su ID
     const p = prospectos.find(x => String(x.id) === String(id));
     if(!p) return;
     
-    // Llenamos el modal con la información
-    document.getElementById("modalNegocio").innerText = p.negocio || "Sin nombre";
-    document.getElementById("modalContacto").innerText = p.contacto || "-";
-    document.getElementById("modalRubro").innerText = p.rubro || "-";
-    document.getElementById("modalDireccion").innerText = p.direccion || "-";
-    document.getElementById("modalCorreo").innerText = p.correo || "-";
-    document.getElementById("modalPrioridad").innerText = p.prioridad || "-";
-    document.getElementById("modalEtiquetas").innerText = p.etiquetas || "-";
-    document.getElementById("modalObservaciones").innerText = p.observaciones || "-";
+    document.getElementById("edit_id").value = p.id;
+    document.getElementById("edit_negocio").value = p.negocio || "";
+    document.getElementById("edit_contacto").value = p.contacto || "";
+    document.getElementById("edit_rubro").value = p.rubro || "";
+    document.getElementById("edit_direccion").value = p.direccion || "";
+    document.getElementById("edit_correo").value = p.correo || "";
+    document.getElementById("edit_prioridad").value = p.prioridad || "";
+    document.getElementById("edit_etiquetas").value = p.etiquetas || "";
+    document.getElementById("edit_observaciones").value = p.observaciones || "";
     
-    // Mostramos el modal
     document.getElementById("modalDetalle").style.display = "flex";
 }
 
@@ -353,6 +411,172 @@ function confirmarMovimiento() {
     })
     .catch(error => console.log("Error:", error));
 }
+
+ // --- FUNCIONES CORREO INDIVIDUAL ---
+function prepararCorreoIndividual(id, correo) {
+    if(!correo || correo === "undefined" || correo.trim() === "") {
+        alert("Este prospecto no tiene un correo registrado válido.");
+        return;
+    }
+    document.getElementById('ci_id').value = id;
+    document.getElementById('ci_correo').value = correo;
+    document.getElementById('ci_correo_txt').innerText = correo;
+    document.getElementById('ci_asunto').value = "";
+    document.getElementById('ci_mensaje').value = "";
+    document.getElementById('modalCorreoIndividual').style.display = 'flex';
+}
+
+function enviarCorreoIndividual() {
+    const id = document.getElementById('ci_id').value;
+    const correo = document.getElementById('ci_correo').value;
+    const asunto = document.getElementById('ci_asunto').value;
+    const mensaje = document.getElementById('ci_mensaje').value;
+
+    if(!asunto || !mensaje) {
+        alert("El asunto y el mensaje son obligatorios.");
+        return;
+    }
+
+    document.getElementById('modalCorreoIndividual').style.display = 'none';
+
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "queueEmail",
+            prospectoId: id,
+            correo: correo,
+            asunto: asunto,
+            mensaje: mensaje
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success) alert("¡Correo encolado con éxito!");
+        else alert("Hubo un error al encolar el correo.");
+    })
+    .catch(error => console.log("Error:", error));
+}
+
+// --- FUNCIONES CORREO MASIVO ---
+function modalCorreoMasivo() {
+    document.getElementById('cm_asunto').value = "";
+    document.getElementById('cm_mensaje').value = "";
+    document.getElementById('modalCorreoMasivo').style.display = 'flex';
+}
+
+function enviarCorreoMasivo() {
+    const asunto = document.getElementById('cm_asunto').value;
+    const mensaje = document.getElementById('cm_mensaje').value;
+
+    if(!asunto || !mensaje) {
+        alert("El asunto y el mensaje son obligatorios.");
+        return;
+    }
+
+    // Filtramos inteligentemente a quién enviarle (solo activos y con email)
+    const destinatarios = prospectos
+        .filter(p => p.correo && p.correo !== "undefined" && p.correo.trim() !== "" && p.activo !== false)
+        .map(p => ({ id: p.id, correo: p.correo }));
+
+    if(destinatarios.length === 0) {
+        alert("No hay prospectos con correo válido en el sistema.");
+        return;
+    }
+
+    document.getElementById('modalCorreoMasivo').style.display = 'none';
+
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "queueBulkEmail",
+            asunto: asunto,
+            mensaje: mensaje,
+            destinatarios: destinatarios
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success) alert(`¡${destinatarios.length} correos añadidos a la cola de envío!`);
+        else alert("Hubo un error al encolar el lote masivo.");
+    })
+    .catch(error => console.log("Error:", error));
+}
+
+// --- FUNCIONES NUEVA COLUMNA ---
+function modalNuevaColumna() {
+    document.getElementById('nc_nombre').value = "";
+    document.getElementById('nc_color').value = "#3498db"; // Azul por defecto
+    document.getElementById('modalNuevaColumna').style.display = 'flex';
+}
+
+function guardarColumna() {
+    const nombre = document.getElementById('nc_nombre').value;
+    const color = document.getElementById('nc_color').value;
+
+    if(!nombre) {
+        alert("El nombre de la columna es obligatorio.");
+        return;
+    }
+
+    // Ocultamos el modal
+    document.getElementById('modalNuevaColumna').style.display = 'none';
+
+    // Calculamos el orden para ponerla al final
+    const nuevoOrden = columnas.length > 0 ? Math.max(...columnas.map(c => c.orden)) + 1 : 1;
+
+    // Enviamos al backend
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "createColumna",
+            nombre: nombre,
+            color: color,
+            orden: nuevoOrden
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success){
+            iniciar(); // Recargamos para que aparezca la columna al instante
+        } else {
+            alert("Error al guardar la columna.");
+        }
+    })
+    .catch(error => console.log("Error:", error));
+}
+
+// --- FUNCIÓN ACTUALIZAR PROSPECTO ---
+function guardarCambiosDetalle() {
+    // Ocultamos el modal
+    document.getElementById('modalDetalle').style.display = 'none';
+
+    // Enviamos el paquete de datos al backend
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "updateProspecto",
+            id: document.getElementById("edit_id").value,
+            negocio: document.getElementById("edit_negocio").value,
+            contacto: document.getElementById("edit_contacto").value,
+            rubro: document.getElementById("edit_rubro").value,
+            direccion: document.getElementById("edit_direccion").value,
+            correo: document.getElementById("edit_correo").value,
+            prioridad: document.getElementById("edit_prioridad").value,
+            etiquetas: document.getElementById("edit_etiquetas").value,
+            observaciones: document.getElementById("edit_observaciones").value
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success){
+            iniciar(); // Recargamos para ver los cambios
+        } else {
+            alert("Error al actualizar el prospecto.");
+        }
+    })
+    .catch(error => console.log("Error:", error));
+}
+    
 </script>
 
 </body>
