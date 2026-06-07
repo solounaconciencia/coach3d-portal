@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campaña Digitalización Cauquenes</title>
+    <title>Coach3D | Digitalización Cauquenes</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,6 +18,15 @@
             color: white; 
             overflow-x: hidden;
         }
+        /* --- BARRA DESPLAZADORA PREMIUM (Nivel Agencia) --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, var(--primary), var(--accent)); 
+            border-radius: 10px; 
+            border: 2px solid rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
         /* Fondo con imagen de Cauquenes y overlay azulado premium */
         .bg-cauquenes {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -96,18 +106,33 @@
             background: rgba(15, 23, 42, 0.98); z-index: 1000; justify-content: center; align-items: center;
         }
         .wizard-glass {
-            display: flex; width: 90%; max-width: 1000px; height: 80vh; background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; overflow: hidden; backdrop-filter: blur(20px);
+            display: flex; width: 95%; max-width: 1000px; height: 85vh; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; backdrop-filter: blur(20px);
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
         .wizard-left {
             flex: 1; background: linear-gradient(135deg, rgba(142,68,173,0.2), rgba(0,210,255,0.1));
-            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
             border-right: 1px solid rgba(255,255,255,0.05); text-align: center;
         }
-        /* REEMPLAZA ESTA IMAGEN POR LA DE KAIRO */
-        .kairo-img { width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(0,210,255,0.4); margin-bottom: 20px;}
-        .wizard-right { flex: 1.5; padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative;}
+        /* Kairo con efecto levitación */
+        .kairo-img { 
+            width: 220px; height: 220px; border-radius: 50%; object-fit: cover; 
+            border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(0,210,255,0.3); 
+            margin-bottom: 20px; animation: levitar 4s ease-in-out infinite;
+        }
+        @keyframes levitar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        /* AQUÍ ESTÁ LA MAGIA DEL SCROLL */
+        .wizard-right { 
+            flex: 1.5; padding: 40px; display: flex; flex-direction: column; 
+            justify-content: flex-start; position: relative; 
+            overflow-y: auto; /* Permite hacer scroll interno */
+            overflow-x: hidden;
+        }
         
         .step { display: none; animation: slideIn 0.5s forwards; }
         .step.active { display: block; }
@@ -132,10 +157,15 @@
 
         @media (max-width: 768px) {
             h1 { font-size: 2.2rem; }
-            .wizard-glass { flex-direction: column; height: 95vh; }
-            .wizard-left { padding: 20px; flex: 0.5; }
-            .kairo-img { width: 120px; height: 120px; }
-            .wizard-right { padding: 30px; flex: 1; }
+            section { padding: 50px 15px; }
+            .wizard-glass { flex-direction: column; height: 92vh; border-radius: 15px; }
+            .wizard-left { padding: 15px; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .kairo-img { width: 100px; height: 100px; margin-bottom: 5px; animation: none; }
+            .wizard-left h3 { font-size: 1.2rem; margin-bottom: 0; }
+            .wizard-left p { display: none; } /* Ocultamos texto largo de Kairo en móviles para ganar espacio */
+            .wizard-right { padding: 20px; flex: 1; overflow-y: auto; justify-content: flex-start;}
+            .step h3 { font-size: 1.5rem; }
+            .step p { font-size: 0.9rem; margin-bottom: 15px; }
         }
     </style>
 </head>
