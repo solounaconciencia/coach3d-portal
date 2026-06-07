@@ -76,6 +76,12 @@ button{
 <span id="total">0</span>
 </p>
 
+<div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+    <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
+    <button onclick="modalNuevaColumna()" style="background:#3498db; color:white; border:none; border-radius:5px;">+ Nueva Columna</button>
+    <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
+</div>
+
 </header>
 
 <div id="kanban"></div>
@@ -90,6 +96,27 @@ button{
         <p><strong>Prioridad:</strong> <span id="modalPrioridad"></span></p>
         <p><strong>Etiquetas:</strong> <span id="modalEtiquetas"></span></p>
         <p><strong>Observaciones:</strong> <span id="modalObservaciones"></span></p>
+    </div>
+</div>
+
+    <div id="modalNuevoProspecto" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalNuevoProspecto').style.display='none'">X</span>
+        <h2>Nuevo Prospecto</h2>
+        <input type="text" id="np_negocio" placeholder="Nombre del Negocio" style="width:90%; padding:8px; margin-bottom:10px;">
+        <input type="text" id="np_contacto" placeholder="Persona de Contacto" style="width:90%; padding:8px; margin-bottom:10px;">
+        <input type="text" id="np_whatsapp" placeholder="WhatsApp (Ej: 56912345678)" style="width:90%; padding:8px; margin-bottom:15px;">
+        <button onclick="guardarProspecto()" style="background:#2ecc71; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Guardar Prospecto</button>
+    </div>
+</div>
+
+<div id="modalMover" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="document.getElementById('modalMover').style.display='none'">X</span>
+        <h2>Mover a columna:</h2>
+        <input type="hidden" id="mover_id">
+        <select id="mover_destino" style="width:100%; padding:8px; margin-bottom:15px;"></select>
+        <button onclick="confirmarMovimiento()" style="background:#f39c12; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Confirmar Movimiento</button>
     </div>
 </div>
 <script>
@@ -178,15 +205,16 @@ function renderizar(){
 
             card.innerHTML =
             `
-            <div onclick="abrirModal('${p.id}')" style="cursor:pointer;" title="Ver detalles">
+            <div onclick="abrirModal('${p.id}')" style="cursor:pointer;" title="Clic para ver detalles y editar">
                 <strong>${p.negocio}</strong>
                 <br>
                 ${p.contacto || ""}
             </div>
-            <br>
-            <button onclick="wa('${p.whatsapp}', '${p.contacto}')">
-            WhatsApp
-            </button>
+            <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
+                <button onclick="wa('${p.whatsapp}', '${p.contacto}')" style="background:#25D366; color:white; border:none; border-radius:4px;">WhatsApp</button>
+                <button onclick="prepararCorreoIndividual('${p.id}', '${p.correo}')" style="background:#7f8c8d; color:white; border:none; border-radius:4px;">Correo</button>
+                <button onclick="moverProspecto('${p.id}')" style="background:#f39c12; color:white; border:none; border-radius:4px;">Mover</button>
+            </div>
             `;
 
             div.appendChild(card);
@@ -241,6 +269,89 @@ function abrirModal(id) {
 
 function cerrarModal() {
     document.getElementById("modalDetalle").style.display = "none";
+}
+
+// --- FUNCIONES NUEVO PROSPECTO ---
+function modalNuevoProspecto() {
+    document.getElementById('np_negocio').value = "";
+    document.getElementById('np_contacto').value = "";
+    document.getElementById('np_whatsapp').value = "";
+    document.getElementById('modalNuevoProspecto').style.display = 'flex';
+}
+
+function guardarProspecto() {
+    const negocio = document.getElementById('np_negocio').value;
+    const contacto = document.getElementById('np_contacto').value;
+    const whatsapp = document.getElementById('np_whatsapp').value;
+    
+    if(!negocio) {
+        alert("El nombre del negocio es obligatorio.");
+        return;
+    }
+    
+    // Ocultamos el modal mientras procesa
+    document.getElementById('modalNuevoProspecto').style.display = 'none';
+    
+    // Enviamos los datos a Apps Script
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "createProspecto",
+            negocio: negocio,
+            contacto: contacto,
+            whatsapp: whatsapp
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success){
+            iniciar(); // Recargamos el tablero automáticamente
+        } else {
+            alert("Error al guardar el prospecto.");
+        }
+    })
+    .catch(error => console.log("Error:", error));
+}
+
+// --- FUNCIONES MOVER PROSPECTO ---
+function moverProspecto(id) {
+    document.getElementById('mover_id').value = id;
+    const select = document.getElementById('mover_destino');
+    select.innerHTML = ''; // Limpiamos opciones anteriores
+    
+    // Llenamos el select con las columnas dinámicas de tu BD
+    columnas.sort((a,b) => a.orden - b.orden).forEach(col => {
+        select.innerHTML += `<option value="${col.id}">${col.nombre}</option>`;
+    });
+    
+    document.getElementById('modalMover').style.display = 'flex';
+}
+
+function confirmarMovimiento() {
+    const id = document.getElementById('mover_id').value;
+    const destinoId = document.getElementById('mover_destino').value;
+    
+    // Ocultamos el modal
+    document.getElementById('modalMover').style.display = 'none';
+
+    // Enviamos la instrucción de cambio de columna a Apps Script
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "updateEstado",
+            id: id,
+            estadoId: destinoId
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success){
+            iniciar(); // Repintamos el tablero para que la tarjeta salte a su nueva columna
+        } else {
+            alert("Error al mover el prospecto.");
+        }
+    })
+    .catch(error => console.log("Error:", error));
 }
 </script>
 
