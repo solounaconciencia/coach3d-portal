@@ -17,11 +17,10 @@
             color: white; 
             overflow-x: hidden;
         }
-        /* Fondo con imagen de Cauquenes y overlay oscuro */
+        /* Fondo con imagen de Cauquenes y overlay azulado premium */
         .bg-cauquenes {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            /* REEMPLAZA ESTA URL POR UNA FOTO ÉPICA DE CAUQUENES O TECNOLOGÍA */
-            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?q=80&w=2070') center/cover;
+            background: linear-gradient(rgba(10, 25, 47, 0.85), rgba(2, 12, 27, 0.95)), url('https://i.postimg.cc/fyWH2qYd/fondo.jpg') center/cover no-repeat;
             z-index: -1;
         }
 
@@ -188,7 +187,7 @@
     <div class="wizard-glass">
         
         <div class="wizard-left">
-            <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=2000" alt="Kairo Coach" class="kairo-img">
+            <img id="kairo-dinamico" src="https://i.postimg.cc/PJ5VqVVr/Kairo-bienvenida.png" alt="Kairo Coach" class="kairo-img">
             <h3 style="color:white; margin-bottom:10px;">Hola, soy Kairo.</h3>
             <p style="color:#cbd5e1; font-size:0.9rem;">Seré tu guía. Analizaré tus respuestas con IA para diseñar tu negocio digital.</p>
         </div>
@@ -317,11 +316,37 @@
         actualizarBarraProgreso(0);
     }
 
+    // Colección de imágenes de Kairo según el paso
+    const imagenesKairo = {
+        0: "https://i.postimg.cc/PJ5VqVVr/Kairo-bienvenida.png",
+        1: "https://i.postimg.cc/RhZp0ppr/Kairo-Identidad.png",
+        2: "https://i.postimg.cc/cLpzcmCd/Kairo-ubicacion.jpg",
+        3: "https://i.postimg.cc/XNsDP3qP/Kairo-Paleta-de-colores.png",
+        4: "https://i.postimg.cc/Tw9Hfv9Q/Kairo-mejor-producto.jpg",
+        5: "https://i.postimg.cc/cLRzX3nQ/Kairo-whatsapp.jpg",
+        6: "https://i.postimg.cc/Rhm61j5P/Kairo-rrss.png",
+        7: "https://i.postimg.cc/7hLCQSh3/kairo-final.jpg"
+    };
+
     function nextStep(stepNumber) {
+        // 1. Cambiamos de paso visualmente
         const steps = document.querySelectorAll('.step');
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById('step' + stepNumber).classList.add('active');
+        
+        // 2. Actualizamos la barra de progreso
         actualizarBarraProgreso(stepNumber);
+        
+        // 3. Cambiamos la cara de Kairo con una pequeña animación (Fade In/Out)
+        const imgElement = document.getElementById('kairo-dinamico');
+        if (imagenesKairo[stepNumber]) {
+            imgElement.style.opacity = 0; // Desaparece rápido
+            setTimeout(() => {
+                imgElement.src = imagenesKairo[stepNumber]; // Cambia la foto
+                imgElement.style.transition = "opacity 0.5s ease-in-out";
+                imgElement.style.opacity = 1; // Aparece suavemente
+            }, 200);
+        }
     }
 
     function actualizarBarraProgreso(step) {
@@ -410,42 +435,9 @@
 
     
 
-    function finalizarEncuesta() {
-        document.getElementById('step7').classList.remove('active');
-        document.getElementById('loader-final').style.display = 'block';
+    
 
-        // Simulamos procesamiento de IA
-        setTimeout(() => {
-            document.getElementById('loader-final').style.display = 'none';
-            document.getElementById('success-final').style.display = 'block';
-        }, 3000);
-    }
-
-    function enviarDatosDiego() {
-        const d1 = document.getElementById('ans1').value || 'N/A';
-        const d2 = document.getElementById('ans2').value || 'N/A';
-        const d3 = document.getElementById('ans3').value || 'N/A';
-        const d4 = document.getElementById('ans4').value || 'N/A';
-        const d5 = document.getElementById('ans5').value || 'N/A';
-        const d6 = document.getElementById('ans6').value || 'N/A';
-
-        const mensaje = `🤖 *ALERTA KAIRO: NUEVO PROSPECTO PREMIUM*\n\n` +
-                        `*1. Negocio:* ${d1}\n` +
-                        `*2. Dirección:* ${d2}\n` +
-                        `*3. Colores:* ${d3}\n` +
-                        `*4. Productos:* ${d4}\n` +
-                        `*5. WA Venta:* ${d5}\n` +
-                        `*6. Redes:* ${d6}\n\n` +
-                        `_Genera la maqueta y envíala en 48 hrs._`;
-
-        const url = `https://wa.me/${WHATSAPP_DIEGO}?text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
-        
-        // Volver al inicio tras 2 segundos
-        setTimeout(() => {
-            location.reload();
-        }, 2000);
-    }
+    
 </script>
 
 </body>
