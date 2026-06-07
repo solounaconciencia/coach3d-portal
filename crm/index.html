@@ -38,6 +38,7 @@ button{ padding:6px 10px; cursor:pointer; }
     <button onclick="modalNuevaColumna()" style="background:#3498db; color:white; border:none; border-radius:5px;">+ Nueva Columna</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
     <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes</button>
+    <button onclick="toggleGuion()" style="background:#8e44ad; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🎙️ Ver Guion (Teleprompter)</button>
 </div>
 </header>
 
@@ -53,6 +54,23 @@ button{ padding:6px 10px; cursor:pointer; }
     </select>
 </div>
 
+<div id="cajaGuion" style="display:none; position:fixed; bottom:20px; right:20px; width:350px; background:white; border-left:5px solid #8e44ad; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; border-radius:8px; flex-direction:column;">
+    <div style="background:#ecf0f1; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:#2c3e50; font-size:13px;">🎙️ Guion de Audio (Fase 2)</strong>
+        <span onclick="toggleGuion()" style="cursor:pointer; font-weight:bold; color:#e74c3c; font-size:16px;">X</span>
+    </div>
+    <div style="padding:15px;">
+        <textarea id="textoGuion" style="width:100%; height:220px; border:none; resize:none; font-size:14px; font-family:Arial; line-height:1.5; outline:none; color:#34495e;" onchange="guardarGuionAuto()">¡Hola [Nombre], gracias por responder! Te cuento súper rápido. Veo que muchos negocios acá siguen dependiendo de contestar WhatsApp a mano todo el día. Como desarrollador, mi objetivo con esta primera etapa de Coach3D es armarles a 10 negocios pioneros un sistema que funcione solo: que reciba al cliente, le muestre lo que ofrecen y concrete la venta.
+
+Pero no quiero venderte promesas en el aire. Quiero armarte una 'Maqueta Digital' gratuita para que veas directo en tu celular cómo se vería tu negocio funcionando con esta tecnología. Es solo un demo visual, sin compromiso.
+
+Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber qué colores te gustan y tus productos estrella. Al final, si quieres, subes tu logo. Llénalo cuando tengas un minutito y me pongo a trabajar en tu prototipo. ¡Un abrazo!</textarea>
+        <div style="text-align:right; margin-top:8px;">
+            <small style="color:#7f8c8d; font-style:italic;" id="guionStatus">Si editas el texto, se guarda solo.</small>
+        </div>
+    </div>
+</div>
+    
 <div id="kanban"></div>
     
 <div id="modalDetalle" class="modal">
@@ -216,6 +234,10 @@ async function iniciar(){
         const configData = await fetch(API + "?action=getConfig").then(r=>r.json());
         if(configData["wa_template"]) {
             waTemplateGlobal = configData["wa_template"];
+        }
+
+        if(configData["guion_audio"]) {
+            document.getElementById("textoGuion").value = configData["guion_audio"];
         }
 
         if(document.getElementById("dash_total")) {
@@ -720,6 +742,41 @@ function guardarAjustes() {
     })
     .catch(error => console.log("Error:", error));
 }
+
+// --- FUNCIONES DEL TELEPROMPTER ---
+function toggleGuion() {
+    const caja = document.getElementById("cajaGuion");
+    // Alterna entre mostrar u ocultar la caja
+    caja.style.display = caja.style.display === "none" || caja.style.display === "" ? "flex" : "none";
+}
+
+function guardarGuionAuto() {
+    const nuevoGuion = document.getElementById("textoGuion").value;
+    document.getElementById("guionStatus").innerText = "Guardando en la nube...";
+    document.getElementById("guionStatus").style.color = "#f39c12";
+
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({
+            action: "updateConfig",
+            clave: "guion_audio",
+            valor: nuevoGuion
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if(res.success) {
+            document.getElementById("guionStatus").innerText = "¡Guardado exitoso!";
+            document.getElementById("guionStatus").style.color = "#2ecc71";
+            setTimeout(() => {
+                document.getElementById("guionStatus").innerText = "Si editas el texto, se guarda solo.";
+                document.getElementById("guionStatus").style.color = "#7f8c8d";
+            }, 3000);
+        }
+    })
+    .catch(error => console.log("Error guardando guion:", error));
+}
+
 </script>
 
 </body>
