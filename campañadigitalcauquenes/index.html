@@ -195,19 +195,32 @@
 
         <div class="wizard-right">
             
-            <div class="step active" id="step1">
+            <div style="width: 100%; background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; margin-bottom: 20px;">
+                <div id="progress-fill" style="width: 0%; height: 100%; background: var(--accent); border-radius: 10px; transition: width 0.4s ease;"></div>
+            </div>
+            <p id="progress-text" style="color:var(--accent); font-size:0.8rem; text-align:right; font-weight:bold; margin-top:-15px; margin-bottom:20px;">Paso 0 de 7</p>
+
+            <div class="step active" id="step0">
+                <h3>Bienvenido a la Transformación</h3>
+                <p>Estás a 7 simples preguntas de ver cómo la tecnología puede hacer crecer tu negocio. Es muy rápido. <br><br><i>Nota: Las imágenes que te pediremos al final son opcionales. Si decides no subirlas, Kairo usará imágenes de ejemplo para que igual puedas ver la magia.</i></p>
+                <div class="wizard-controls" style="justify-content: flex-end;">
+                    <button class="btn-next" onclick="nextStep(1)">Comenzar 🚀</button>
+                </div>
+            </div>
+
+            <div class="step" id="step1">
                 <h3>1. Identidad</h3>
                 <p>¿Cuál es el nombre exacto de tu negocio?</p>
                 <input type="text" id="ans1" placeholder="Ej: Panadería La Tradición">
                 <div class="wizard-controls">
-                    <button class="btn-prev" style="visibility:hidden;">Atrás</button>
+                    <button class="btn-prev" onclick="nextStep(0)">Atrás</button>
                     <button class="btn-next" onclick="nextStep(2)">Siguiente</button>
                 </div>
             </div>
 
             <div class="step" id="step2">
                 <h3>2. Territorio</h3>
-                <p>¿Cuál es tu dirección física o sector de reparto en Cauquenes? (Pega link de Maps si tienes)</p>
+                <p>¿Cuál es tu dirección física o sector de reparto en Cauquenes?</p>
                 <input type="text" id="ans2" placeholder="Ej: Balmaceda 123, Cauquenes">
                 <div class="wizard-controls">
                     <button class="btn-prev" onclick="nextStep(1)">Atrás</button>
@@ -256,27 +269,27 @@
             </div>
 
             <div class="step" id="step7">
-                <h3>7. El Toque Final</h3>
-                <p>Por motivos de seguridad, te pediremos que nos envíes tu Logo y un par de fotos directamente a nuestro WhatsApp oficial de Coach3D al finalizar.</p>
+                <h3>7. El Toque Final (Imágenes)</h3>
+                <p>Si lo deseas, envíanos tu Logo y un par de fotos a nuestro WhatsApp oficial: <b>+56 9 XXXX XXXX</b>.</p>
+                <p style="color:#cbd5e1; font-size:0.9rem; margin-bottom: 20px;"><i>(Si no tienes ahora, no te preocupes, Kairo usará fotos profesionales de ejemplo).</i></p>
                 <p style="color:var(--accent); font-weight:bold;">¿Listo para ver la magia?</p>
                 <div class="wizard-controls">
                     <button class="btn-prev" onclick="nextStep(6)">Atrás</button>
-                    <button class="btn-next" style="background:#2ecc71; color:white;" onclick="finalizarEncuesta()">🚀 Procesar mi Prototipo</button>
+                    <button class="btn-next" style="background:#2ecc71; color:white;" onclick="enviarEncuestaBackend()">🚀 Procesar mi Prototipo</button>
                 </div>
             </div>
 
             <div id="loader-final">
                 <div class="spinner"></div>
                 <h3 style="color:var(--accent);">Procesando Datos con IA...</h3>
-                <p>Kairo está encriptando la información.</p>
+                <p>Kairo está encriptando la información y enviándola al laboratorio.</p>
             </div>
 
             <div id="success-final" style="display:none; text-align:center;">
                 <h2 style="font-size:3rem; margin-bottom:10px;">✅</h2>
                 <h3 style="color:#2ecc71; margin-bottom:15px;">¡Misión Cumplida!</h3>
-                <p style="font-size:1.1rem; line-height:1.6;">Los planos de tu negocio han sido enviados al laboratorio de Coach3D.<br><br>Diego te contactará en 48 hrs con tu Prototipo Premium. Prepárate para el futuro.</p>
-                <p style="margin-top:20px; font-size:0.9rem; color:#cbd5e1;">Haz clic abajo para enviar tus datos a la central.</p>
-                <button class="btn-premium" onclick="enviarDatosDiego()" style="margin-top:10px; padding:10px 20px; font-size:1rem;">✉️ Enviar a Central Segura</button>
+                <p style="font-size:1.1rem; line-height:1.6;">Los planos de tu negocio han sido recibidos con éxito.<br><br>Diego te contactará en 48 hrs con tu Prototipo Premium. Prepárate para el futuro.</p>
+                <button class="btn-premium" onclick="location.reload()" style="margin-top:20px; padding:10px 20px; font-size:1rem;">Volver al Inicio</button>
             </div>
 
         </div>
@@ -287,18 +300,68 @@
     // Tu número de WhatsApp donde quieres recibir las respuestas (código de país + número)
     const WHATSAPP_DIEGO = "56976003402"; 
 
+    // PEGA AQUÍ LA MISMA URL DE TU CRM
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec"; 
+
     function iniciarEncuesta() {
         document.getElementById('landing').style.display = 'none';
         document.getElementById('wizard-container').style.display = 'flex';
+        actualizarBarraProgreso(0);
     }
 
     function nextStep(stepNumber) {
-        // Ocultar todos
         const steps = document.querySelectorAll('.step');
         steps.forEach(s => s.classList.remove('active'));
-        // Mostrar el deseado
         document.getElementById('step' + stepNumber).classList.add('active');
+        actualizarBarraProgreso(stepNumber);
     }
+
+    function actualizarBarraProgreso(step) {
+        const totalPasos = 7;
+        const porcentaje = (step / totalPasos) * 100;
+        document.getElementById('progress-fill').style.width = porcentaje + '%';
+        
+        if(step > 0) {
+            document.getElementById('progress-text').innerText = `Paso ${step} de ${totalPasos}`;
+        } else {
+            document.getElementById('progress-text').innerText = `Paso 0 de ${totalPasos}`;
+        }
+    }
+
+    function enviarEncuestaBackend() {
+        document.getElementById('step7').classList.remove('active');
+        document.getElementById('loader-final').style.display = 'block';
+        document.getElementById('progress-text').style.display = 'none';
+
+        const data = {
+            action: "guardarEncuesta",
+            negocio: document.getElementById('ans1').value || 'N/A',
+            direccion: document.getElementById('ans2').value || 'N/A',
+            colores: document.getElementById('ans3').value || 'N/A',
+            productos: document.getElementById('ans4').value || 'N/A',
+            whatsapp: document.getElementById('ans5').value || 'N/A',
+            redes: document.getElementById('ans6').value || 'N/A'
+        };
+
+        // Enviar invisiblemente a tu Google Sheets / Correo
+        fetch(URL_APPS_SCRIPT, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(res => {
+            document.getElementById('loader-final').style.display = 'none';
+            document.getElementById('success-final').style.display = 'block';
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Hubo un error de conexión, pero no te preocupes, Kairo lo está solucionando.");
+            document.getElementById('loader-final').style.display = 'none';
+            document.getElementById('step7').classList.add('active');
+        });
+    }
+
+    
 
     function finalizarEncuesta() {
         document.getElementById('step7').classList.remove('active');
