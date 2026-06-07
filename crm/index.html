@@ -7,9 +7,15 @@
 <title>CRM de COACH3D Cauquenes</title>
 
 <style>
-body{ margin:0; font-family:Arial; background:#f4f4f4; }
+body{ margin:0; font-family:Arial; background:#e8ecef; } /* Fondo gris azulado relajante */
 header{ background:white; padding:20px; box-shadow:0 2px 4px rgba(0,0,0,.1); }
-#kanban{ display:flex; gap:15px; overflow-x:auto; padding:20px; }
+#kanban{ display:flex; gap:15px; overflow-x:auto; padding:20px 20px 40px 20px; }
+
+/* Nueva Barra Desplazadora Gruesa y Visible */
+#kanban::-webkit-scrollbar { height: 14px; }
+#kanban::-webkit-scrollbar-track { background: #d1d8e0; border-radius: 10px; }
+#kanban::-webkit-scrollbar-thumb { background: #7f8fa6; border-radius: 10px; border: 2px solid #d1d8e0; }
+#kanban::-webkit-scrollbar-thumb:hover { background: #2c3e50; }
 .columna{ min-width:300px; border-radius:10px; padding:10px; color:white; }
 .tarjeta{ background:white; color:black; padding:10px; border-radius:8px; margin-bottom:10px; }
 button{ padding:6px 10px; cursor:pointer; }
@@ -35,7 +41,7 @@ button{ padding:6px 10px; cursor:pointer; }
 
 <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
     <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
-    <button onclick="modalNuevaColumna()" style="background:#3498db; color:white; border:none; border-radius:5px;">+ Nueva Columna</button>
+    <button onclick="abrirGestorColumnas()" style="background:#3498db; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Gestionar Columnas</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
     <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes</button>
     <button onclick="toggleTeleprompter('cajaGuionFase2')" style="background:#8e44ad; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🎙️ Guion Fase 2 (Audio)</button>
@@ -198,15 +204,33 @@ Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber 
     </div>
 </div>
 
-<div id="modalNuevaColumna" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="document.getElementById('modalNuevaColumna').style.display='none'">X</span>
-        <h2>Nueva Columna</h2>
-        <input type="text" id="nc_nombre" placeholder="Ej: En Negociación" style="width:90%; padding:8px; margin-bottom:10px;">
-        <br>
-        <label for="nc_color" style="font-weight:bold;">Color de la columna:</label>
+<div id="modalGestorColumnas" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <span class="close-btn" onclick="document.getElementById('modalGestorColumnas').style.display='none'">X</span>
+        <h2>📊 Gestionar Columnas</h2>
+        
+        <div id="lista_columnas_mini" style="background:#f9f9f9; padding:10px; border-radius:8px; max-height:250px; overflow-y:auto; margin-bottom:15px; border:1px solid #ddd;">
+            </div>
+
+        <h4 style="margin-bottom:5px; color:#2c3e50;">+ Crear Nueva</h4>
+        <input type="text" id="nc_nombre" placeholder="Ej: FASE 8: Fidelización" style="width:90%; padding:8px; margin-bottom:10px;">
+        <label for="nc_color" style="font-weight:bold; font-size:12px;">Color:</label>
         <input type="color" id="nc_color" value="#3498db" style="margin-bottom:15px; cursor:pointer;">
-        <button onclick="guardarColumna()" style="background:#3498db; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Guardar Columna</button>
+        
+        <button onclick="guardarColumna()" style="background:#3498db; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:5px;">Añadir Columna</button>
+    </div>
+</div>
+
+<div id="modalWhatsAppPersonalizado" class="modal">
+    <div class="modal-content" style="max-width: 550px;">
+        <span class="close-btn" onclick="document.getElementById('modalWhatsAppPersonalizado').style.display='none'">X</span>
+        <h2>💬 Enviar WhatsApp</h2>
+        <p style="font-size:12px; color:#7f8c8d;">Revisa y ajusta el mensaje automático antes de enviarlo.</p>
+        <input type="hidden" id="wa_numero_oculto">
+        
+        <textarea id="wa_mensaje_final" style="width:100%; height:180px; padding:10px; font-size:14px; border-radius:5px; border:1px solid #bdc3c7; resize:vertical;"></textarea>
+        
+        <button onclick="dispararWhatsAppReal()" style="background:#25D366; color:white; border:none; padding:12px; width:100%; cursor:pointer; border-radius:5px; font-weight:bold; margin-top:10px;">🚀 Abrir WhatsApp y Enviar</button>
     </div>
 </div>
 
@@ -412,6 +436,7 @@ function renderizar(){
     }
 }
 
+// --- NUEVO WHATSAPP INTELIGENTE (SIN PROMPT) ---
 function wa(numero, contacto, negocio, estadoId){
     let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
     let nomNegocio = (negocio && negocio !== "undefined" && negocio !== "") ? negocio : "tu negocio";
@@ -419,7 +444,6 @@ function wa(numero, contacto, negocio, estadoId){
     let mensajeBase = "";
     let columna = String(estadoId);
 
-    // Mapeo Inteligente basado en el ID o Nombre de la columna
     if (columna === "1" || columna.includes("Contactar") || columna.includes("FASE 1")) { 
         mensajeBase = plantillasWA.f1;
     } else if (columna === "3" || columna.includes("Audio") || columna.includes("ESPERANDO") || columna.includes("FASE 3")) { 
@@ -432,13 +456,19 @@ function wa(numero, contacto, negocio, estadoId){
         mensajeBase = `Hola ${nombre}, te contacto desde Coach3D respecto a los avances de ${nomNegocio}.`;
     }
     
-    // Reemplazamos los comodines por los datos reales
     let mensajeFinal = mensajeBase.replace(/{nombre}/g, nombre).replace(/{negocio}/g, nomNegocio);
     
-    let promptFinal = prompt("Revisa el mensaje automatizado antes de disparar:", mensajeFinal);
-    if(promptFinal !== null){
-        window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(promptFinal));
-    }
+    // Abrimos la ventana grande en vez del 'prompt'
+    document.getElementById('wa_numero_oculto').value = numero;
+    document.getElementById('wa_mensaje_final').value = mensajeFinal;
+    document.getElementById('modalWhatsAppPersonalizado').style.display = 'flex';
+}
+
+function dispararWhatsAppReal() {
+    const numero = document.getElementById('wa_numero_oculto').value;
+    const mensaje = document.getElementById('wa_mensaje_final').value;
+    document.getElementById('modalWhatsAppPersonalizado').style.display = 'none';
+    window.open("https://wa.me/" + numero + "?text=" + encodeURIComponent(mensaje));
 }
 
 iniciar();
@@ -830,7 +860,47 @@ function guardarAjustesMaestros() {
 }
 
 
+// --- FUNCIONES GESTOR DE COLUMNAS ---
+function abrirGestorColumnas() {
+    const contenedor = document.getElementById("lista_columnas_mini");
+    contenedor.innerHTML = "";
+    
+    columnas.sort((a,b) => a.orden - b.orden).forEach((col, index) => {
+        contenedor.innerHTML += `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:white; padding:8px; margin-bottom:5px; border-radius:5px; border-left: 4px solid ${col.color}; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+            <span style="font-size:13px; font-weight:bold; color:#2c3e50;">${col.nombre}</span>
+            <div style="display:flex; gap:5px;">
+                <button onclick="moverColumnaBackend('${col.id}', 'arriba')" style="background:#bdc3c7; color:white; border:none; border-radius:3px; padding:4px 8px;" title="Subir">⬆️</button>
+                <button onclick="moverColumnaBackend('${col.id}', 'abajo')" style="background:#bdc3c7; color:white; border:none; border-radius:3px; padding:4px 8px;" title="Bajar">⬇️</button>
+                <button onclick="eliminarColumna('${col.id}')" style="background:#e74c3c; color:white; border:none; border-radius:3px; padding:4px 8px;" title="Borrar">🗑️</button>
+            </div>
+        </div>`;
+    });
+    
+    document.getElementById('nc_nombre').value = "";
+    document.getElementById('modalGestorColumnas').style.display = 'flex';
+}
 
+function moverColumnaBackend(id, direccion) {
+    document.getElementById('modalGestorColumnas').style.display = 'none';
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({ action: "moverColumna", id: id, direccion: direccion })
+    }).then(r=>r.json()).then(res=>{
+        if(res.success) iniciar();
+    });
+}
+
+function eliminarColumna(id) {
+    if(!confirm("¿Estás seguro de borrar esta columna? Los prospectos en ella ya no se verán hasta que los muevas a otra.")) return;
+    document.getElementById('modalGestorColumnas').style.display = 'none';
+    fetch(API, {
+        method: 'POST',
+        body: JSON.stringify({ action: "deleteColumn", id: id })
+    }).then(r=>r.json()).then(res=>{
+        if(res.success) iniciar();
+    });
+}
 
 
 
