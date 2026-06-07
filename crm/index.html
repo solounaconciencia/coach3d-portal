@@ -1,1 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Coach3D CRM</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f4f4f4;
+}
+
+header{
+    background:white;
+    padding:20px;
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+}
+
+#kanban{
+    display:flex;
+    gap:15px;
+    overflow-x:auto;
+    padding:20px;
+}
+
+.columna{
+    min-width:300px;
+    border-radius:10px;
+    padding:10px;
+    color:white;
+}
+
+.tarjeta{
+    background:white;
+    color:black;
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+
+button{
+    padding:6px 10px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Coach3D CRM</h1>
+
+<p>Total Prospectos:
+<span id="total">0</span>
+</p>
+
+</header>
+
+<div id="kanban"></div>
+
+<script>
+
+const API =
+"https://script.google.com/a/macros/coach3dlatam.app/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";
+
+let columnas = [];
+let prospectos = [];
+
+async function iniciar(){
+
+    try{
+
+        columnas =
+            await fetch(
+                API + "?action=getColumnas"
+            )
+            .then(r=>r.json());
+
+        prospectos =
+            await fetch(
+                API + "?action=getProspectos"
+            )
+            .then(r=>r.json());
+
+        document.getElementById(
+            "total"
+        ).innerText =
+            prospectos.length;
+
+        renderizar();
+
+    }catch(error){
+
+        console.log(error);
+
+        alert(
+            "Error conectando con Apps Script"
+        );
+
+    }
+
+}
+
+function renderizar(){
+
+    const kanban =
+        document.getElementById(
+            "kanban"
+        );
+
+    kanban.innerHTML = "";
+
+    columnas
+    .sort((a,b)=>a.orden-b.orden)
+    .forEach(col=>{
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+        div.className =
+            "columna";
+
+        div.style.background =
+            col.color;
+
+        div.innerHTML =
+            `<h2>${col.nombre}</h2>`;
+
+        prospectos
+        .filter(
+            p=>String(p.estadoId)
+            ===
+            String(col.id)
+        )
+        .forEach(p=>{
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "tarjeta";
+
+            card.innerHTML =
+            `
+            <strong>${p.negocio}</strong>
+            <br>
+            ${p.contacto || ""}
+            <br><br>
+
+            <button onclick="wa('${p.whatsapp}')">
+            WhatsApp
+            </button>
+
+            `;
+
+            div.appendChild(card);
+
+        });
+
+        kanban.appendChild(div);
+
+    });
+
+}
+
+function wa(numero){
+
+    window.open(
+        "https://wa.me/" + numero
+    );
+
+}
+
+iniciar();
+
+</script>
+
+</body>
+</html>
