@@ -123,13 +123,26 @@ button{ padding:6px 10px; cursor:pointer; }
 </div>
 
 <div id="modalCorreoMasivo" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 600px;">
         <span class="close-btn" onclick="document.getElementById('modalCorreoMasivo').style.display='none'">X</span>
         <h2>Correo Masivo</h2>
-        <p>Se enviará un correo individual a todos los prospectos con email registrado.</p>
+        
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <select id="cm_filtro_columna" onchange="filtrarListaCorreos()" style="flex:1; padding:8px; border-radius:4px; border:1px solid #bdc3c7;">
+                <option value="ALL">Todas las Columnas</option>
+            </select>
+        </div>
+        
+        <div style="border:1px solid #bdc3c7; padding:10px; border-radius:5px; margin-bottom:15px; max-height:150px; overflow-y:auto; background:#f9f9f9; text-align:left;">
+            <label style="font-weight:bold; display:block; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:5px; cursor:pointer;">
+                <input type="checkbox" id="cm_seleccionar_todos" onchange="toggleTodosCorreos(this)"> Seleccionar Todos (Visibles)
+            </label>
+            <div id="cm_lista_destinatarios"></div>
+        </div>
+
         <input type="text" id="cm_asunto" placeholder="Asunto" style="width:90%; padding:8px; margin-bottom:10px;">
         <textarea id="cm_mensaje" placeholder="Mensaje base para todos..." style="width:90%; padding:8px; margin-bottom:15px; height:100px;"></textarea>
-        <button onclick="enviarCorreoMasivo()" style="background:#e67e22; color:white; border:none; padding:10px; width:100%; cursor:pointer;">Añadir Masivo a Cola</button>
+        <button onclick="enviarCorreoMasivo()" style="background:#e67e22; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:4px;">Añadir Masivo a Cola</button>
     </div>
 </div>
 
@@ -443,10 +456,49 @@ function enviarCorreoIndividual() {
     .catch(error => console.log("Error:", error));
 }
 
+
+// --- FUNCIONES CORREO MASIVO ---
 function modalCorreoMasivo() {
     document.getElementById('cm_asunto').value = "";
     document.getElementById('cm_mensaje').value = "";
+    document.getElementById('cm_seleccionar_todos').checked = false;
+    
+    // Llenamos el filtro desplegable con tus columnas actuales
+    const selectCol = document.getElementById('cm_filtro_columna');
+    selectCol.innerHTML = '<option value="ALL">Todas las Columnas</option>';
+    columnas.sort((a,b) => a.orden - b.orden).forEach(col => {
+        selectCol.innerHTML += `<option value="${col.id}">${col.nombre}</option>`;
+    });
+
+    // Dibujamos la lista inicial de checkboxes
+    filtrarListaCorreos(); 
     document.getElementById('modalCorreoMasivo').style.display = 'flex';
+}
+
+function filtrarListaCorreos() {
+    const colId = document.getElementById('cm_filtro_columna').value;
+    const contenedor = document.getElementById('cm_lista_destinatarios');
+    contenedor.innerHTML = ""; // Limpiamos la lista
+    document.getElementById('cm_seleccionar_todos').checked = false;
+
+    // Filtramos solo los que tienen correo válido y están activos
+    prospectos.filter(p => p.correo && p.correo.trim() !== "" && p.correo !== "undefined" && p.activo !== false).forEach(p => {
+        // Si hay una columna seleccionada y no coincide, saltamos al siguiente
+        if(colId !== "ALL" && String(p.estadoId) !== String(colId)) return;
+        
+        contenedor.innerHTML += `
+            <label style="display:block; margin-bottom:5px; font-size:13px; cursor:pointer;">
+                <input type="checkbox" class="cm_checkbox_prospecto" value="${p.id}" data-correo="${p.correo}"> 
+                <strong>${p.negocio}</strong> <span style="color:#7f8c8d;">(${p.correo})</span>
+            </label>
+        `;
+    });
+}
+
+function toggleTodosCorreos(source) {
+    // Si marcamos "Seleccionar todos", marcamos todos los checkboxes visibles
+    const checkboxes = document.querySelectorAll('.cm_checkbox_prospecto');
+    checkboxes.forEach(cb => cb.checked = source.checked);
 }
 
 function enviarCorreoMasivo() {
@@ -458,12 +510,15 @@ function enviarCorreoMasivo() {
         return;
     }
 
-    const destinatarios = prospectos
-        .filter(p => p.correo && p.correo !== "undefined" && p.correo.trim() !== "" && p.activo !== false)
-        .map(p => ({ id: p.id, correo: p.correo }));
+    // Recolectamos SOLAMENTE los que el usuario marcó con el check
+    const checkboxes = document.querySelectorAll('.cm_checkbox_prospecto:checked');
+    const destinatarios = Array.from(checkboxes).map(cb => ({
+        id: cb.value,
+        correo: cb.getAttribute('data-correo')
+    }));
 
     if(destinatarios.length === 0) {
-        alert("No hay prospectos con correo válido en el sistema.");
+        alert("Debes seleccionar al menos un prospecto de la lista.");
         return;
     }
 
