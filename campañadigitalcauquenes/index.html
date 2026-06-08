@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coach3D | Digitalización Cauquenes</title>
+    <title>Campaña Digitalización Cauquenes</title>
     <link rel="icon" type="image/png" href="https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
     <style>
@@ -18,7 +18,8 @@
             color: white; 
             overflow-x: hidden;
         }
-        /* --- BARRA DESPLAZADORA PREMIUM (Nivel Agencia) --- */
+        
+        /* --- BARRA DESPLAZADORA PREMIUM --- */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { 
@@ -27,6 +28,7 @@
             border: 2px solid rgba(15, 23, 42, 0.8);
         }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
         /* Fondo con imagen de Cauquenes y overlay azulado premium */
         .bg-cauquenes {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -59,32 +61,18 @@
             padding: 40px; margin: 20px auto; max-width: 800px;
         }
 
-        /* Carrusel Infinito Premium (Estilo X/Twitter) */
+        /* Carrusel Infinito Premium */
         .carousel-container {
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            padding: 30px 0;
-            /* Efecto difuminado en los bordes para que parezca que aparecen de la niebla */
+            width: 100%; overflow: hidden; position: relative; padding: 30px 0;
             mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
             -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
-        
         .carousel-track {
-            display: flex;
-            width: max-content;
-            gap: 20px;
-            /* Velocidad de la pasarela: 60s. Si la quieres más rápida, bájalo a 40s */
+            display: flex; width: max-content; gap: 20px;
             animation: scroll-carrusel 60s linear infinite; 
         }
-
-        /* Pausa la pasarela si el cliente pone el mouse encima para leer */
         .carousel-track:hover { animation-play-state: paused; }
-
-        @keyframes scroll-carrusel {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        @keyframes scroll-carrusel { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .tweet-card {
             width: 320px; background: rgba(255, 255, 255, 0.03); 
@@ -93,12 +81,27 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: transform 0.3s;
         }
         .tweet-card:hover { transform: translateY(-5px); border-color: rgba(0, 210, 255, 0.4); }
-
         .tweet-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .tweet-header img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
         .tweet-user strong { display: block; color: white; font-size: 1.1rem; }
         .tweet-user span { color: #00d2ff; font-size: 0.85rem; }
         .tweet-body { font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; }
+
+        /* REPRODUCTOR DE VIDEO PREMIUM */
+        .video-container {
+            width: 100%; max-width: 800px; margin: 0 auto 40px auto;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            position: relative;
+        }
+        .video-responsive { overflow: hidden; padding-bottom: 56.25%; position: relative; height: 0; }
+        .video-responsive iframe { left: 0; top: 0; height: 100%; width: 100%; position: absolute; border: none; }
+        .video-glow {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 105%; height: 105%; background: var(--accent);
+            filter: blur(50px); opacity: 0.15; z-index: -1;
+        }
 
         /* FORMULARIO INTERACTIVO (WIZARD) */
         #wizard-container {
@@ -115,23 +118,17 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
             border-right: 1px solid rgba(255,255,255,0.05); text-align: center;
         }
-        /* Kairo con efecto levitación */
         .kairo-img { 
             width: 220px; height: 220px; border-radius: 50%; object-fit: cover; 
             border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(0,210,255,0.3); 
             margin-bottom: 20px; animation: levitar 4s ease-in-out infinite;
         }
-        @keyframes levitar {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
+        @keyframes levitar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         
-        /* AQUÍ ESTÁ LA MAGIA DEL SCROLL */
         .wizard-right { 
             flex: 1.5; padding: 40px; display: flex; flex-direction: column; 
             justify-content: flex-start; position: relative; 
-            overflow-y: auto; /* Permite hacer scroll interno */
-            overflow-x: hidden;
+            overflow-y: auto; overflow-x: hidden;
         }
         
         .step { display: none; animation: slideIn 0.5s forwards; }
@@ -145,12 +142,10 @@
             color: white; padding: 15px; border-radius: 10px; font-size: 1.1rem; outline: none; margin-bottom: 20px; transition: border 0.3s;
         }
         .step input:focus, .step textarea:focus { border-color: var(--accent); }
-        
         .wizard-controls { display: flex; justify-content: space-between; margin-top: 20px; }
         .btn-next { background: var(--accent); color: #0f172a; padding: 12px 30px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; font-size: 1.1rem; }
         .btn-prev { background: transparent; color: white; border: 1px solid white; padding: 12px 30px; border-radius: 8px; cursor: pointer; }
 
-        /* Loader Final */
         #loader-final { display: none; text-align: center; }
         .spinner { width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -162,32 +157,10 @@
             .wizard-left { padding: 15px; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
             .kairo-img { width: 100px; height: 100px; margin-bottom: 5px; animation: none; }
             .wizard-left h3 { font-size: 1.2rem; margin-bottom: 0; }
-            .wizard-left p { display: none; } /* Ocultamos texto largo de Kairo en móviles para ganar espacio */
+            .wizard-left p { display: none; } 
             .wizard-right { padding: 20px; flex: 1; overflow-y: auto; justify-content: flex-start;}
             .step h3 { font-size: 1.5rem; }
             .step p { font-size: 0.9rem; margin-bottom: 15px; }
-        }
-
-        /* --- REPRODUCTOR DE VIDEO PREMIUM --- */
-        .video-container {
-            width: 100%; max-width: 800px; margin: 0 auto 40px auto;
-            border-radius: 20px; overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            border: 2px solid rgba(0, 210, 255, 0.3);
-            position: relative;
-        }
-        .video-responsive {
-            overflow: hidden; padding-bottom: 56.25%; /* Proporción 16:9 perfecta */
-            position: relative; height: 0;
-        }
-        .video-responsive iframe {
-            left: 0; top: 0; height: 100%; width: 100%; position: absolute; border: none;
-        }
-        /* Efecto de resplandor detrás del video */
-        .video-glow {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 105%; height: 105%; background: var(--accent);
-            filter: blur(50px); opacity: 0.15; z-index: -1;
         }
     </style>
 </head>
@@ -195,7 +168,9 @@
 
 <div class="bg-cauquenes"></div>
 
-<section>
+<div class="landing-container" id="landing">
+    
+    <section>
         <h1>Llevamos tu negocio al futuro</h1>
         <p>Campaña de Digitalización Cauquenes 2026. Exclusivo para emprendedores locales que no le temen al éxito.</p>
         
@@ -210,6 +185,37 @@
             </div>
         </div>
     </section>
+
+    <section>
+        <div class="glass-card">
+            <h2>¿Quiénes Somos?</h2>
+            <p>Somos <strong>Coach3D Latam</strong>, un laboratorio tecnológico liderado por Diego y Kairo (tu coach virtual). Nuestra misión es empoderar a los negocios locales con herramientas que antes solo usaban las grandes corporaciones.</p>
+        </div>
+        <button class="btn-premium" onclick="iniciarEncuesta()" style="padding: 12px 30px; font-size:1rem;">Postular mi negocio</button>
+    </section>
+
+    <section>
+        <div class="glass-card" style="border-color: rgba(0, 210, 255, 0.3);">
+            <h2>¿Para qué y Por qué?</h2>
+            <p><strong>Para qué:</strong> Para que dejes de perder tiempo respondiendo precios a mano y tu negocio venda 24/7 de forma automática.</p>
+            <p><strong>Por qué:</strong> Porque Cauquenes está lleno de talento, y los emprendedores locales merecen herramientas premium para competir a nivel nacional. La tecnología no es el futuro, es el presente.</p>
+        </div>
+        <button class="btn-premium" onclick="iniciarEncuesta()" style="padding: 12px 30px; font-size:1rem;">Crear mi Prototipo Gratis</button>
+    </section>
+
+    <section style="max-width: 100vw; overflow: hidden; padding-bottom: 60px;">
+        <h2>Lo que dice nuestra red</h2>
+        <p style="margin-bottom: 10px;">Únete a los negocios pioneros de Cauquenes que ya dieron el salto.</p>
+        
+        <div class="carousel-container">
+            <div class="carousel-track" id="carrusel-pista">
+                </div>
+        </div>
+        
+        <button class="btn-premium" onclick="iniciarEncuesta()" style="margin-top: 30px;">Comenzar encuesta de 7 preguntas</button>
+    </section>
+
+</div>
 
 <div id="wizard-container">
     <div class="wizard-glass">
@@ -332,9 +338,6 @@
 </div>
 
 <script>
-    // Tu número de WhatsApp donde quieres recibir las respuestas (código de país + número)
-    const WHATSAPP_DIEGO = "56976003402"; 
-
     // PEGA AQUÍ LA MISMA URL DE TU CRM
     const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec"; 
 
@@ -344,7 +347,6 @@
         actualizarBarraProgreso(0);
     }
 
-    // Colección de imágenes de Kairo según el paso
     const imagenesKairo = {
         0: "https://i.postimg.cc/PJ5VqVVr/Kairo-bienvenida.png",
         1: "https://i.postimg.cc/RhZp0ppr/Kairo-Identidad.png",
@@ -357,22 +359,19 @@
     };
 
     function nextStep(stepNumber) {
-        // 1. Cambiamos de paso visualmente
         const steps = document.querySelectorAll('.step');
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById('step' + stepNumber).classList.add('active');
         
-        // 2. Actualizamos la barra de progreso
         actualizarBarraProgreso(stepNumber);
         
-        // 3. Cambiamos la cara de Kairo con una pequeña animación (Fade In/Out)
         const imgElement = document.getElementById('kairo-dinamico');
         if (imagenesKairo[stepNumber]) {
-            imgElement.style.opacity = 0; // Desaparece rápido
+            imgElement.style.opacity = 0; 
             setTimeout(() => {
-                imgElement.src = imagenesKairo[stepNumber]; // Cambia la foto
+                imgElement.src = imagenesKairo[stepNumber]; 
                 imgElement.style.transition = "opacity 0.5s ease-in-out";
-                imgElement.style.opacity = 1; // Aparece suavemente
+                imgElement.style.opacity = 1; 
             }, 200);
         }
     }
@@ -389,7 +388,6 @@
         }
     }
 
-    // Convertidor de archivos a código seguro Base64
     const toBase64 = file => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -414,7 +412,6 @@
         const logoFile = document.getElementById('ans_logo').files[0];
         const fotoFile = document.getElementById('ans_foto').files[0];
 
-        // Validaciones de peso (2MB = 2000000 bytes)
         if(logoFile) {
             if(logoFile.size > 2000000) { 
                 alert("Tu Logo pesa demasiado. Intenta con una imagen más ligera (Máx 2MB)."); 
@@ -431,7 +428,6 @@
             fotoData = await toBase64(fotoFile);
         }
 
-        // Empaquetamos todo
         const data = {
             action: "guardarEncuesta",
             negocio: document.getElementById('ans1').value || 'N/A',
@@ -444,7 +440,6 @@
             fotoFile: fotoData
         };
 
-        // Enviamos invisiblemente a tu Google Sheets / Correo
         fetch(URL_APPS_SCRIPT, {
             method: 'POST',
             body: JSON.stringify(data)
@@ -461,8 +456,7 @@
         });
     }
 
-    
-// --- FÁBRICA DE TESTIMONIOS (30 CASOS - CARRUSEL INFINITO) ---
+    // --- FÁBRICA DE TESTIMONIOS (30 CASOS) ---
     const listaTestimonios = [
         { nombre: "Carlos M.", rubro: "@carlos_mecanica", texto: "Antes perdía horas respondiendo precios por WhatsApp. Hoy mi web vende sola mientras duermo. ¡Increíble! Gracias Coach3D.", img: "32" },
         { nombre: "Loreto Pastelería", rubro: "@dulce_loreto", texto: "La maqueta me voló la cabeza. Ver mi logo en una plataforma premium me dio el empuje que necesitaba para modernizarme.", img: "44" },
@@ -499,8 +493,7 @@
     function cargarCarrusel() {
         const pista = document.getElementById('carrusel-pista');
         let tarjetasHTML = "";
-
-        // Generamos el HTML para los 15 testimonios
+        
         listaTestimonios.forEach(t => {
             tarjetasHTML += `
             <div class="tweet-card">
@@ -512,17 +505,12 @@
             </div>`;
         });
 
-        // TRUCO DE MAGIA: Duplicamos las tarjetas para que el carrusel sea un ciclo infinito sin cortes
         pista.innerHTML = tarjetasHTML + tarjetasHTML;
     }
 
-    // Ejecutar el carrusel apenas cargue la página
     window.onload = function() {
         cargarCarrusel();
     };
-    
-
-    
 </script>
 
 </body>
