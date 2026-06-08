@@ -358,21 +358,34 @@
         7: "https://i.postimg.cc/7hLCQSh3/kairo-final.jpg"
     };
 
+    // TRUCO PREMIUM: Precargar imágenes en la memoria caché para que el cambio sea instantáneo
+    Object.values(imagenesKairo).forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+
     function nextStep(stepNumber) {
+        // 1. Cambiamos de paso visualmente
         const steps = document.querySelectorAll('.step');
         steps.forEach(s => s.classList.remove('active'));
         document.getElementById('step' + stepNumber).classList.add('active');
         
+        // 2. Actualizamos la barra de progreso
         actualizarBarraProgreso(stepNumber);
         
+        // 3. Cambiamos la cara de Kairo de forma segura
         const imgElement = document.getElementById('kairo-dinamico');
         if (imagenesKairo[stepNumber]) {
-            imgElement.style.opacity = 0; 
+            imgElement.style.opacity = 0; // Desvanecer foto vieja
+            
             setTimeout(() => {
-                imgElement.src = imagenesKairo[stepNumber]; 
-                imgElement.style.transition = "opacity 0.5s ease-in-out";
-                imgElement.style.opacity = 1; 
-            }, 200);
+                imgElement.src = imagenesKairo[stepNumber]; // Cambiar a foto nueva
+                
+                // Esperar a que la foto nueva esté lista antes de volver a mostrarla
+                imgElement.onload = () => {
+                    imgElement.style.opacity = 1;
+                };
+            }, 300); // 300 milisegundos para dar tiempo al efecto
         }
     }
 
