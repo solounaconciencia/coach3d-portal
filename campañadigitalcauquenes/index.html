@@ -167,6 +167,28 @@
             .step h3 { font-size: 1.5rem; }
             .step p { font-size: 0.9rem; margin-bottom: 15px; }
         }
+
+        /* --- REPRODUCTOR DE VIDEO PREMIUM --- */
+        .video-container {
+            width: 100%; max-width: 800px; margin: 0 auto 40px auto;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            position: relative;
+        }
+        .video-responsive {
+            overflow: hidden; padding-bottom: 56.25%; /* Proporción 16:9 perfecta */
+            position: relative; height: 0;
+        }
+        .video-responsive iframe {
+            left: 0; top: 0; height: 100%; width: 100%; position: absolute; border: none;
+        }
+        /* Efecto de resplandor detrás del video */
+        .video-glow {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 105%; height: 105%; background: var(--accent);
+            filter: blur(50px); opacity: 0.15; z-index: -1;
+        }
     </style>
 </head>
 <body>
@@ -177,8 +199,18 @@
     
     <section>
         <h1>Llevamos tu negocio al futuro</h1>
-        <p>Campaña de Digitalización Cauquenes 2026. Exclusivo para emprendedores que no le temen al éxito.</p>
-        <button class="btn-premium" onclick="iniciarEncuesta()">Comenzar Encuesta de 7 preguntas</button>
+        <p>Campaña de Digitalización Cauquenes 2026. Exclusivo para emprendedores locales que no le temen al éxito.</p>
+        
+        <div style="position: relative; margin-top: 40px;">
+            <div class="video-glow"></div>
+            <div class="video-container">
+                <div class="video-responsive">
+                    <iframe id="video-diego" src="https://www.youtube.com/embed/ScMzIvxBSi4?rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-premium" onclick="iniciarEncuesta()" style="margin-top: 20px;">Comenzar Encuesta de 7 preguntas</button>
     </section>
 
     <section>
