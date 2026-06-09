@@ -2111,18 +2111,20 @@
 
         <button class="btn" onclick="cancelarRegistro()" style="margin-top: 10px; font-size: 0.8em;">Volver</button>
     </div>
+
+    <!-- ☰ MENU PERMANENTE (FUERA DEL DASHBOARD) -->
+    <button id="kairo-btn-hamburguesa" class="btn-hamburguesa hidden" onclick="toggleMenuApp()">☰</button>
+    <div id="overlay-menu" class="overlay-menu" onclick="toggleMenuApp()"></div>
+    <div id="sidebar-menu" class="sidebar-menu">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+            <h3 style="color: var(--neon-n); margin: 0; letter-spacing: 2px;">MENU PRINCIPAL</h3>
+            <button onclick="toggleMenuApp()" style="background:transparent; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
+        </div>
+        <div id="contenedor-items-menu"></div>
+    </div>
+
+    <!-- INICIO DEL DASHBOARD -->
     <div id="view-dashboard" class="hidden">
-        <button class="btn-hamburguesa" onclick="toggleMenuApp()">☰</button>
-        
-      <div id="overlay-menu" class="overlay-menu" onclick="toggleMenuApp()"></div>
-      <div id="sidebar-menu" class="sidebar-menu">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
-              <h3 style="color: var(--neon-n); margin: 0; letter-spacing: 2px;">MENU PRINCIPAL</h3>
-              <button onclick="toggleMenuApp()" style="background:transparent; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
-          </div>
-          <div id="contenedor-items-menu">
-              </div>
-      </div>
 
     <div class="logout-btn btn-m" onclick="logout()" style="position: absolute; top: 10px; right: 10px; font-size: 0.7em; padding: 5px 10px;">Cerrar Sesión</div>
 
@@ -2132,7 +2134,7 @@
         <button class="btn btn-m" style="padding: 6px 15px; font-size: 0.7em;" onclick="abrirCentroComando()">CENTRO DE COMANDO</button>
     </div>
 
-    <div id="modal-centro-comando" class="hidden glass-panel" style="max-width: 900px; height: 85vh; overflow-y: auto; padding: 0;">
+    <div id="modal-centro-comando" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 3000000 !important; width: 95% !important; max-width: 900px !important; height: 85vh !important; overflow-y: auto !important; padding: 0; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
         <div style="background: rgba(0,0,0,0.8); padding: 20px; border-bottom: 1px solid var(--neon-m); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;">
             <h2 style="margin: 0; color: var(--neon-m); font-family: 'Orbitron'; letter-spacing: 2px;">CENTRO DE COMANDO</h2>
             <button onclick="cerrarCentroComando()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">×</button>
@@ -3641,7 +3643,7 @@ function showForm(type) {
       document.getElementById('modal-recover').classList.add('hidden');
 
       document.getElementById('modal-login').classList.add('hidden');
-
+      document.getElementById('kairo-btn-hamburguesa').classList.remove('hidden');
       document.getElementById('step-1-recover').classList.remove('hidden');
 
       document.getElementById('step-2-recover').classList.add('hidden');
@@ -4128,6 +4130,7 @@ function logout() {
   localStorage.clear();
   sessionUser = null;
   // Redirección limpia a tu misma página de GitHub Pages, no a Google Scripts externos
+  document.getElementById('kairo-btn-hamburguesa').classList.add('hidden');
   window.top.location.href = window.location.origin + window.location.pathname;
 }
 
@@ -8328,6 +8331,7 @@ async function abrirCentroComando() {
     document.body.appendChild(modal); // Inmunidad a la Matrix
     modal.classList.remove('hidden');
     modal.style.display = 'block';
+    document.getElementById('main-content').classList.add('blur-effect'); // 🛡️ Aplica el desenfoque al fondo
     
     mostrarLoading("Cargando base de datos...");
     
@@ -8348,6 +8352,7 @@ function cerrarCentroComando() {
     const modal = document.getElementById('modal-centro-comando');
     modal.classList.add('hidden');
     modal.style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect'); // 🛡️ Quita el desenfoque
 }
 
 function cambiarTabAdmin(tabId) {
