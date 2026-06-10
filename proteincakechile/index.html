@@ -2,546 +2,135 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProteinaCake | Pastelería Vegana Proteica en Cauquenes</title>
-    
-    <!-- Tipografía Premium: Montserrat -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- Íconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <title>Banner LinkedIn Diego Arenas</title>
     <style>
-        /* Variables de Marca Personalizadas (Azul, Verde, Blanco) */
         :root {
-            --color-primario: #0047AB; /* Azul cobalto profundo, autoridad y confianza */
-            --color-secundario: #4CAF50; /* Verde vibrante, salud y frescura vegana */
-            --color-acento: #4CAF50; /* Verde para CTAs */
-            --color-texto: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            --font-main: 'Montserrat', sans-serif;
+            --primary-bg: #0a0f1e;
+            --neon-m: #a855f7; /* Morado */
+            --neon-n: #22d3ee; /* Cian */
+            --neon-f: #10b981; /* Verde */
+            --white: #e2e8f0;
         }
-
-        /* Reset y Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: var(--font-main);
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            /* Fondo elegante y oscuro para que el Glassmorphism y los colores destaquen */
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            background-attachment: fixed;
-            color: var(--color-texto);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Glassmorphism Util */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* Navegación Fija */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 10px 5%;
+            background: #111;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
         }
-
-        .logo-container {
+        /* Contenedor con las dimensiones oficiales exigidas por LinkedIn */
+        .linkedin-banner {
+            width: 1584px;
+            height: 396px;
+            background-color: var(--primary-bg);
+            background-image: linear-gradient(135deg, rgba(10,15,30,0.95) 0%, rgba(20,10,40,0.9) 100%), 
+                              url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1584&q=80');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid var(--neon-n);
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
         }
-
-        .logo-img {
-            height: 50px; /* Ajuste para el logo conceptual generado */
-            border-radius: 8px;
+        /* Cuadrícula digital Matrix de fondo */
+        .linkedin-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, rgba(34,211,238,0.03) 1px, transparent 1px),
+                        linear-gradient(rgba(168,85,247,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--color-texto);
-        }
-
-        .logo-text span {
-            color: var(--color-secundario);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--color-secundario);
-        }
-
-        .hamburger {
-            display: none;
-            cursor: pointer;
-            font-size: 28px;
-            color: var(--color-texto);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
+        /* Zona de resguardo para la foto de perfil redonda de LinkedIn */
+        .profile-safe-zone {
+            width: 420px;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            padding: 0 20px;
-            padding-top: 100px;
-            /* Fondo sutil con imagen de pastelería moderna */
-            background: url('https://images.unsplash.com/photo-1587216661136-e822005df881?q=80&w=2000&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: 2;
         }
-
-        .hero-content {
-            max-width: 900px;
-            padding: 60px;
-            border-radius: 30px;
-        }
-
-        .hero h1 {
-            font-size: 3.8rem;
-            font-weight: 800;
-            margin-bottom: 25px;
-            line-height: 1.1;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.7);
-        }
-
-        .hero h1 span {
-            color: var(--color-secundario);
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 45px;
-            font-weight: 300;
-            color: #e0e0e0;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 18px 50px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-            background: var(--color-primario);
-            border: none;
-            border-radius: 50px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
-            box-shadow: 0 10px 25px rgba(0, 71, 171, 0.4);
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px rgba(0, 71, 171, 0.6);
-            background-color: #003a8c;
-        }
-
-        .btn-alt {
-            background: var(--color-secundario);
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
-        }
-
-        .btn-alt:hover {
-            background-color: #3d8b40;
-            box-shadow: 0 15px 30px rgba(76, 175, 80, 0.6);
-        }
-
-        /* Sección Productos */
-        .productos {
-            padding: 120px 5%;
-            text-align: center;
-        }
-
-        .productos h2 {
-            font-size: 2.8rem;
-            margin-bottom: 20px;
-            font-weight: 800;
-        }
-
-        .productos h2 span {
-            color: var(--color-primario);
-        }
-
-        .productos > p {
-            margin-bottom: 70px;
-            font-size: 1.2rem;
-            font-weight: 300;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            color: #ccc;
-        }
-
-        .grid-productos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 50px;
-            margin-top: 50px;
-        }
-
-        .card {
-            padding: 30px;
-            text-align: left;
+        /* Bloque central del mensaje de impacto */
+        .content-zone {
+            flex: 1;
+            padding-right: 50px;
+            z-index: 2;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
-            border: 1px solid transparent;
+            justify-content: center;
         }
-
-        .card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            border-color: var(--color-secundario);
-        }
-
-        .card img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 15px;
-            margin-bottom: 25px;
-        }
-
-        .card-tag {
-            display: inline-block;
-            background: rgba(76, 175, 80, 0.2);
-            color: var(--color-secundario);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+        .main-slogan {
+            color: var(--white);
+            font-size: 2rem;
             font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 15px;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-
-        .card h3 {
-            font-size: 1.7rem;
-            margin-bottom: 12px;
-            font-weight: 800;
+        .main-slogan span {
+            color: var(--neon-n);
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
         }
-
-        .card p {
-            font-size: 1rem;
-            margin-bottom: 25px;
-            color: #d0d0d0;
-            font-weight: 300;
-            flex-grow: 1;
-        }
-
-        .card .btn-card {
-            width: 100%;
-            text-align: center;
-            padding: 12px;
-            font-size: 0.9rem;
-        }
-
-        /* Sección Ubicación */
-        .ubicacion {
-            padding: 100px 5%;
-            text-align: center;
-            margin-bottom: 120px;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .ubicacion-box {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 60px;
-            border-radius: 30px;
-        }
-
-        .ubicacion-box h2 {
-            font-size: 2.5rem;
-            margin-bottom: 25px;
-            font-weight: 800;
-        }
-
-        .ubicacion-box p {
-            margin-bottom: 40px;
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: #e0e0e0;
-        }
-
-        .info-address {
+        /* Módulos de los pilares */
+        .pillars-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 40px;
+            gap: 25px;
+        }
+        .pillar-tag {
+            font-size: 0.95rem;
             font-weight: 600;
-            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 14px;
+            border-radius: 4px;
+            background: rgba(15, 25, 45, 0.7);
         }
-
-        .info-address i {
-            color: var(--color-secundario);
-            font-size: 1.5rem;
-        }
-
-        /* Burbuja WhatsApp */
-        .whatsapp-float {
-            position: fixed;
-            width: 65px;
-            height: 65px;
-            bottom: 40px;
+        .p-tech { border: 1px solid var(--neon-n); color: var(--neon-n); }
+        .p-fin { border: 1px solid var(--neon-m); color: var(--neon-m); }
+        .p-ment { border: 1px solid var(--neon-f); color: var(--neon-f); }
+        /* URL del Call To Action en la esquina inferior derecha */
+        .cta-url {
+            position: absolute;
+            bottom: 25px;
             right: 40px;
-            background-color: #25d366;
-            color: #FFF;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 35px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            animation: pulse 2s infinite;
-            transition: transform 0.3s;
-        }
-
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-        }
-
-        /* Footer Redes Sociales */
-        footer {
-            text-align: center;
-            padding: 50px;
-            background: rgba(0,0,0,0.8);
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .social-links {
-            margin-bottom: 30px;
-        }
-
-        .social-links a {
-            color: white;
-            font-size: 28px;
-            margin: 0 20px;
-            transition: color 0.3s, transform 0.3s;
-            display: inline-block;
-        }
-
-        .social-links a:hover {
-            color: var(--color-secundario);
-            transform: scale(1.2) translateY(-5px);
-        }
-
-        footer p {
-            font-size: 0.9rem;
-            color: #aaa;
-            font-weight: 300;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .hero h1 { font-size: 3rem; }
-            .hero-content { padding: 40px; }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                position: fixed;
-                right: -100%;
-                top: 71px;
-                flex-direction: column;
-                background: rgba(10, 10, 10, 0.98);
-                width: 100%;
-                text-align: center;
-                transition: 0.4s ease;
-                padding: 50px 0;
-                backdrop-filter: blur(20px);
-                border-bottom: 1px solid var(--glass-border);
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links li {
-                margin: 15px 0;
-            }
-
-            .hamburger {
-                display: block;
-            }
-
-            .hero h1 { font-size: 2.2rem; }
-            .hero p { font-size: 1rem; }
-            .btn { padding: 15px 35px; font-size: 1rem; }
-            
-            .productos h2 { font-size: 2.2rem; }
-            .grid-productos { gap: 30px; }
-
-            .ubicacion-box { padding: 30px; }
-            .ubicacion-box h2 { font-size: 2rem; }
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: rgba(168, 85, 247, 0.2);
+            padding: 8px 18px;
+            border-radius: 5px;
+            border: 1px solid var(--neon-m);
+            letter-spacing: 0.5px;
+            z-index: 2;
+            text-shadow: 0 0 8px rgba(168, 85, 247, 0.6);
         }
     </style>
 </head>
 <body>
 
-    <!-- Navegación -->
-    <header>
-        <div class="logo-container">
-            <!-- Logo Conceptual Generado inyectado aquí -->
-            <img src="image_0.png" alt="ProteinaCake Logo Concept" class="logo-img">
-            <div class="logo-text">Proteina<span>Cake</span></div>
-        </div>
-        <div class="hamburger" id="hamburger">
-            <i class="fas fa-bars"></i>
-        </div>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="#inicio">Inicio</a></li>
-            <li><a href="#productos">Pastelería Fitness</a></li>
-            <li><a href="#ubicacion">Ubicación</a></li>
-            <li><a href="#" target="_blank">Instagram</a></li>
-        </ul>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero" id="inicio">
-        <div class="hero-content glass">
-            <h1>El Placer de la Pastelería, <span>sin Culpa 24/7.</span></h1>
-            <p>Descubre en Cauquenes la evolución del sabor: recetas veganas premium potenciadas con suplementos de proteína. Deliciosos Muffins, Queques y Galletas que cuidan tu cuerpo y satisfacen tu antojo, disponibles para pedir en cualquier momento.</p>
-            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-                <a href="#productos" class="btn">Ver Catálogo Proteico</a>
-                <a href="https://wa.me/56976003412" class="btn btn-alt" target="_blank">Pide por WhatsApp</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Productos Estrella -->
-    <section class="productos" id="productos">
-        <div class="card-tag" style="background: rgba(0, 71, 171, 0.1); color: var(--color-primario);">Proteína & Sabor</div>
-        <h2>Nuestra Selección Elite en <span>Cauquenes</span></h2>
-        <p>No elijas entre sabor y nutrición. Nuestra pastelería vegana está diseñada para atletas y amantes del dulce que buscan un estándar superior.</p>
+    <div class="linkedin-banner">
         
-        <div class="grid-productos">
-            <!-- Producto 1: Muffins -->
-            <div class="card glass">
-                <img src="https://images.unsplash.com/photo-1603532648955-039310d9ed75?q=80&w=600&auto=format&fit=crop" alt="Muffins Proteicos ProteinaCake">
-                <div class="card-tag">Vegano + Proteína</div>
-                <h3>Muffins Power Bomb</h3>
-                <p>Esponjosos y cargados de energía. Perfectos para un snack post-entrenamiento o un desayuno rápido. 15g de proteína vegetal por unidad.</p>
-                <a href="https://wa.me/56976003412?text=Hola!%20Quiero%20pedir%20tus%20Muffins%20Power%20Bomb" class="btn btn-card" target="_blank">Pide los tuyos</a>
-            </div>
-
-            <!-- Producto 2: Queques -->
-            <div class="card glass">
-                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=600&auto=format&fit=crop" alt="Queques Saludables Cauquenes">
-                <div class="card-tag">Receta Premium</div>
-                <h3>Queques Fit Deluxe</h3>
-                <p>Sabor tradicional con una macro-nutrición moderna. Variedad de sabores (Chocolate, Vainilla, Zanahoria), sin azúcar añadida y 100% plant-based.</p>
-                <a href="https://wa.me/56976003412?text=Hola!%20Me%20interesan%20tus%20Queques%20Fit%20Deluxe" class="btn btn-card" target="_blank">Quiero Info</a>
-            </div>
-
-            <!-- Producto 3: Galletas -->
-            <div class="card glass">
-                <img src="https://images.unsplash.com/photo-1486427944299-d1955d23e34d?q=80&w=600&auto=format&fit=crop" alt="Galletas Veganas Proteína">
-                <div class="card-tag">Crujiente & Sano</div>
-                <h3>Galletas Protein Crunch</h3>
-                <p>El snack perfecto para llevar. Crujientes galletas artesanales complementadas con proteína en polvo premium. Ideales para calmar el antojo de forma inteligente.</p>
-                <a href="https://wa.me/56976003412?text=Hola!%20Quiero%20probar%20tus%20Galletas%20Protein%20Crunch" class="btn btn-card" target="_blank">Encargar Ahora</a>
+        <div class="profile-safe-zone"></div>
+        
+        <div class="content-zone">
+            <h1 class="main-slogan">
+                Optimizando tu Negocio, tu Salud y tus Finanzas a través de la <span>Tecnología</span> y la <span>Mentalidad</span>.
+            </h1>
+            <div class="pillars-container">
+                <div class="pillar-tag p-tech">E-Commerce & IA</div>
+                <div class="pillar-tag p-fin">Ecosistemas 3D</div>
+                <div class="pillar-tag p-ment">Consultoría Estratégica</div>
             </div>
         </div>
-    </section>
-
-    <!-- Ubicación -->
-    <section class="ubicacion" id="ubicacion">
-        <div class="ubicacion-box glass">
-            <h2>Punto de Retiro Exclusivo</h2>
-            <div class="info-address">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Victoria 150, Cauquenes</span>
-            </div>
-            <p>Visítanos para retirar tus pedidos y conocer el epicentro de la pastelería fitness en la ciudad. Siente el aroma de la innovación.</p>
-            <a href="https://maps.google.com/?q=Victoria+150,+Cauquenes" target="_blank" class="btn btn-alt"><i class="fas fa-location-arrow"></i> Cómo Llegar</a>
+        
+        <div class="cta-url">
+            Visita nuestra plataforma ➔ coach3dlatam.app/servicios
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="logo-container" style="justify-content: center; margin-bottom: 20px;">
-             <img src="image_0.png" alt="ProteinaCake Logo Concept" class="logo-img" style="height: 40px;">
-             <div class="logo-text" style="font-size: 20px;">Proteina<span>Cake</span></div>
-        </div>
-        <div class="social-links">
-            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
-        </div>
-        <p>&copy; 2026 ProteinaCake. Pastelería Vegana Proteica Premium en Cauquenes.</p>
-        <p style="font-size: 0.8rem; margin-top: 10px; color: #777;">Diseño Glassmorphism de Alta Gama.</p>
-    </footer>
-
-    <!-- Burbuja WhatsApp -->
-    <a href="https://wa.me/56976003412" class="whatsapp-float" target="_blank" title="¡Haz tu pedido de ProteinaCake!">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <!-- Script para Menú Hamburguesa -->
-    <script>
-        const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('nav-links');
-        const links = document.querySelectorAll('.nav-links li a');
-
-        // Alternar menú al hacer clic en la hamburguesa
-        hamburger.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-
-        // Cerrar el menú al hacer clic en un enlace (ideal para móviles)
-        links.forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-            });
-        });
-    </script>
 </body>
 </html>
