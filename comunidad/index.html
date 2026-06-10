@@ -3643,7 +3643,7 @@ function showForm(type) {
       document.getElementById('modal-recover').classList.add('hidden');
 
       document.getElementById('modal-login').classList.add('hidden');
-      document.getElementById('kairo-btn-hamburguesa').classList.remove('hidden');
+      document.getElementById('kairo-btn-hamburguesa').classList.add('hidden'); // 🛡️ CORREGIDO: Se oculta al salir
       document.getElementById('step-1-recover').classList.remove('hidden');
 
       document.getElementById('step-2-recover').classList.add('hidden');
@@ -3812,6 +3812,7 @@ async function loadDashboard() {
 
   document.getElementById('view-welcome').classList.add('hidden');
   document.getElementById('modal-login').classList.add('hidden');
+  document.getElementById('kairo-btn-hamburguesa').classList.remove('hidden'); // 🛡️ CORREGIDO: Se activa al entrar a la Matrix
   
   const perfilPendiente = sessionStorage.getItem('kairo_perfil_pendiente');
   const d3dPendiente = sessionStorage.getItem('kairo_d3d_pendiente');
