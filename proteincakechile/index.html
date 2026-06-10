@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banner Ecosistema Coach 3D LATAM</title>
+    <title>Banner Ecosistema Coach 3D LATAM - Con Resplandor</title>
     <style>
         :root {
             --primary-bg: #0a0f1e;
@@ -30,7 +30,7 @@
             color: var(--white);
         }
 
-        /* Lienzo con las dimensiones oficiales requeridas por LinkedIn */
+        /* Lienzo con las dimensiones oficiales de LinkedIn (1584x396) */
         .linkedin-banner {
             width: 1584px;
             height: 396px;
@@ -46,7 +46,7 @@
             overflow: hidden;
         }
 
-        /* Malla digital Matrix */
+        /* Malla digital Matrix (Fondo tipo RED) */
         .linkedin-banner::before {
             content: '';
             position: absolute;
@@ -57,12 +57,46 @@
             z-index: 1;
         }
 
-        /* Espacio libre y reservado a la izquierda para tu silueta real */
+        /* EL DETALLE: Resplandor circular de fondo donde irá tu silueta */
+        .glow-backdrop {
+            position: absolute;
+            top: 50%;
+            left: 220px; /* Centrado exactamente en la zona destinada al protagonista */
+            transform: translate(-50%, -50%);
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, rgba(34,211,238,0.1) 50%, transparent 70%);
+            filter: blur(10px);
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Círculo tecnológico sutil superpuesto en el resplandor */
+        .tech-circle-detail {
+            position: absolute;
+            top: 50%;
+            left: 220px;
+            transform: translate(-50%, -50%);
+            width: 290px;
+            height: 290px;
+            border: 1px dashed rgba(168, 85, 247, 0.25);
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Espacio libre reservado a la izquierda para tu silueta real */
         .personal-placement-zone {
             width: 440px;
             height: 100%;
             position: relative;
             z-index: 2;
+            /* Cuando tengas tu URL, puedes añadir tu imagen recortada aquí como background-image si deseas verlo integrado localmente */
+            /* background-image: url('[TU_URL_DE_IMAGEN_CORTADA_AQUÍ]'); */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: bottom center;
         }
 
         /* Bloque central de textos y propuesta de valor */
@@ -151,6 +185,9 @@
 <body>
 
     <div class="linkedin-banner">
+        
+        <div class="glow-backdrop"></div>
+        <div class="tech-circle-detail"></div>
         
         <div class="personal-placement-zone"></div>
         
