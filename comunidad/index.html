@@ -1506,10 +1506,12 @@
 }
 
 .premium-card-media {
-    width: 40%; overflow: hidden; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);
+    width: 40%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); height: 250px; 
+    background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 .premium-card-media img {
-    width: 100%; height: 220px; object-fit: cover; transition: transform 0.5s ease;
+    width: 100%; height: 100%; object-fit: contain; /* 🛡️ FOCUS: Contain evita el recorte */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 /* Micro-Zoom Cinematográfico Dopamínico */
 .premium-service-card:hover .premium-card-media img {
@@ -2251,16 +2253,43 @@
         <div id="tab-admin-herramientas" class="hidden" style="padding: 20px; text-align: center; color: #94a3b8;">Construyendo Inyector de Ecosistema...</div>
         
         <div id="tab-admin-rangos" class="hidden" style="padding: 20px;">
-            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">👥</span> GESTIÓN DE RANGOS Y EQUIPO</h3>
-            <p style="font-size: 0.85em; color: #94a3b8; margin-top:-5px;">Busca a un usuario de la comunidad para ascenderlo a Coach o actualizar su perfil público.</p>
+            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">👥</span> GESTIÓN DE EQUIPO Y AGENDA</h3>
             
+            <p style="font-size: 0.85em; color: #94a3b8; margin-top:-5px;">Busca a un usuario por correo para ascenderlo a Coach.</p>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <input type="email" id="admin-busqueda-email" placeholder="Correo electrónico del integrante..." style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
                 <button class="btn btn-n" onclick="buscarUsuarioParaRango()">🔍 BUSCAR</button>
             </div>
+            <div id="admin-resultado-rango" class="hidden" style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border: 1px solid var(--neon-m); margin-bottom: 20px;"></div>
 
-            <div id="admin-resultado-rango" class="hidden" style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border: 1px solid var(--neon-m);">
-                 </div>
+            <h4 style="color: var(--neon-f); font-family: 'Orbitron';">🎖️ COACHES ACTIVOS</h4>
+            <div id="admin-lista-coaches-activos" style="display:flex; flex-direction:column; gap:10px; max-height:200px; overflow-y:auto; margin-bottom:20px; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);"></div>
+
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+
+            <h4 style="color: var(--neon-n); font-family: 'Orbitron';">📅 CONTROL MAESTRO DE TURNOS</h4>
+            
+            <div style="background: rgba(168, 85, 247, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-m); display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 0.7em; color: var(--neon-m);">Añadir Nueva Columna de Coach al Calendario</label>
+                    <input type="text" id="gen-nuevo-coach" placeholder="Nombre exacto del Coach" style="width: 100%; padding:8px; margin-top:5px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px;">
+                </div>
+                <button class="btn btn-m" style="padding: 8px 15px; height: 35px; font-size: 0.8em;" onclick="añadirCoachAgendaAdmin()">+ CREAR COLUMNA</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-f); margin-bottom: 20px;">
+                <div><label style="font-size: 0.7em; color: #cbd5e1;">Fecha Inicio</label><input type="date" id="gen-agenda-inicio-fecha" style="width:100%; padding:8px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px;"></div>
+                <div><label style="font-size: 0.7em; color: #cbd5e1;">Fecha Fin</label><input type="date" id="gen-agenda-fin-fecha" style="width:100%; padding:8px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px;"></div>
+                <div><label style="font-size: 0.7em; color: #cbd5e1;">Hora Inicio</label><input type="time" id="gen-agenda-inicio-hora" style="width:100%; padding:8px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px;"></div>
+                <div><label style="font-size: 0.7em; color: #cbd5e1;">Hora Fin</label><input type="time" id="gen-agenda-fin-hora" style="width:100%; padding:8px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px;"></div>
+                <div style="display:flex; align-items:flex-end;"><button class="btn btn-f" style="width: 100%; padding: 8px; font-size: 0.8em;" onclick="generarTurnosMasivosAdmin()">GENERAR BLOQUES</button></div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                <input type="date" id="admin-agenda-fecha" style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+                <button class="btn btn-n" onclick="cargarAdminAgenda()">🔄 VER MATRIZ DEL DÍA</button>
+            </div>
+            <div id="admin-matriz-agenda" style="background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--neon-m); overflow-x: auto;"></div>
         </div>
 
         <!-- ============================================== -->
@@ -2380,89 +2409,91 @@
 </div>
 
 
-
-
-
-
-
     </div> <div id="seccion-herramientas" class="glass-panel seccion-dashboard hidden" style="margin-top: 30px; padding: 15px; border-top: 2px solid var(--neon-n); overflow: hidden;">
-
         <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
-
             <img src="https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/22d3ee/external-growth-business-and-teamwork-flatart-icons-outline-flatarticons.png" style="width: 35px; height: 35px; filter: drop-shadow(0 0 5px var(--neon-n));">
-
             <h2 style="text-align: center; color: var(--neon-n); font-size: 1.3em; letter-spacing: 2px; margin: 0; text-transform: uppercase;">Impulso Personal</h2>
-
         </div>
 
         <div class="grid-herramientas">
-
             <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--neon-f); border-radius: 15px; padding: 15px; display: flex; flex-direction: column;">
-
                 <h3 style="color: var(--neon-f); text-align: center; font-size: 0.8em; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Propulsión y Orden Financiero</h3>
-
                 <div id="contenedor-herramientas-f" style="display: flex; flex-direction: column; gap: 10px;"></div>
-
             </div>
-
             <div style="background: rgba(34, 211, 238, 0.05); border: 1px solid var(--neon-n); border-radius: 15px; padding: 15px; display: flex; flex-direction: column;">
-
                 <h3 style="color: var(--neon-n); text-align: center; font-size: 0.8em; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Bio-Hack Nutrición</h3>
-
                 <div id="contenedor-herramientas-n" style="display: flex; flex-direction: column; gap: 10px;"></div>
-
             </div>
-
             <div style="background: rgba(168, 85, 247, 0.05); border: 1px solid var(--neon-m); border-radius: 15px; padding: 15px; display: flex; flex-direction: column;">
-
                 <h3 style="color: var(--neon-m); text-align: center; font-size: 0.8em; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Mentalidad & Propósito</h3>
-
                 <div id="contenedor-herramientas-m" style="display: flex; flex-direction: column; gap: 10px;"></div>
-
             </div>
-
         </div>
-
     </div>
 
+    <div id="panel-acceso-coach" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 1px dashed var(--neon-m); padding: 20px; text-align: center; background: rgba(168, 85, 247, 0.05);">
+        <h3 style="color: var(--neon-m); margin: 0 0 10px 0; font-family: 'Orbitron'; letter-spacing: 1px;">👨‍💻 PORTAL DEL COACH</h3>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin: 0 0 15px 0;">Gestiona tus horas disponibles en el calendario de la comunidad.</p>
+        <button class="btn btn-m" style="padding: 10px 20px; font-size: 0.85em;" onclick="abrirPortalCoach()">📅 GESTIONAR MI AGENDA</button>
+    </div>
 
+    <div id="modal-mi-agenda-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 600px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+        <button onclick="cerrarPortalCoach()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+        <h3 style="color: var(--neon-m); text-align: center; font-family: 'Orbitron'; margin-top: 0;">📅 MI AGENDA (Próximos 30 Días)</h3>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <input type="date" id="coach-mi-agenda-fecha" style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+            <button class="btn btn-n" onclick="cargarMiAgendaCoach()">🔄 ACTUALIZAR</button>
+        </div>
 
+        <div id="coach-matriz-agenda" style="background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--neon-m); max-height: 400px; overflow-y: auto;">
+             </div>
+    </div>
+
+    <div id="btn-acceso-coach" class="hidden seccion-dashboard" style="margin-top: 20px; border: 1px dashed var(--neon-m); padding: 20px; text-align: center; background: rgba(168, 85, 247, 0.05); border-radius: 12px;">
+        <h3 style="color: var(--neon-m); margin: 0 0 10px 0; font-family: 'Orbitron'; letter-spacing: 1px;">👨‍💻 HERRAMIENTAS DE COACH</h3>
+        <button class="btn btn-m" style="padding: 10px 20px; font-size: 0.85em;" onclick="abrirPortalCoachMaestro()">INGRESAR A MI PORTAL</button>
+    </div>
+
+    <div id="modal-portal-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: center;">
+        <button onclick="cerrarPortalCoachMaestro()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+        <span style="font-size: 3em;">👨‍💻</span>
+        <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 10px;">MI PORTAL</h3>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 25px;">Bienvenido a tu centro de control profesional.</p>
+        <button class="btn btn-n" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px;" onclick="abrirDisponibilidadCoach()">📅 MI DISPONIBILIDAD (AGENDA)</button>
+    </div>
+
+    <div id="modal-mi-agenda-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000001 !important; width: 95% !important; max-width: 600px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+        <button onclick="cerrarDisponibilidadCoach()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+        <h3 style="color: var(--neon-n); text-align: center; font-family: 'Orbitron'; margin-top: 0;">📅 MI DISPONIBILIDAD</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <input type="date" id="coach-mi-agenda-fecha" style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-n); color: white; border-radius: 5px;">
+            <button class="btn btn-n" onclick="cargarMiAgendaCoach()">🔄 ACTUALIZAR DÍA</button>
+        </div>
+        <div id="coach-matriz-agenda" style="background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--neon-n); max-height: 400px; overflow-y: auto;"></div>
+    </div>    
+        
     <h2 id="pilar-titulo-detalle" style="text-align: center; font-size: 2.5rem; margin-top: 30px; text-transform: uppercase; letter-spacing: 3px; font-weight: 900;"></h2>
-
     <div id="contenedor-botones-pilar" style="display: flex; flex-direction: column; gap: 15px; padding: 20px;"></div>
-
-</div> <div id="contenido-modulo-diagnostico" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px;">
-
+</div> 
+            
+<div id="contenido-modulo-diagnostico" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px;">
     <div class="contenedor-diagnostico glass-panel" id="marco-diagnostico">
-
         <div id="progreso-header">
-
             <div id="barra-diagnostico" style="width: 0%"></div>
-
         </div>
-
         <div id="cuerpo-diagnostico">
-
             <div class="spinner"></div>
-
             <p class="amber" style="text-align:center; margin-top:15px; letter-spacing:1px;">CONECTANDO CON LA MATRIX...</p>
-
         </div>
-
         <div id="footer-diagnostico" style="margin-top: 30px; display:none;">
-
             <button class="btn btn-m" style="font-size: 0.7em; opacity: 0.6;" onclick="salirDelModulo()">[ ABORTAR_DIAGNÓSTICO ]</button>
-
         </div>
-
     </div>
-
 </div>
 
 
-
 <div id="modulo-perfil-bienestar" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; background-image: url('https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; position: relative; overflow: hidden; border: 2px solid var(--neon-n);">
-
     <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(10, 15, 30, 0.85); z-index: 0;"></div>
 
     <div style="position: relative; z-index: 1; padding: 10px;">
@@ -3286,13 +3317,23 @@
     </div>
 
     <div id="ser-contenedor-reserva" class="hidden" style="margin-bottom: 15px; background: rgba(34, 211, 238, 0.03); padding: 15px; border: 1px dashed var(--neon-n); border-radius: 12px; text-align: left;">
-        <label style="font-size: 0.75em; color: var(--neon-n); font-weight: bold; display: block; margin-bottom: 10px; text-align: center; letter-spacing: 1px;">📅 CALENDARIO DE ATENCIÓN: JUNIO 2026</label>
+        
+        <label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 8px;">👤 SELECCIONA A TU COACH:</label>
+        <select id="ser-coach-elegido" style="width: 100%; padding: 10px; background: #000; color: white; border: 1px solid var(--neon-m); border-radius: 4px; font-family:'Orbitron'; margin-bottom: 15px;" onchange="renderizarCalendarioDinamico()"></select>
+
+        <div id="ser-header-mes-calendario" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <button onclick="cambiarMesCalendario(-1)" style="background: transparent; border: none; color: var(--neon-n); font-size: 1.2em; cursor: pointer;">◄</button>
+            <label id="ser-label-mes-actual" style="font-size: 0.85em; color: var(--neon-n); font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">MES AÑO</label>
+            <button onclick="cambiarMesCalendario(1)" style="background: transparent; border: none; color: var(--neon-n); font-size: 1.2em; cursor: pointer;">►</button>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; font-size: 0.7em; font-weight: bold; color: var(--neon-n); margin-bottom: 8px;">
             <div>DO</div><div>LU</div><div>MA</div><div>MI</div><div>JU</div><div>VI</div><div>SA</div>
         </div>
         <div id="ser-mesh-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 15px;"></div>
+        
         <div id="ser-bloque-horas-dia" class="hidden" style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
-            <label style="font-size: 0.72em; color: #fff; display: block; margin-bottom: 8px; font-weight: 600;">⏰ Bloques Horarios Disponibles:</label>
+            <label style="font-size: 0.72em; color: #fff; display: block; margin-bottom: 8px; font-weight: 600;">⏰ Horas Disponibles para <span id="lbl-coach-horas" style="color:var(--neon-m);"></span>:</label>
             <div id="ser-lista-botones-horas" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;"></div>
         </div>
     </div>
@@ -4049,6 +4090,14 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
     document.getElementById('btn-admin-maestro').classList.remove('hidden');
   } else {
     document.getElementById('btn-admin-maestro').classList.add('hidden');
+  }
+
+  if(sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
+      const btnCoach = document.getElementById('btn-acceso-coach');
+      if (btnCoach) btnCoach.classList.remove('hidden');
+  } else {
+      const btnCoach = document.getElementById('btn-acceso-coach');
+      if (btnCoach) btnCoach.classList.add('hidden');
   }
 
   const data = await apiCall("getDashboardData", { email: sessionUser.email });
@@ -6948,136 +6997,7 @@ function cerrarDetalleServicio() {
     servicioSeleccionadoActivo = null;
 }
 
-// =========================================================================
-// 📅 MATRIX CALENDAR ENGINE: EXPERIENCIA MENSUAL DINÁMICA C3D
-// =========================================================================
-let databaseHorariosCache = [];
 
-async function inicializarCalendarioEcomm3D(skuServicio) {
-    const mesh = document.getElementById('ser-mesh-calendario');
-    mesh.innerHTML = "<p style='color:var(--neon-n); font-size:0.75em; text-align:center; grid-column:1/-1;'>Sincronizando agenda...</p>";
-    
-    const res = await apiCall("obtenerHorariosDisponibles");
-    if (res && res.success) {
-        databaseHorariosCache = res.horarios;
-        
-        let cabeceraCalculada = "MENSUAL";
-        if(res.horarios.length > 0) {
-            let partesFecha = res.horarios[0].fecha.split("-");
-            let mesesPalabras = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-            cabeceraCalculada = `${mesesPalabras[parseInt(partesFecha[1])-1]} ${partesFecha[0]}`;
-        }
-        const lblCalendario = document.querySelector('#ser-contenedor-reserva label');
-        if (lblCalendario) lblCalendario.innerText = `📅 CALENDARIO DE ATENCIÓN: ${cabeceraCalculada}`;
-        
-        renderizarMesJunio2026();
-    } else {
-        mesh.innerHTML = "<p style='color:#f87171; font-size:0.75em; grid-column:1/-1;'>Error al conectar con la agenda.</p>";
-    }
-}
-
-function renderizarMesJunio2026() {
-    const mesh = document.getElementById('ser-mesh-calendario');
-    mesh.innerHTML = "";
-
-    // 🛡️ Configuración fija para Junio 2026 (Basado en tu captura y calendario real)
-    // El mes arranca en día Lunes (index 1 de la cuadrícula)
-    const desfaseDiasVacios = 1; 
-    const totalDiasMes = 30;
-
-    // Rellenamos los casilleros vacíos del desfase
-    for (let i = 0; i < desfaseDiasVacios; i++) {
-        let vacio = document.createElement('div');
-        mesh.appendChild(vacio);
-    }
-
-    // Dibujamos los 30 casilleros del mes
-    for (let dia = 1; dia <= totalDiasMes; dia++) {
-        let cell = document.createElement('div');
-        let diaString = dia.toString().padStart(2, '0');
-        let fechaTarget = `2026-06-${diaString}`;
-
-        // Filtramos en la caché si ese día específico tiene horas libres
-        let tieneDisponibilidad = databaseHorariosCache.some(h => h.fecha === fechaTarget);
-
-        cell.innerText = dia;
-        cell.style = "padding:8px 0; font-size:0.8em; border-radius:6px; color:#475569; font-weight:600; transition:0.2s;";
-
-        if (tieneDisponibilidad) {
-            cell.style.color = "#fff";
-            cell.style.background = "rgba(34, 211, 238, 0.08)";
-            cell.style.border = "1px solid rgba(34, 211, 238, 0.2)";
-            cell.style.cursor = "pointer";
-            
-            cell.onclick = function() {
-                // Limpieza visual de selección de casilleros
-                const todasLasCeldas = mesh.querySelectorAll('div');
-                todasLasCeldas.forEach(c => { if(c.style.backgroundColor === "var(--neon-n)") { c.style.background = "rgba(34, 211, 238, 0.08)"; c.style.color = "#fff"; } });
-                
-                cell.style.background = "var(--neon-n)";
-                cell.style.color = "#000";
-                desplegarHorasDelDiaElegido(fechaTarget);
-            };
-        }
-        mesh.appendChild(cell);
-    }
-}
-
-function desplegarHorasDelDiaElegido(fechaFiltro) {
-    const bloqueHoras = document.getElementById('ser-bloque-horas-dia');
-    const contenedorBotones = document.getElementById('ser-lista-botones-horas');
-    
-    contenedorBotones.innerHTML = "";
-    bloqueHoras.classList.remove('hidden');
-
-    // Limpiamos selector previo si existía
-    let boxCoachExistente = document.getElementById('ser-selector-coach-box');
-    if (boxCoachExistente) boxCoachExistente.remove();
-
-    let slotsDelDia = databaseHorariosCache.filter(h => h.fecha === fechaFiltro);
-
-    slotsDelDia.forEach(slot => {
-        let btnHora = document.createElement('button');
-        btnHora.className = "btn";
-        btnHora.style = "padding:6px 12px; font-size:0.78em; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); color:#fff; width:auto; margin:0;";
-        btnHora.innerText = slot.hora;
-
-        btnHora.onclick = function() {
-            const todosLosBtn = contenedorBotones.querySelectorAll('button');
-            todosLosBtn.forEach(b => { b.style.background = "rgba(255,255,255,0.03)"; b.style.borderColor = "rgba(255,255,255,0.1)"; b.style.color = "#fff"; });
-
-            btnHora.style.background = "var(--neon-n)";
-            btnHora.style.borderColor = "var(--neon-n)";
-            btnHora.style.color = "#000";
-
-            slotSeleccionadoCacheId = slot.id; // Amarramos el ID Horario elegido
-            
-            // 🛡️ INYECTAR SELECTOR DINÁMICO DE COACHES
-            let boxCoach = document.getElementById('ser-selector-coach-box');
-            if(!boxCoach) {
-                boxCoach = document.createElement('div');
-                boxCoach.id = 'ser-selector-coach-box';
-                boxCoach.style = "margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.5); border: 1px dashed var(--neon-m); border-radius: 8px; animation: fadeIn 0.3s;";
-                document.getElementById('ser-contenedor-reserva').appendChild(boxCoach);
-            }
-            
-            let opcionesHTML = slot.coaches.map(c => `<option value="${c.linkPago}">${c.nombre}</option>`).join('');
-            
-            boxCoach.innerHTML = `
-                <label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold; display: block; margin-bottom: 8px;">👤 SELECCIONA TU COACH PARA ESTA SESIÓN:</label>
-                <select id="ser-coach-elegido" style="width: 100%; padding: 10px; background: #000; color: white; border: 1px solid var(--neon-m); border-radius: 4px; font-family:'Orbitron';">
-                    ${opcionesHTML}
-                </select>
-                <p style="font-size: 0.65em; color: #94a3b8; margin: 8px 0 0 0;">El pago y la atención se derivarán al profesional seleccionado.</p>
-            `;
-            
-            const btnAccionPrincipal = document.getElementById('ser-btn-accion');
-            btnAccionPrincipal.style.opacity = "1";
-            btnAccionPrincipal.innerText = "CONFIRMAR RESERVA Y AVANZAR";
-        };
-        contenedorBotones.appendChild(btnHora);
-    });
-}
 
 function actualizarFichaTecnicaVariante() {
     const skuElegido = document.getElementById('ser-select-regalo').value;
@@ -8844,6 +8764,331 @@ async function alternarEstadoCoach(idHorario, coach, nuevoEstado) {
         notify("❌ Error al modificar el horario en la Matrix.");
     }
 }
+
+// =========================================================
+// 👨‍💻 PORTAL DEL COACH Y GENERADOR ADMIN
+// =========================================================
+async function abrirPortalCoach() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-mi-agenda-coach').classList.remove('hidden');
+    document.getElementById('modal-mi-agenda-coach').style.display = 'block';
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    document.getElementById('coach-mi-agenda-fecha').value = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+    cargarMiAgendaCoach();
+}
+
+function cerrarPortalCoach() {
+    document.getElementById('modal-mi-agenda-coach').classList.add('hidden');
+    document.getElementById('modal-mi-agenda-coach').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+async function cargarMiAgendaCoach() {
+    const fechaInput = document.getElementById('coach-mi-agenda-fecha').value;
+    const contenedor = document.getElementById('coach-matriz-agenda');
+    contenedor.innerHTML = "<div class='spinner'></div><p style='text-align:center; color:var(--neon-n);'>Descargando tus horas...</p>";
+
+    const res = await apiCall("obtenerMiAgendaCoach", { fecha: fechaInput, emailCoach: sessionUser.email });
+    if (res && res.success) {
+        contenedor.innerHTML = "";
+        if (res.horarios.length === 0) {
+            contenedor.innerHTML = "<p style='color:#94a3b8; padding: 20px; text-align: center;'>No hay bloques generados por el sistema para esta fecha.</p>";
+            return;
+        }
+        res.horarios.forEach(h => {
+            let isLibre = (h.estado === "LIBRE");
+            let colorBtn = isLibre ? "var(--neon-f)" : "#ef4444";
+            let textBtn = isLibre ? "ESTOY DISPONIBLE" : "NO ATENDERÉ";
+            contenedor.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span style="color:white; font-family:'Orbitron'; font-size: 1.1em; font-weight:bold;">${h.hora}</span>
+                    <button onclick="alternarMiHorarioCoach('${h.id}', '${isLibre ? 'NO DISPONIBLE' : 'LIBRE'}')" style="background:transparent; border:1px solid ${colorBtn}; color:${colorBtn}; padding:8px 15px; border-radius:4px; font-size:0.8em; cursor:pointer; font-weight:bold; transition:0.3s;" onmouseover="this.style.background='${colorBtn}'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='${colorBtn}';">${textBtn}</button>
+                </div>
+            `;
+        });
+    } else { contenedor.innerHTML = `<p style='color:#f87171; text-align:center; padding:20px;'>Error: ${res ? res.msg : "Sin conexión"}</p>`; }
+}
+
+async function alternarMiHorarioCoach(idHorario, nuevoEstado) {
+    mostrarLoading("Actualizando agenda...");
+    const res = await apiCall("alternarMiHorarioCoach", { idHorario: idHorario, emailCoach: sessionUser.email, nuevoEstado: nuevoEstado });
+    ocultarLoading();
+    if (res && res.success) cargarMiAgendaCoach();
+    else notify("❌ Error al modificar: " + (res ? res.msg : "Conexión fallida"));
+}
+
+async function generarTurnosMasivosAdmin() {
+    const fecha = document.getElementById('gen-agenda-fecha').value;
+    const inicio = document.getElementById('gen-agenda-inicio').value;
+    const fin = document.getElementById('gen-agenda-fin').value;
+    const intervalo = document.getElementById('gen-agenda-intervalo').value;
+    if (!fecha || !inicio || !fin) return notify("Completa Fecha, Hora Inicio y Hora Fin.");
+
+    mostrarLoading("Generando Bloques Cuánticos en la Matrix...");
+    const res = await apiCall("adminGenerarBloquesAgenda", { fecha, inicio, fin, intervalo });
+    ocultarLoading();
+
+    if (res && res.success) {
+        notify(`✅ ${res.creados} bloques horarios generados con éxito.`);
+        document.getElementById('admin-agenda-fecha').value = fecha; 
+        cargarAdminAgenda();
+    } else { notify("❌ Error: " + (res ? res.msg : "Conexión fallida.")); }
+}
+
+async function añadirCoachAgendaAdmin() {
+    const nombre = document.getElementById('gen-nuevo-coach').value.trim();
+    if (!nombre) return notify("Escribe el nombre del nuevo Coach.");
+
+    mostrarLoading("Alterando arquitectura de Columnas...");
+    const res = await apiCall("adminAgregarCoachAgenda", { nombreCoach: nombre });
+    ocultarLoading();
+
+    if (res && res.success) {
+        notify("✅ Columna creada. El Coach ya existe en el Calendario.");
+        document.getElementById('gen-nuevo-coach').value = "";
+        cargarAdminAgenda();
+    } else { notify("❌ Error: " + (res ? res.msg : "Conexión fallida.")); }
+}        
+
+// =========================================================
+// 👨‍💻 MOTORES: PORTAL COACH Y ADMIN
+// =========================================================
+
+// --- RUTAS DEL COACH ---
+function abrirPortalCoachMaestro() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-portal-coach').classList.remove('hidden');
+    document.getElementById('modal-portal-coach').style.display = 'block';
+}
+function cerrarPortalCoachMaestro() {
+    document.getElementById('modal-portal-coach').classList.add('hidden');
+    document.getElementById('modal-portal-coach').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+function abrirDisponibilidadCoach() {
+    document.getElementById('modal-portal-coach').classList.add('hidden'); 
+    document.getElementById('modal-mi-agenda-coach').classList.remove('hidden');
+    document.getElementById('modal-mi-agenda-coach').style.display = 'block';
+    const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    document.getElementById('coach-mi-agenda-fecha').value = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+    cargarMiAgendaCoach();
+}
+function cerrarDisponibilidadCoach() {
+    document.getElementById('modal-mi-agenda-coach').classList.add('hidden');
+    document.getElementById('modal-mi-agenda-coach').style.display = 'none';
+    document.getElementById('modal-portal-coach').classList.remove('hidden'); 
+}
+
+async function cargarMiAgendaCoach() {
+    const fechaInput = document.getElementById('coach-mi-agenda-fecha').value;
+    const contenedor = document.getElementById('coach-matriz-agenda');
+    contenedor.innerHTML = "<div class='spinner'></div><p style='text-align:center; color:var(--neon-n);'>Descargando tus horas...</p>";
+
+    const res = await apiCall("obtenerMiAgendaCoach", { fecha: fechaInput, emailCoach: sessionUser.email });
+    if (res && res.success) {
+        contenedor.innerHTML = "";
+        if (res.horarios.length === 0) {
+            contenedor.innerHTML = "<p style='color:#94a3b8; padding: 20px; text-align: center;'>No hay bloques generados por el Admin para esta fecha.</p>";
+            return;
+        }
+        res.horarios.forEach(h => {
+            let isLibre = (h.estado === "LIBRE");
+            let colorBtn = isLibre ? "var(--neon-f)" : "#ef4444";
+            let textBtn = isLibre ? "ESTOY DISPONIBLE" : "NO ATENDERÉ";
+            contenedor.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span style="color:white; font-family:'Orbitron'; font-size: 1.1em; font-weight:bold;">${h.hora}</span>
+                    <button onclick="alternarMiHorarioCoach('${h.id}', '${isLibre ? 'NO DISPONIBLE' : 'LIBRE'}')" style="background:transparent; border:1px solid ${colorBtn}; color:${colorBtn}; padding:8px 15px; border-radius:4px; font-size:0.8em; cursor:pointer; font-weight:bold; transition:0.3s;" onmouseover="this.style.background='${colorBtn}'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='${colorBtn}';">${textBtn}</button>
+                </div>`;
+        });
+    } else { contenedor.innerHTML = `<p style='color:#f87171; text-align:center; padding:20px;'>Error: ${res ? res.msg : "Sin conexión"}</p>`; }
+}
+
+async function alternarMiHorarioCoach(idHorario, nuevoEstado) {
+    mostrarLoading("Actualizando agenda...");
+    const res = await apiCall("alternarMiHorarioCoach", { idHorario: idHorario, emailCoach: sessionUser.email, nuevoEstado: nuevoEstado });
+    ocultarLoading();
+    if (res && res.success) cargarMiAgendaCoach();
+    else notify("❌ Error al modificar: " + (res ? res.msg : "Conexión fallida"));
+}
+
+// --- RUTAS DEL ADMIN ---
+async function cargarListaCoachesAdmin() {
+    const contenedor = document.getElementById('admin-lista-coaches-activos');
+    contenedor.innerHTML = "<p style='color:#94a3b8; text-align:center;'>Cargando escuadrón...</p>";
+    const res = await apiCall("adminObtenerListaCoaches");
+    if(res && res.success) {
+        contenedor.innerHTML = "";
+        if(res.coaches.length === 0) return contenedor.innerHTML = "<p style='color:#94a3b8; text-align:center;'>No tienes coaches activos.</p>";
+        res.coaches.forEach(c => {
+            contenedor.innerHTML += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div><strong style="color:var(--neon-f); font-size:0.9em;">${c.nombre}</strong><br><span style="color:#94a3b8; font-size:0.7em;">${c.email}</span></div>
+                    <button class="btn btn-n" style="padding:4px 8px; font-size:0.7em;" onclick="document.getElementById('admin-busqueda-email').value='${c.email}'; buscarUsuarioParaRango();">⚙️ EDITAR</button>
+                </div>`;
+        });
+    } else { contenedor.innerHTML = "<p style='color:#f87171; text-align:center;'>Error al cargar escuadrón.</p>"; }
+}
+
+async function generarTurnosMasivosAdmin() {
+    const fechaInicio = document.getElementById('gen-agenda-inicio-fecha').value;
+    const fechaFin = document.getElementById('gen-agenda-fin-fecha').value;
+    const hInicio = document.getElementById('gen-agenda-inicio-hora').value;
+    const hFin = document.getElementById('gen-agenda-fin-hora').value;
+    
+    if (!fechaInicio || !fechaFin || !hInicio || !hFin) return notify("Completa todos los campos de Rango de Fechas y Horas.");
+    
+    mostrarLoading("Generando Bloques Cuánticos en la Matrix...");
+    const res = await apiCall("adminGenerarBloquesAgendaRango", { fechaInicio, fechaFin, hInicio, hFin, intervalo: "60" });
+    ocultarLoading();
+    
+    if (res && res.success) {
+        notify(`✅ ${res.creados} bloques horarios generados.`);
+        document.getElementById('admin-agenda-fecha').value = fechaInicio; 
+        cargarAdminAgenda();
+    } else { notify("❌ Error: " + (res ? res.msg : "Conexión fallida.")); }
+}
+
+async function añadirCoachAgendaAdmin() {
+    const nombre = document.getElementById('gen-nuevo-coach').value.trim();
+    if (!nombre) return notify("Escribe el nombre del nuevo Coach.");
+    mostrarLoading("Alterando arquitectura de Columnas...");
+    const res = await apiCall("adminAgregarCoachAgenda", { nombreCoach: nombre });
+    ocultarLoading();
+    if (res && res.success) {
+        notify("✅ Columna creada en Calendario.");
+        document.getElementById('gen-nuevo-coach').value = "";
+    } else { notify("❌ Error: " + (res ? res.msg : "Conexión fallida.")); }
+}
+
+// --- EL CALENDARIO DEL CLIENTE (MOTOR PERPETUO) ---
+let databaseHorariosCache = [];
+let mesCalendarioActual = new Date().getMonth();
+let anioCalendarioActual = new Date().getFullYear();
+
+async function inicializarCalendarioEcomm3D(skuServicio) {
+    const mesh = document.getElementById('ser-mesh-calendario');
+    const selectorCoach = document.getElementById('ser-coach-elegido');
+    mesh.innerHTML = "<p style='color:var(--neon-n); font-size:0.75em; text-align:center; grid-column:1/-1;'>Sincronizando agenda...</p>";
+    selectorCoach.innerHTML = '<option value="">Cargando Coaches...</option>';
+
+    mesCalendarioActual = new Date().getMonth();
+    anioCalendarioActual = new Date().getFullYear();
+
+    const res = await apiCall("obtenerHorariosDisponibles");
+    if (res && res.success) {
+        databaseHorariosCache = res.horarios;
+        let coachesMap = new Map();
+        databaseHorariosCache.forEach(slot => { slot.coaches.forEach(c => { coachesMap.set(c.nombre, c.linkPago); }); });
+
+        selectorCoach.innerHTML = '<option value=\"\" disabled selected>-- Elige con quién atenderte --</option>';
+        if (coachesMap.size === 0) {
+            selectorCoach.innerHTML = '<option value=\"\" disabled>No hay coaches disponibles</option>';
+            mesh.innerHTML = ""; return;
+        }
+
+        coachesMap.forEach((link, nombre) => {
+            let opt = document.createElement('option');
+            opt.value = link; 
+            opt.setAttribute('data-nombre', nombre);
+            opt.innerText = nombre;
+            selectorCoach.appendChild(opt);
+        });
+        mesh.innerHTML = "<p style='color:#cbd5e1; font-size:0.75em; text-align:center; grid-column:1/-1; padding: 15px;'>↑ Selecciona a tu Coach arriba.</p>";
+    } else { mesh.innerHTML = "<p style='color:#f87171; grid-column:1/-1;'>Error de conexión.</p>"; }
+}
+
+function cambiarMesCalendario(direccion) {
+    mesCalendarioActual += direccion;
+    if (mesCalendarioActual > 11) { mesCalendarioActual = 0; anioCalendarioActual++; }
+    if (mesCalendarioActual < 0) { mesCalendarioActual = 11; anioCalendarioActual--; }
+    renderizarCalendarioDinamico();
+}
+
+function renderizarCalendarioDinamico() {
+    const mesh = document.getElementById('ser-mesh-calendario');
+    const selectorCoach = document.getElementById('ser-coach-elegido');
+    const nombreCoach = selectorCoach.options[selectorCoach.selectedIndex]?.getAttribute('data-nombre');
+
+    document.getElementById('ser-bloque-horas-dia').classList.add('hidden');
+    document.getElementById('ser-btn-accion').style.opacity = "0.4";
+    slotSeleccionadoCacheId = null;
+
+    if (!nombreCoach) return;
+
+    const mesesPalabras = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    document.getElementById('ser-label-mes-actual').innerText = `${mesesPalabras[mesCalendarioActual]} ${anioCalendarioActual}`;
+    document.getElementById('lbl-coach-horas').innerText = nombreCoach;
+
+    mesh.innerHTML = "";
+
+    const primerDiaMes = new Date(anioCalendarioActual, mesCalendarioActual, 1).getDay();
+    const diasEnElMes = new Date(anioCalendarioActual, mesCalendarioActual + 1, 0).getDate();
+
+    for (let i = 0; i < primerDiaMes; i++) mesh.appendChild(document.createElement('div'));
+
+    const slotsCoachActivo = databaseHorariosCache.filter(slot => slot.coaches.some(c => c.nombre === nombreCoach));
+
+    for (let dia = 1; dia <= diasEnElMes; dia++) {
+        let cell = document.createElement('div');
+        let diaString = dia.toString().padStart(2, '0');
+        let mesString = (mesCalendarioActual + 1).toString().padStart(2, '0');
+        let fechaTarget = `${anioCalendarioActual}-${mesString}-${diaString}`;
+
+        let tieneDisponibilidad = slotsCoachActivo.some(h => h.fecha === fechaTarget);
+
+        cell.innerText = dia;
+        cell.style = "padding:8px 0; font-size:0.8em; border-radius:6px; color:#475569; font-weight:600; transition:0.2s;";
+        
+        if (tieneDisponibilidad) {
+            cell.style.color = "#fff";
+            cell.style.background = "rgba(34, 211, 238, 0.08)";
+            cell.style.border = "1px solid rgba(34, 211, 238, 0.2)";
+            cell.style.cursor = "pointer";
+            
+            cell.onclick = function() {
+                const todasLasCeldas = mesh.querySelectorAll('div');
+                todasLasCeldas.forEach(c => { if(c.style.backgroundColor === "var(--neon-n)") { c.style.background = "rgba(34, 211, 238, 0.08)"; c.style.color = "#fff"; } });
+                cell.style.background = "var(--neon-n)";
+                cell.style.color = "#000";
+                desplegarHorasDelDiaCoach(fechaTarget, nombreCoach, slotsCoachActivo);
+            };
+        }
+        mesh.appendChild(cell);
+    }
+}
+
+function desplegarHorasDelDiaCoach(fechaFiltro, nombreCoach, slotsCoachActivo) {
+    const bloqueHoras = document.getElementById('ser-bloque-horas-dia');
+    const contenedorBotones = document.getElementById('ser-lista-botones-horas');
+    contenedorBotones.innerHTML = "";
+    bloqueHoras.classList.remove('hidden');
+
+    let slotsDelDia = slotsCoachActivo.filter(h => h.fecha === fechaFiltro);
+    slotsDelDia.sort((a, b) => a.hora.localeCompare(b.hora));
+
+    slotsDelDia.forEach(slot => {
+        let btnHora = document.createElement('button');
+        btnHora.className = "btn";
+        btnHora.style = "padding:6px 12px; font-size:0.78em; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); color:#fff; width:auto; margin:0;";
+        btnHora.innerText = slot.hora;
+
+        btnHora.onclick = function() {
+            const todosLosBtn = contenedorBotones.querySelectorAll('button');
+            todosLosBtn.forEach(b => { b.style.background = "rgba(255,255,255,0.03)"; b.style.borderColor = "rgba(255,255,255,0.1)"; b.style.color = "#fff"; });
+            btnHora.style.background = "var(--neon-n)";
+            btnHora.style.borderColor = "var(--neon-n)";
+            btnHora.style.color = "#000";
+            slotSeleccionadoCacheId = slot.id; 
+            
+            const btnAccionPrincipal = document.getElementById('ser-btn-accion');
+            btnAccionPrincipal.style.opacity = "1";
+            btnAccionPrincipal.innerText = "CONFIRMAR RESERVA Y AVANZAR";
+        };
+        contenedorBotones.appendChild(btnHora);
+    });
+}
+        
     </script>
 </body>
 
