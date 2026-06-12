@@ -1489,38 +1489,52 @@
     box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
 }
 
-/* Tarjetas Reversibles Premium */
-.premium-service-card {
-    display: flex; align-items: center; gap: 40px; background: var(--glass);
-    border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 25px;
-    margin-bottom: 25px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.premium-service-card:hover {
-    border-color: rgba(255,255,255,0.15); transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-}
+/* ========================================================= */
+    /* TARJETAS PREMIUM (SERVICIOS Y CURSOS) - UNIFICADO FOCUS   */
+    /* ========================================================= */
+    .premium-service-card {
+        display: flex; align-items: center; gap: 40px; background: var(--glass);
+        border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 25px;
+        margin-bottom: 25px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .premium-service-card:hover {
+        border-color: rgba(255,255,255,0.15); transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    }
+    .premium-service-card:nth-child(even) { flex-direction: row-reverse; }
 
-/* Efecto Espejo Cruzado Automático */
-.premium-service-card:nth-child(even) {
-    flex-direction: row-reverse;
-}
+    .premium-card-media {
+        width: 40%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); height: 250px; 
+        background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .premium-card-media img {
+        width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .premium-service-card:hover .premium-card-media img { transform: scale(1.06); }
 
-.premium-card-media {
-    width: 40%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); height: 250px; 
-    background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; overflow: hidden;
-}
-.premium-card-media img {
-    width: 100%; height: 100%; object-fit: contain; /* 🛡️ FOCUS: Contain evita el recorte */
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-/* Micro-Zoom Cinematográfico Dopamínico */
-.premium-service-card:hover .premium-card-media img {
-    transform: scale(1.06);
-}
-
-.premium-card-info {
-    width: 60%; display: flex; flex-direction: column; gap: 12px; text-align: left;
-}
+    .premium-card-info { width: 60%; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+    
+    .pilar-filter-container {
+        background: rgba(10, 15, 30, 0.6); backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.05); border-radius: 15px;
+        padding: 20px; margin-bottom: 35px; display: flex; align-items: center; gap: 20px;
+    }
+    .kairo-filter-avatar {
+        width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--neon-n);
+        box-shadow: 0 0 10px var(--neon-n); object-fit: contain; background: #0a0f1e;
+    }
+    .pilar-tabs-wrapper { display: flex; gap: 12px; flex-wrap: wrap; flex-grow: 1; }
+    .filter-tab-premium {
+        padding: 12px 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 30px; color: #e2e8f0; font-family: 'Orbitron', sans-serif; font-size: 0.8em;
+        cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); letter-spacing: 1px;
+    }
+    .filter-tab-premium.active {
+        background: rgba(34, 211, 238, 0.12); border-color: var(--neon-n); color: var(--neon-n);
+        box-shadow: 0 0 15px rgba(34, 211, 238, 0.25);
+    }
+    .premium-catalog-grid { display: flex; flex-direction: column; gap: 30px; margin-bottom: 40px; }
+    .multistep-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-top: 15px; }
 
 @media (max-width: 768px) {
     .premium-service-card, .premium-service-card:nth-child(even) { flex-direction: column; gap: 20px; }
@@ -2453,6 +2467,20 @@
 
         <div id="coach-matriz-agenda" style="background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--neon-m); max-height: 400px; overflow-y: auto;">
              </div>
+        <!-- 🎛️ MODAL 3: MIS COBROS (COACH) -->
+    <div id="modal-cobros-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000001 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-f) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+        <button onclick="cerrarCobrosCoach()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+        <h3 style="color: var(--neon-f); text-align: center; font-family: 'Orbitron'; margin-top: 0;">💰 MIS COBROS</h3>
+        <p style="font-size: 0.85em; color: #cbd5e1; line-height: 1.5; margin-bottom: 15px; text-align: center;">Para recibir los pagos de tus servicios directamente en tu cuenta bancaria, ingresa tu <strong>Access Token de Producción</strong> de MercadoPago.</p>
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 0.75em; color: #94a3b8; margin-bottom: 20px; text-align: left;">
+            <b>¿Dónde lo consigo?</b><br>
+            1. Inicia sesión en MercadoPago.<br>
+            2. Ve a <i>Tu Negocio</i> > <i>Configuración</i> > <i>Credenciales de producción</i>.<br>
+            3. Copia el código "Access token" (empieza con APP_USR-...).
+        </div>
+        <input type="password" id="coach-token-mp" placeholder="APP_USR-..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-f); color: white; border-radius: 5px; margin-bottom: 20px;">
+        <button class="btn btn-f" style="width: 100%; padding: 15px;" onclick="guardarTokenMPCoach()">💾 GUARDAR / ACTUALIZAR TOKEN</button>
+    </div>
     </div>
 
     <div id="btn-acceso-coach" class="hidden seccion-dashboard" style="margin-top: 20px; border: 1px dashed var(--neon-m); padding: 20px; text-align: center; background: rgba(168, 85, 247, 0.05); border-radius: 12px;">
@@ -2466,6 +2494,7 @@
         <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 10px;">MI PORTAL</h3>
         <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 25px;">Bienvenido a tu centro de control profesional.</p>
         <button class="btn btn-n" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px;" onclick="abrirDisponibilidadCoach()">📅 MI DISPONIBILIDAD (AGENDA)</button>
+        <button class="btn btn-f" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px;" onclick="abrirCobrosCoach()">💰 MIS TOKEN DE COBROS</button>
     </div>
 
     <div id="modal-mi-agenda-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000001 !important; width: 95% !important; max-width: 600px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
@@ -5421,6 +5450,7 @@ async function ejecutarCrearHerramienta() {
 }
 
 function iniciarDiagnosticoModular() {
+    apagarTodosLosModulos();
     console.log("🚀 Kairo: Iniciando Motor de Diagnóstico...");
     closeAlert();
 
@@ -5873,36 +5903,48 @@ function mostrarAvisoLimite() {
 
 
 
-function salirDelModulo() {
-
-    const diagModulo = document.getElementById('contenido-modulo-diagnostico');
-    if (diagModulo) diagModulo.classList.add('hidden');
-        
-    const perfilModulo = document.getElementById('modulo-perfil-bienestar');
-    if (perfilModulo) {
-        perfilModulo.classList.add('hidden');
-        document.getElementById('form-perfil-bienestar').classList.remove('hidden');
-        document.getElementById('resultado-perfil-bienestar').classList.add('hidden');
-        document.getElementById('bubblePerfil').innerHTML = "Hola, soy Kairo. Ingresa tus parámetros metabólicos. Los campos con (*) son obligatorios para generar tu cálculo base.";
-    }
-
-    // 🛡️ INYECCIÓN FOCUS: Apaga el módulo de e-commerce de servicios al salir
-    const serviciosModulo = document.getElementById('modulo-servicios-comunidad');
-    if (serviciosModulo) serviciosModulo.classList.add('hidden');
-
-    // 🛡️ REPARO CO-CREACIÓN: Oculta la calculadora financiera para evitar superposiciones en pantalla
-    const calcModulo = document.getElementById('modulo-calculadora-financiera');
-    if (calcModulo) calcModulo.classList.add('hidden');
-
-    document.getElementById('view-dashboard').classList.remove('hidden');
-    if (typeof loadDashboard === 'function' && sessionUser) {
-        loadDashboard();
-    }
+// =========================================================
+// 🧹 MASTER SWITCH: CONTROLADOR DE VISTAS DE LA MATRIX
+// =========================================================
+function apagarTodosLosModulos() {
+    const modulos = [
+        'view-welcome', 'view-dashboard', 'seccion-herramientas',
+        'contenido-modulo-diagnostico', 'modulo-perfil-bienestar',
+        'modulo-calculadora-financiera', 'modulo-servicios-comunidad',
+        'modulo-cursos-netflix', 'modulo-productos-ecommerce',
+        'panel-acceso-coach', 'btn-acceso-coach'
+    ];
     
-    const cuerpoDiag = document.getElementById('cuerpo-diagnostico');
-    if (cuerpoDiag) cuerpoDiag.innerHTML = '<div class="spinner"></div>';
-    if (typeof closeAlert === 'function') closeAlert();
+    // Apaga todas las ventanas
+    modulos.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    
+    // Limpiezas generales visuales
     document.getElementById('main-content').classList.remove('blur-effect');
+    const cartFloat = document.getElementById('cart-float-bubble');
+    if (cartFloat) cartFloat.style.display = "none";
+    if (typeof closeAlert === 'function') closeAlert();
+}
+
+function salirDelModulo() {
+    apagarTodosLosModulos();
+    document.getElementById('view-dashboard').classList.remove('hidden');
+    
+    const herramientas = document.getElementById('seccion-herramientas');
+    if (herramientas) herramientas.classList.remove('hidden');
+
+    if (sessionUser) {
+        // Renderizar botones de Coach según el rango al volver al Dashboard
+        if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
+            const btnCoach = document.getElementById('btn-acceso-coach');
+            const panelCoach = document.getElementById('panel-acceso-coach');
+            if (btnCoach) btnCoach.classList.remove('hidden');
+            if (panelCoach) panelCoach.classList.remove('hidden');
+        }
+        if (typeof loadDashboard === 'function') loadDashboard();
+    }
 }
 
 function cerrarAlertaClaveYAbrirPerfil() {
@@ -5914,7 +5956,7 @@ function cerrarAlertaClaveYAbrirPerfil() {
 
 // 🍏 MÓDULO INTEGRADO: PERFIL DE BIENESTAR FRONTIER V2
 function iniciarPerfilBienestar() {
-
+    apagarTodosLosModulos();
     closeAlert();
 
     const welcome = document.getElementById('view-welcome'); // 🛡️ CAPA CORRECCIÓN: Capturamos la pantalla inicial
@@ -6523,6 +6565,7 @@ var ingData = [];
 var gasData = [];
 
 function iniciarcalculadorafinanciera() {
+    apagarTodosLosModulos();
     closeAlert();
     const welcome = document.getElementById('view-welcome');
     const dash = document.getElementById('view-dashboard');
@@ -6676,6 +6719,7 @@ let servicioSeleccionadoActivo = null;
 let pilarActivoComercial = "FINANZAS"; // Pilar por defecto al iniciar la Matrix
 
 async function iniciarservicios() {
+    apagarTodosLosModulos();
     closeAlert();
     document.getElementById('view-welcome').classList.add('hidden');
     document.getElementById('view-dashboard').classList.add('hidden');
@@ -6958,23 +7002,39 @@ async function ejecutarAccionComercialServicio() {
         if (s.accion === "RESERVA") localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoCacheId);
         if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
 
-        // 🛡️ ENRUTADOR DINÁMICO DE PAGO: Extraemos el link del Coach si es Reserva, o el del Servicio por defecto
-        let linkFinalDePago = s.linkPago; // Por defecto el del servicio
-        
+        // 🛡️ FOCUS: Capturamos el nombre del Coach para la auditoría contable
         if (s.accion === "RESERVA") {
-            const selectorCoach = document.getElementById('ser-coach-elegido');
-            if (selectorCoach && selectorCoach.value && selectorCoach.value.trim() !== "") {
-                linkFinalDePago = selectorCoach.value.trim(); // Link personal del Coach
-            }
+            const sel = document.getElementById('ser-coach-elegido');
+            if (sel && sel.selectedIndex > 0) detalleString += ` | Coach: ${sel.options[sel.selectedIndex].text}`;
         }
 
-        if (linkFinalDePago && linkFinalDePago !== "" && linkFinalDePago !== "#") {
-            cerrarDetalleServicio();
-            window.location.href = linkFinalDePago;
-            return;
-        } else {
-            return notify("Kairo Alerta: El Coach seleccionado no tiene un enlace de pago activo configurado.");
+        // 🛡️ GENERADOR DINÁMICO DE COBRO MERCADOPAGO (Token Admin)
+        cerrarDetalleServicio();
+        mostrarLoading("Conectando con Banco Central de la Matrix...");
+        
+        // 🛡️ Extraemos el nombre del Coach si es una Reserva de horas
+        let coachElegido = "";
+        if (s.accion === "RESERVA") {
+            const sel = document.getElementById('ser-coach-elegido');
+            if (sel && sel.selectedIndex > 0) coachElegido = sel.options[sel.selectedIndex].text;
         }
+
+        apiCall("crearPreferenciaMP", {
+            carrito: [{nombre: s.nombre, cantidad: 1, precio: precioFinalACobrar, variante: s.accion}],
+            email: emailUser,
+            nombre: nombreUser,
+            coachPropietario: coachElegido, // 🛡️ FOCUS: Mandamos el nombre del coach al servidor
+            urlRetorno: window.location.origin + window.location.pathname,
+            moduloRetorno: "retorno_pago" 
+        }).then(resPago => {
+            if(resPago && resPago.success) {
+                window.location.href = resPago.init_point;
+            } else {
+                ocultarLoading();
+                notify("Error al generar cobro: " + resPago.msg);
+            }
+        });
+        return;
     }
 
     // --- SALIDA AUTOMATIZADA EXCLUSIVA PARA SERVICIOS GRATUITOS ---
@@ -7301,6 +7361,7 @@ let pilarTiendaActivo = "NUTRICION";
 let patrocinadoresCache = [];
 
 async function iniciarproductos() {
+    apagarTodosLosModulos();
     closeAlert();
     const ocultar = ['view-welcome', 'view-dashboard', 'seccion-herramientas', 'modulo-servicios-comunidad', 'modulo-perfil-bienestar', 'modulo-calculadora-financiera', 'contenido-modulo-diagnostico'];
     ocultar.forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
@@ -7491,15 +7552,6 @@ function cerrarModalEcommerce() {
     document.getElementById('modal-ecommerce-producto').classList.add('hidden');
     document.getElementById('modal-ecommerce-producto').style.display = 'none';
     productoActivoEcom = null;
-}
-
-// Lógica para que al salir a Dashboard, el carrito flote desaparezca
-const originalSalirDelModulo = salirDelModulo;
-salirDelModulo = function() {
-    originalSalirDelModulo();
-    document.getElementById('cart-float-bubble').style.display = "none";
-    const mod = document.getElementById('modulo-productos-ecommerce');
-    if(mod) mod.classList.add('hidden');
 }
 
 // 🌐 FUNCIONES PATROCINADORES Y CTA TIENDA
@@ -7815,6 +7867,7 @@ let vistaSoloMisCursos = false;
 let cronometroGuillotinaC3D = null;
 
 async function iniciarcursos() {
+    apagarTodosLosModulos();
     closeAlert();
     // Apagamos visualmente las otras secciones de la SPA
     const ocultar = ['view-welcome', 'view-dashboard', 'seccion-herramientas', 'modulo-servicios-comunidad', 'modulo-perfil-bienestar', 'modulo-calculadora-financiera', 'contenido-modulo-diagnostico', 'modulo-productos-ecommerce'];
@@ -7977,19 +8030,38 @@ function desviarAPagoCurso() {
         window.open(`https://wa.me/56976003402?text=${encodeURIComponent(mensajeWA)}`, '_blank');
         cerrarModalCinemaPlay();
     } else {
-        // Caso Venta: Si tiene link en el Excel, lo manda; si no, levanta error
-        if(cursoActivoCinema.linkPago && cursoActivoCinema.linkPago.trim() !== "" && cursoActivoCinema.linkPago !== "#") {
-            // Congelamos variables comerciales por si el checkout causa redirección
-            localStorage.setItem('kairo_ecommerce_sku', cursoActivoCinema.sku);
-            localStorage.setItem('kairo_ecommerce_nombre', cursoActivoCinema.nombre);
-            localStorage.setItem('kairo_ecommerce_tipo', "CURSOS");
-            if(sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
-            
-            cerrarModalCinemaPlay();
-            window.location.href = cursoActivoCinema.linkPago.trim();
-        } else {
-            notify("Kairo Alerta: Este curso premium no tiene un link de MercadoPago configurado en la columna M.");
-        }
+        // 🛡️ GENERADOR DINÁMICO DE COBRO MERCADOPAGO CURSOS (Token Admin)
+        const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
+        let precioActual = esSusc ? cursoActivoCinema.precioSusc : cursoActivoCinema.precioNormal;
+        
+        if (precioActual <= 0) return notify("Error: El precio configurado es cero o inválido.");
+
+        localStorage.setItem('kairo_ecommerce_sku', cursoActivoCinema.sku);
+        localStorage.setItem('kairo_ecommerce_nombre', cursoActivoCinema.nombre);
+        localStorage.setItem('kairo_ecommerce_accion', cursoActivoCinema.accion);
+        localStorage.setItem('kairo_ecommerce_monto', precioActual);
+        localStorage.setItem('kairo_ecommerce_detalle', "Acceso a Cinema Play");
+        localStorage.setItem('kairo_ecommerce_tipo', "CURSOS");
+        localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS"); // Reusamos el enrutador
+        if(sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
+        
+        cerrarModalCinemaPlay();
+        mostrarLoading("Conectando con Banco Central de la Matrix...");
+        
+        apiCall("crearPreferenciaMP", {
+            carrito: [{nombre: cursoActivoCinema.nombre, cantidad: 1, precio: precioActual, variante: "Cinema"}],
+            email: sessionUser ? sessionUser.email : "ANÓNIMO",
+            nombre: sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : "Estudiante",
+            urlRetorno: window.location.origin + window.location.pathname,
+            moduloRetorno: "retorno_pago"
+        }).then(resPago => {
+            if (resPago && resPago.success) {
+                window.location.href = resPago.init_point;
+            } else {
+                ocultarLoading();
+                notify("Error de pasarela: " + resPago.msg);
+            }
+        });
     }
 }
 
@@ -8169,13 +8241,6 @@ function solicitarCrearCurso() {
     document.getElementById('form-cta-cursos').classList.add('hidden');
 }
 
-// Sobreescribimos la salida del módulo de Cursos para limpiar el menú
-const originalSalirModuloC3D = salirDelModulo;
-salirDelModulo = function() {
-    originalSalirModuloC3D();
-    const mod = document.getElementById('modulo-cursos-netflix');
-    if(mod) mod.classList.add('hidden');
-}
 
 function renderizarUltimosCursos() {
     const grid = document.getElementById('cursos-destacados-grid');
@@ -9093,7 +9158,36 @@ function desplegarHorasDelDiaCoach(fechaFiltro, nombreCoach, slotsCoachActivo) {
         contenedorBotones.appendChild(btnHora);
     });
 }
-        
+
+function abrirCobrosCoach() {
+    document.getElementById('modal-portal-coach').classList.add('hidden');
+    document.getElementById('modal-cobros-coach').classList.remove('hidden');
+    document.getElementById('modal-cobros-coach').style.display = 'block';
+    // Si ya lo tenía, no se lo borramos
+    document.getElementById('coach-token-mp').value = sessionUser.tokenMP || "";
+}
+
+function cerrarCobrosCoach() {
+    document.getElementById('modal-cobros-coach').classList.add('hidden');
+    document.getElementById('modal-cobros-coach').style.display = 'none';
+    document.getElementById('modal-portal-coach').classList.remove('hidden');
+}
+
+async function guardarTokenMPCoach() {
+    const token = document.getElementById('coach-token-mp').value.trim();
+    mostrarLoading("Guardando Token en la Matrix...");
+    const res = await apiCall("guardarTokenCoach", { email: sessionUser.email, tokenMP: token });
+    ocultarLoading();
+    
+    if (res && res.success) {
+        notify("✅ Token blindado en la Matrix. Tus ventas irán a tu cuenta.");
+        sessionUser.tokenMP = token;
+        sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+        cerrarCobrosCoach();
+    } else {
+        notify("❌ Error: " + (res ? res.msg : "Conexión fallida."));
+    }
+}
     </script>
 </body>
 
