@@ -9732,7 +9732,15 @@ async function guardarRecompensaAdmin() {
         notify("❌ Error en la Matrix: " + (res? res.msg : "Fallo de red"));
     }
 }
-            
+
+// --- UTILIDADES DEL BAZAR DE CANJE ---
+function cerrarModalDetalleCanje() {
+    document.getElementById('modal-detalle-canje').classList.add('hidden');
+    document.getElementById('modal-detalle-canje').style.display = 'none';
+    // Si el fondo estaba borroso, lo limpiamos
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+        
     </script>
 </body>
 
