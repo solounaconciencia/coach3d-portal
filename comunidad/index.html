@@ -2165,6 +2165,7 @@
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-herramientas')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🛠️ HERRAMIENTAS</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-rangos')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">👥 COACHES</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-agenda'); cargarAdminAgenda();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">📅 AGENDAS</button>
+            <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-canjes'); inicializarAdminCanjes();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🎁 BAZAR</button>
         </div>
 
         <div id="tab-admin-productos" style="padding: 20px;">
@@ -2328,6 +2329,87 @@
                  <!-- JS inyectará la cuadrícula aquí -->
             </div>
             <p style="font-size: 0.7em; color: #666; margin-top: 10px; text-align: center;">Para agregar nuevos días y horas, debes insertar filas en tu Excel HORARIOS_LOG.</p>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MÓDULO 7: BAZAR DE CANJES Y SORTEOS            -->
+        <!-- ============================================== -->
+        <div id="tab-admin-canjes" class="hidden" style="padding: 20px;">
+            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">🎁</span> GESTIÓN DE RECOMPENSAS Y SORTEOS</h3>
+            
+            <!-- CAJA DE SORTEOS (POZO PRIVADO ADMIN) -->
+            <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; padding: 20px; border-radius: 12px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h4 style="color: #fbbf24; margin: 0 0 5px 0; font-family: 'Orbitron';">🎰 LA CAJA DE SORTEOS (POZO ACTIVO)</h4>
+                    <p style="color: #cbd5e1; font-size: 0.8em; margin: 0;">Se alimenta del <input type="number" id="admin-pozo-porcentaje" value="3" style="width: 50px; padding: 2px; margin: 0; display: inline-block; text-align: center; font-weight: bold; color: var(--neon-n); background: transparent; border: none; border-bottom: 1px dashed var(--neon-n);">% de las ventas totales de la plataforma.</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="color: #cbd5e1; font-size: 0.8em; display: block;">Pozo Acumulado Real:</span>
+                    <strong id="admin-pozo-acumulado" style="color: #fbbf24; font-size: 2em; font-family: 'Orbitron'; filter: drop-shadow(0 0 5px #fbbf24);">$0</strong>
+                </div>
+            </div>
+
+            <!-- CREADOR DE RECOMPENSAS -->
+            <h4 style="color: var(--neon-n); font-family: 'Orbitron'; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">➕ CREAR NUEVO CANJE</h4>
+            <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 8px; border: 1px dashed var(--neon-n); margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <label style="font-size: 0.75em; color: var(--neon-n);">Tipo de Recompensa</label>
+                        <select id="canje-tipo" onchange="toggleCamposAdminCanje()">
+                            <option value="SORTEO">🎟️ Ficha de Sorteo</option>
+                            <option value="PRODUCTO">🛍️ Producto Físico/Digital</option>
+                            <option value="SERVICIO">🎓 Servicio / Mentoría</option>
+                            <option value="GIFTCARD">💳 Giftcard Externa</option>
+                        </select>
+                    </div>
+                    
+                    <div id="caja-canje-referencia" class="hidden">
+                        <label style="font-size: 0.75em; color: var(--neon-n);">Seleccionar del Catálogo</label>
+                        <select id="canje-sku-ref">
+                            <option value="">Cargando catálogo...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-size: 0.75em; color: var(--neon-n);">Título / Premio</label>
+                        <input type="text" id="canje-titulo" placeholder="Ej: Sorteo iPhone 15 Pro">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 0.75em; color: var(--neon-n);">Costo (Puntos C3D)</label>
+                        <input type="number" id="canje-costo" placeholder="Ej: 500">
+                    </div>
+
+                    <div id="caja-canje-imagen">
+                        <label style="font-size: 0.75em; color: var(--neon-n);">URL Imagen (Opcional)</label>
+                        <input type="text" id="canje-imagen" placeholder="https://...">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 0.75em; color: var(--neon-n);">Stock Total (Vacío = Infinito)</label>
+                        <input type="number" id="canje-stock" placeholder="Ej: 100 fichas">
+                    </div>
+                </div>
+
+                <div id="caja-canje-fechas" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div><label style="font-size: 0.75em; color: var(--neon-n);">Fecha Inicio (Opcional)</label><input type="date" id="canje-fecha-inicio"></div>
+                    <div><label style="font-size: 0.75em; color: var(--neon-n);">Fecha Fin (Opcional)</label><input type="date" id="canje-fecha-fin"></div>
+                </div>
+
+                <div id="caja-canje-sorteo" style="margin-top: 15px;">
+                    <label style="font-size: 0.75em; color: #fbbf24;">Promociones de Fichas (Sorteos)</label>
+                    <input type="text" id="canje-promo" placeholder="Ej: 3 fichas x 1200 pts, 10 fichas x 3000 pts" style="border-color: #fbbf24;">
+                    <label style="font-size: 0.75em; color: #cbd5e1; display: block; margin-top: 10px;">Descripción Detallada</label>
+                    <textarea id="canje-descripcion" rows="3" placeholder="Describe las reglas, cómo se entrega, etc..."></textarea>
+                </div>
+
+                <button class="btn btn-n" style="width: 100%; padding: 15px; margin-top: 20px;" onclick="guardarRecompensaAdmin()">PUBLICAR EN EL BAZAR</button>
+            </div>
+            
+            <h4 style="color: var(--neon-admin); font-family: 'Orbitron';">📦 RECOMPENSAS ACTIVAS</h4>
+            <div id="admin-lista-canjes" style="background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); padding: 15px; max-height: 300px; overflow-y: auto;">
+                <p style="text-align: center; color: #94a3b8; font-size: 0.85em;">Sincronizando...</p>
+            </div>
         </div>
 
     </div>
@@ -2983,6 +3065,47 @@
     </div>
 </div>
 
+<!-- =========================================================================
+   🎁 MÓDULO: BAZAR DE RECOMPENSAS (CANJE)
+========================================================================= -->
+<div id="modulo-canje-recompensas" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-m); padding: 25px; text-align: center;">
+    
+    <div style="margin-bottom: 25px;">
+        <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px var(--neon-m)); margin-bottom: 10px;">🎁</div>
+        <h2 style="color: var(--neon-m); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Bazar de Recompensas</h2>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px;">Tu esfuerzo vale. Canjea tus Puntos C3D por acceso a la lotería, productos exclusivos, mentorías y giftcards.</p>
+        
+        <div style="display: inline-block; background: rgba(0,0,0,0.6); border: 1px solid #fbbf24; padding: 10px 20px; border-radius: 30px; margin-top: 15px;">
+            <span style="color: #cbd5e1; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px;">Tu Saldo: </span>
+            <strong id="bazar-saldo-usuario" style="color: #fbbf24; font-size: 1.2em; font-family: 'Orbitron';">0 Puntos</strong>
+        </div>
+    </div>
+
+    <!-- FILTROS DEL BAZAR -->
+    <div class="pilar-filter-container" style="justify-content: center; flex-wrap: wrap;">
+        <button class="filter-tab-premium active" onclick="filtrarBazarCanje('TODOS')">🌟 VER TODO</button>
+        <button class="filter-tab-premium" onclick="filtrarBazarCanje('SORTEO')">🎟️ LOTERÍA Y SORTEOS</button>
+        <button class="filter-tab-premium" onclick="filtrarBazarCanje('PRODUCTO')">🛍️ MERCADO</button>
+        <button class="filter-tab-premium" onclick="filtrarBazarCanje('SERVICIO')">🎓 SERVICIOS VIP</button>
+        <button class="filter-tab-premium" onclick="filtrarBazarCanje('GIFTCARD')">💳 GIFTCARDS</button>
+    </div>
+
+    <!-- GRILLA DE RECOMPENSAS -->
+    <div id="bazar-grid-recompensas" class="store-grid">
+        <p style='color:var(--neon-m); text-align:center; grid-column:1/-1;'>Descargando catálogo de premios desde la Matrix...</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <button class="btn" style="width: 100%; max-width: 300px; opacity: 0.6; font-size: 0.85em;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+    </div>
+</div>
+
+<!-- 🎛️ MODAL: DETALLE DEL CANJE / SORTEO -->
+<div id="modal-detalle-canje" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left; max-height: 85vh !important; overflow-y: auto !important;">
+    <button onclick="cerrarModalDetalleCanje()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <div id="contenido-detalle-canje"></div>
+</div>
+    
 <!-- 🎛️ MODAL: DECLARAR REFERIDO -->
 <div id="modal-ingreso-referido" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left;">
     <button onclick="cerrarModalIngresoReferido()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
@@ -5983,7 +6106,8 @@ function apagarTodosLosModulos() {
         'contenido-modulo-diagnostico', 'modulo-perfil-bienestar',
         'modulo-calculadora-financiera', 'modulo-servicios-comunidad',
         'modulo-cursos-netflix', 'modulo-productos-ecommerce',
-        'panel-acceso-coach', 'btn-acceso-coach', 'modulo-puntos-referidos'
+        'panel-acceso-coach', 'btn-acceso-coach', 'modulo-puntos-referidos',
+        'modulo-canje-recompensas'
     ];
     
     // Apaga todas las ventanas
@@ -9428,8 +9552,187 @@ function abrirAutorizacionesCoach() {
     notify("Auditoría de Ascensos de Suscriptores en construcción...");
 }
 
+function iniciarcanje() {
+    apagarTodosLosModulos(); // 🛡️ EL INTERRUPTOR MAESTRO FOCUS
+    const modulo = document.getElementById('modulo-canje-recompensas');
+    if (modulo) {
+        modulo.classList.remove('hidden');
+        const saldoBoveda = document.getElementById('puntos-saldo-actual');
+        if(saldoBoveda) document.getElementById('bazar-saldo-usuario').innerText = saldoBoveda.innerText + " Puntos";
+        
+        // ⚡ Motor encendido
+        sincronizarBazarCanje(); 
+    }
+}
+        
+// =========================================================
+// 🎁 MOTOR CORE: BAZAR DE RECOMPENSAS Y SORTEOS
+// =========================================================
+let catalogoCanjeCache = [];
 
+async function sincronizarBazarCanje() {
+    const grid = document.getElementById('bazar-grid-recompensas');
+    grid.innerHTML = "<p style='color:var(--neon-m); text-align:center; grid-column:1/-1;'><span class='spinner' style='display:inline-block; width:20px; height:20px; border-width:2px; vertical-align:middle; margin:0 10px 0 0;'></span>Sincronizando catálogo de premios...</p>";
+    
+    const res = await apiCall("obtenerDatosBazar");
+    if (res && res.success) {
+        catalogoCanjeCache = res.recompensas;
+        filtrarBazarCanje('TODOS');
+    } else {
+        grid.innerHTML = "<p style='color:#ff4444; text-align:center; grid-column:1/-1;'>Error al cargar recompensas.</p>";
+    }
+}
 
+function filtrarBazarCanje(tipo) {
+    // Manejo de botones (Filtros UX)
+    document.querySelectorAll('#modulo-canje-recompensas .filter-tab-premium').forEach(btn => btn.classList.remove('active'));
+    if(event && event.target) event.target.classList.add('active');
+
+    const grid = document.getElementById('bazar-grid-recompensas');
+    grid.innerHTML = "";
+
+    let filtrados = catalogoCanjeCache;
+    if (tipo !== 'TODOS') {
+        filtrados = filtrados.filter(r => r.tipo === tipo);
+    }
+
+    if (filtrados.length === 0) {
+        grid.innerHTML = "<p style='color:#94a3b8; text-align:center; grid-column:1/-1; padding: 40px;'>No hay recompensas disponibles en esta categoría aún.</p>";
+        return;
+    }
+
+    filtrados.forEach(r => {
+        const isSorteo = r.tipo === 'SORTEO';
+        const colorBorde = isSorteo ? '#fbbf24' : 'var(--neon-n)';
+        let extraHTML = isSorteo ? `<div style="position:absolute; top:10px; left:10px; background:#fbbf24; color:#000; font-size:0.65em; font-weight:bold; padding:4px 8px; border-radius:4px; font-family:'Orbitron';">🎟️ LOTERÍA</div>` : '';
+        
+        grid.innerHTML += `
+            <div class="store-card" style="border-color: ${colorBorde};">
+                <div class="store-card-img-wrapper">
+                    <img class="store-card-img" src="${r.imagen}" onerror="this.src='https://i.postimg.cc/Dwqrq0gz/Logo-app-blanco.png'">
+                    ${extraHTML}
+                </div>
+                <div class="store-card-content">
+                    <div class="store-card-brand" style="color:${colorBorde};">${r.tipo}</div>
+                    <h3 class="store-card-title">${r.titulo}</h3>
+                    <div style="font-size: 0.75em; color: #94a3b8; margin-top: 5px;">Stock: ${r.stock}</div>
+                    <div class="store-card-price-row" style="margin-top: 15px;">
+                        <span class="store-card-price" style="color:var(--neon-f); font-size:1.1rem;">${r.costo} Pts</span>
+                        <button class="btn btn-n" style="padding: 8px 15px; font-size: 0.75em; border-color:${colorBorde}; color:${colorBorde};" onclick="notify('Módulo de procesamiento de canje en desarrollo...')">CANJEAR</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// --- LOGICA DEL ADMINISTRADOR ---
+async function inicializarAdminCanjes() {
+    mostrarLoading("Calculando Pozo y Sincronizando Bóveda...");
+    const res = await apiCall("adminObtenerDatosCanje");
+    ocultarLoading();
+
+    if (res && res.success) {
+        // Render del Pozo Acumulado
+        document.getElementById('admin-pozo-acumulado').innerText = "$" + res.pozo.toLocaleString();
+        document.getElementById('admin-pozo-porcentaje').value = res.porcentajePozo;
+
+        // Poblamos el Selector de Catálogo desde la Tienda (E-Commerce y Servicios)
+        const selectCat = document.getElementById('canje-sku-ref');
+        selectCat.innerHTML = '<option value="">-- Selecciona un ítem --</option>';
+        res.catalogoGeneral.forEach(item => {
+            selectCat.innerHTML += `<option value="${item.sku}" data-img="${item.imagen}" data-nombre="${item.nombre}">${item.pilar} | ${item.nombre}</option>`;
+        });
+
+        // Poblamos la lista de Recompensas Activas
+        const lista = document.getElementById('admin-lista-canjes');
+        lista.innerHTML = "";
+        if (res.recompensas.length === 0) {
+            lista.innerHTML = "<p style='text-align: center; color: #94a3b8; font-size: 0.85em;'>No hay recompensas activas.</p>";
+        } else {
+            res.recompensas.forEach(r => {
+                lista.innerHTML += `
+                    <div style="display:flex; align-items:center; gap:15px; padding:10px; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <img src="${r.imagen}" style="width:40px; height:40px; object-fit:cover; border-radius:5px; border:1px solid #444;">
+                        <div style="flex:1;">
+                            <strong style="color:white; font-size:0.9em; font-family:'Orbitron';">${r.titulo}</strong>
+                            <br><span style="color:var(--neon-n); font-size:0.7em;">TIPO: ${r.tipo} | COSTO: ${r.costo} Pts | STOCK: ${r.stock}</span>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+}
+
+function toggleCamposAdminCanje() {
+    const tipo = document.getElementById('canje-tipo').value;
+    const cRef = document.getElementById('caja-canje-referencia');
+    const cImg = document.getElementById('caja-canje-imagen');
+    const cSort = document.getElementById('caja-canje-sorteo');
+    
+    // Mostramos u ocultamos campos dinámicamente según la neuro-estrategia
+    if (tipo === 'PRODUCTO' || tipo === 'SERVICIO') {
+        cRef.classList.remove('hidden');
+        cImg.classList.add('hidden');
+        cSort.classList.add('hidden');
+    } else if (tipo === 'SORTEO') {
+        cRef.classList.add('hidden');
+        cImg.classList.remove('hidden');
+        cSort.classList.remove('hidden');
+    } else { // GIFTCARD
+        cRef.classList.add('hidden');
+        cImg.classList.remove('hidden');
+        cSort.classList.add('hidden');
+    }
+}
+
+async function guardarRecompensaAdmin() {
+    const tipo = document.getElementById('canje-tipo').value;
+    let skuRef = "", titulo = "", imagen = "", desc = "", promo = "";
+
+    // Extracción inteligente de datos según el tipo
+    if (tipo === 'PRODUCTO' || tipo === 'SERVICIO') {
+        const sel = document.getElementById('canje-sku-ref');
+        if(sel.selectedIndex <= 0) return notify("Selecciona un ítem del catálogo.");
+        skuRef = sel.value;
+        imagen = sel.options[sel.selectedIndex].getAttribute('data-img');
+        titulo = document.getElementById('canje-titulo').value.trim() || sel.options[sel.selectedIndex].getAttribute('data-nombre');
+    } else {
+        titulo = document.getElementById('canje-titulo').value.trim();
+        imagen = document.getElementById('canje-imagen').value.trim();
+        if(!titulo) return notify("Escribe un título para la recompensa.");
+    }
+
+    if (tipo === 'SORTEO') {
+        promo = document.getElementById('canje-promo').value.trim();
+        desc = document.getElementById('canje-descripcion').value.trim();
+    }
+
+    const costo = document.getElementById('canje-costo').value;
+    const stock = document.getElementById('canje-stock').value || "INFINITO";
+    const fInicio = document.getElementById('canje-fecha-inicio').value;
+    const fFin = document.getElementById('canje-fecha-fin').value;
+
+    if(!costo) return notify("Ingresa el costo en puntos C3D.");
+
+    const payload = {
+        tipo, skuRef, titulo, costo, imagen, stock, fInicio, fFin, promo, desc
+    };
+
+    mostrarLoading("Publicando en el Bazar...");
+    const res = await apiCall("adminGuardarRecompensa", payload);
+    ocultarLoading();
+
+    if(res && res.success) {
+        notify("✅ Recompensa inyectada exitosamente en el ecosistema.");
+        document.getElementById('canje-titulo').value = "";
+        document.getElementById('canje-costo').value = "";
+        inicializarAdminCanjes(); // Refrescar lista visual
+    } else {
+        notify("❌ Error en la Matrix: " + (res? res.msg : "Fallo de red"));
+    }
+}
+            
     </script>
 </body>
 
