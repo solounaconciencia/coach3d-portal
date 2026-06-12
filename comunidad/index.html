@@ -2012,6 +2012,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body onload="checkSession()">
 
@@ -2843,49 +2844,22 @@
 </div>
 
 <div id="modulo-productos-ecommerce" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
-
-    
-
     <div style="background: rgba(0,0,0,0.5); border-top: 1px solid var(--neon-n); border-bottom: 1px solid var(--neon-n); padding: 15px 0; margin-bottom: 25px; overflow: hidden; position: relative;">
-
         <div style="display: flex; width: 200%; animation: scroll-marquee-patrocinadores 20s linear infinite;" id="marquee-patrocinadores">
-
             </div>
-
     </div>
-
-
-
     <div style="text-align: center; margin-bottom: 25px;">
-
         <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Tienda C3D Premium</h2>
-
         <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Suplementación, Accesorios y Herramientas Tridimensionales</p>
-
     </div>
-
-
-
     <div class="pilar-filter-bar" id="tienda-tabs-selector">
-
         <div class="filter-tab-premium" onclick="cambiarPilarTienda('FINANZAS')">FINANZAS</div>
-
         <div class="filter-tab-premium active" onclick="cambiarPilarTienda('NUTRICION')">NUTRICIÓN</div>
-
         <div class="filter-tab-premium" onclick="cambiarPilarTienda('MENTALIDAD')">MENTALIDAD</div>
-
     </div>
-
-
-
     <div style="text-align: center; margin-bottom: 20px;">
-
         <button class="btn btn-m" style="font-size: 0.7em; padding: 8px 20px;" onclick="cambiarPilarTienda('TODOS')">VER TODOS LOS PRODUCTOS</button>
-
     </div>
-
-
-
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 30px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
         <div>
             <label style="font-size: 0.7em; color: var(--neon-admin); display: block; margin-bottom: 5px;">Categoría</label>
@@ -2893,7 +2867,6 @@
                 <option value="TODAS">Todas las Categorías</option>
             </select>
         </div>
-
         <div>
             <label style="font-size: 0.7em; color: #fbbf24; display: block; margin-bottom: 5px;">Recomendación</label>
             <select id="filtro-recomendacion" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
@@ -2905,7 +2878,6 @@
             </select>
         </div>
         <div>
-
             <label style="font-size: 0.7em; color: var(--neon-f); display: block; margin-bottom: 5px;">Rango de Precio</label>
             <select id="filtro-precio" class="nave-input" style="margin:0; font-size:0.8em; padding:8px;" onchange="aplicarFiltrosTienda()">
                 <option value="TODOS">Todos los precios</option>
@@ -2940,7 +2912,106 @@
     </div>
     <button class="btn" style="width: 100%; margin-top: 25px; opacity: 0.7;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
 </div> 
-</div></div>           
+</div></div>   
+
+<!-- =========================================================================
+   🪙 MÓDULO: PUNTOS Y REFERIDOS (C3D NETWORK)
+========================================================================= -->
+<div id="modulo-puntos-referidos" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid #fbbf24; padding: 25px;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px #fbbf24); margin-bottom: 10px;">🪙</div>
+        <h2 style="color: #fbbf24; font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Economía C3D & Mi Red</h2>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; line-height: 1.5;">
+            Gana el <b>5%</b> de tus inversiones personales y el <b>2%</b> de lo que inviertan tus referidos directos en la plataforma. Acumula puntos (1 Pto = $1) y canjéalos por giftcards, productos o servicios.
+        </p>
+    </div>
+
+    <!-- ZONA 1: BÓVEDA DE PUNTOS -->
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+        <div style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; border: 1px dashed #fbbf24; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+            <p style="margin: 0; color: #fbbf24; font-weight: bold; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px;">Saldo Disponible</p>
+            <h1 id="puntos-saldo-actual" style="margin: 5px 0 0 0; font-size: 3rem; color: white; font-family: 'Orbitron'; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);">0</h1>
+            <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 0.75em;">Puntos C3D</p>
+        </div>
+        
+        <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #cbd5e1; font-size: 0.85em;">Total Referidos Directos:</span>
+                <strong id="puntos-total-referidos" style="color: white; font-size: 1.2em;">0</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #cbd5e1; font-size: 0.85em;">Puntos Ganados por Red:</span>
+                <strong id="puntos-ganados-red" style="color: #10b981; font-size: 1.2em;">0</strong>
+            </div>
+            <button class="btn btn-n" style="width: 100%; padding: 12px; font-size: 0.8em;" onclick="abrirModalIngresoReferido()">+ DECLARAR NUEVO REFERIDO</button>
+        </div>
+    </div>
+
+    <!-- ZONA 2: LISTA DE REFERIDOS DIRECTOS (TODOS) -->
+    <h3 style="color: var(--neon-n); font-family: 'Orbitron'; font-size: 1.1em; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">👥 MIS REFERIDOS DIRECTOS</h3>
+    <div style="overflow-x: auto; margin-bottom: 25px;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.85em;">
+            <thead>
+                <tr style="background: rgba(0,0,0,0.6); color: var(--neon-n);">
+                    <th style="padding: 12px; text-align: left;">Nombre</th>
+                    <th style="padding: 12px; text-align: left;">Fecha Ingreso</th>
+                    <th style="padding: 12px; text-align: center;">Es Suscriptor</th>
+                    <th style="padding: 12px; text-align: center;">Puntos Generados</th>
+                    <th style="padding: 12px; text-align: center;">Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-referidos-directos" style="color: #cbd5e1;">
+                <tr><td colspan="5" style="text-align: center; padding: 20px;">Sincronizando con la Matrix...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ZONA 3: PODERES DE SUSCRIPTOR Y COACH (OCULTOS POR DEFECTO) -->
+    <div id="puntos-zona-vip" class="hidden" style="margin-top: 30px; border-top: 1px dashed rgba(251, 191, 36, 0.4); padding-top: 25px;">
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <button class="btn btn-f" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em;" onclick="abrirVisorArbolRed()">🌐 EXPLORAR MI RED (ÁRBOL)</button>
+            <button id="btn-autorizaciones-coach" class="btn btn-m hidden" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em; position: relative;" onclick="abrirAutorizacionesCoach()">
+                🛡️ AUTORIZACIONES
+                <span id="badge-autorizaciones" class="hidden" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+            </button>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <button class="btn" style="width: 100%; opacity: 0.6; font-size: 0.85em;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+    </div>
+</div>
+
+<!-- 🎛️ MODAL: DECLARAR REFERIDO -->
+<div id="modal-ingreso-referido" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left;">
+    <button onclick="cerrarModalIngresoReferido()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0; text-align: center;">NUEVO REFERIDO</h3>
+    <p style="font-size: 0.85em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px; text-align: center;">Declara a tu invitado. El Coach patrocinador ascendente recibirá la notificación para realizar el cierre de la venta, garantizándote tu porcentaje en puntos.</p>
+    
+    <form id="form-nuevo-referido" onsubmit="event.preventDefault(); registrarNuevoReferido();">
+        <input type="text" id="ref-nombre" placeholder="Nombre de tu invitado" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
+        <input type="email" id="ref-email" placeholder="Correo Electrónico (Opcional si no lo sabes)" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
+        <input type="text" id="ref-whatsapp" placeholder="WhatsApp de contacto" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 20px;">
+        
+        <button type="submit" class="btn btn-n" style="width: 100%; padding: 15px;">ENVIAR A LA MATRIX</button>
+    </form>
+</div>
+
+<!-- 🎛️ MODAL: VISOR DE ÁRBOL TECNOLÓGICO -->
+<div id="modal-visor-red" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 98% !important; max-width: 1000px !important; height: 90vh !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 20px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; display: flex; flex-direction: column;">
+    <button onclick="cerrarVisorArbolRed()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; z-index: 10;">×</button>
+    <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0; text-align: center;">🌐 RED TRIDIMENSIONAL</h3>
+    <div style="text-align: center; margin-bottom: 10px;">
+        <button class="btn" style="padding: 5px 15px; font-size: 0.7em; border: 1px solid #444;" onclick="zoomArbol(1.2)">🔍 ACERCAR</button>
+        <button class="btn" style="padding: 5px 15px; font-size: 0.7em; border: 1px solid #444;" onclick="zoomArbol(0.8)">🔎 ALEJAR</button>
+    </div>
+    <div id="contenedor-grafico-arbol" style="flex-grow: 1; overflow: auto; background: rgba(0,0,0,0.4); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1); position: relative;">
+        <div id="canvas-arbol" style="transform-origin: top center; transition: transform 0.3s ease; text-align: center; padding: 20px;">
+            <!-- Google Charts inyectará la red aquí -->
+        </div>
+    </div>
+</div>
             
 <div id="modal-perfil" class="hidden glass-panel">
     <h3 style="color: var(--neon-n); text-align: center;">Editar Perfil</h3>
@@ -5912,7 +5983,7 @@ function apagarTodosLosModulos() {
         'contenido-modulo-diagnostico', 'modulo-perfil-bienestar',
         'modulo-calculadora-financiera', 'modulo-servicios-comunidad',
         'modulo-cursos-netflix', 'modulo-productos-ecommerce',
-        'panel-acceso-coach', 'btn-acceso-coach'
+        'panel-acceso-coach', 'btn-acceso-coach', 'modulo-puntos-referidos'
     ];
     
     // Apaga todas las ventanas
@@ -9188,6 +9259,177 @@ async function guardarTokenMPCoach() {
         notify("❌ Error: " + (res ? res.msg : "Conexión fallida."));
     }
 }
+
+// =========================================================
+// 🪙 MOTOR CORE: PUNTOS Y RED (C3D NETWORK)
+// =========================================================
+
+function iniciarpuntosyreferidos() {
+    apagarTodosLosModulos(); // 🛡️ EL INTERRUPTOR MAESTRO FOCUS
+    
+    const modulo = document.getElementById('modulo-puntos-referidos');
+    if (modulo) {
+        modulo.classList.remove('hidden');
+        
+        // Carga de seguridad: Solo mostramos la zona VIP si el rango lo permite
+        const zonaVip = document.getElementById('puntos-zona-vip');
+        const btnAut = document.getElementById('btn-autorizaciones-coach');
+        
+        if (sessionUser && (sessionUser.rango === "Suscriptor" || sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
+            zonaVip.classList.remove('hidden');
+            if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
+                btnAut.classList.remove('hidden');
+            } else {
+                btnAut.classList.add('hidden');
+            }
+        } else {
+            zonaVip.classList.add('hidden');
+        }
+
+        // Llamada a la API para traer los datos reales
+        sincronizarDatosEconomiaRed();
+    }
+}
+
+function abrirModalIngresoReferido() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-ingreso-referido').classList.remove('hidden');
+    document.getElementById('modal-ingreso-referido').style.display = 'block';
+}
+
+function cerrarModalIngresoReferido() {
+    document.getElementById('modal-ingreso-referido').classList.add('hidden');
+    document.getElementById('modal-ingreso-referido').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+    document.getElementById('form-nuevo-referido').reset();
+}
+
+let factorZoomArbol = 1;
+
+async function sincronizarDatosEconomiaRed() {
+    const res = await apiCall("sincronizarDatosEconomia", { email: sessionUser.email });
+    
+    if (res && res.success) {
+        // 1. Actualizar Bóveda
+        document.getElementById('puntos-saldo-actual').innerText = res.puntosTotales || 0;
+        document.getElementById('puntos-total-referidos').innerText = res.referidosDirectos.length || 0;
+        document.getElementById('puntos-ganados-red').innerText = res.puntosRed || 0;
+        
+        // 2. Actualizar Tabla
+        const tbody = document.getElementById('tabla-referidos-directos');
+        tbody.innerHTML = "";
+        if (res.referidosDirectos.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='5' style='text-align: center; padding: 20px; color: #94a3b8;'>Aún no tienes referidos directos registrados.</td></tr>";
+        } else {
+            res.referidosDirectos.forEach(r => {
+                let colorSusc = r.rango === "Suscriptor" ? "var(--neon-f)" : "#94a3b8";
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 12px; font-weight:bold;">${r.nombre}</td>
+                        <td style="padding: 12px;">${r.fecha}</td>
+                        <td style="padding: 12px; text-align: center; color: ${colorSusc}; font-weight:bold;">${r.rango}</td>
+                        <td style="padding: 12px; text-align: center; color: var(--neon-n);">${r.puntosAportados}</td>
+                        <td style="padding: 12px; text-align: center;">Activo</td>
+                    </tr>`;
+            });
+        }
+        
+        // 3. Guardar el árbol en memoria para cuando el usuario presione el botón
+        window.kairoArbolRed = res.nodosArbol;
+    } else {
+        notify("Error al sincronizar datos financieros: " + (res ? res.msg : "Sin conexión"));
+    }
+}
+
+async function registrarNuevoReferido() {
+    const nombre = document.getElementById('ref-nombre').value.trim();
+    const email = document.getElementById('ref-email').value.trim() || "no-email@pendiente.com";
+    const whatsapp = document.getElementById('ref-whatsapp').value.trim();
+    
+    if(!nombre || !whatsapp) return notify("Nombre y WhatsApp son obligatorios.");
+    
+    mostrarLoading("Inyectando prospecto en el CRM...");
+    const res = await apiCall("registrarReferidoCRM", {
+        patrocinadorEmail: sessionUser.email,
+        patrocinadorNombre: sessionUser.seudónimo || sessionUser.nombre,
+        prospectoNombre: nombre,
+        prospectoEmail: email,
+        prospectoWP: whatsapp
+    });
+    ocultarLoading();
+
+    if (res && res.success) {
+        notify("✅ Referido registrado. Tu línea ascendente ha sido notificada para el cierre.");
+        cerrarModalIngresoReferido();
+        sincronizarDatosEconomiaRed(); // Refrescar la tabla
+    } else {
+        notify("❌ Error al registrar: " + (res ? res.msg : "Fallo de conexión."));
+    }
+}
+
+// --- GOOGLE CHARTS: DIBUJADO DE RED ---
+function abrirVisorArbolRed() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-visor-red').classList.remove('hidden');
+    document.getElementById('modal-visor-red').style.display = 'flex';
+    
+    factorZoomArbol = 1;
+    document.getElementById('canvas-arbol').style.transform = `scale(${factorZoomArbol})`;
+
+    // Cargar Google Charts dinámicamente si no está listo
+    google.charts.load('current', {packages:["orgchart"]});
+    google.charts.setOnLoadCallback(dibujarArbol);
+}
+
+function cerrarVisorArbolRed() {
+    document.getElementById('modal-visor-red').classList.add('hidden');
+    document.getElementById('modal-visor-red').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+function zoomArbol(factor) {
+    factorZoomArbol *= factor;
+    document.getElementById('canvas-arbol').style.transform = `scale(${factorZoomArbol})`;
+}
+
+function dibujarArbol() {
+    if (!window.kairoArbolRed || window.kairoArbolRed.length === 0) {
+        document.getElementById('canvas-arbol').innerHTML = "<p style='color:#94a3b8; padding:40px;'>Tu red aún está en construcción.</p>";
+        return;
+    }
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Name');
+    data.addColumn('string', 'Manager');
+    data.addColumn('string', 'ToolTip');
+
+    // Mapeo dinámico de los datos que vienen del backend
+    let filasGrafico = window.kairoArbolRed.map(nodo => {
+        // Diseño de la tarjeta del nodo
+        let colorFondo = nodo.rango === "Coach" ? "#a855f7" : (nodo.rango === "Suscriptor" ? "#10b981" : "#334155");
+        let nodoHTML = `
+            <div style="background: ${colorFondo}; color: white; padding: 10px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); min-width: 120px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                <div style="font-size: 20px;">${nodo.genero === "Femenino" ? "👩" : "👨"}</div>
+                <strong style="font-size: 0.9em; font-family:'Orbitron'; display:block; margin-top:5px;">${nodo.nombre}</strong>
+                <small style="opacity: 0.8; font-size: 0.7em;">${nodo.rango}</small>
+            </div>
+        `;
+        // [Contenido HTML, ID del Padre, Tooltip]
+        return [{ v: nodo.id, f: nodoHTML }, nodo.padreId, nodo.rango];
+    });
+
+    data.addRows(filasGrafico);
+
+    var chart = new google.visualization.OrgChart(document.getElementById('canvas-arbol'));
+    chart.draw(data, {allowHtml: true, size: 'medium', nodeClass: 'kairo-nodo-red'});
+}
+
+function abrirAutorizacionesCoach() {
+    notify("Auditoría de Ascensos de Suscriptores en construcción...");
+}
+
+
+
     </script>
 </body>
 
