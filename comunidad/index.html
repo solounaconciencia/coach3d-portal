@@ -2696,6 +2696,12 @@ body { padding-top: 75px; } /* Ajuste global para no quedar bajo la barra */
 
         <!-- Tarjetas de Datos -->
         <div id="dash-data-diag" class="hidden pillars-container" style="display: none; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%;">
+            
+            <div style="width: 100%; text-align: center; margin-bottom: 5px;">
+                <span style="font-size: 0.65em; color: var(--neon-admin); letter-spacing: 2px; text-transform: uppercase;">Nivel Tridimensional</span>
+                <h3 id="diag-nivel-texto" style="margin: 0; color: white; font-family: 'Orbitron'; font-size: 1.4rem;">--</h3>
+            </div>
+
             <div class="pillar-card" style="border-color: var(--neon-f); flex: 1; min-width: 80px; max-width: 120px;">
                 <h4 style="font-size: 0.6em; margin-bottom: 5px;">FINANZAS</h4>
                 <h1 style="color: var(--neon-f); display: flex; align-items: baseline; justify-content: center;">
@@ -2714,8 +2720,12 @@ body { padding-top: 75px; } /* Ajuste global para no quedar bajo la barra */
                     <span id="metric-m">0</span><span style="font-size: 0.4em; color: #666; margin-left: 4px;">/45</span>
                 </h1>
             </div>
-            <div style="width: 100%; text-align: center; margin-top: 10px;">
-                <button class="btn btn-n" style="font-size: 0.7em; padding: 8px 15px;" onclick="iniciarDiagnosticoModular()">ACTUALIZAR DIAGNÓSTICO</button>
+            
+            <div style="width: 100%; text-align: center; margin-top: 15px;">
+                <button id="btn-actualizar-diag" class="btn btn-n" style="font-size: 0.7em; padding: 8px 15px;" onclick="iniciarDiagnosticoModular()">ACTUALIZAR DIAGNÓSTICO</button>
+                <p id="info-disponibilidad" style="font-size: 0.7em; color: var(--neon-admin); margin-top: 8px;">
+                    * Solo puedes realizar 2 diagnósticos al mes. Disponibles: <span id="num-disponible">2</span>
+                </p>
             </div>
         </div>
 
@@ -4835,6 +4845,9 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           document.getElementById('btn-metricas-coach').classList.remove('hidden');
       }
 
+      // 1.5 Corrección: Nivel de Rango en el Hero
+      document.getElementById('badge-nivel').innerText = sessionUser.nivelRango ? sessionUser.nivelRango : "NIVEL 1";
+
       // 2. Diagnóstico 3D
       if (sData.diag) {
           document.getElementById('dash-empty-diag').classList.add('hidden');
@@ -4843,11 +4856,10 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           document.getElementById('metric-f').innerText = sData.diag.f || 0;
           document.getElementById('metric-n').innerText = sData.diag.n || 0;
           document.getElementById('metric-m').innerText = sData.diag.m || 0;
-          document.getElementById('badge-nivel').innerText = sData.diag.nivel || "Iniciante";
+          document.getElementById('diag-nivel-texto').innerText = sData.diag.nivel || "Iniciante";
       } else {
           document.getElementById('dash-empty-diag').classList.remove('hidden');
           document.getElementById('dash-data-diag').classList.add('hidden');
-          document.getElementById('badge-nivel').innerText = "SIN DIAGNÓSTICO";
       }
 
       // 3. Composición Corporal
@@ -4904,7 +4916,7 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
   if (res && res.success !== false) {
     const spanNum = document.getElementById('num-disponible');
     if (spanNum) spanNum.innerText = res.disponibles;
-    const btnDiag = document.querySelector('#container-btn-diagnostico .btn');
+    const btnDiag = document.getElementById('btn-actualizar-diag');
     if (res.disponibles <= 0 && btnDiag) {
         btnDiag.classList.add('bloqueado');
         btnDiag.style.opacity = "0.5";
