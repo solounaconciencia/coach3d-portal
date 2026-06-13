@@ -3343,6 +3343,28 @@
         </div>
     </div>
 </div>
+
+<!-- 🎛️ MODAL: REDACCIÓN MASIVA ADMIN -->
+<div id="modal-redaccion-admin" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000005 !important; width: 95% !important; max-width: 600px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; border-radius: 15px !important;">
+    <button onclick="cerrarRedaccionMasiva()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0; display: flex; align-items: center; gap: 10px;"><span>📢</span> TRANSMISIÓN GLOBAL</h3>
+    <p style="font-size: 0.8em; color: #cbd5e1; margin-bottom: 15px;">Envía mensajes a toda la comunidad o a rangos específicos. Los correos saldrán en lotes automáticos para proteger el servidor.</p>
+    
+    <label style="font-size: 0.75em; color: var(--neon-m);">Destinatarios</label>
+    <select id="admin-masivo-destino" style="margin-bottom: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white;">
+        <option value="TODOS">Toda la Comunidad</option>
+        <option value="Suscriptor">Solo Suscriptores VIP</option>
+        <option value="Coach">Solo Coaches</option>
+    </select>
+    
+    <label style="font-size: 0.75em; color: var(--neon-m);">Asunto</label>
+    <input type="text" id="admin-masivo-asunto" placeholder="Ej: Nueva actualización disponible" style="margin-bottom: 10px;">
+    
+    <label style="font-size: 0.75em; color: var(--neon-m);">Mensaje</label>
+    <textarea id="admin-masivo-mensaje" rows="6" placeholder="Escribe el comunicado oficial..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; padding: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-bottom: 15px;"></textarea>
+    
+    <button id="btn-enviar-masivo" class="btn btn-m" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';" onclick="ejecutarEnvioMasivo()">INICIAR PROTOCOLO DE DIFUSIÓN</button>
+</div>
     
 <!-- 🎛️ MODAL: DECLARAR REFERIDO -->
 <div id="modal-ingreso-referido" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left;">
@@ -10372,7 +10394,51 @@ function cerrarMiCoach() {
 }
 
 function abrirRedaccionMasiva() {
-    notify("El editor de Correos y Difusiones requiere conexión a la Base de Datos. Esperando inyección Backend.");
+    if(sessionUser.rango !== "Admin") {
+        return notify("Acceso Denegado: Solo el Alto Consejo puede emitir transmisiones globales.");
+    }
+    document.getElementById('modulo-buzon').classList.add('blur-effect');
+    const modal = document.getElementById('modal-redaccion-admin');
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+}
+
+function cerrarRedaccionMasiva() {
+    document.getElementById('modal-redaccion-admin').classList.add('hidden');
+    document.getElementById('modal-redaccion-admin').style.display = 'none';
+    document.getElementById('modulo-buzon').classList.remove('blur-effect');
+}
+
+async function ejecutarEnvioMasivo() {
+    const destino = document.getElementById('admin-masivo-destino').value;
+    const asunto = document.getElementById('admin-masivo-asunto').value.trim();
+    const mensaje = document.getElementById('admin-masivo-mensaje').value.trim();
+
+    if(!asunto || !mensaje) return notify("El asunto y el mensaje son obligatorios.");
+
+    const btn = document.getElementById('btn-enviar-masivo');
+    btn.innerText = "INYECTANDO A LA COLA DE CORREOS...";
+    btn.disabled = true;
+
+    const res = await apiCall("adminProgramarMasivo", {
+        remitente: sessionUser.email,
+        destinatario: destino,
+        asunto: asunto,
+        mensaje: mensaje
+    });
+
+    btn.innerText = "INICIAR PROTOCOLO DE DIFUSIÓN";
+    btn.disabled = false;
+
+    if(res && res.success) {
+        notify("✅ Difusión encolada con éxito. Kairo enviará los correos progresivamente y aparecerán en la bandeja del sistema de los usuarios.");
+        cerrarRedaccionMasiva();
+        document.getElementById('admin-masivo-asunto').value = "";
+        document.getElementById('admin-masivo-mensaje').value = "";
+        sincronizarBuzonMatrix(); // Refrescar para ver el mensaje en "Enviados"
+    } else {
+        notify("❌ Error de comunicación: " + (res ? res.msg : "Sin conexión"));
+    }
 }
 
 let buzonCache = [];
