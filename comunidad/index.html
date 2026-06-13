@@ -2008,6 +2008,103 @@
 @media (max-width: 768px) {
     .card-destacada { flex: 0 0 88%; }
 }
+
+/* ============================================== */
+/* 🏆 MÓDULO MIS LOGROS: PEDESTAL Y MEDALLAS      */
+/* ============================================== */
+.insignia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+.insignia-card {
+    position: relative;
+    background: rgba(0,0,0,0.4);
+    border-radius: 15px;
+    padding: 20px 10px 10px 10px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 160px;
+}
+.insignia-card:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.2);
+}
+/* El Pedestal 3D */
+.pedestal-neon {
+    width: 80%;
+    height: 15px;
+    background: radial-gradient(ellipse at top, rgba(34, 211, 238, 0.8) 0%, transparent 70%);
+    border-bottom: 2px solid var(--neon-n);
+    border-radius: 50%;
+    margin-top: -10px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 5px 15px rgba(34, 211, 238, 0.4);
+}
+.insignia-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+/* Efecto Levitación al Desbloquear */
+.insignia-card.unlocked:hover .insignia-img {
+    transform: translateY(-10px) scale(1.1);
+    filter: drop-shadow(0 15px 15px rgba(34, 211, 238, 0.6));
+}
+/* Efecto de Bloqueo Absoluto */
+.insignia-card.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+.insignia-card.locked .pedestal-neon {
+    background: radial-gradient(ellipse at top, rgba(100, 100, 100, 0.8) 0%, transparent 70%);
+    border-bottom: 2px solid #555;
+    box-shadow: none;
+}
+.candado-icono {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    z-index: 3;
+    opacity: 0.8;
+}
+/* Tooltip / Burbuja de Instrucción */
+.insignia-card .tooltip-insignia {
+    visibility: hidden;
+    width: 160px;
+    background-color: rgba(0,0,0,0.9);
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 10px;
+    position: absolute;
+    z-index: 10;
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border: 1px solid var(--neon-n);
+    font-size: 0.75rem;
+    pointer-events: none;
+}
+.insignia-card:hover .tooltip-insignia {
+    visibility: visible;
+    opacity: 1;
+}
   </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
@@ -2530,6 +2627,12 @@
                 <h3 style="color: var(--neon-m); text-align: center; font-size: 0.8em; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Mentalidad & Propósito</h3>
                 <div id="contenedor-herramientas-m" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </div>
+        </div>
+        <!-- ACCESO RÁPIDO DE COMUNICACIÓN -->
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn btn-n" style="width: 100%; max-width: 400px; padding: 15px; font-size: 0.9em;" onclick="iniciarbuzon()">
+                📬 BUZÓN
+            </button>
         </div>
     </div>
 
@@ -3066,6 +3169,67 @@
 </div>
 
 <!-- =========================================================================
+   🏆 MÓDULO: MIS LOGROS Y DESAFÍO 90 DÍAS
+========================================================================= -->
+<div id="modulo-mis-logros" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px; text-align: center;">
+    
+    <div style="margin-bottom: 25px;">
+        <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px var(--neon-n)); margin-bottom: 10px;">🏆</div>
+        <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Mis Logros</h2>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px;">Tu historial de victorias. Supera tus límites y colecciona las marcas de tu evolución.</p>
+    </div>
+
+    <!-- TABS INTERNOS DEL MÓDULO -->
+    <div class="pilar-filter-container" style="justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+        <button class="filter-tab-premium active" onclick="cambiarTabLogros('tab-insignias')">🎖️ INSIGNIAS</button>
+        <button class="filter-tab-premium" onclick="cambiarTabLogros('tab-diplomas')">🎓 DIPLOMAS</button>
+        <button class="filter-tab-premium" onclick="cambiarTabLogros('tab-desafio')" style="border-color: #f97316; color: #f97316;">🔥 DESAFÍO 90 DÍAS</button>
+    </div>
+
+    <!-- TAB: INSIGNIAS -->
+    <div id="tab-insignias" class="seccion-logro">
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+            <select id="filtro-insignias-pilar" style="width: auto; padding: 8px 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-admin); color: white; border-radius: 20px; font-size: 0.8em;" onchange="filtrarInsigniasUI()">
+                <option value="TODAS">Todos los Pilares</option>
+                <option value="FISICO">Físico / Salud</option>
+                <option value="COMUNIDAD">Comunidad / Rango</option>
+                <option value="MENTALIDAD">Mentalidad / Rachas</option>
+            </select>
+        </div>
+        <div id="muro-insignias-grid" class="insignia-grid">
+            <p style="color:var(--neon-n); grid-column:1/-1;">Sincronizando vitrina de medallas...</p>
+        </div>
+    </div>
+
+    <!-- TAB: DIPLOMAS -->
+    <div id="tab-diplomas" class="seccion-logro hidden">
+        <h3 style="color: white; font-family: 'Orbitron'; margin-bottom: 20px;">CERTIFICADOS DE COMPETENCIA</h3>
+        <div id="muro-diplomas-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+            <p style="color:#94a3b8; grid-column:1/-1;">Aún no tienes diplomas. Completa y aprueba los exámenes en la sección Cursos para desbloquearlos.</p>
+        </div>
+    </div>
+
+    <!-- TAB: DESAFÍO 90 DÍAS -->
+    <div id="tab-desafio" class="seccion-logro hidden" style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; border: 1px dashed #f97316;">
+        <h3 style="color: #f97316; font-family: 'Orbitron'; margin-top: 0; text-transform: uppercase;">DESAFÍO PERSONAL 90 DÍAS DE TRANSFORMACIÓN</h3>
+        <p style="font-size: 0.85em; color: #cbd5e1; max-width: 600px; margin: 0 auto 25px; line-height: 1.5;">Tu disciplina forja tu realidad. Haz clic en el día actual para leer tu código de neuro-programación. Si fallas un día, la racha vuelve a cero. Recompensas VIP a los 30, 60 y 90 días.</p>
+        
+        <div style="background: rgba(249, 115, 22, 0.1); border-left: 3px solid #f97316; padding: 15px; text-align: left; margin-bottom: 20px; display: inline-block;">
+            <span style="font-size: 0.8em; color: #f97316; text-transform: uppercase; letter-spacing: 1px; display: block;">Racha Actual:</span>
+            <span id="racha-actual-numero" style="font-size: 2.5rem; font-family: 'Orbitron'; font-weight: bold; color: white;">0</span> <span style="color: #cbd5e1; font-size: 1rem;">Días</span>
+        </div>
+
+        <div id="grid-90-dias" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; justify-content: center;">
+            <p style="color:#f97316; grid-column:1/-1;">Dibujando tablero de 90 días...</p>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <button class="btn" style="width: 100%; max-width: 300px; opacity: 0.6; font-size: 0.85em;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+    </div>
+</div>
+    
+<!-- =========================================================================
    🎁 MÓDULO: BAZAR DE RECOMPENSAS (CANJE)
 ========================================================================= -->
 <div id="modulo-canje-recompensas" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-m); padding: 25px; text-align: center;">
@@ -3104,6 +3268,80 @@
 <div id="modal-detalle-canje" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left; max-height: 85vh !important; overflow-y: auto !important;">
     <button onclick="cerrarModalDetalleCanje()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
     <div id="contenido-detalle-canje"></div>
+</div>
+
+<!-- =========================================================================
+   📩 MÓDULO COMUNICACIÓN: BUZÓN CENTRAL Y CHAT
+========================================================================= -->
+<div id="modulo-buzon" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 0; display: flex; flex-direction: column; height: 85vh; max-height: 800px; overflow: hidden;">
+    
+    <!-- HEADER ESTILO GMAIL -->
+    <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 2rem; filter: drop-shadow(0 0 8px var(--neon-n));">📬</span>
+            <h2 style="color: var(--neon-n); font-family: 'Orbitron'; margin: 0; letter-spacing: 1px;">BUZÓN C3D</h2>
+        </div>
+        <button class="btn" style="opacity: 0.6; padding: 8px 15px; font-size: 0.8em;" onclick="salirDelModulo()">X CERRAR</button>
+    </div>
+
+    <!-- SPLIT LAYOUT (CARPETAS Y MENSAJES) -->
+    <div style="display: flex; flex: 1; overflow: hidden; flex-wrap: wrap;">
+        
+        <!-- SIDEBAR DE CARPETAS -->
+        <div style="flex: 1 1 200px; max-width: 250px; background: rgba(0,0,0,0.3); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column;">
+            <div style="padding: 15px;">
+                <button class="btn btn-n" style="width: 100%; font-size: 0.85em; padding: 12px;" onclick="abrirRedaccionMasiva()">✎ REDACTAR</button>
+            </div>
+            <div id="buzon-carpetas" style="flex: 1; overflow-y: auto;">
+                <div class="buzon-carpeta active" onclick="cambiarCarpetaBuzon(this, 'RECIBIDOS')" style="padding: 15px; cursor: pointer; border-left: 4px solid var(--neon-n); background: rgba(34, 211, 238, 0.1); color: white; font-weight: bold; transition: 0.3s;">📥 Bandeja de Entrada</div>
+                <div class="buzon-carpeta" onclick="cambiarCarpetaBuzon(this, 'ENVIADOS')" style="padding: 15px; cursor: pointer; border-left: 4px solid transparent; color: #cbd5e1; transition: 0.3s;">📤 Enviados</div>
+                <div class="buzon-carpeta" onclick="cambiarCarpetaBuzon(this, 'SISTEMA')" style="padding: 15px; cursor: pointer; border-left: 4px solid transparent; color: #cbd5e1; transition: 0.3s;">⚙️ Alertas de Red</div>
+                
+                <!-- INTEGRACIÓN MI COACH -->
+                <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.2); padding: 15px;">
+                    <p style="font-size: 0.7em; color: var(--neon-f); text-align: center; margin: 0 0 10px 0; font-weight: bold; text-transform: uppercase;">Línea Directa</p>
+                    <button class="btn btn-f" style="width: 100%; font-size: 0.8em; padding: 12px;" onclick="abrirMiCoach()">💬 MI COACH</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL CENTRAL (BUSCADOR Y LISTA) -->
+        <div style="flex: 3 1 400px; display: flex; flex-direction: column; overflow: hidden; background: rgba(10, 15, 30, 0.5);">
+            <div style="padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+                <input type="text" id="buzon-buscador" placeholder="🔍 Buscar mensajes..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid #444; color: white; border-radius: 8px;" onkeyup="filtrarBuzonUI()">
+            </div>
+            <div id="buzon-lista-mensajes" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                <p style="text-align: center; color: var(--neon-n); margin-top: 40px;">Sincronizando correos...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🎛️ MODAL: MI COACH (CHAT INTERNO) -->
+<div id="modal-mi-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 450px !important; height: 80vh !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-f) !important; padding: 0 !important; box-shadow: 0 0 50px rgba(16, 185, 129, 0.4) !important; display: flex; flex-direction: column; border-radius: 15px !important; overflow: hidden;">
+    
+    <div style="padding: 15px 20px; background: rgba(16, 185, 129, 0.15); border-bottom: 1px solid var(--neon-f); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 1.8rem; filter: drop-shadow(0 0 5px var(--neon-f));">💬</div>
+            <div>
+                <h3 style="color: var(--neon-f); font-family: 'Orbitron'; margin: 0; font-size: 1.1em; letter-spacing: 1px;">MI COACH</h3>
+                <small style="color: #cbd5e1; font-size: 0.75em;">Conexión Encriptada Ascendente</small>
+            </div>
+        </div>
+        <button onclick="cerrarMiCoach()" style="background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; transition: 0.3s;">×</button>
+    </div>
+    
+    <div id="chat-mensajes" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: rgba(0,0,0,0.6);">
+        <p style="text-align: center; color: #94a3b8; font-size: 0.85em; margin-top: 50px;">Conectando con la Matrix...</p>
+    </div>
+    
+    <div style="padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(10, 15, 30, 0.9);">
+        <textarea id="chat-input" rows="2" maxlength="500" placeholder="Escribe tu mensaje... (Max 500 carac.)" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.8); border: 1px solid var(--neon-f); color: white; border-radius: 8px; resize: none; box-sizing: border-box; font-family: inherit; margin-bottom: 10px;"></textarea>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span id="chat-contador" style="color: #64748b; font-size: 0.75em;">0/500</span>
+            <button class="btn btn-f" style="padding: 10px 25px; font-weight: bold;" onclick="enviarMensajeChat()">ENVIAR 🚀</button>
+        </div>
+    </div>
 </div>
     
 <!-- 🎛️ MODAL: DECLARAR REFERIDO -->
@@ -3715,6 +3953,38 @@
     <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarTransferencia()">CANCELAR</button>
 </div>
 
+<!-- 🎛️ MODAL: FRASE NEURO-PROGRAMACIÓN (DESAFÍO 90 DÍAS) -->
+<div id="modal-frase-diaria" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 90% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid #f97316 !important; padding: 30px !important; text-align: center !important; border-radius: 15px !important; box-shadow: 0 0 50px rgba(249, 115, 22, 0.4) !important;">
+    <button onclick="cerrarModalFrase()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <div style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px #f97316);">🔥</div>
+    <h3 style="color: #f97316; font-family: 'Orbitron'; margin-top: 0;">DÍA <span id="desafio-dia-num"></span></h3>
+    <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 10px; border: 1px dashed rgba(249, 115, 22, 0.3); margin-bottom: 20px;">
+        <p id="desafio-frase-texto" style="font-size: 1.1em; color: white; font-style: italic; line-height: 1.6; margin: 0;"></p>
+    </div>
+    <button class="btn" style="background: #f97316; color: white; width: 100%; font-weight: bold; padding: 15px; font-family: 'Orbitron';" onclick="confirmarDiaDesafio()">ACEPTAR Y MARCAR DÍA</button>
+</div>
+
+<!-- 🎛️ MODAL: INVITACIÓN A SER COACH (HITO 90 DÍAS) -->
+<div id="modal-invitacion-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 30px !important; box-shadow: 0 0 50px rgba(168, 85, 247, 0.5) !important;">
+    <button onclick="cerrarModalInvitacionCoach()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <div style="text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--neon-m));">👑</div>
+        <h2 style="color: var(--neon-m); font-family: 'Orbitron'; margin: 0 0 10px 0;">¡LA CONSTANCIA FORJA LEYENDAS!</h2>
+        <p style="font-size: 0.9em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">Has completado 90 días ininterrumpidos en la Matrix. Tu mentalidad ya no pertenece al promedio. Por tu profundo interés en el desarrollo personal, la comunidad te invita oficialmente a certificarte como <b>Coach Tridimensional</b>.</p>
+    </div>
+    <form id="form-ascenso-coach" onsubmit="event.preventDefault(); enviarSolicitudCoach90Dias();">
+        <input type="text" id="coach90-nombre" placeholder="Nombre Completo" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
+        <input type="email" id="coach90-email" placeholder="Correo Electrónico" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="coach90-whatsapp" placeholder="WhatsApp" required style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+            <input type="text" id="coach90-pais" placeholder="País" required style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        </div>
+        <textarea id="coach90-motivo" placeholder="¿Por qué deseas guiar a otros como Coach?" required rows="3" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 20px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
+        
+        <button type="submit" class="btn btn-m" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';">ACEPTAR EL RETO Y POSTULAR</button>
+    </form>
+</div>
+    
     <script>
 
         // CONFIGURACIÓN GLOBAL
@@ -6107,7 +6377,7 @@ function apagarTodosLosModulos() {
         'modulo-calculadora-financiera', 'modulo-servicios-comunidad',
         'modulo-cursos-netflix', 'modulo-productos-ecommerce',
         'panel-acceso-coach', 'btn-acceso-coach', 'modulo-puntos-referidos',
-        'modulo-canje-recompensas'
+        'modulo-canje-recompensas', 'modulo-mis-logros', 'modulo-buzon'
     ];
     
     // Apaga todas las ventanas
@@ -9739,6 +10009,510 @@ function cerrarModalDetalleCanje() {
     document.getElementById('modal-detalle-canje').style.display = 'none';
     // Si el fondo estaba borroso, lo limpiamos
     document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+// =========================================================
+// 🏆 MOTOR CORE: LOGROS, INSIGNIAS Y DESAFÍO 90 DÍAS
+// =========================================================
+
+function iniciarmislogros() {
+    apagarTodosLosModulos(); // 🛡️ EL INTERRUPTOR MAESTRO FOCUS
+    const modulo = document.getElementById('modulo-mis-logros');
+    if (modulo) {
+        modulo.classList.remove('hidden');
+        cambiarTabLogros('tab-insignias');
+        // ⚡ Motor encendido
+        sincronizarDatosLogros();
+    }
+}
+
+function cambiarTabLogros(tabId) {
+    // Apagar todas las secciones internas de este módulo
+    document.querySelectorAll('#modulo-mis-logros .seccion-logro').forEach(t => t.classList.add('hidden'));
+    
+    // Resetear diseño de los botones
+    document.querySelectorAll('#modulo-mis-logros .filter-tab-premium').forEach(b => {
+        b.classList.remove('active');
+        if(b.innerText.includes('DESAFÍO')) {
+            b.style.background = 'transparent';
+        }
+    });
+    
+    // Encender la sección seleccionada
+    document.getElementById(tabId).classList.remove('hidden');
+    if(event && event.target) {
+        const btn = event.target;
+        btn.classList.add('active');
+        // Neuro-diseño: El Desafío 90 días tiene un color naranja agresivo para destacar
+        if(tabId === 'tab-desafio') {
+            btn.style.background = 'rgba(249, 115, 22, 0.15)';
+            btn.style.boxShadow = '0 0 15px rgba(249, 115, 22, 0.3)';
+        }
+    }
+}
+
+let catalogoInsigniasCache = [];
+let progresoUsuarioCache = null;
+
+function sincronizarDatosLogros(payload) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheetCat = ss.getSheetByName("CATALOGO_INSIGNIAS");
+    let sheetProg = ss.getSheetByName("PROGRESO_USUARIOS");
+    
+    let catalogo = [];
+    let progreso = { insignias: [], racha: 0, ultimoDia: "", diplomas: [] };
+    
+    // 1. Leer el catálogo de medallas disponibles
+    if (sheetCat) {
+      let dataCat = sheetCat.getDataRange().getValues();
+      for(let i = 1; i < dataCat.length; i++) {
+         if(dataCat[i][0]) {
+             catalogo.push({
+               id: dataCat[i][0].toString().trim(),
+               categoria: dataCat[i][1].toString().toUpperCase().trim(),
+               titulo: dataCat[i][2],
+               instruccion: dataCat[i][3],
+               imagen: dataCat[i][4]
+             });
+         }
+      }
+    }
+    
+    // 2. Leer el progreso del usuario y AUDITAR CONSTANCIA
+    if (sheetProg) {
+      let dataProg = sheetProg.getDataRange().getValues();
+      let emailBuscado = payload.email.toLowerCase().trim();
+      let filaUsuario = -1;
+      
+      let hoy = new Date();
+      let fechaHoyStr = Utilities.formatDate(hoy, "GMT-3", "yyyy-MM-dd");
+      
+      for(let i = 1; i < dataProg.length; i++) {
+         if(dataProg[i][0].toString().toLowerCase().trim() === emailBuscado) {
+            filaUsuario = i + 1;
+            progreso.insignias = dataProg[i][1] ? dataProg[i][1].toString().split(",").map(s => s.trim()).filter(s => s !== "") : [];
+            progreso.racha = Number(dataProg[i][2]) || 0;
+            progreso.ultimoDia = dataProg[i][3] ? dataProg[i][3].toString() : "";
+            progreso.diplomas = dataProg[i][4] ? dataProg[i][4].toString().split(",").map(s => s.trim()).filter(s => s !== "") : [];
+            
+            // 🛡️ MOTOR DE AVERSIÓN A LA PÉRDIDA (Comprueba si falló al abrir la página)
+            if(progreso.racha > 0 && progreso.ultimoDia !== "" && progreso.ultimoDia !== fechaHoyStr) {
+                let partesUltimo = progreso.ultimoDia.split("-");
+                let dUltimo = new Date(partesUltimo[0], partesUltimo[1]-1, partesUltimo[2]);
+                let partesHoy = fechaHoyStr.split("-");
+                let dHoy = new Date(partesHoy[0], partesHoy[1]-1, partesHoy[2]);
+                
+                let diffTime = Math.abs(dHoy - dUltimo);
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                
+                // Si la diferencia es mayor a 1 día (No fue ayer), SE ROMPE LA RACHA
+                if(diffDays > 1) {
+                    progreso.racha = 0;
+                    sheetProg.getRange(filaUsuario, 3).setValue(0); // Guardamos la derrota en el Excel
+                }
+            }
+            break;
+         }
+      }
+      
+      // Si el usuario es nuevo en esta área, lo creamos
+      if(filaUsuario === -1) {
+         sheetProg.appendRow([emailBuscado, "", 0, "", "", ""]);
+      }
+    }
+    
+    return { success: true, catalogo: catalogo, progreso: progreso };
+  } catch(e) { return { success: false, msg: e.toString() }; }
+}
+
+function filtrarInsigniasUI() {
+    const grid = document.getElementById('muro-insignias-grid');
+    grid.innerHTML = "";
+    
+    const pilarSeleccionado = document.getElementById('filtro-insignias-pilar').value;
+    
+    let filtradas = catalogoInsigniasCache;
+    if (pilarSeleccionado !== "TODAS") {
+        filtradas = filtradas.filter(i => i.categoria === pilarSeleccionado);
+    }
+    
+    if (filtradas.length === 0) {
+        grid.innerHTML = `<p style="color:#94a3b8; grid-column:1/-1; padding: 30px;">Kairo no encontró insignias en esta categoría. Sigue esforzándote.</p>`;
+        return;
+    }
+    
+    filtradas.forEach(insignia => {
+        // Verificamos si el usuario tiene este ID en su array de insignias
+        const estaDesbloqueada = progresoUsuarioCache.insignias.includes(insignia.id);
+        const claseEstado = estaDesbloqueada ? "unlocked" : "locked";
+        
+        // HTML de la medalla con Neuro-Diseño (CSS del Pedestal 3D que ya instalamos)
+        grid.innerHTML += `
+            <div class="insignia-card ${claseEstado}">
+                ${!estaDesbloqueada ? '<div class="candado-icono">🔒</div>' : ''}
+                <img src="${insignia.imagen}" class="insignia-img" onerror="this.src='https://img.icons8.com/fluency/96/medal.png'">
+                <div class="pedestal-neon"></div>
+                <h4 style="color: ${estaDesbloqueada ? 'white' : '#94a3b8'}; margin: 15px 0 5px 0; font-size: 0.85em; font-family: 'Orbitron'; line-height: 1.2;">${insignia.titulo}</h4>
+                <div class="tooltip-insignia">${estaDesbloqueada ? '¡Logro Desbloqueado! Eres parte de la élite.' : insignia.instruccion}</div>
+            </div>
+        `;
+    });
+}
+
+function renderizarTablero90Dias() {
+    const grid = document.getElementById('grid-90-dias');
+    const rachaActual = progresoUsuarioCache.racha;
+    
+    // Actualiza el número gigante
+    document.getElementById('racha-actual-numero').innerText = rachaActual;
+    
+    grid.innerHTML = "";
+    
+    // Dibujamos 90 casilleros
+    for(let dia = 1; dia <= 90; dia++) {
+        let colorFondo = "rgba(0,0,0,0.5)";
+        let colorBorde = "#444";
+        let colorTexto = "#666";
+        let cursor = "not-allowed";
+        let onclickHTML = "";
+        
+        // Neuro-Gamificación de Tablero
+        if (dia <= rachaActual) {
+            // Días ya completados (Naranja Encendido)
+            colorFondo = "rgba(249, 115, 22, 0.2)";
+            colorBorde = "#f97316";
+            colorTexto = "#f97316";
+        } else if (dia === rachaActual + 1) {
+            // El Siguiente día disponible (Brillando para invitar al clic)
+            colorFondo = "rgba(34, 211, 238, 0.2)";
+            colorBorde = "var(--neon-n)";
+            colorTexto = "var(--neon-n)";
+            cursor = "pointer";
+            onclickHTML = `onclick="ejecutarDiaDesafio(${dia})"`;
+        }
+        
+        // Hitos VIP
+        let esHito = (dia === 30 || dia === 60 || dia === 90);
+        let iconoHito = esHito ? '<span style="position:absolute; top:-5px; right:-5px; font-size:0.8em;">🌟</span>' : '';
+
+        grid.innerHTML += `
+            <div ${onclickHTML} style="position:relative; width: 100%; aspect-ratio: 1/1; display:flex; align-items:center; justify-content:center; background:${colorFondo}; border:1px solid ${colorBorde}; color:${colorTexto}; border-radius:6px; font-weight:bold; font-family:'Orbitron'; font-size:0.9em; cursor:${cursor}; transition:0.3s; box-sizing:border-box;">
+                ${dia}
+                ${iconoHito}
+            </div>
+        `;
+    }
+}
+
+// REPOSITORIO DE NEURO-PROGRAMACIÓN (Agrega tus 90 frases aquí respetando las comillas)
+const misFrases90Dias = {
+    1: "La disciplina es hacer lo que odias hacer, pero hacerlo como si lo amaras.",
+    2: "Tu mente se rinde mucho antes que tu cuerpo. Domínala y lo dominarás todo.",
+    3: "El dolor de la disciplina pesa onzas; el dolor del arrepentimiento pesa toneladas.",
+    4: "Si no sacrificas por lo que quieres, lo que quieres se convertirá en el sacrificio.",
+    5: "La motivación te hace empezar. El hábito te hace continuar.",
+    30: "Has conquistado el primer mes. Ya no eres la misma persona que empezó.",
+    60: "Dos meses forjando acero en tu mente. La Matrix comienza a inclinarse a tu favor.",
+    90: "El camino del 2% ha sido completado. Bienvenido a la élite tridimensional."
+};
+
+function ejecutarDiaDesafio(diaObjetivo) {
+    document.getElementById('desafio-dia-num').innerText = diaObjetivo;
+    
+    // Busca la frase. Si no la has escrito en el diccionario de arriba, pone una por defecto.
+    document.getElementById('desafio-frase-texto').innerText = misFrases90Dias[diaObjetivo] || "La constancia es la llave maestra de la Matrix. Mantén el ritmo.";
+    
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-frase-diaria').classList.remove('hidden');
+    document.getElementById('modal-frase-diaria').style.display = 'block';
+}
+
+function cerrarModalFrase() {
+    document.getElementById('modal-frase-diaria').classList.add('hidden');
+    document.getElementById('modal-frase-diaria').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+async function confirmarDiaDesafio() {
+    const btn = document.querySelector('#modal-frase-diaria button');
+    btn.innerText = "SINCRONIZANDO CON LA MATRIX..."; 
+    btn.disabled = true;
+
+    const res = await apiCall("registrarDiaDesafio", { email: sessionUser.email });
+
+    btn.innerText = "ACEPTAR Y MARCAR DÍA"; 
+    btn.disabled = false;
+
+    if (res && res.success) {
+        cerrarModalFrase();
+        progresoUsuarioCache.racha = res.racha;
+        renderizarTablero90Dias(); // Redibuja el tablero en vivo
+
+        if (res.racha === 1 && res.rachaAnterior > 0) {
+            // Gatillo Aversión a la Pérdida
+            kairoMessage({mensaje: "Kairo ha detectado una fisura en tu constancia. Has perdido un día y tu racha ha vuelto a 0. El dolor es el mejor maestro. Levántate y vuelve a empezar.", icon: "⚠️"});
+        } else if (res.hito === 30 || res.hito === 60) {
+            // Premio VIP Temporal
+            sessionUser.rango = "Suscriptor"; 
+            sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser)); // Guardamos en memoria
+            kairoMessage({mensaje: `¡HITO ALCANZADO! Por superar los ${res.hito} días, Kairo te ha otorgado el rango de Suscriptor VIP de forma gratuita y temporal. Disfruta los beneficios del 2%.`, icon: "🎁"});
+        } else if (res.hito === 90) {
+            // Invitación a Coach
+            abrirModalSerCoach();
+        } else {
+            notify("✅ Día registrado con éxito en la Matrix.");
+        }
+    } else {
+        notify("❌ " + (res ? res.msg : "Error al conectar con la base de datos."));
+        cerrarModalFrase();
+    }
+}
+
+// Lógica Formulario Ser Coach
+function abrirModalSerCoach() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    const m = document.getElementById('modal-invitacion-coach');
+    m.classList.remove('hidden');
+    m.style.display = 'block';
+    
+    // Autocompletar datos del usuario
+    document.getElementById('coach90-nombre').value = sessionUser.nombre;
+    document.getElementById('coach90-email').value = sessionUser.email;
+    document.getElementById('coach90-whatsapp').value = sessionUser.whatsapp || "";
+    document.getElementById('coach90-pais').value = sessionUser.pais || "";
+}
+
+function cerrarModalInvitacionCoach() {
+    document.getElementById('modal-invitacion-coach').classList.add('hidden');
+    document.getElementById('modal-invitacion-coach').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+async function enviarSolicitudCoach90Dias() {
+    const btn = document.querySelector('#form-ascenso-coach button');
+    btn.innerText = "ENVIANDO EXPEDIENTE A CENTRAL...";
+    btn.disabled = true;
+
+    const payload = {
+        nombre: document.getElementById('coach90-nombre').value.trim(),
+        email: document.getElementById('coach90-email').value.trim(),
+        whatsapp: document.getElementById('coach90-whatsapp').value.trim(),
+        pais: document.getElementById('coach90-pais').value.trim(),
+        motivo: document.getElementById('coach90-motivo').value.trim(),
+        userEmail: sessionUser.email
+    };
+
+    const res = await apiCall("procesarPostulacionCoach90Dias", payload);
+
+    if (res && res.success) {
+        cerrarModalInvitacionCoach();
+        kairoMessage({mensaje: "Expediente enviado con éxito. El Alto Consejo de la comunidad se pondrá en contacto contigo en un plazo máximo de 48 horas para coordinar tu entrevista formal. Descansa, lo has ganado.", icon: "🏅"});
+    } else {
+        btn.innerText = "ACEPTAR EL RETO Y POSTULAR";
+        btn.disabled = false;
+        notify("Error al enviar solicitud: " + (res ? res.msg : "Sin conexión."));
+    }
+}
+
+// =========================================================
+// 📩 MOTOR CORE: BUZÓN Y CHAT "MI COACH"
+// =========================================================
+
+function iniciarbuzon() {
+    apagarTodosLosModulos(); // 🛡️ EL INTERRUPTOR MAESTRO FOCUS
+    const modulo = document.getElementById('modulo-buzon');
+    if (modulo) {
+        modulo.classList.remove('hidden');
+        notify("Sincronizando con el servidor de correos...");
+        sincronizarBuzonMatrix(); // ⚡ Motor encendido
+    }
+}
+
+function cambiarCarpetaBuzon(elemento, carpeta) {
+    document.querySelectorAll('.buzon-carpeta').forEach(el => {
+        el.classList.remove('active');
+        el.style.borderLeftColor = 'transparent';
+        el.style.color = '#cbd5e1';
+        el.style.background = 'transparent';
+        el.style.fontWeight = 'normal';
+    });
+    
+    elemento.classList.add('active');
+    elemento.style.borderLeftColor = 'var(--neon-n)';
+    elemento.style.color = 'white';
+    elemento.style.background = 'rgba(34, 211, 238, 0.1)';
+    elemento.style.fontWeight = 'bold';
+    
+    renderizarListaBuzon(carpeta); // ⚡ Motor de carga encendido
+}
+        
+function abrirMiCoach() {
+    // Al abrir el chat, no apagamos el Buzón. Solo abrimos el modal encima.
+    document.getElementById('modulo-buzon').classList.add('blur-effect');
+    const modal = document.getElementById('modal-mi-coach');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    // Contador dinámico de caracteres
+    const txt = document.getElementById('chat-input');
+    const contador = document.getElementById('chat-contador');
+    txt.oninput = function() {
+        contador.innerText = `${this.value.length}/500`;
+    };
+}
+
+function cerrarMiCoach() {
+    document.getElementById('modal-mi-coach').classList.add('hidden');
+    document.getElementById('modal-mi-coach').style.display = 'none';
+    document.getElementById('modulo-buzon').classList.remove('blur-effect');
+    
+    document.getElementById('chat-input').value = "";
+    document.getElementById('chat-contador').innerText = "0/500";
+}
+
+function abrirRedaccionMasiva() {
+    notify("El editor de Correos y Difusiones requiere conexión a la Base de Datos. Esperando inyección Backend.");
+}
+
+let buzonCache = [];
+let miCoachEmailCache = "";
+let buzonCarpetaActual = "RECIBIDOS";
+
+async function sincronizarBuzonMatrix() {
+    const res = await apiCall("sincronizarBuzon", { email: sessionUser.email });
+    if(res && res.success) {
+        buzonCache = res.mensajes;
+        miCoachEmailCache = res.miCoach;
+        renderizarListaBuzon(buzonCarpetaActual);
+        sincronizarChatMiCoach();
+    } else {
+        document.getElementById('buzon-lista-mensajes').innerHTML = "<p style='color:#ff4444; text-align:center;'>Error al cargar el buzón matricial.</p>";
+    }
+}
+
+function renderizarListaBuzon(carpeta) {
+    buzonCarpetaActual = carpeta;
+    const contenedor = document.getElementById('buzon-lista-mensajes');
+    contenedor.innerHTML = "";
+
+    let filtrados = [];
+    const miEmail = sessionUser.email.toLowerCase();
+
+    // Filtros de Carpeta Inteligentes
+    if(carpeta === "RECIBIDOS") {
+        filtrados = buzonCache.filter(m => m.tipo !== "CHAT" && (m.destinatario.toLowerCase() === miEmail || m.destinatario === "todos"));
+    } else if(carpeta === "ENVIADOS") {
+        filtrados = buzonCache.filter(m => m.remitente.toLowerCase() === miEmail && m.tipo !== "CHAT");
+    } else if(carpeta === "SISTEMA") {
+        filtrados = buzonCache.filter(m => m.tipo === "ALERTA" && (m.destinatario.toLowerCase() === miEmail || m.destinatario === "todos"));
+    }
+
+    // Buscador Interno
+    const query = document.getElementById('buzon-buscador').value.toLowerCase().trim();
+    if(query !== "") {
+        filtrados = filtrados.filter(m => m.remitente.toLowerCase().includes(query) || m.asunto.toLowerCase().includes(query) || m.cuerpo.toLowerCase().includes(query));
+    }
+
+    // Orden Cronológico
+    filtrados.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+    if(filtrados.length === 0) {
+        contenedor.innerHTML = "<p style='color:#94a3b8; text-align:center; margin-top:20px;'>Bandeja limpia. Sin mensajes aquí.</p>";
+        return;
+    }
+
+    filtrados.forEach(m => {
+        const esNoLeido = (m.estado === "NO_LEIDO" && m.destinatario.toLowerCase() === miEmail) ? "font-weight: bold; color: white;" : "color: #cbd5e1;";
+        const fechaStr = new Date(m.fecha).toLocaleDateString();
+
+        contenedor.innerHTML += `
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; ${esNoLeido}" onclick="notify('Visualizador de correo interno en desarrollo.')">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="font-size:0.8em; color:var(--neon-n);">${m.remitente}</span>
+                    <span style="font-size:0.7em; color:#64748b;">${fechaStr}</span>
+                </div>
+                <div style="font-size:0.95em; margin-bottom:5px;">${m.asunto}</div>
+                <div style="font-size:0.8em; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${m.cuerpo}</div>
+            </div>
+        `;
+    });
+}
+
+function filtrarBuzonUI() {
+    renderizarListaBuzon(buzonCarpetaActual);
+}
+
+function sincronizarChatMiCoach() {
+    const contenedor = document.getElementById('chat-mensajes');
+    contenedor.innerHTML = "";
+
+    const miEmail = sessionUser.email.toLowerCase();
+    
+    // Filtrar solo chats entre yo y mi coach
+    const mensajesChat = buzonCache.filter(m => m.tipo === "CHAT" && 
+        ((m.remitente.toLowerCase() === miEmail && m.destinatario.toLowerCase() === miCoachEmailCache.toLowerCase()) || 
+         (m.remitente.toLowerCase() === miCoachEmailCache.toLowerCase() && m.destinatario.toLowerCase() === miEmail))
+    );
+
+    mensajesChat.sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+
+    if(mensajesChat.length === 0) {
+        contenedor.innerHTML = "<p style='color:#94a3b8; text-align:center; font-size:0.85em; margin-top:20px;'>Aún no hay mensajes. Inicia la conversación.</p>";
+        return;
+    }
+
+    mensajesChat.forEach(m => {
+        const esMio = m.remitente.toLowerCase() === miEmail;
+        const alineacion = esMio ? "flex-end" : "flex-start";
+        const bg = esMio ? "rgba(16, 185, 129, 0.2)" : "rgba(255,255,255,0.05)";
+        const borde = esMio ? "var(--neon-f)" : "#444";
+        const fechaStr = new Date(m.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        contenedor.innerHTML += `
+            <div style="display:flex; flex-direction:column; align-items:${alineacion}; width:100%;">
+                <div style="background:${bg}; border:1px solid ${borde}; padding:10px 15px; border-radius:12px; max-width:80%; color:white; font-size:0.85em; line-height:1.4;">
+                    ${m.cuerpo}
+                </div>
+                <span style="font-size:0.65em; color:#64748b; margin-top:3px;">${fechaStr}</span>
+            </div>
+        `;
+    });
+
+    contenedor.scrollTop = contenedor.scrollHeight; // Auto-scroll al final del chat
+}
+
+async function enviarMensajeChat() {
+    const txt = document.getElementById('chat-input').value.trim();
+    if(!txt) return;
+
+    const btn = document.querySelector('#modal-mi-coach .btn-f');
+    btn.innerText = "⏳..."; btn.disabled = true;
+
+    const payload = {
+        remitente: sessionUser.email,
+        destinatario: miCoachEmailCache,
+        mensaje: txt
+    };
+
+    const res = await apiCall("enviarMensajeCoach", payload);
+    
+    btn.innerText = "ENVIAR 🚀"; btn.disabled = false;
+
+    if(res && res.success) {
+        document.getElementById('chat-input').value = "";
+        document.getElementById('chat-contador').innerText = "0/500";
+        
+        // Simular inserción local para velocidad de carga UI
+        buzonCache.push({
+            id: "MSG-TEMP", fecha: new Date().toISOString(),
+            remitente: sessionUser.email, destinatario: miCoachEmailCache,
+            tipo: "CHAT", asunto: "Mensaje Directo", cuerpo: txt, estado: "NO_LEIDO"
+        });
+        sincronizarChatMiCoach();
+    } else {
+        notify("Error al enviar mensaje: " + (res ? res.msg : "Conexión fallida"));
+    }
 }
         
     </script>
