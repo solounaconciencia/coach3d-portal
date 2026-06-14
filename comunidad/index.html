@@ -3953,12 +3953,14 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
                     <label style="font-size:0.75em; color:#94a3b8;">Token MercadoPago (PROD):</label>
                     <input type="password" id="conf-mp-token" class="nave-input" placeholder="APP_USR-..." style="padding:8px; margin-bottom:10px;">
                     
-                    <label style="font-size:0.75em; color:#94a3b8;">Datos Bancarios (Transferencia):</label>
-                    <input type="text" id="conf-banco-nombre" class="nave-input" placeholder="Banco (Ej: Banco Estado)" style="padding:8px; margin-bottom:5px;">
-                    <input type="text" id="conf-banco-tipo" class="nave-input" placeholder="Tipo Cuenta (Ej: Cuenta RUT)" style="padding:8px; margin-bottom:5px;">
-                    <input type="text" id="conf-banco-rut" class="nave-input" placeholder="RUT (Ej: 11.111.111-1)" style="padding:8px; margin-bottom:5px;">
-                    <input type="text" id="conf-banco-numero" class="nave-input" placeholder="N° Cuenta" style="padding:8px; margin-bottom:5px;">
-                    <input type="text" id="conf-banco-correo" class="nave-input" placeholder="Correo comprobantes" style="padding:8px;">
+                    <label style="font-size:0.75em; color:#94a3b8;">Pasarelas Internacionales:</label>
+                    <input type="text" id="conf-dlocal-link" class="nave-input" placeholder="Link dLocal Go" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-paypal-link" class="nave-input" placeholder="Link PayPal (Ej: paypal.me/...)" style="padding:8px; margin-bottom:15px;">
+                    
+                    <label style="font-size:0.75em; color:#94a3b8;">Criptomonedas (Binance Pay / USDT):</label>
+                    <input type="text" id="conf-binance-wallet" class="nave-input" placeholder="Dirección Billetera (Ej: TqX...)" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-binance-red" class="nave-input" placeholder="Red (Ej: TRC20 o BSC)" style="padding:8px; margin-bottom:5px;">
+                    <input type="text" id="conf-email-admin" class="nave-input" placeholder="Correo para alertas de pago" style="padding:8px;">
                 </div>
             </div>
 
@@ -4163,11 +4165,19 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
     <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
         <label class="custom-radio">
             <input type="radio" name="metodoPago" value="MP" checked>
-            <strong>MercadoPago</strong> (Tarjetas, Débito, Efectivo)
+            <strong>MercadoPago</strong> (Tarjetas Chile)
         </label>
         <label class="custom-radio">
-            <input type="radio" name="metodoPago" value="TRANSFERENCIA">
-            <strong>Transferencia Bancaria</strong> (Adjuntar comprobante)
+            <input type="radio" name="metodoPago" value="DLOCAL">
+            <strong>dLocal Go</strong> (Tarjetas LATAM / Efectivo Local)
+        </label>
+        <label class="custom-radio">
+            <input type="radio" name="metodoPago" value="PAYPAL">
+            <strong>PayPal</strong> (Internacional)
+        </label>
+        <label class="custom-radio">
+            <input type="radio" name="metodoPago" value="BINANCE">
+            <strong style="color: #fbbf24;">Binance Pay / USDT</strong> (Cripto Sin Comisiones)
         </label>
     </div>
 
@@ -6097,11 +6107,11 @@ async function abrirAdminHerramientas() {
       
       // Nuevos campos E-commerce
       document.getElementById('conf-mp-token').value = resConfig.tokenMP || "";
-      document.getElementById('conf-banco-nombre').value = resConfig.bancoNombre || "";
-      document.getElementById('conf-banco-tipo').value = resConfig.bancoTipo || "";
-      document.getElementById('conf-banco-rut').value = resConfig.bancoRut || "";
-      document.getElementById('conf-banco-numero').value = resConfig.bancoNumero || "";
-      document.getElementById('conf-banco-correo').value = resConfig.bancoCorreo || "";
+      document.getElementById('conf-dlocal-link').value = resConfig.dlocalLink || "";
+      document.getElementById('conf-paypal-link').value = resConfig.paypalLink || "";
+      document.getElementById('conf-binance-wallet').value = resConfig.binanceWallet || "";
+      document.getElementById('conf-binance-red').value = resConfig.binanceRed || "";
+      document.getElementById('conf-email-admin').value = resConfig.emailAdmin || "";
       document.getElementById('conf-legal-terminos').value = resConfig.legalTerminos || "";
       document.getElementById('conf-legal-privacidad').value = resConfig.legalPrivacidad || "";
   }
@@ -6138,11 +6148,11 @@ async function guardarConfiguracion() {
     regaloReferidoAniversario: document.getElementById('conf-regalo-referido-aniversario').value,
     // Sincronización E-commerce
     tokenMP: document.getElementById('conf-mp-token').value,
-    bancoNombre: document.getElementById('conf-banco-nombre').value,
-    bancoTipo: document.getElementById('conf-banco-tipo').value,
-    bancoRut: document.getElementById('conf-banco-rut').value,
-    bancoNumero: document.getElementById('conf-banco-numero').value,
-    bancoCorreo: document.getElementById('conf-banco-correo').value,
+    dlocalLink: document.getElementById('conf-dlocal-link').value,
+    paypalLink: document.getElementById('conf-paypal-link').value,
+    binanceWallet: document.getElementById('conf-binance-wallet').value,
+    binanceRed: document.getElementById('conf-binance-red').value,
+    emailAdmin: document.getElementById('conf-email-admin').value,
     legalTerminos: document.getElementById('conf-legal-terminos').value,
     legalPrivacidad: document.getElementById('conf-legal-privacidad').value
   };
