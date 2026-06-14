@@ -2825,19 +2825,27 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
         <div id="coach-matriz-agenda" style="background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--neon-m); max-height: 400px; overflow-y: auto;">
              </div>
         <!-- 🎛️ MODAL 3: MIS COBROS (COACH) -->
-    <div id="modal-cobros-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000001 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-f) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+    <div id="modal-cobros-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000001 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-f) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; max-height: 85vh !important; overflow-y: auto !important; text-align: left;">
         <button onclick="cerrarCobrosCoach()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
-        <h3 style="color: var(--neon-f); text-align: center; font-family: 'Orbitron'; margin-top: 0;">💰 MIS COBROS</h3>
-        <p style="font-size: 0.85em; color: #cbd5e1; line-height: 1.5; margin-bottom: 15px; text-align: center;">Para recibir los pagos de tus servicios directamente en tu cuenta bancaria, ingresa tu <strong>Access Token de Producción</strong> de MercadoPago.</p>
-        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 0.75em; color: #94a3b8; margin-bottom: 20px; text-align: left;">
-            <b>¿Dónde lo consigo?</b><br>
-            1. Inicia sesión en MercadoPago.<br>
-            2. Ve a <i>Tu Negocio</i> > <i>Configuración</i> > <i>Credenciales de producción</i>.<br>
-            3. Copia el código "Access token" (empieza con APP_USR-...).
+        <h3 style="color: var(--neon-f); text-align: center; font-family: 'Orbitron'; margin-top: 0;">💰 MIS BILLETERAS</h3>
+        <p style="font-size: 0.8em; color: #cbd5e1; line-height: 1.5; margin-bottom: 15px; text-align: center;">Configura los métodos de pago que aceptarás de tus clientes. Si dejas un campo vacío, no aparecerá en el Checkout.</p>
+        
+        <label style="font-size:0.75em; color:var(--neon-f); font-weight:bold;">MercadoPago (Tarjetas Chile)</label>
+        <input type="password" id="coach-token-mp" placeholder="Access Token (APP_USR-...)" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-f); color: white; border-radius: 5px; margin-bottom: 15px;">
+        
+        <label style="font-size:0.75em; color:var(--neon-f); font-weight:bold;">dLocal Go (Tarjetas LATAM / Efectivo)</label>
+        <input type="text" id="coach-token-dlocal" placeholder="Link de Pago Abierto dLocal Go" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-f); color: white; border-radius: 5px; margin-bottom: 15px;">
+        
+        <label style="font-size:0.75em; color:var(--neon-f); font-weight:bold;">PayPal (Internacional Resto del Mundo)</label>
+        <input type="text" id="coach-token-paypal" placeholder="Ej: paypal.me/MiNombre" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-f); color: white; border-radius: 5px; margin-bottom: 15px;">
+        
+        <label style="font-size:0.75em; color:#fbbf24; font-weight:bold;">Binance Pay / USDT (Criptomonedas)</label>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <input type="text" id="coach-token-binance-wallet" placeholder="Dirección de Billetera (Ej: TqX...)" style="flex:2; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #fbbf24; color: white; border-radius: 5px;">
+            <input type="text" id="coach-token-binance-red" placeholder="Red (Ej: TRC20)" style="flex:1; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #fbbf24; color: white; border-radius: 5px;">
         </div>
-        <input type="password" id="coach-token-mp" placeholder="APP_USR-..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-f); color: white; border-radius: 5px; margin-bottom: 20px;">
-        <button class="btn btn-f" style="width: 100%; padding: 15px;" onclick="guardarTokenMPCoach()">💾 GUARDAR / ACTUALIZAR TOKEN</button>
-    </div>
+
+        <button class="btn btn-f" style="width: 100%; padding: 15px; font-weight:bold;" onclick="guardarBilleterasCoach()">💾 ENCRIPTAR EN LA MATRIX</button>
     </div>
 
     <div id="btn-acceso-coach" class="hidden seccion-dashboard" style="margin-top: 20px; border: 1px dashed var(--neon-m); padding: 20px; text-align: center; background: rgba(168, 85, 247, 0.05); border-radius: 12px;">
@@ -4185,27 +4193,24 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
     <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarCheckout()">VOLVER AL CARRITO</button>
 </div>
 
-<div id="modal-ecommerce-transferencia" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000010 !important; width: 92% !important; max-width: 500px !important; max-height: 90vh !important; overflow-y: auto !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid var(--neon-n) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
-    <h3 style="text-align:center; color: var(--neon-n); font-family: 'Orbitron'; margin-top:0;">TRANSFERENCIA BANCARIA</h3>
-    <div style="background: rgba(34, 211, 238, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--neon-n); margin-bottom: 20px; font-size: 0.85em; color: #cbd5e1; line-height: 1.5;">
-        <p style="margin-top:0;">Realiza una transferencia por el monto exacto de <strong id="transf-monto" style="color:white; font-size:1.2em;"></strong> a la siguiente cuenta:</p>
-        <ul style="list-style: none; padding: 0; color: white;">
-            <li><strong>Banco:</strong> <span id="transf-banco"></span></li>
-            <li><strong>Tipo:</strong> <span id="transf-tipo"></span></li>
-            <li><strong>N° Cuenta:</strong> <span id="transf-numero"></span></li>
-            <li><strong>RUT:</strong> <span id="transf-rut"></span></li>
-            <li><strong>Correo:</strong> <span id="transf-correo"></span></li>
-        </ul>
-        <p style="color: #f87171; font-weight: bold; margin-bottom: 0; font-size: 0.9em;">⚠️ ATENCIÓN: Transfiere el monto EXACTO. No hay devoluciones ni "vueltos".</p>
+<div id="modal-ecommerce-binance" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000010 !important; width: 92% !important; max-width: 500px !important; max-height: 90vh !important; overflow-y: auto !important; padding: 25px !important; background: rgba(10, 15, 30, 0.99) !important; border: 2px solid #fbbf24 !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
+    <h3 style="text-align:center; color: #fbbf24; font-family: 'Orbitron'; margin-top:0;">BINANCE PAY / USDT CRIPTO</h3>
+    <div style="background: rgba(251, 191, 36, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed #fbbf24; margin-bottom: 20px; font-size: 0.85em; color: #cbd5e1; line-height: 1.5; text-align: center;">
+        <p style="margin-top:0;">Envía el monto exacto equivalente a <strong id="binance-monto-usd" style="color:white; font-size:1.2em;"></strong> dólares a la siguiente dirección criptográfica:</p>
+        <div style="background: #000; padding: 10px; border-radius: 8px; margin: 15px 0;">
+            <span style="display:block; color:var(--neon-admin); font-size: 0.8em; margin-bottom: 5px;">Red a utilizar: <strong id="binance-red" style="color:white;"></strong></span>
+            <strong id="binance-wallet" style="color: #fbbf24; font-family: monospace; font-size: 1.1em; word-break: break-all; user-select: all;"></strong>
+        </div>
+        <p style="color: #f87171; font-weight: bold; margin-bottom: 0; font-size: 0.85em;">⚠️ Verifica la red antes de enviar. Fondos enviados a la red equivocada se perderán para siempre.</p>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;">
-        <label style="display:block; margin-bottom: 10px; color: var(--neon-m); font-weight: bold;">Sube la foto de tu comprobante:</label>
-        <input type="file" id="transf-foto-comprobante" accept="image/*" style="width: 100%; background: #000; padding: 10px; border: 1px solid var(--neon-m); color: white; border-radius: 5px;">
+    <div style="text-align: left; margin-bottom: 20px;">
+        <label style="display:block; margin-bottom: 10px; color: #fbbf24; font-weight: bold;">Sube la captura de pantalla o recibo (TxID):</label>
+        <input type="file" id="binance-foto-comprobante" accept="image/*" style="width: 100%; background: #000; padding: 10px; border: 1px solid #fbbf24; color: white; border-radius: 5px; box-sizing: border-box;">
     </div>
 
-    <button id="btn-enviar-transferencia" class="btn btn-n" style="width:100%; padding:15px; font-weight:bold; font-family:'Orbitron';" onclick="ejecutarEnvioTransferencia()">ENVIAR COMPROBANTE</button>
-    <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarTransferencia()">CANCELAR</button>
+    <button id="btn-enviar-binance" class="btn" style="width:100%; padding:15px; font-weight:bold; font-family:'Orbitron'; background: transparent; border: 1px solid #fbbf24; color: #fbbf24;" onclick="ejecutarEnvioBinance()">ENVIAR COMPROBANTE AL COACH</button>
+    <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarBinance()">CANCELAR Y VOLVER</button>
 </div>
 
 <!-- 🎛️ MODAL: FRASE NEURO-PROGRAMACIÓN (DESAFÍO 90 DÍAS) -->
@@ -7829,37 +7834,24 @@ async function ejecutarAccionComercialServicio() {
         if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
 
         // 🛡️ FOCUS: Capturamos el nombre del Coach para la auditoría contable
-        if (s.accion === "RESERVA") {
-            const sel = document.getElementById('ser-coach-elegido');
-            if (sel && sel.selectedIndex > 0) detalleString += ` | Coach: ${sel.options[sel.selectedIndex].text}`;
-        }
-
-        // 🛡️ GENERADOR DINÁMICO DE COBRO MERCADOPAGO (Token Admin)
-        cerrarDetalleServicio();
-        mostrarLoading("Conectando con Banco Central de la Matrix...");
-        
-        // 🛡️ Extraemos el nombre del Coach si es una Reserva de horas
         let coachElegido = "";
         if (s.accion === "RESERVA") {
             const sel = document.getElementById('ser-coach-elegido');
-            if (sel && sel.selectedIndex > 0) coachElegido = sel.options[sel.selectedIndex].text;
+            if (sel && sel.selectedIndex > 0) {
+                coachElegido = sel.options[sel.selectedIndex].text;
+                detalleString += ` | Coach: ${coachElegido}`;
+            }
         }
 
-        apiCall("crearPreferenciaMP", {
-            carrito: [{nombre: s.nombre, cantidad: 1, precio: precioFinalACobrar, variante: s.accion}],
-            email: emailUser,
-            nombre: nombreUser,
-            coachPropietario: coachElegido, // 🛡️ FOCUS: Mandamos el nombre del coach al servidor
-            urlRetorno: window.location.origin + window.location.pathname,
-            moduloRetorno: "retorno_pago" 
-        }).then(resPago => {
-            if(resPago && resPago.success) {
-                window.location.href = resPago.init_point;
-            } else {
-                ocultarLoading();
-                notify("Error al generar cobro: " + resPago.msg);
-            }
-        });
+        cerrarDetalleServicio();
+        
+        // LIMPIAMOS EL CARRITO E INYECTAMOS EL SERVICIO ÚNICO PARA EL CHECKOUT
+        carritoCompras = [{
+            sku: s.sku, nombre: s.nombre, precio: precioFinalACobrar, variante: s.accion, cantidad: 1, foto: s.urlImagen
+        }];
+        
+        // Llamamos al Checkout Inteligente pasándole el nombre del Coach y avisando que es Compra Directa
+        abrirCheckout(coachElegido, true, precioFinalACobrar);
         return;
     }
 
@@ -8523,15 +8515,53 @@ function cerrarCheckout() {
     toggleCart(); 
 }
 
-function abrirCheckout() {
-    if(carritoCompras.length === 0) return notify("No hay productos en tu carrito.");
-    toggleCart();
-    document.getElementById('checkout-total-monto').innerText = document.getElementById('cart-total-price').innerText;
+let billeterasCoachActivoCache = {}; // Memoria temporal para el cajero
+let coachElegidoParaCheckout = ""; // Memoria fotográfica para MercadoPago
+
+async function abrirCheckout(coachName = "", esCompraDirecta = false, montoDirecto = null) {
+    coachElegidoParaCheckout = coachName; // El cajero memoriza al Coach
+    if(carritoCompras.length === 0 && !esCompraDirecta) return notify("No hay productos en tu carrito.");
     
-    if (!sessionUser) {
-        document.getElementById('checkout-guest-fields').classList.remove('hidden');
+    // Si la compra viene del carrito de la tienda, cerramos la barra lateral
+    if (!esCompraDirecta) toggleCart(); 
+    
+    document.getElementById('checkout-total-monto').innerText = esCompraDirecta ? "$" + montoDirecto.toLocaleString() : document.getElementById('cart-total-price').innerText;
+    
+    if (!sessionUser) document.getElementById('checkout-guest-fields').classList.remove('hidden');
+    else document.getElementById('checkout-guest-fields').classList.add('hidden');
+
+    mostrarLoading("Hackeando Cajas Fuertes...");
+    
+    // Enviamos el nombre del Coach para escanear sus billeteras (si está vacío, asume Admin)
+    const resMetodos = await apiCall("obtenerMetodosDePago", { coach: coachName });
+    ocultarLoading();
+
+    if (resMetodos && resMetodos.success) {
+        billeterasCoachActivoCache = resMetodos.metodos;
+        const radios = document.querySelectorAll('input[name="metodoPago"]');
+        let seleccionadoDefault = false;
+
+        // Renderizado Dinámico de Botones de Pago según lo que tenga el Coach
+        radios.forEach(radio => {
+            let label = radio.parentElement;
+            if (radio.value === "MP" && billeterasCoachActivoCache.mp !== "") { label.style.display = "flex"; if(!seleccionadoDefault) { radio.checked = true; seleccionadoDefault = true; } }
+            else if (radio.value === "MP") label.style.display = "none";
+
+            if (radio.value === "DLOCAL" && billeterasCoachActivoCache.dlocal !== "") { label.style.display = "flex"; if(!seleccionadoDefault) { radio.checked = true; seleccionadoDefault = true; } }
+            else if (radio.value === "DLOCAL") label.style.display = "none";
+
+            if (radio.value === "PAYPAL" && billeterasCoachActivoCache.paypal !== "") { label.style.display = "flex"; if(!seleccionadoDefault) { radio.checked = true; seleccionadoDefault = true; } }
+            else if (radio.value === "PAYPAL") label.style.display = "none";
+
+            if (radio.value === "BINANCE" && billeterasCoachActivoCache.binanceWallet !== "") { label.style.display = "flex"; if(!seleccionadoDefault) { radio.checked = true; seleccionadoDefault = true; } }
+            else if (radio.value === "BINANCE") label.style.display = "none";
+        });
+        
+        if (!seleccionadoDefault) {
+            return notify("Error de Pasarela: El Coach no ha configurado ningún método de pago.");
+        }
     } else {
-        document.getElementById('checkout-guest-fields').classList.add('hidden');
+        return notify("Error al recuperar métodos de pago de la Matrix.");
     }
 
     const modal = document.getElementById('modal-ecommerce-checkout');
@@ -8546,17 +8576,20 @@ async function procesarPagoCarrito() {
         return notify("Por favor, ingresa un nombre y un correo válido para enviarte el comprobante de compra.");
     }
 
-    const metodo = document.querySelector('input[name="metodoPago"]:checked').value;
+    const metodoElegido = document.querySelector('input[name="metodoPago"]:checked');
+    if (!metodoElegido) return notify("Selecciona un método de pago.");
+    const metodo = metodoElegido.value;
+
     const btn = document.getElementById('btn-checkout-pagar');
-    btn.innerText = "CONECTANDO CON LA MATRIX...";
-    btn.disabled = true;
+    btn.innerText = "CONECTANDO CON LA MATRIX..."; btn.disabled = true;
 
     if (metodo === "MP") {
         const returnUrlBase = window.location.origin + window.location.pathname;
         const res = await apiCall("crearPreferenciaMP", {
-            carrito: carritoCompras,
-            email: emailComprador,
-            nombre: nombreComprador,
+            carrito: carritoCompras, 
+            email: emailComprador, 
+            nombre: nombreComprador, 
+            coachPropietario: coachElegidoParaCheckout, // Se le entrega el dinero al dueño correcto
             urlRetorno: returnUrlBase
         });
         if (res && res.success) {
@@ -8564,49 +8597,47 @@ async function procesarPagoCarrito() {
             localStorage.setItem('kairo_ecommerce_tipo', "PRODUCTOS");
             window.location.href = res.init_point;
         } else {
-            btn.innerText = "CONFIRMAR Y PAGAR";
-            btn.disabled = false;
-            notify("Error al conectar con MercadoPago: " + (res ? res.msg : "Sin respuesta."));
+            btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+            notify("Error MercadoPago: " + (res ? res.msg : "Sin respuesta."));
         }
-    } else if (metodo === "TRANSFERENCIA") {
-        btn.innerText = "CONFIRMAR Y PAGAR";
-        btn.disabled = false;
-        abrirModalTransferencia();
+    } 
+    else if (metodo === "DLOCAL") {
+        window.location.href = billeterasCoachActivoCache.dlocal;
+    } 
+    else if (metodo === "PAYPAL") {
+        window.location.href = billeterasCoachActivoCache.paypal;
+    }
+    else if (metodo === "BINANCE") {
+        btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+        abrirModalBinance();
     }
 }
 
-async function abrirModalTransferencia() {
+function abrirModalBinance() {
     cerrarCheckout();
+    document.getElementById('binance-monto-usd').innerText = document.getElementById('checkout-total-monto').innerText.replace('$', '').trim(); // Asume paridad 1:1 o deberás convertir CLP a USD si tu plataforma está en pesos.
+    document.getElementById('binance-wallet').innerText = billeterasCoachActivoCache.binanceWallet;
+    document.getElementById('binance-red').innerText = billeterasCoachActivoCache.binanceRed;
     
-    const resConf = await apiCall("obtenerDatosBancariosPublicos");
-    if (resConf && resConf.success) {
-        document.getElementById('transf-monto').innerText = document.getElementById('checkout-total-monto').innerText;
-        document.getElementById('transf-banco').innerText = resConf.bancoNombre || "N/A";
-        document.getElementById('transf-tipo').innerText = resConf.bancoTipo || "N/A";
-        document.getElementById('transf-numero').innerText = resConf.bancoNumero || "N/A";
-        document.getElementById('transf-rut').innerText = resConf.bancoRut || "N/A";
-        document.getElementById('transf-correo').innerText = resConf.bancoCorreo || "N/A";
-    }
-
-    document.getElementById('modal-ecommerce-transferencia').classList.remove('hidden');
-    document.getElementById('modal-ecommerce-transferencia').style.display = "block";
+    document.getElementById('modal-ecommerce-binance').classList.remove('hidden');
+    document.getElementById('modal-ecommerce-binance').style.display = "block";
 }
 
-function cerrarTransferencia() {
-    document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
-    document.getElementById('modal-ecommerce-transferencia').style.display = "none";
+function cerrarBinance() {
+    document.getElementById('modal-ecommerce-binance').classList.add('hidden');
+    document.getElementById('modal-ecommerce-binance').style.display = "none";
     abrirCheckout();
 }
-        
-async function ejecutarEnvioTransferencia() {
-    const inputFoto = document.getElementById('transf-foto-comprobante');
-    if (!inputFoto.files || inputFoto.files.length === 0) {
-        return notify("Debes subir la foto del comprobante para continuar.");
-    }
+
+async function ejecutarEnvioBinance() {
+    const inputFoto = document.getElementById('binance-foto-comprobante');
+    if (!inputFoto.files || inputFoto.files.length === 0) return notify("Sube el comprobante de Binance (TxID) para continuar.");
+    
     const file = inputFoto.files[0];
-    if (file.size > 3000000) return notify("El comprobante es muy pesado. Máximo 3MB.");
-    const btn = document.getElementById('btn-enviar-transferencia');
-    btn.innerText = "ENVIANDO A LA MATRIX..."; btn.disabled = true;
+    if (file.size > 3000000) return notify("La imagen es muy pesada. Máximo 3MB.");
+    
+    const btn = document.getElementById('btn-enviar-binance');
+    btn.innerText = "TRANSMITIENDO A LA MATRIX..."; btn.disabled = true;
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -8614,44 +8645,41 @@ async function ejecutarEnvioTransferencia() {
         let emailComprador = sessionUser ? sessionUser.email : document.getElementById('checkout-guest-email').value.trim();
         let nombreComprador = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : document.getElementById('checkout-guest-nombre').value.trim();
         const payload = {
-            carrito: carritoCompras,
-            email: emailComprador,
-            nombre: nombreComprador,
-            comprobanteBase64: fotoBase64,
-            montoTotal: document.getElementById('checkout-total-monto').innerText
+            carrito: carritoCompras, email: emailComprador, nombre: nombreComprador,
+            comprobanteBase64: fotoBase64, montoTotal: document.getElementById('checkout-total-monto').innerText
         };
+        
+        // Reusamos el consolidador de transferencia antiguo, ya que cumple la misma función de subida y auditoría
         const res = await apiCall("registrarTransferenciaEcommerce", payload);
 
         if (res && res.success) {
-            carritoCompras = [];
-            guardarCarritoLocal();
-            renderizarCarrito();
+            carritoCompras = []; guardarCarritoLocal(); renderizarCarrito();
             
-            document.getElementById('modal-ecommerce-transferencia').classList.add('hidden');
-            document.getElementById('modal-ecommerce-transferencia').style.display = "none";
+            document.getElementById('modal-ecommerce-binance').classList.add('hidden');
+            document.getElementById('modal-ecommerce-binance').style.display = "none";
             
             const numPedido = res.orden_id;
-            const waTxt = encodeURIComponent(`¡Hola Coach! Acabo de hacer una transferencia por productos en la web.\n\n📦 N° Pedido: ${numPedido}\n💵 Monto: ${payload.montoTotal}\n\nQuedo atento para coordinar la entrega.`);
+            const waTxt = encodeURIComponent(`🚀 *¡PAGO CRIPTO ENVIADO!*\n\n📦 *N° Pedido:* ${numPedido}\n💰 *Monto USDT:* ${payload.montoTotal}\n\nCoach, he depositado los USDT en tu wallet. Verifica tu Binance para liberar mi pedido.`);
+            
             const tarjetaHTML = `
                 <div style="text-align: center; width: 100%;">
-                    <p style="color: var(--neon-n); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡ORDEN RECIBIDA!</p>
+                    <p style="color: #fbbf24; font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡COMPROBANTE ENVIADO!</p>
                     <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
-                        Tu comprobante fue inyectado en la Matrix. Tu N° de Pedido es: <strong style="color:white;">${numPedido}</strong>.<br><br>Escríbele a un Coach ahora mismo para coordinar el envío/entrega.
+                        Tu transacción Cripto ha sido notificada al Coach. Tu N° de Pedido es: <strong style="color:white;">${numPedido}</strong>.<br><br>Dale clic abajo para enviarle un aviso directo por WhatsApp al Coach y agilizar la entrega.
                     </p>
-                    <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;"
-onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
+                    <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 AVISAR POR WHATSAPP AL COACH</button>
                 </div>
             `;
-            await kairoMessage({ mensaje: tarjetaHTML, icon: "📦" });
+            await kairoMessage({ mensaje: tarjetaHTML, icon: "🪙" });
             salirDelModulo();
         } else {
-            btn.innerText = "ENVIAR COMPROBANTE";
-            btn.disabled = false;
-            notify("Error al registrar: " + (res ? res.msg : "Sin conexión"));
+            btn.innerText = "ENVIAR COMPROBANTE AL COACH"; btn.disabled = false;
+            notify("Error Matrix: " + (res ? res.msg : "Sin conexión"));
         }
     };
     reader.readAsDataURL(file);
 }
+     
 
 // 🛡️ SENSOR DE RETORNO DE MERCADOPAGO (PRODUCTOS)
 window.addEventListener('load', async function() {
@@ -9989,8 +10017,12 @@ function abrirCobrosCoach() {
     document.getElementById('modal-portal-coach').classList.add('hidden');
     document.getElementById('modal-cobros-coach').classList.remove('hidden');
     document.getElementById('modal-cobros-coach').style.display = 'block';
-    // Si ya lo tenía, no se lo borramos
+    
     document.getElementById('coach-token-mp').value = sessionUser.tokenMP || "";
+    document.getElementById('coach-token-dlocal').value = sessionUser.dlocal || "";
+    document.getElementById('coach-token-paypal').value = sessionUser.paypal || "";
+    document.getElementById('coach-token-binance-wallet').value = sessionUser.binanceWallet || "";
+    document.getElementById('coach-token-binance-red').value = sessionUser.binanceRed || "";
 }
 
 function cerrarCobrosCoach() {
@@ -9999,22 +10031,33 @@ function cerrarCobrosCoach() {
     document.getElementById('modal-portal-coach').classList.remove('hidden');
 }
 
-async function guardarTokenMPCoach() {
-    const token = document.getElementById('coach-token-mp').value.trim();
-    mostrarLoading("Guardando Token en la Matrix...");
-    const res = await apiCall("guardarTokenCoach", { email: sessionUser.email, tokenMP: token });
+async function guardarBilleterasCoach() {
+    const mp = document.getElementById('coach-token-mp').value.trim();
+    const dloc = document.getElementById('coach-token-dlocal').value.trim();
+    const pay = document.getElementById('coach-token-paypal').value.trim();
+    const bWall = document.getElementById('coach-token-binance-wallet').value.trim();
+    const bRed = document.getElementById('coach-token-binance-red').value.trim();
+    
+    mostrarLoading("Encriptando Billeteras en la Matrix...");
+    const res = await apiCall("guardarTokenCoach", { 
+        email: sessionUser.email, tokenMP: mp, dlocal: dloc, paypal: pay, binanceWallet: bWall, binanceRed: bRed 
+    });
     ocultarLoading();
     
     if (res && res.success) {
-        notify("✅ Token blindado en la Matrix. Tus ventas irán a tu cuenta.");
-        sessionUser.tokenMP = token;
+        notify("✅ Billeteras encriptadas. Tu embudo de ventas está blindado.");
+        sessionUser.tokenMP = mp;
+        sessionUser.dlocal = dloc;
+        sessionUser.paypal = pay;
+        sessionUser.binanceWallet = bWall;
+        sessionUser.binanceRed = bRed;
         sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
         cerrarCobrosCoach();
     } else {
         notify("❌ Error: " + (res ? res.msg : "Conexión fallida."));
     }
 }
-
+        
 // =========================================================
 // 🪙 MOTOR CORE: PUNTOS Y RED (C3D NETWORK)
 // =========================================================
