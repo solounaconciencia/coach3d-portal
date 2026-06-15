@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">f
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coach 3D LATAM - Comunidad</title>
     <link rel="icon" href="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
     <style>
@@ -2329,7 +2329,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
             <div class="c3d-nav-menu">
                 <button class="c3d-nav-btn" onclick="salirDelModulo()"><span class="c3d-nav-icon">🏠</span><span>INICIO</span></button>
                 <button class="c3d-nav-btn" onclick="iniciarbuzon()"><span class="c3d-nav-icon">📬</span><span>BUZÓN</span></button>
-                <button class="c3d-nav-btn" onclick="iniciarpuntosyreferidos()"><span class="c3d-nav-icon">🌐</span><span>MI RED</span></button>
+                <button class="c3d-nav-btn" onclick="iniciarMiRedNavbar()"><span class="c3d-nav-icon">🌐</span><span>MI RED</span></button>
                 <button class="c3d-nav-btn" onclick="iniciarservicios()"><span class="c3d-nav-icon">📈</span><span>EMPRENDE</span></button>
                 <button class="c3d-nav-btn" onclick="desplegarFormularioCoach3D()"><span class="c3d-nav-icon">🤝</span><span>SE COACH</span></button>
             </div>
@@ -3358,7 +3358,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     </div>
 
     <!-- ZONA 3: PODERES DE SUSCRIPTOR Y COACH (OCULTOS POR DEFECTO) -->
-    <div id="puntos-zona-vip" class="hidden" style="margin-top: 30px; border-top: 1px dashed rgba(251, 191, 36, 0.4); padding-top: 25px;">
+    <div id="puntos-zona-vip" style="margin-top: 30px; border-top: 1px dashed rgba(251, 191, 36, 0.4); padding-top: 25px;">
         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
             <button class="btn btn-f" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em;" onclick="abrirVisorArbolRed()">🌐 EXPLORAR MI RED (ÁRBOL)</button>
             <button id="btn-autorizaciones-coach" class="btn btn-m hidden" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em; position: relative;" onclick="abrirAutorizacionesCoach()">
@@ -3640,6 +3640,13 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 <div id="modal-visor-red" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 98% !important; max-width: 1000px !important; height: 90vh !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 20px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; display: flex; flex-direction: column;">
     <button onclick="cerrarVisorArbolRed()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; z-index: 10;">×</button>
     <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0; text-align: center;">🌐 RED TRIDIMENSIONAL</h3>
+    
+    <!-- CONTROLES EXCLUSIVOS COACH / ADMIN -->
+    <div id="red-controles-coach" class="hidden" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
+        <button class="btn btn-m" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirModalSeguimientoRed()">📊 SEGUIMIENTO</button>
+        <button class="btn btn-f" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirModalOtorgarPuntos()">🪙 OTORGAR PUNTOS</button>
+    </div>
+
     <div style="text-align: center; margin-bottom: 10px;">
         <button class="btn" style="padding: 5px 15px; font-size: 0.7em; border: 1px solid #444;" onclick="zoomArbol(1.2)">🔍 ACERCAR</button>
         <button class="btn" style="padding: 5px 15px; font-size: 0.7em; border: 1px solid #444;" onclick="zoomArbol(0.8)">🔎 ALEJAR</button>
@@ -4905,6 +4912,8 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
   if(sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
       const btnCoach = document.getElementById('btn-acceso-coach');
       if (btnCoach) btnCoach.classList.remove('hidden');
+      const btnAuth = document.getElementById('btn-autorizaciones-coach'); // 🛡️ FOCUS
+      if (btnAuth) btnAuth.classList.remove('hidden');                     // 🛡️ FOCUS
   } else {
       const btnCoach = document.getElementById('btn-acceso-coach');
       if (btnCoach) btnCoach.classList.add('hidden');
@@ -11323,7 +11332,172 @@ function cerrarFlyerPromo() {
     document.getElementById('modal-flyer-promo').style.display = 'none';
     document.getElementById('main-content').classList.remove('blur-effect');
 }
+// 🚀 NUEVO ENRUTADOR: MI RED (NAVBAR)
+function iniciarMiRedNavbar() {
+    if (!sessionUser) return notify("Debes iniciar sesión en la Matrix.");
+    
+    const controlesCoach = document.getElementById('red-controles-coach');
+    
+    // Validamos permisos para encender los paneles de control
+    if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
+        if (controlesCoach) controlesCoach.classList.remove('hidden');
+    } else {
+        if (controlesCoach) controlesCoach.classList.add('hidden');
+    }
+    
+    // 🛡️ Nota: Asegúrate de tener la función abrirVisorArbolRed() definida en tu JS de Redes
+    if (typeof abrirVisorArbolRed === 'function') abrirVisorArbolRed();
+    else notify("El visor del árbol de red se está sincronizando...");
+}
+
+// 🛡️ APERTURAS DE MODALES FASE 1
+function abrirModalSeguimientoRed() {
+    document.getElementById('modal-seguimiento-coach').classList.remove('hidden');
+}
+function cerrarModalSeguimientoRed() {
+    document.getElementById('modal-seguimiento-coach').classList.add('hidden');
+}
+function abrirModalOtorgarPuntos() {
+    document.getElementById('modal-otorgar-puntos').classList.remove('hidden');
+}
+function cerrarModalOtorgarPuntos() {
+    document.getElementById('modal-otorgar-puntos').classList.add('hidden');
+}
+
+// 🌐 LÓGICA DE SEGUIMIENTO Y CARGA DE PUNTOS (Fase 2)
+
+// 1. Obtener y Renderizar la Organización del Coach
+async function abrirModalSeguimientoRed() {
+    document.getElementById('modal-seguimiento-coach').classList.remove('hidden');
+    const contenedor = document.getElementById('lista-seguimiento-coaches');
+    contenedor.innerHTML = '<div class="spinner"></div><p style="color: var(--neon-m); text-align:center; width:100%;">Analizando métricas de la red...</p>';
+
+    const res = await apiCall("obtenerSeguimientoRed", { email: sessionUser.email });
+    if (res && res.success) {
+        contenedor.innerHTML = "";
+        if (res.coaches.length === 0) {
+            contenedor.innerHTML = '<p style="color: #cbd5e1; text-align:center;">Aún no tienes Coaches registrados en tu organización directa.</p>';
+            return;
+        }
+        res.coaches.forEach(c => {
+            contenedor.innerHTML += `
+                <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--neon-m); border-radius: 8px; padding: 15px; margin-bottom: 10px; width: 100%;">
+                    <h4 style="color: white; margin: 0 0 10px 0; display:flex; justify-content:space-between; align-items:center;">
+                        <span>👨‍💻 ${c.nombre}</span>
+                        <a href="https://wa.me/${c.whatsapp}" target="_blank" class="btn btn-f" style="padding: 5px 10px; font-size: 0.7em; text-decoration:none;">📱 CHAT</a>
+                    </h4>
+                    <div style="display:flex; justify-content: space-between; font-size: 0.85em; color: #cbd5e1; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px;">
+                        <div style="text-align:center;"><b style="color:var(--neon-n); font-size:1.2em;">${c.metricas.refTotales}</b><br><small>Referidos</small></div>
+                        <div style="text-align:center; border-left:1px solid #444; border-right:1px solid #444; padding: 0 15px;"><b style="color:#fbbf24; font-size:1.2em;">${c.metricas.suscTotales}</b><br><small>Suscriptores</small></div>
+                        <div style="text-align:center;"><b style="color:var(--neon-m); font-size:1.2em;">${c.metricas.coachTotales}</b><br><small>Coaches</small></div>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        contenedor.innerHTML = '<p style="color: #ff4444; text-align:center;">Error al conectar con la Matrix.</p>';
+    }
+}
+
+// 2. Cargar Catálogo Dinámico en la Ventana Offline
+async function abrirModalOtorgarPuntos() {
+    document.getElementById('modal-otorgar-puntos').classList.remove('hidden');
+    const selectSku = document.getElementById('puntos-offline-sku');
+    selectSku.innerHTML = '<option value="">Sincronizando catálogo universal...</option>';
+    
+    const res = await apiCall("obtenerCatalogoUniversal");
+    if (res && res.success) {
+        selectSku.innerHTML = '<option value="">Selecciona el Ítem Vendido</option>';
+        res.catalogo.forEach(i => {
+            selectSku.innerHTML += `<option value="${i.sku}">${i.nombre}</option>`;
+        });
+    } else {
+        selectSku.innerHTML = '<option value="">Error al cargar catálogo</option>';
+    }
+}
+
+// 3. Generar la Venta y el Pago del 5%
+async function ejecutarPagoVentaOffline() {
+    const payload = {
+        emailCoach: sessionUser.email,
+        nombre: document.getElementById('puntos-offline-nombre').value.trim(),
+        fechaNac: document.getElementById('puntos-offline-fecha').value,
+        whatsapp: document.getElementById('puntos-offline-wp').value.trim(),
+        email: document.getElementById('puntos-offline-email').value.trim(),
+        pais: document.getElementById('puntos-offline-pais').value.trim(),
+        sku: document.getElementById('puntos-offline-sku').value,
+        monto: document.getElementById('puntos-offline-monto').value
+    };
+
+    if (!payload.nombre || !payload.email || !payload.sku || !payload.monto) {
+        return notify("Faltan datos obligatorios (Nombre, Email, Ítem, Monto).");
+    }
+
+    const btn = document.querySelector('#modal-otorgar-puntos .btn-f');
+    btn.innerText = "CALCULANDO 5% Y GENERANDO PAGO...";
+    btn.disabled = true;
+
+    const res = await apiCall("procesarVentaOffline", payload);
+    
+    btn.innerText = "CALCULAR 5% Y GENERAR PAGO";
+    btn.disabled = false;
+
+    if (res && res.success) {
+        cerrarModalOtorgarPuntos();
+        
+        // Vaciamos el formulario
+        document.getElementById('puntos-offline-nombre').value = "";
+        document.getElementById('puntos-offline-wp').value = "";
+        document.getElementById('puntos-offline-email').value = "";
+        document.getElementById('puntos-offline-monto').value = "";
+
+        let msg = `
+            <div style="text-align:center;">
+                <h3 style="color:var(--neon-f); font-family:'Orbitron';">VENTA REGISTRADA</h3>
+                <p style="color:#cbd5e1; font-size:0.9em; margin-bottom:15px;">La comisión retenida para la plataforma es de <b style="color:white; font-size:1.2em;">$${res.comision.toLocaleString()}</b>.</p>
+                <a href="${res.init_point}" target="_blank" class="btn btn-n" style="width:100%; display:inline-block; padding:15px; font-weight:bold; box-sizing:border-box; text-decoration:none;" onclick="cerrarKairoMsg()">💳 PAGAR 5% AHORA</a>
+                <p style="font-size:0.75em; color:#94a3b8; margin-top:15px;">Kairo cargará los puntos al usuario una vez que el pago sea validado en sistema.</p>
+            </div>`;
+        kairoMessage({ mensaje: msg, icon: "🪙" });
+    } else {
+        notify(res ? res.msg : "Error al procesar la venta.");
+    }
+}
     </script>
+<!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
+<div id="modal-seguimiento-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 600px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+    <button onclick="cerrarModalSeguimientoRed()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0; text-align: center;">📊 SEGUIMIENTO DE ORGANIZACIÓN</h3>
+    <p style="color: #cbd5e1; font-size: 0.85em; text-align: center;">Lista de Coaches bajo tu mando y sus métricas de evolución.</p>
+    <div id="lista-seguimiento-coaches" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px dashed var(--neon-m); min-height: 150px; display: flex; align-items: center; justify-content: center;">
+        <p style="color: var(--neon-m);">Sincronizando red en Fase 2...</p>
+    </div>
+</div>
+
+<!-- 🎛️ MODAL: OTORGAR PUNTOS (VENTA OFFLINE) (Fase 1) -->
+<div id="modal-otorgar-puntos" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 650px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-f) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: left;">
+    <button onclick="cerrarModalOtorgarPuntos()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <h3 style="color: var(--neon-f); font-family: 'Orbitron'; margin-top: 0; text-align: center;">🪙 REGISTRO DE VENTA Y PUNTOS</h3>
+    <p style="color: #cbd5e1; font-size: 0.85em; text-align: center; margin-bottom: 20px;">Convierte tus ventas presenciales en Puntos C3D para tus clientes. Registraremos la transacción y se calculará el 5% de pago a la plataforma.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="puntos-offline-nombre" placeholder="Nombre del Cliente" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <input type="date" id="puntos-offline-fecha" title="Fecha de Nacimiento" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: #cbd5e1; border-radius: 5px;">
+        <input type="text" id="puntos-offline-wp" placeholder="WhatsApp" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <input type="email" id="puntos-offline-email" placeholder="Email" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <input type="text" id="puntos-offline-pais" placeholder="País" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; grid-column: span 2;">
+    </div>
+
+    <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--neon-f); margin-bottom: 15px;">
+        <label style="font-size: 0.8em; color: var(--neon-f); font-weight: bold;">Detalle de Venta</label>
+        <select id="puntos-offline-sku" style="width: 100%; padding: 10px; background: #000; border: 1px solid var(--neon-f); color: white; border-radius: 5px; margin: 10px 0;">
+            <option value="">Selecciona Producto/Servicio/Curso (Fase 2)</option>
+        </select>
+        <input type="number" id="puntos-offline-monto" placeholder="Monto total de venta al cliente ($)" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-f); color: white; border-radius: 5px; box-sizing: border-box;">
+    </div>
+
+    <button class="btn btn-f" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';" onclick="ejecutarPagoVentaOffline()">CALCULAR 5% Y GENERAR PAGO</button>
+</div>
 </body>
 
 </html>
