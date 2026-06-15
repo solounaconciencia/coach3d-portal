@@ -4325,40 +4325,46 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
             const originalGetItem = Storage.prototype.getItem;
             const originalRemoveItem = Storage.prototype.removeItem;
 
-            // 1. Intercepta el Guardado (Lo encripta en el aire)
             Storage.prototype.setItem = function(key, value) {
                 if (key === 'kairo_session') {
-                    let encoded = "";
-                    for (let i = 0; i < value.length; i++) {
-                        encoded += String.fromCharCode(value.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
+                    try {
+                        // Limpieza Unicode para evitar que colapse con tildes o caracteres especiales
+                        const safeValue = unescape(encodeURIComponent(value));
+                        let encoded = "";
+                        for (let i = 0; i < safeValue.length; i++) {
+                            encoded += String.fromCharCode(safeValue.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
+                        }
+                        originalSetItem.call(this, 'kairo_token', btoa(encoded));
+                        originalSetItem.call(this, 'kairo_session', "ENCRIPTADO_POR_KAIRO"); 
+                    } catch(e) {
+                        // Respaldo de emergencia si falla la criptografía
+                        originalSetItem.call(this, 'kairo_session', value);
                     }
-
-                    originalSetItem.call(this, 'kairo_token', btoa(encoded));
-                    // Borramos el rastro en texto plano para los curiosos
-                    originalSetItem.call(this, 'kairo_session', "ENCRIPTADO_POR_KAIRO"); 
                 } else {
                     originalSetItem.call(this, key, value);
                 }
             };
 
-            // 2. Intercepta la Lectura (Lo desencripta antes de entregarlo)
             Storage.prototype.getItem = function(key) {
                 if (key === 'kairo_session') {
                     let token = originalGetItem.call(this, 'kairo_token');
+                    let plain = originalGetItem.call(this, 'kairo_session');
+                    
+                    if (!token && plain && plain !== "ENCRIPTADO_POR_KAIRO") return plain; // Fallback
                     if (!token) return null;
+                    
                     try {
                         let decoded = atob(token);
                         let str = "";
                         for (let i = 0; i < decoded.length; i++) {
                             str += String.fromCharCode(decoded.charCodeAt(i) ^ KAIRO_KEY.charCodeAt(i % KAIRO_KEY.length));
                         }
-                        return str;
+                        return decodeURIComponent(escape(str));
                     } catch(e) { return null; }
                 }
                 return originalGetItem.call(this, key);
             };
 
-            // 3. Intercepta el Borrado al cerrar sesión (Limpia los rastros)
             Storage.prototype.removeItem = function(key) {
                 if (key === 'kairo_session') {
                     originalRemoveItem.call(this, 'kairo_token');
@@ -5886,141 +5892,72 @@ function zoomCroppie(paso) {
 
 
 function abrirSeccionPilar(nombrePilar, color) {
-
   // 1. Asegurar sesión
-
   if (!sessionUser) {
-
-    const ancla = localStorage.getItem('kairo_session');
-
+    const ancla = sessionStorage.getItem('kairo_session');
     if (ancla) sessionUser = JSON.parse(ancla);
-
     else return;
-
   }
-
-
 
   // 2. Cambiar a la vista de detalle
-
   const dash = document.getElementById('view-dashboard');
-
   const detalle = document.getElementById('view-pilar-detalle');
-
   const titulo = document.getElementById('pilar-titulo-detalle');
-
   const contenedor = document.getElementById('contenedor-botones-pilar');
 
-
-
   if (dash) dash.classList.add('hidden');
-
   if (detalle) detalle.classList.remove('hidden');
-
   if (titulo) {
-
     titulo.innerText = nombrePilar;
-
     titulo.style.color = color;
-
   }
 
-
-
   // 3. Insertar el mensaje de Auditoría directamente
-
   if (contenedor) {
-
     contenedor.innerHTML = `
-
       <div class="boton-neuro" style="flex-direction: column; text-align: center; padding: 30px; border: 1px solid ${color};">
-
         <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 10px;">
-
           Próximamente más contenido, más herramientas y más beneficios.
-
         </p>
 
         <p style="font-size: 1rem; color: #ccc;">
-
           Síguenos en Instagram: 
-
           <a href="https://www.instagram.com/Coach3dlatam" target="_blank" 
-
              style="color: ${color}; text-decoration: underline; font-weight: bold;">
-
              @Coach3dlatam
-
           </a>
-
         </p>
-
       </div>
-
     `;
-
   }
-
 }
-
-
-
-
 
 function volverAlDashboard() {
-
   document.getElementById('view-pilar-detalle').classList.add('hidden');
-
   document.getElementById('view-dashboard').classList.remove('hidden');
-
 }
 
-
-
 function renderizarBotonesKairo(botones) {
-
   const contenedor = document.getElementById('contenedor-botones-pilar');
 
-  
-
   // Limpiamos el contenedor por si había algo antes
-
   contenedor.innerHTML = "";
-
-
-
   if (!botones || botones.length === 0) {
-
     contenedor.innerHTML = "<p style='color: #666; text-align: center;'>Kairo no encontró botones para tu rango en este pilar.</p>";
-
     return;
-
   }
 
-
-
   // Dibujamos cada botón que envió el servidor
-
   botones.forEach(btn => {
-
     const botonHTML = `
-
       <div onclick="window.open('${btn.url}', '_blank')" 
-
            style="display: flex; align-items: center; background: #1a2238; border: 1px solid #22d3ee; padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.3s; gap: 15px;">
-
         <img src="${btn.icono}" style="width: 35px; height: 35px;">
-
         <span style="color: white; font-weight: bold; font-size: 1.1em;">${btn.nombre}</span>
-
       </div>
-
     `;
-
     contenedor.innerHTML += botonHTML;
-
   });
-
 }
 
 // --- VIGILANTE DE INACTIVIDAD KAIRO (BLINDADO CON CUENTA REGRESIVA) ---
@@ -6034,10 +5971,10 @@ function resetearVigilante() {
   // 1. Configura el reloj: 10 minutos (600000 ms) para avisar de la inactividad
   timerInactividad = setTimeout(dispararAlertaCierre, 600000); 
   
-  // 2. Persistencia en memoria
+  // 2. Persistencia unificada en memoria de corto plazo
   if(sessionUser && sessionUser.email) {
     sessionUser.timestamp = new Date().getTime();
-    localStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+    sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
   }
 }
 
