@@ -2669,7 +2669,7 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
                 </div>
 
                 <!-- Botón Desafío Integrado -->
-                <button class="btn" style="background:rgba(249, 115, 22, 0.1); border:1px solid #f97316; color:#f97316; font-size:0.8em; padding:10px; text-align:left; display:flex; justify-content:space-between; align-items:center;" onclick="iniciarmislogros()">
+                <button class="btn" style="background:rgba(249, 115, 22, 0.1); border:1px solid #f97316; color:#f97316; font-size:0.8em; padding:10px; text-align:left; display:flex; justify-content:space-between; align-items:center;" onclick="iniciarDesafio90()">
                     <span>🔥 RETO 90 DÍAS CONSTANCIA</span>
                     <span style="font-family:'Orbitron'; font-weight:bold;">IR ➔</span>
                 </button>
@@ -3391,21 +3391,18 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
 <!-- =========================================================================
    🏆 MÓDULO: MIS LOGROS Y DESAFÍO 90 DÍAS
 ========================================================================= -->
-<div id="modulo-mis-logros" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px; text-align: center;">
-    
+<div id="modulo-mis-logros" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px; text-align: center;">    
     <div style="margin-bottom: 25px;">
         <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px var(--neon-n)); margin-bottom: 10px;">🏆</div>
         <h2 style="color: var(--neon-n); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Mis Logros</h2>
         <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px;">Tu historial de victorias. Supera tus límites y colecciona las marcas de tu evolución.</p>
     </div>
-
     <!-- TABS INTERNOS DEL MÓDULO -->
     <div class="pilar-filter-container" style="justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
         <button class="filter-tab-premium active" onclick="cambiarTabLogros('tab-insignias')">🎖️ INSIGNIAS</button>
         <button class="filter-tab-premium" onclick="cambiarTabLogros('tab-diplomas')">🎓 DIPLOMAS</button>
         <button class="filter-tab-premium" onclick="cambiarTabLogros('tab-desafio')" style="border-color: #f97316; color: #f97316;">🔥 DESAFÍO 90 DÍAS</button>
     </div>
-
     <!-- TAB: INSIGNIAS -->
     <div id="tab-insignias" class="seccion-logro">
         <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
@@ -3428,22 +3425,75 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
             <p style="color:#94a3b8; grid-column:1/-1;">Aún no tienes diplomas. Completa y aprueba los exámenes en la sección Cursos para desbloquearlos.</p>
         </div>
     </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <button class="btn" style="width: 100%; max-width: 300px; opacity: 0.6; font-size: 0.85em;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
+    </div>
+</div>
 
-    <!-- TAB: DESAFÍO 90 DÍAS -->
-    <div id="tab-desafio" class="seccion-logro hidden" style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; border: 1px dashed #f97316;">
-        <h3 style="color: #f97316; font-family: 'Orbitron'; margin-top: 0; text-transform: uppercase;">DESAFÍO PERSONAL 90 DÍAS DE TRANSFORMACIÓN</h3>
-        <p style="font-size: 0.85em; color: #cbd5e1; max-width: 600px; margin: 0 auto 25px; line-height: 1.5;">Tu disciplina forja tu realidad. Haz clic en el día actual para leer tu código de neuro-programación. Si fallas un día, la racha vuelve a cero. Recompensas VIP a los 30, 60 y 90 días.</p>
-        
-        <div style="background: rgba(249, 115, 22, 0.1); border-left: 3px solid #f97316; padding: 15px; text-align: left; margin-bottom: 20px; display: inline-block;">
-            <span style="font-size: 0.8em; color: #f97316; text-transform: uppercase; letter-spacing: 1px; display: block;">Racha Actual:</span>
-            <span id="racha-actual-numero" style="font-size: 2.5rem; font-family: 'Orbitron'; font-weight: bold; color: white;">0</span> <span style="color: #cbd5e1; font-size: 1rem;">Días</span>
+<!-- =========================================================================
+   🔥 MÓDULO INDEPENDIENTE: DESAFÍO 90 DÍAS (GAME BOARD)
+========================================================================= -->
+<div id="modulo-desafio-90" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid #f97316; padding: 30px;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+        <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px #f97316); margin-bottom: 10px;">🔥</div>
+        <h2 style="color: #f97316; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; margin: 0; text-transform: uppercase;">Desafío 90 Días de Transformación</h2>
+        <p style="font-size: 0.9em; color: #cbd5e1; margin-top: 5px; max-width: 700px; margin-left: auto; margin-right: auto;">
+            Tu disciplina forja tu realidad. Haz clic en la casilla de tu día actual para leer el código de neuro-programación. <b style="color: #f87171;">Si fallas un día, la racha vuelve a cero.</b>
+        </p>
+    </div>
+
+    <!-- SPLIT LAYOUT: RACHA Y RECOMPENSAS -->
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
+        <!-- Panel Izquierdo: Racha -->
+        <div style="flex: 1; min-width: 250px; background: rgba(249, 115, 22, 0.05); border: 1px dashed #f97316; border-radius: 15px; padding: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -20px; left: -20px; font-size: 8rem; opacity: 0.05; pointer-events: none;">📈</div>
+            <span style="font-size: 0.85em; color: #f97316; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">RACHA ACTUAL</span>
+            <div style="display: flex; align-items: baseline; gap: 5px; margin-top: 10px;">
+                <span id="tablero-racha-num" style="font-size: 5rem; font-family: 'Orbitron'; font-weight: 900; color: white; text-shadow: 0 0 20px rgba(249, 115, 22, 0.6); line-height: 1;">0</span>
+                <span style="font-size: 1.2rem; color: #cbd5e1; font-family: 'Orbitron';">DÍAS</span>
+            </div>
         </div>
 
-        <div id="grid-90-dias" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; justify-content: center;">
-            <p style="color:#f97316; grid-column:1/-1;">Dibujando tablero de 90 días...</p>
+        <!-- Panel Derecho: Recompensas -->
+        <div style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+            <h4 style="color: var(--neon-n); margin: 0 0 15px 0; font-family: 'Orbitron'; letter-spacing: 1px;">🏆 RECOMPENSAS POR CONSTANCIA</h4>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 1.5rem; width: 40px; text-align: center;">🥉</div>
+                <div>
+                    <strong style="color: white; font-size: 0.9em; display: block;">Día 30: Ascenso a Suscriptor</strong>
+                    <span style="color: #94a3b8; font-size: 0.75em;">Acceso a descuentos y herramientas VIP.</span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 1.5rem; width: 40px; text-align: center;">🥈</div>
+                <div>
+                    <strong style="color: white; font-size: 0.9em; display: block;">Día 60: Mantenimiento VIP</strong>
+                    <span style="color: #94a3b8; font-size: 0.75em;">Renovación automática de tus privilegios.</span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px; background: rgba(168, 85, 247, 0.1); border: 1px dashed var(--neon-m); padding: 10px; border-radius: 8px;">
+                <div style="font-size: 1.5rem; width: 40px; text-align: center; filter: drop-shadow(0 0 5px var(--neon-m));">👑</div>
+                <div>
+                    <strong style="color: var(--neon-m); font-size: 0.9em; display: block; font-family: 'Orbitron';">Día 90: CERTIFICACIÓN COACH</strong>
+                    <span style="color: #cbd5e1; font-size: 0.75em;">Gana dinero guiando a tu propia comunidad.</span>
+                </div>
+            </div>
         </div>
     </div>
-    
+
+    <!-- EL TABLERO DE JUEGO (GAME BOARD) -->
+    <div style="background: rgba(0,0,0,0.5); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.05);">
+        <h4 style="color: #cbd5e1; margin: 0 0 20px 0; text-align: center; font-family: 'Orbitron';">EL CAMINO DEL GUERRERO</h4>
+        
+        <!-- Contenedor Flex para envolver los cuadros simulando un camino -->
+        <div id="game-board-90" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px;">
+            <p style="color:#f97316;">Dibujando tablero interactivo...</p>
+        </div>
+    </div>
+
     <div style="text-align: center; margin-top: 40px;">
         <button class="btn" style="width: 100%; max-width: 300px; opacity: 0.6; font-size: 0.85em;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
     </div>
@@ -4211,15 +4261,28 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
     <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6; font-size: 0.85em;" onclick="cerrarBinance()">CANCELAR Y VOLVER</button>
 </div>
 
-<!-- 🎛️ MODAL: FRASE NEURO-PROGRAMACIÓN (DESAFÍO 90 DÍAS) -->
+<!-- 🎛️ MODAL: FRASE NEURO-PROGRAMACIÓN CON REDES SOCIALES -->
 <div id="modal-frase-diaria" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 90% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid #f97316 !important; padding: 30px !important; text-align: center !important; border-radius: 15px !important; box-shadow: 0 0 50px rgba(249, 115, 22, 0.4) !important;">
     <button onclick="cerrarModalFrase()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    
     <div style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px #f97316);">🔥</div>
-    <h3 style="color: #f97316; font-family: 'Orbitron'; margin-top: 0;">DÍA <span id="desafio-dia-num"></span></h3>
-    <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 10px; border: 1px dashed rgba(249, 115, 22, 0.3); margin-bottom: 20px;">
-        <p id="desafio-frase-texto" style="font-size: 1.1em; color: white; font-style: italic; line-height: 1.6; margin: 0;"></p>
+    <h3 style="color: #f97316; font-family: 'Orbitron'; margin-top: 0; letter-spacing: 1px;">DÍA <span id="desafio-dia-num"></span></h3>
+    
+    <div style="background: rgba(255,255,255,0.02); padding: 25px 20px; border-radius: 10px; border: 1px dashed rgba(249, 115, 22, 0.3); margin-bottom: 20px; position: relative;">
+        <span style="position: absolute; top: -10px; left: 15px; font-size: 2rem; color: #f97316; opacity: 0.3;">"</span>
+        <p id="desafio-frase-texto" style="font-size: 1.1em; color: white; font-style: italic; line-height: 1.6; margin: 0; position: relative; z-index: 2;"></p>
+        <span style="position: absolute; bottom: -20px; right: 15px; font-size: 2rem; color: #f97316; opacity: 0.3;">"</span>
     </div>
-    <button class="btn" style="background: #f97316; color: white; width: 100%; font-weight: bold; padding: 15px; font-family: 'Orbitron';" onclick="confirmarDiaDesafio()">ACEPTAR Y MARCAR DÍA</button>
+
+    <!-- BOTONES DE COMPARTIR -->
+    <p style="font-size: 0.75em; color: #cbd5e1; margin-bottom: 10px; text-transform: uppercase;">Inspira a otros compartiendo tu avance:</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+        <button onclick="compartirFrase('whatsapp')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: #25D366; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;"><img src="https://img.icons8.com/color/24/ffffff/whatsapp--v1.png"/> WA</button>
+        <button onclick="compartirFrase('facebook')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: #1877F2; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;"><img src="https://img.icons8.com/color/24/ffffff/facebook-new.png"/> FB</button>
+        <button onclick="compartirFrase('instagram')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;"><img src="https://img.icons8.com/color/24/ffffff/instagram-new--v1.png"/> IG</button>
+    </div>
+
+    <button id="btn-marcar-dia" class="btn" style="background: #f97316; color: white; width: 100%; font-weight: bold; padding: 15px; font-family: 'Orbitron';" onclick="confirmarDiaDesafio()">ACEPTAR Y MARCAR DÍA</button>
 </div>
 
 <!-- 🎛️ MODAL: INVITACIÓN A SER COACH (HITO 90 DÍAS) -->
@@ -11116,6 +11179,210 @@ function trackAccionValiosa(accion, detalle) {
     // Disparo asíncrono ciego (no le ponemos 'await' para que no pause la navegación del usuario)
     apiCall("registrarMetricaAdmin", { email: emailRastreo, accion: accion, detalle: detalle });
 }   
+
+// =========================================================
+// 🔥 MOTOR JAVASCRIPT: DESAFÍO 90 DÍAS
+// =========================================================
+let cacheFrases90Dias = [];
+let diaActualSeleccionado = 0;
+
+async function iniciarDesafio90() {
+    apagarTodosLosModulos();
+    document.getElementById('modulo-desafio-90').classList.remove('hidden');
+    
+    const grid = document.getElementById('game-board-90');
+    grid.innerHTML = "<div class='spinner' style='border-left-color: #f97316;'></div>";
+
+    // 1. Cargamos las frases desde la Matrix (Nueva Hoja)
+    if (cacheFrases90Dias.length === 0) {
+        const resFrases = await apiCall("obtenerFrasesDesafio");
+        if (resFrases && resFrases.success) cacheFrases90Dias = resFrases.frases;
+    }
+
+    // 2. Cargamos el progreso del usuario
+    const resProgreso = await apiCall("sincronizarDatosLogros", { email: sessionUser.email });
+    
+    if (resProgreso && resProgreso.success) {
+        const rachaActual = resProgreso.progreso.racha || 0;
+        const ultimoDiaStr = resProgreso.progreso.ultimoDia || "";
+        
+        // Evaluamos si el día de hoy ya está marcado
+        const fechaHoy = new Date().toLocaleDateString('en-CA').split('T')[0]; // Formato YYYY-MM-DD local
+        const yaJugoHoy = (ultimoDiaStr === fechaHoy);
+
+        document.getElementById('tablero-racha-num').innerText = rachaActual;
+        renderizarTableroGame(rachaActual, yaJugoHoy);
+    } else {
+        grid.innerHTML = "<p style='color:#ff4444;'>Error conectando con la Matrix.</p>";
+    }
+}
+
+function renderizarTableroGame(racha, yaJugoHoy) {
+    const grid = document.getElementById('game-board-90');
+    grid.innerHTML = "";
+    
+    // Casilla siguiente a jugar (Si hoy no ha jugado, es la racha+1. Si ya jugó, no hay casilla clickeable hoy)
+    const diaHabilitadoParaJugar = yaJugoHoy ? -1 : (racha + 1);
+
+    for (let i = 1; i <= 90; i++) {
+        const box = document.createElement('div');
+        let boxStyle = "width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 8px; font-size: 0.8em; transition: 0.3s; cursor: default; position: relative;";
+        
+        let bgColor = "rgba(255,255,255,0.05)";
+        let borderColor = "rgba(255,255,255,0.1)";
+        let colorTxt = "#64748b";
+        let isMilestone = (i === 30 || i === 60 || i === 90);
+
+        // ESTADOS DEL TABLERO
+        if (i <= racha) {
+            // Ya completado
+            bgColor = "rgba(249, 115, 22, 0.2)";
+            borderColor = "#f97316";
+            colorTxt = "#f97316";
+            box.innerHTML = "✓";
+            boxStyle += "box-shadow: inset 0 0 10px rgba(249,115,22,0.3);";
+        } else if (i === diaHabilitadoParaJugar) {
+            // EL BOTÓN DEL DÍA DE HOY
+            bgColor = "#f97316";
+            borderColor = "#fff";
+            colorTxt = "#fff";
+            box.innerHTML = i;
+            boxStyle += "box-shadow: 0 0 15px #f97316; cursor: pointer; animation: pulse 2s infinite;";
+            box.onclick = () => abrirModalFrase(i);
+        } else {
+            // Futuro
+            box.innerHTML = i;
+        }
+
+        // Diseño Especial para Nodos Jefe (30, 60, 90)
+        if (isMilestone) {
+            boxStyle += "border-radius: 50%; transform: scale(1.15); font-family: 'Orbitron'; z-index: 2;";
+            if (i > racha && i !== diaHabilitadoParaJugar) {
+                borderColor = "var(--neon-m)";
+                colorTxt = "var(--neon-m)";
+                bgColor = "rgba(168, 85, 247, 0.1)";
+            } else if (i <= racha) {
+                box.innerHTML = "👑";
+            }
+        }
+
+        box.style.cssText = boxStyle + `background: ${bgColor}; border: 2px solid ${borderColor}; color: ${colorTxt};`;
+        grid.appendChild(box);
+    }
+}
+
+function abrirModalFrase(dia) {
+    diaActualSeleccionado = dia;
+    document.getElementById('desafio-dia-num').innerText = dia;
+    
+    // Buscar la frase en la memoria, si no, poner genérica
+    const objFrase = cacheFrases90Dias.find(f => parseInt(f.dia) === parseInt(dia));
+    const fraseTexto = objFrase ? objFrase.frase : `Día ${dia}: Hoy decido construir la mejor versión de mí mismo.`;
+    
+    document.getElementById('desafio-frase-texto').innerText = fraseTexto;
+    
+    document.getElementById('main-content').classList.add('blur-effect');
+    document.getElementById('modal-frase-diaria').classList.remove('hidden');
+    document.getElementById('modal-frase-diaria').style.display = 'block';
+}
+
+function compartirFrase(redSocial) {
+    const frase = document.getElementById('desafio-frase-texto').innerText;
+    const dia = document.getElementById('desafio-dia-num').innerText;
+    const textoACompartir = encodeURIComponent(`🔥 Día ${dia} de mi Desafío 90 Días C3D completado.\n\n"${frase}"\n\nÚnete a la evolución en Coach 3D LATAM.`);
+    
+    if (redSocial === 'whatsapp') {
+        window.open(`https://api.whatsapp.com/send?text=${textoACompartir}`, '_blank');
+    } else if (redSocial === 'facebook') {
+        // Facebook usa link de URL, el quote a veces falla por políticas, pero lo intentamos
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${textoACompartir}`, '_blank');
+    } else if (redSocial === 'instagram') {
+        // IG no tiene API web directa de compartir texto. Usamos el portapapeles.
+        navigator.clipboard.writeText(decodeURIComponent(textoACompartir)).then(() => {
+            notify("✅ ¡Texto copiado al portapapeles! Pégalo en tu Historia o Feed de Instagram.");
+        });
+    }
+}
+
+async function confirmarDiaDesafio() {
+    const btn = document.getElementById('btn-marcar-dia');
+    btn.innerText = "Sincronizando..."; btn.disabled = true;
+
+    if (typeof trackAccionValiosa === 'function') trackAccionValiosa("Constancia", "Marcó Día " + diaActualSeleccionado);
+
+    const res = await apiCall("registrarDiaDesafio", { email: sessionUser.email });
+    
+    btn.innerText = "ACEPTAR Y MARCAR DÍA"; btn.disabled = false;
+
+    if (res && res.success) {
+        cerrarModalFrase();
+        iniciarDesafio90(); // Recarga el tablero para pintar la casilla
+        
+        // Lanzamos el modal de Graduación si llegó al 90
+        if (res.hito === 90) {
+            setTimeout(() => {
+                document.getElementById('main-content').classList.add('blur-effect');
+                document.getElementById('modal-invitacion-coach').classList.remove('hidden');
+                document.getElementById('modal-invitacion-coach').style.display = 'block';
+            }, 1000);
+        } else if (res.hito === 30 || res.hito === 60) {
+            setTimeout(() => {
+                sessionUser.rango = "Suscriptor";
+                sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
+                kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡RANGO VIP DESBLOQUEADO! 👑</h3><p>Tu constancia te ha premiado. Haz ascendido a Suscriptor en la Matrix.</p>`, icon: '🎖️' });
+                loadDashboard(); // Refresca los colores del perfil
+            }, 1000);
+        }
+    } else {
+        notify("❌ " + (res ? res.msg : "Error de conexión."));
+        cerrarModalFrase();
+    }
+}
+
+function cerrarModalFrase() {
+    document.getElementById('modal-frase-diaria').classList.add('hidden');
+    document.getElementById('modal-frase-diaria').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+// =========================================================
+// 👑 MOTOR: POSTULACIÓN A COACH (HITO 90 DÍAS)
+// =========================================================
+async function enviarSolicitudCoach90Dias() {
+    const btn = document.querySelector('#form-ascenso-coach .btn-m');
+    btn.innerText = "⚡ TRANSMITIENDO A LA MATRIX..."; 
+    btn.disabled = true;
+
+    const payload = {
+        userEmail: sessionUser.email,
+        nombre: document.getElementById('coach90-nombre').value.trim(),
+        email: document.getElementById('coach90-email').value.trim(),
+        whatsapp: document.getElementById('coach90-whatsapp').value.trim(),
+        pais: document.getElementById('coach90-pais').value.trim(),
+        motivo: document.getElementById('coach90-motivo').value.trim()
+    };
+
+    const res = await apiCall("procesarPostulacionCoach90Dias", payload);
+    
+    btn.innerText = "ACEPTAR EL RETO Y POSTULAR"; 
+    btn.disabled = false;
+
+    if (res && res.success) {
+        cerrarModalInvitacionCoach();
+        kairoMessage({
+            mensaje: `<h3 style="color:var(--neon-m); font-family:'Orbitron';">¡POSTULACIÓN ENVIADA! 👑</h3><p>Tu expediente de 90 días ha sido enviado a la cúpula de Coaches. Pronto serás contactado para tu entrevista de certificación.</p>`,
+            icon: '🚀'
+        });
+    } else {
+        notify("❌ Error al enviar la postulación: " + (res ? res.msg : "Sin conexión a la Matrix"));
+    }
+}
+
+function cerrarModalInvitacionCoach() {
+    document.getElementById('modal-invitacion-coach').classList.add('hidden');
+    document.getElementById('modal-invitacion-coach').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
     </script>
 </body>
 
