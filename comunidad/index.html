@@ -2788,12 +2788,6 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 <div id="contenedor-herramientas-m" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </div>
         </div>
-        <!-- ACCESO RÁPIDO DE COMUNICACIÓN -->
-        <div style="text-align: center; margin-top: 25px;">
-            <button class="btn btn-n" style="width: 100%; max-width: 400px; padding: 15px; font-size: 0.9em;" onclick="iniciarbuzon()">
-                📬 BUZÓN
-            </button>
-        </div>
     </div>
 
     <div id="panel-acceso-coach" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 1px dashed var(--neon-m); padding: 20px; text-align: center; background: rgba(168, 85, 247, 0.05);">
@@ -3268,11 +3262,11 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 </div></div>   
 
 <!-- FOOTER LEGAL -->
-<div id="c3d-global-footer" class="c3d-footer hidden">
-    <p style="margin: 0 0 10px 0; font-family: 'Orbitron'; color: var(--neon-n);">© 2026 Área de Soluciones Tecnológicas - Coach 3D LATAM</p>
+<div id="c3d-global-footer" class="c3d-footer hidden" style="background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; width: 95%; max-width: 1000px; margin: 40px auto 20px auto; padding: 20px;">
+    <p style="margin: 0 0 10px 0; font-family: 'Orbitron'; color: #cbd5e1;">© 2026 Área de Soluciones Tecnológicas - Coach 3D LATAM</p>
     <p style="margin: 0; font-size: 0.85em;">
-        <a onclick="abrirModalLegal('terminos')">Términos de Servicio</a> | 
-        <a onclick="abrirModalLegal('privacidad')">Políticas de Privacidad</a>
+        <a onclick="abrirModalLegal('terminos')" style="color: var(--neon-n); font-weight: bold; padding: 0 10px;">Términos de Servicio</a> | 
+        <a onclick="abrirModalLegal('privacidad')" style="color: var(--neon-n); font-weight: bold; padding: 0 10px;">Políticas de Privacidad</a>
     </p>
 </div>
 
