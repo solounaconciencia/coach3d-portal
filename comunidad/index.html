@@ -3455,21 +3455,21 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 <div style="font-size: 1.5rem; width: 40px; text-align: center;">🥉</div>
                 <div>
                     <strong style="color: white; font-size: 0.9em; display: block;">Día 30: Ascenso a Suscriptor</strong>
-                    <span style="color: #94a3b8; font-size: 0.75em;">Acceso a descuentos y herramientas VIP.</span>
+                    <span style="color: #94a3b8; font-size: 0.75em;">Suscripción por 7 días. Acceso a descuentos y herramientas VIP.</span>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
                 <div style="font-size: 1.5rem; width: 40px; text-align: center;">🥈</div>
                 <div>
                     <strong style="color: white; font-size: 0.9em; display: block;">Día 60: Mantenimiento VIP</strong>
-                    <span style="color: #94a3b8; font-size: 0.75em;">Renovación automática de tus privilegios.</span>
+                    <span style="color: #94a3b8; font-size: 0.75em;">Suscripción por 14 días. Renovación de tus privilegios.</span>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 15px; background: rgba(168, 85, 247, 0.1); border: 1px dashed var(--neon-m); padding: 10px; border-radius: 8px;">
                 <div style="font-size: 1.5rem; width: 40px; text-align: center; filter: drop-shadow(0 0 5px var(--neon-m));">👑</div>
                 <div>
-                    <strong style="color: var(--neon-m); font-size: 0.9em; display: block; font-family: 'Orbitron';">Día 90: CERTIFICACIÓN COACH</strong>
-                    <span style="color: #cbd5e1; font-size: 0.75em;">Gana dinero guiando a tu propia comunidad.</span>
+                    <strong style="color: var(--neon-m); font-size: 0.9em; display: block; font-family: 'Orbitron';">Día 90: INVITACIÓN ESPECIAL</strong>
+                    <span style="color: #cbd5e1; font-size: 0.75em;">Invitació Especial!. Reunión con un Coach Certificado y aprende a ganar dinero guiando a tu propia comunidad.</span>
                 </div>
             </div>
         </div>
@@ -4995,15 +4995,20 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           document.getElementById('dash-empty-comp').classList.add('hidden');
           document.getElementById('dash-data-comp').classList.remove('hidden');
           document.getElementById('dash-data-comp').style.display = 'block';
+          
+          let grasaVal = Number(sData.perfil.grasa) || 0;
+          let musculoVal = Number(sData.perfil.musculo) || 0;
+          let restoVal = 100 - grasaVal - musculoVal;
+          if (restoVal < 0) restoVal = 0; // Seguro matemático por si los datos superan 100
+
           document.getElementById('dash-comp-peso').innerText = (sData.perfil.peso || 0) + " kg";
-          document.getElementById('dash-comp-grasa').innerText = (sData.perfil.grasa || 0) + " %";
+          document.getElementById('dash-comp-grasa').innerText = grasaVal + " %";
           document.getElementById('dash-comp-edadm').innerText = (sData.perfil.edadMet || 0) + " años";
           document.getElementById('dash-comp-riesgo').innerText = sData.perfil.riesgo || "--";
-          document.getElementById('dash-chart-comp').src = "https://quickchart.io/chart?width=150&height=150&format=png&backgroundColor=transparent&c=" + encodeURIComponent(`{type:'doughnut',data:{labels:['Grasa','Músculo','Resto'],datasets:[{data:[${sData.perfil.grasa || 20},${sData.perfil.musculo || 40},${40}],backgroundColor:['#f87171','#22d3ee','#e2e8f0'],borderWidth:0}]},options:{plugins:{legend:{display:false}},cutoutPercentage:70}}`);
+          
+          // Gráfico dinámico auto-calculado
+          document.getElementById('dash-chart-comp').src = "https://quickchart.io/chart?width=150&height=150&format=png&backgroundColor=transparent&c=" + encodeURIComponent(`{type:'doughnut',data:{labels:['Grasa','Músculo','Resto'],datasets:[{data:[${grasaVal},${musculoVal},${restoVal}],backgroundColor:['#f87171','#22d3ee','#e2e8f0'],borderWidth:0}]},options:{plugins:{legend:{display:false}},cutoutPercentage:70}}`);
       } else {
-          document.getElementById('dash-empty-comp').classList.remove('hidden');
-          document.getElementById('dash-data-comp').classList.add('hidden');
-      }
 
       // 4. Finanzas
       if (sData.finanzas) {
@@ -11116,7 +11121,14 @@ let diaActualSeleccionado = 0;
 
 async function iniciarDesafio90() {
     apagarTodosLosModulos();
+    
+    // 1. Ocultar el panel principal del Dashboard
+    const dashboardHome = document.getElementById('dashboard-inicio');
+    if (dashboardHome) dashboardHome.classList.add('hidden');
+    
+    // 2. Mostrar el Desafío y forzar la pantalla hacia arriba
     document.getElementById('modulo-desafio-90').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     const grid = document.getElementById('game-board-90');
     grid.innerHTML = "<div class='spinner' style='border-left-color: #f97316;'></div>";
