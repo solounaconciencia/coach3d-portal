@@ -7833,8 +7833,8 @@ async function ejecutarAccionComercialServicio() {
         if (s.accion === "RESERVA") localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoCacheId);
         if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
 
-        // 🛡️ FOCUS: Capturamos el nombre del Coach para la auditoría contable
-        let coachElegido = "";
+        // 🛡️ FOCUS: Capturamos el nombre del Coach priorizando la Columna L (s.coach)
+        let coachElegido = s.coach || ""; 
         if (s.accion === "RESERVA") {
             const sel = document.getElementById('ser-coach-elegido');
             if (sel && sel.selectedIndex > 0) {
