@@ -959,19 +959,15 @@
 
 /* Contenedor Maestro para evitar que todo se desparrame en PC */
 
+/* Contenedor Maestro para evitar que todo se desparrame en PC */
 .seccion-dashboard {
-
   max-width: 1000px;
-
-  margin: 30px auto !important;
-
+  margin: 15px auto 30px auto !important; 
   width: 95%; /* Deja un pequeño margen respiratorio a los lados */
-
   box-sizing: border-box;
-
   overflow: hidden; /* Corta cualquier intento de salirse */
-
 }
+body { padding-top: 85px; } /* Empuje unificado y preciso */
 
 /* Grid de Herramientas: 1 columna en móvil, 3 en PC */
 
@@ -2143,9 +2139,6 @@
 .c3d-nav-btn:hover { color: var(--neon-n); background: rgba(255,255,255,0.05); }
 .c3d-nav-icon { font-size: 1.5em; }
 
-/* Empuja el cuerpo hacia abajo para que no quede detrás de la pared */
-body { padding-top: 120px; } 
-#view-dashboard { margin-top: 0; position: relative; }
 
 /* Control Responsivo: En celulares oculta la palabra y deja el icono */
 @media (max-width: 768px) {
@@ -2181,8 +2174,6 @@ body { padding-top: 120px; }
 }
 .c3d-empty-state:hover { background: rgba(34, 211, 238, 0.08); border-color: var(--neon-n); transform: translateY(-2px); }
 
-body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante */
-#view-dashboard { margin-top: 10px; position: relative; }
 .kairo-divisor-seccion {
     color: white; font-family: 'Orbitron'; font-size: 1.2rem;
     margin: 40px 0 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-align: left;
@@ -3932,35 +3923,24 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">
 
             <h2 style="margin:0; color: var(--neon-admin); letter-spacing: 2px;">CENTRAL DE SISTEMA</h2>
-
             <button onclick="cerrarAlquimia()" style="background:transparent; border:none; color:white; font-size:24px; cursor:pointer;">×</button>
-
         </div>
 
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-
             <button class="btn btn-n" style="font-size: 0.7em; flex: 1;" onclick="tabAlquimia('estetica')">ESTÉTICA</button>
-
             <button class="btn btn-m" style="font-size: 0.7em; flex: 1;" onclick="tabAlquimia('pilares')">PILARES</button>
-
             <button class="btn btn-f" style="font-size: 0.7em; flex: 1;" onclick="tabAlquimia('kairo')">SISTEMA</button>
-
         </div>
 
         <div id="tab-estetica" class="seccion-tab">
-
             <label>Título de la App</label>
-
             <input type="text" id="conf-titulo" placeholder="Ej: Coach 3D LATAM">
-
             <label>URL Fondo de Pantalla <span class="help-icon" data-help="Sube tu imagen a postimg.cc, copia el 'Enlace directo' y pégalo aquí.">?</span></label>
-
             <input type="text" id="conf-fondo" placeholder="https://...">
-
+            <label>URL Flyer Promocional Emergente (Opcional) <span class="help-icon" data-help="Aparecerá como ventana emergente al iniciar sesión.">?</span></label>
+            <input type="text" id="conf-flyer-promo" placeholder="https://...">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-
                 <div><label>Color Primario (Neón N)</label><input type="color" id="conf-color-n" style="height: 40px; padding: 2px;"></div>
-
                 <div><label>Color Secundario (Neón M)</label><input type="color" id="conf-color-m" style="height: 40px; padding: 2px;"></div>
             </div>
         </div>
@@ -4305,7 +4285,16 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
         <button type="submit" class="btn btn-m" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';">ACEPTAR EL RETO Y POSTULAR</button>
     </form>
 </div>
-    
+
+<!-- 🎛️ MODAL: FLYER PROMOCIONAL EMERGENTE -->
+<div id="modal-flyer-promo" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 550px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.4) !important; display: flex; flex-direction: column; border-radius: 15px !important; text-align: center;">
+    <button onclick="cerrarFlyerPromo()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; z-index:10; transition: 0.3s; font-weight: bold;">×</button>
+    <div style="flex: 1; overflow: hidden; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; margin-top: 15px;">
+        <img id="img-flyer-promo" src="" style="width: 100%; max-height: 65vh; object-fit: contain; border-radius: 10px;">
+    </div>
+    <button class="btn btn-n" style="width: 100%; padding: 12px; font-weight: bold; font-family: 'Orbitron';" onclick="cerrarFlyerPromo()">ACEPTAR Y CONTINUAR</button>
+</div>
+
     <script>
 
         // CONFIGURACIÓN GLOBAL
@@ -5080,6 +5069,21 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           }
       }, 1500);
   }
+
+    // Inyección del Flyer Promocional Emergente (1 vez por sesión)
+      if (sData.legales && sData.legales.flyerPromo && sData.legales.flyerPromo.trim() !== "") {
+          if (!sessionStorage.getItem('kairo_flyer_visto')) {
+              setTimeout(() => {
+                  document.getElementById('img-flyer-promo').src = filtrarUrlImagen(sData.legales.flyerPromo);
+                  document.getElementById('main-content').classList.add('blur-effect');
+                  const modalFlyer = document.getElementById('modal-flyer-promo');
+                  document.body.appendChild(modalFlyer); // Lo saca del fondo borroso
+                  modalFlyer.classList.remove('hidden');
+                  modalFlyer.style.display = 'flex';
+                  sessionStorage.setItem('kairo_flyer_visto', 'true');
+              }, 500); // Pequeño retraso para que el dashboard cargue primero
+          }
+      }
 }
 
 // 🛡️ Función interna auxiliar para limpiar rastros del disco local
@@ -6098,27 +6102,15 @@ function mostrarVentanaSuscripcion(nombreHerramienta) {
   // 2. Asignamos la URL al botón
 
   linkWA.href = `https://wa.me/${miTelefono}?text=${textoMensaje}`;
-
-  
-
   // 3. Mostramos el modal (Orden: layout primero, clase después)
-
   modal.style.display = 'flex'; 
-
   modal.classList.remove('hidden');
-
 }
 
-
-
 function cerrarModalSuscripcion() {
-
   const modal = document.getElementById('modal-suscripcion');
-
   modal.style.display = 'none'; 
-
   modal.classList.add('hidden');
-
 }
 
 async function abrirAdminHerramientas() {
@@ -6146,7 +6138,7 @@ async function abrirAdminHerramientas() {
       document.getElementById('conf-regalo-aniversario').value = resConfig.regaloAniversario || 0;
       document.getElementById('conf-regalo-referido-aniversario').value = resConfig.regaloReferidoAniversario || 0;
       
-      // Nuevos campos E-commerce
+      // Nuevos campos E-commerce y Flyer
       document.getElementById('conf-mp-token').value = resConfig.tokenMP || "";
       document.getElementById('conf-dlocal-link').value = resConfig.dlocalLink || "";
       document.getElementById('conf-paypal-link').value = resConfig.paypalLink || "";
@@ -6155,6 +6147,7 @@ async function abrirAdminHerramientas() {
       document.getElementById('conf-email-admin').value = resConfig.emailAdmin || "";
       document.getElementById('conf-legal-terminos').value = resConfig.legalTerminos || "";
       document.getElementById('conf-legal-privacidad').value = resConfig.legalPrivacidad || "";
+      document.getElementById('conf-flyer-promo').value = resConfig.flyerPromo || "";
   }
 }
 
@@ -6164,16 +6157,13 @@ function cerrarAlquimia() {
 }
 
 function tabAlquimia(tabId) {
-
   // Oculta todas las pestañas
   document.querySelectorAll('.seccion-tab').forEach(t => t.classList.add('hidden'));
-
   // Muestra la seleccionada
   document.getElementById('tab-' + tabId).classList.remove('hidden');
 }
 
 // --- CIRUGÍA FOCUS: GUARDAR ALQUIMIA ADMIN ---
-
 async function guardarConfiguracion() {
   const btnGuardar = event.target;
   btnGuardar.innerText = "⚡ SINCRONIZANDO...";
@@ -6187,7 +6177,7 @@ async function guardarConfiguracion() {
     regaloCumpleanos: document.getElementById('conf-regalo-cumpleanos').value,
     regaloAniversario: document.getElementById('conf-regalo-aniversario').value,
     regaloReferidoAniversario: document.getElementById('conf-regalo-referido-aniversario').value,
-    // Sincronización E-commerce
+    // Sincronización E-commerce y Flyer
     tokenMP: document.getElementById('conf-mp-token').value,
     dlocalLink: document.getElementById('conf-dlocal-link').value,
     paypalLink: document.getElementById('conf-paypal-link').value,
@@ -6195,7 +6185,8 @@ async function guardarConfiguracion() {
     binanceRed: document.getElementById('conf-binance-red').value,
     emailAdmin: document.getElementById('conf-email-admin').value,
     legalTerminos: document.getElementById('conf-legal-terminos').value,
-    legalPrivacidad: document.getElementById('conf-legal-privacidad').value
+    legalPrivacidad: document.getElementById('conf-legal-privacidad').value,
+    flyerPromo: document.getElementById('conf-flyer-promo').value
   };
 
   const root = document.documentElement;
@@ -11318,6 +11309,12 @@ async function enviarSolicitudCoach90Dias() {
 function cerrarModalInvitacionCoach() {
     document.getElementById('modal-invitacion-coach').classList.add('hidden');
     document.getElementById('modal-invitacion-coach').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+function cerrarFlyerPromo() {
+    document.getElementById('modal-flyer-promo').classList.add('hidden');
+    document.getElementById('modal-flyer-promo').style.display = 'none';
     document.getElementById('main-content').classList.remove('blur-effect');
 }
     </script>
