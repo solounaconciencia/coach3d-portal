@@ -2356,9 +2356,6 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
 
     <!-- INICIO DEL DASHBOARD -->
     <div id="view-dashboard" class="hidden">
-
-    <div class="logout-btn btn-m" onclick="logout()" style="position: absolute; top: 10px; right: 10px; font-size: 0.7em; padding: 5px 10px;">Cerrar Sesión</div>
-
     
     <div id="modal-centro-comando" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 3000000 !important; width: 95% !important; max-width: 900px !important; height: 85vh !important; overflow-y: auto !important; padding: 0; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; box-shadow: 0 0 50px rgba(0,0,0,0.95) !important;">
         <div style="background: rgba(0,0,0,0.8); padding: 20px; border-bottom: 1px solid var(--neon-m); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;">
@@ -2627,7 +2624,8 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
     <div id="view-dashboard-main" class="glass-panel seccion-dashboard" style="max-width: 900px; padding: 30px;">
         
         <!-- ZONA 1: IDENTIDAD Y ESTATUS -->
-        <div class="c3d-user-hero">
+        <div class="c3d-user-hero" style="position: relative;">
+            <div class="logout-btn btn" onclick="logout()" style="position: absolute; top: 15px; right: 15px; font-size: 0.7em; padding: 6px 12px; z-index: 20; border: 1px solid #444; color: #cbd5e1; background: rgba(0,0,0,0.5);">CERRAR SESIÓN</div>
             <!-- Columna Izquierda: Foto y Botones -->
             <div class="c3d-user-avatar-col">
                 <div style="position: relative; width: 120px; margin-bottom: 15px;">
@@ -2637,7 +2635,7 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
                     </div>
                 </div>
                 <button class="btn btn-n" style="width:100%; padding:8px; font-size:0.7em; margin-bottom:8px;" onclick="abrirHistorialGlobal()">HISTORIAL</button>
-                <button id="btn-metricas-coach" class="btn btn-m hidden" style="width:100%; padding:8px; font-size:0.7em;">MÉTRICAS</button>
+                <button id="btn-metricas-global" class="btn btn-n" style="width:100%; padding:8px; font-size:0.7em;" onclick="abrirMetricasGlobales()">MÉTRICAS</button>
             </div>
             
             <!-- Columna Derecha: Datos y Métricas -->
@@ -2650,19 +2648,19 @@ body { padding-top: 100px; } /* Empuja el contenido bajo la nueva barra flotante
                 <p id="user-info" style="opacity: 0.8; font-size: 0.85em; margin: 0 0 15px 0; color: #cbd5e1;">País | Edad</p>
                 
                 <!-- KPIs Variables según Rango -->
+                <!-- KPIs Variables según Rango -->
                 <div id="kpi-container-rango" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                     <div class="c3d-metric-badge">
-                        <span class="c3d-metric-val" style="color:var(--neon-n);" id="kpi-puntos">0</span>
-                        <span class="c3d-metric-lbl">Puntos Red</span>
+                        <span class="c3d-metric-val" style="color:#fbbf24;" id="kpi-puntos">0</span>
+                        <span class="c3d-metric-lbl">PUNTOS C3D</span>
                     </div>
                     <div class="c3d-metric-badge">
                         <span class="c3d-metric-val" id="kpi-ref-total">0</span>
                         <span class="c3d-metric-lbl">Referidos</span>
                     </div>
-                    <!-- Aparecen solo si es Suscriptor o Coach -->
-                    <div id="kpi-box-susc" class="c3d-metric-badge hidden">
+                    <div id="kpi-box-susc" class="c3d-metric-badge">
                         <span class="c3d-metric-val" style="color:var(--neon-f);" id="kpi-ref-susc">0</span>
-                        <span class="c3d-metric-lbl">Susc. VIP</span>
+                        <span class="c3d-metric-lbl">Ref. Suscriptor</span>
                     </div>
                     <div id="kpi-box-coach" class="c3d-metric-badge hidden">
                         <span class="c3d-metric-val" style="color:var(--neon-m);" id="kpi-ref-coach">0</span>
@@ -4864,23 +4862,61 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
   const sData = await apiCall("getSuperDashboardData", { email: sessionUser.email });
   
   if (sData && sData.success) {
-      // 1. Identidad y Economía
-      document.getElementById('badge-rango').innerText = sessionUser.rango || "Usuario";
-      document.getElementById('kpi-puntos').innerText = sData.puntos;
-      document.getElementById('kpi-ref-total').innerText = sData.refTotal;
+      // 1. Identidad, Economía y Colorimetría de Estatus
+      let badgeR = document.getElementById('badge-rango');
+      let r = sessionUser.rango || "Usuario";
+      let nr = (sessionUser.nivelRango || "NIVEL 1").toUpperCase();
       
-      if (sessionUser.rango === "Suscriptor" || sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
-          document.getElementById('kpi-box-susc').classList.remove('hidden');
-          document.getElementById('kpi-ref-susc').innerText = sData.refSusc;
-      }
-      if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
-          document.getElementById('kpi-box-coach').classList.remove('hidden');
-          document.getElementById('kpi-ref-coach').innerText = sData.refCoach;
-          document.getElementById('btn-metricas-coach').classList.remove('hidden');
+      let bgRango = "var(--neon-m)"; 
+      let txtRango = "black"; 
+      let borderRango = "transparent";
+
+      if (r === "Usuario") { 
+          bgRango = "var(--neon-n)"; 
+          txtRango = "black"; 
+      } else if (r === "Suscriptor") { 
+          bgRango = "#fbbf24"; 
+          txtRango = "black"; 
+      } else if (r === "Coach") {
+          if (nr.includes("CONSULTOR MAYOR")) { bgRango = "#3b82f6"; txtRango = "white"; }
+          else if (nr.includes("PRODUCTOR CALIFICADO")) { bgRango = "#ef4444"; txtRango = "white"; }
+          else if (nr.includes("SUPERVISOR")) { bgRango = "black"; txtRango = "white"; borderRango = "1px solid rgba(255,255,255,0.3)"; }
+          else { bgRango = "var(--neon-f)"; txtRango = "black"; } // Coach Nivel 1
+      } else if (r === "Admin") { 
+          bgRango = "var(--neon-m)"; 
+          txtRango = "black"; 
       }
 
-      // 1.5 Corrección: Nivel de Rango en el Hero
-      document.getElementById('badge-nivel').innerText = sessionUser.nivelRango ? sessionUser.nivelRango : "NIVEL 1";
+      if (badgeR) {
+          badgeR.style.background = bgRango;
+          badgeR.style.color = txtRango;
+          badgeR.style.border = borderRango;
+          badgeR.innerText = r.toUpperCase();
+      }
+
+      const badgeNivel = document.getElementById('badge-nivel');
+      if (badgeNivel) badgeNivel.innerText = nr;
+
+      // Inyección segura de Contadores Universales
+      const kpiPuntos = document.getElementById('kpi-puntos');
+      if (kpiPuntos) kpiPuntos.innerText = sData.puntos;
+
+      const kpiRefTotal = document.getElementById('kpi-ref-total');
+      if (kpiRefTotal) kpiRefTotal.innerText = sData.refTotal;
+
+      const kpiRefSusc = document.getElementById('kpi-ref-susc');
+      if (kpiRefSusc) kpiRefSusc.innerText = sData.refSusc;
+
+      // Inyección exclusiva para Coaches
+      const kpiBoxCoach = document.getElementById('kpi-box-coach');
+      const kpiRefCoach = document.getElementById('kpi-ref-coach');
+
+      if (r === "Coach" || r === "Admin") {
+          if (kpiBoxCoach) kpiBoxCoach.classList.remove('hidden');
+          if (kpiRefCoach) kpiRefCoach.innerText = sData.refCoach;
+      } else {
+          if (kpiBoxCoach) kpiBoxCoach.classList.add('hidden');
+      }
 
       // 2. Diagnóstico 3D
       if (sData.diag) {
@@ -7683,6 +7719,7 @@ async function enviarPostulacionCoach3D() {
         
         
 function abrirDetalleServicio(sku, pilar) {
+    trackAccionValiosa("Apertura de Vitrina", "Servicio: " + sku);
     const servicio = catalogoServiciosCache[pilar].find(x => x.sku === sku);
     if (!servicio) return;
     
@@ -7748,6 +7785,7 @@ function abrirDetalleServicio(sku, pilar) {
 }
 
 async function ejecutarAccionComercialServicio() {
+    trackAccionValiosa("Intención de Compra", "Servicio: " + servicioSeleccionadoActivo.sku);
     const s = servicioSeleccionadoActivo;
     if (!s) return;
 
@@ -8325,6 +8363,7 @@ function renderizarGrillaEcommerce(lista = inventarioEcommerce) {
 }
 
 function abrirModalEcommerce(sku) {
+    trackAccionValiosa("Apertura de Vitrina", "Producto: " + sku);
     const p = inventarioEcommerce.find(x => x.sku === sku);
     if(!p) return;
     productoActivoEcom = p;
@@ -8434,6 +8473,7 @@ function guardarCarritoLocal() {
 }
 
 function agregarAlCarritoDesdeModal() {
+    trackAccionValiosa("Intención de Compra", "Carrito: " + productoActivoEcom.sku);
     if(!productoActivoEcom) return;
     const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
     const precio = esSusc ? productoActivoEcom.precioSuscriptor : productoActivoEcom.precioNormal;
@@ -8570,6 +8610,7 @@ async function abrirCheckout(coachName = "", esCompraDirecta = false, montoDirec
 }
 
 async function procesarPagoCarrito() {
+    trackAccionValiosa("Fricción Final", "Inicia Pago " + metodoElegido.value);
     let emailComprador = sessionUser ? sessionUser.email : document.getElementById('checkout-guest-email').value.trim();
     let nombreComprador = sessionUser ? (sessionUser.seudónimo || sessionUser.nombre) : document.getElementById('checkout-guest-nombre').value.trim();
     if (!sessionUser && (!emailComprador || !nombreComprador || !emailComprador.includes('@'))) {
@@ -8873,9 +8914,8 @@ function renderizarGrillaNetflix(lista) {
     });
 }
 
-
-
 function desviarAPagoCurso() {
+    trackAccionValiosa("Intento de Desbloqueo", "Curso: " + cursoActivoCinema.sku);
     if(!cursoActivoCinema) return;
     
     if (cursoActivoCinema.accion === "GRUPAL") {
@@ -8920,6 +8960,7 @@ function desviarAPagoCurso() {
 }
 
 function abrirModalCinemaPlay(sku) {
+    trackAccionValiosa("Interés de Aprendizaje", "Curso: " + sku);
     const c = inventarioCursos.find(x => x.sku === sku);
     if (!c) return;
     cursoActivoCinema = c;
@@ -8991,6 +9032,7 @@ function abrirModalCinemaPlay(sku) {
 
 // 🧠 CEREBRO DEL REPRODUCTOR Y LA GUILLOTINA INTELIGENTE
 function reproducirVideoModulo(idx) {
+    trackAccionValiosa("Reproducción", "Curso: " + cursoActivoCinema.sku + " | Modulo: " + idx);
     if(!cursoActivoCinema) return;
     const c = cursoActivoCinema;
     const yaComprado = cursosCompradosCache.includes(c.sku.trim().toUpperCase());
@@ -10140,6 +10182,7 @@ async function sincronizarDatosEconomiaRed() {
 }
 
 async function registrarNuevoReferido() {
+    trackAccionValiosa("Declaración Prospecto", "Nuevo Referido: " + document.getElementById('ref-nombre').value.trim());
     const nombre = document.getElementById('ref-nombre').value.trim();
     const email = document.getElementById('ref-email').value.trim() || "no-email@pendiente.com";
     const whatsapp = document.getElementById('ref-whatsapp').value.trim();
@@ -10639,6 +10682,7 @@ function cerrarModalFrase() {
 }
 
 async function confirmarDiaDesafio() {
+    trackAccionValiosa("Constancia", "Marcó Día en Reto 90");
     const btn = document.querySelector('#modal-frase-diaria button');
     btn.innerText = "SINCRONIZANDO CON LA MATRIX..."; 
     btn.disabled = true;
@@ -11064,7 +11108,14 @@ function renderizarHistorialGlobal() {
     }
 }
         
-        
+// =========================================================
+// 📈 SENSORES SILENCIOSOS (TRACKING DE ALTO VALOR)
+// =========================================================
+function trackAccionValiosa(accion, detalle) {
+    let emailRastreo = sessionUser ? sessionUser.email : "ANÓNIMO";
+    // Disparo asíncrono ciego (no le ponemos 'await' para que no pause la navegación del usuario)
+    apiCall("registrarMetricaAdmin", { email: emailRastreo, accion: accion, detalle: detalle });
+}   
     </script>
 </body>
 
