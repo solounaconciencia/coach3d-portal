@@ -5010,11 +5010,15 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           document.getElementById('dash-comp-riesgo').innerText = sData.perfil.riesgo || "--";
           
           // Gráfico dinámico auto-calculado
+          // Gráfico dinámico auto-calculado
           document.getElementById('dash-chart-comp').src = "https://quickchart.io/chart?width=150&height=150&format=png&backgroundColor=transparent&c=" + encodeURIComponent(`{type:'doughnut',data:{labels:['Grasa','Músculo','Resto'],datasets:[{data:[${grasaVal},${musculoVal},${restoVal}],backgroundColor:['#f87171','#22d3ee','#e2e8f0'],borderWidth:0}]},options:{plugins:{legend:{display:false}},cutoutPercentage:70}}`);
       } else {
+          document.getElementById('dash-empty-comp').classList.remove('hidden');
+          document.getElementById('dash-data-comp').classList.add('hidden');
+      }
 
-      // 4. Finanzas
-      if (sData.finanzas) {
+          // 4. Finanzas
+          if (sData.finanzas) {
           document.getElementById('dash-empty-fin').classList.add('hidden');
           document.getElementById('dash-data-fin').classList.remove('hidden');
           document.getElementById('dash-data-fin').style.display = 'block';
