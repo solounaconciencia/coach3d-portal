@@ -2981,64 +2981,120 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 <div id="modulo-calculadora-financiera" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-m); position: relative; overflow: hidden; padding: 25px;">
     <div style="text-align: center; margin-bottom: 25px;">
         <h2 style="color: var(--neon-m); font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase; font-size: 1.4em; text-shadow: 0 0 10px var(--neon-m);">Calculadora Financiera C3D</h2>
-        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Descifra tu flujo de caja y genera tu Reporte de Libertad</p>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; font-style: italic;">Descifra tu flujo de caja, tu patrimonio y proyecta tu Reporte de Libertad</p>
     </div>
+
     <div id="app-content-calc">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px;">
+        <!-- 🪙 SELECTOR DE MONEDA -->
+        <div style="margin-bottom: 20px; text-align: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px dashed #fbbf24;">
+            <label style="font-size: 0.85em; color: #fbbf24; font-weight: bold; margin-right: 10px;">Moneda de Cálculo:</label>
+            <select id="calc-moneda" style="width: auto; padding: 8px 15px; background: #000; color: white; border: 1px solid #fbbf24; border-radius: 5px; font-family: 'Orbitron'; font-size: 1em;">
+                <option value="CLP">🇨🇱 CLP (Pesos Chilenos)</option>
+                <option value="UF">🇨🇱 UF (Unidad de Fomento)</option>
+                <option value="USD">🇺🇸 USD (Dólares)</option>
+                <option value="COP">🇨🇴 COP (Pesos Colombianos)</option>
+                <option value="SOL">🇵🇪 SOL (Soles Peruanos)</option>
+                <option value="ARG">🇦🇷 ARG (Pesos Argentinos)</option>
+            </select>
+            <p style="font-size: 0.7em; color: #94a3b8; margin: 8px 0 0 0;">⚠️ Los cálculos en divisas extranjeras son estimaciones basadas en el factor de conversión configurado por la administración.</p>
+        </div>
+
+        <!-- 📊 FLUJO DE CAJA (INGRESOS Y GASTOS) -->
+        <h4 style="color: var(--white); font-family: 'Orbitron'; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">1. FLUJO DE CAJA MENSUAL</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 20px;">
             <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid var(--neon-f); padding: 20px; border-radius: 15px;">
-                <h3 style="color: var(--neon-f); margin-top:0; font-family:'Orbitron', sans-serif; font-size: 1em; letter-spacing: 1px;">+ HABER (INGRESOS)</h3>
-                <input type="text" id="ing-desc" placeholder="Concepto (Ej. Sueldo o Venta)" style="background: rgba(0,0,0,0.6);">
-                <input type="number" id="ing-val" placeholder="Monto $" style="background: rgba(0,0,0,0.6);">
-                <button class="btn btn-f" onclick="addIngreso()" style="width: 100%; margin-top: 5px;">AGREGAR A HABER</button>
+                <h3 style="color: var(--neon-f); margin-top:0; font-size: 0.9em; letter-spacing: 1px;">+ HABER (INGRESOS MENSUALES)</h3>
+                <input type="text" id="ing-desc" placeholder="Concepto (Ej. Sueldo, Negocio)" style="background: rgba(0,0,0,0.6);">
+                <input type="number" id="ing-val" placeholder="Monto" style="background: rgba(0,0,0,0.6);">
+                <button class="btn btn-f" onclick="addIngreso()" style="width: 100%; margin-top: 5px;">AGREGAR INGRESO</button>
+                <div id="list-ing" style="margin-top: 15px; max-height: 150px; overflow-y: auto; font-size: 0.85em;"></div>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid #ef4444; padding: 20px; border-radius: 15px;">
+                <h3 style="color: #ef4444; margin-top:0; font-size: 0.9em; letter-spacing: 1px;">- DEBE (GASTOS MENSUALES)</h3>
+                <input type="text" id="gas-desc" placeholder="Concepto (Ej. Arriendo, Luz, Comida)" style="background: rgba(0,0,0,0.6);">
+                <input type="number" id="gas-val" placeholder="Monto" style="background: rgba(0,0,0,0.6);">
+                <button class="btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; width: 100%; margin-top: 5px;" onclick="addGasto()" onmouseover="this.style.background='#ef4444'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#ef4444';">AGREGAR GASTO</button>
+                <div id="list-gas" style="margin-top: 15px; max-height: 150px; overflow-y: auto; font-size: 0.85em;"></div>
+            </div>
+        </div>
+
+        <!-- 🏛️ PATRIMONIO (ACTIVOS Y PASIVOS) -->
+        <h4 style="color: var(--white); font-family: 'Orbitron'; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-top: 30px;">2. ESTADO PATRIMONIAL GLOBAL</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px;">
+            <div style="background: rgba(34, 211, 238, 0.03); border: 1px solid var(--neon-n); padding: 20px; border-radius: 15px;">
+                <h3 style="color: var(--neon-n); margin-top:0; font-size: 0.9em; letter-spacing: 1px;">+ ACTIVOS (LO QUE POSEES)</h3>
+                <input type="text" id="act-desc" placeholder="Concepto (Ej. Casa, Auto, Ahorros)" style="background: rgba(0,0,0,0.6);">
+                <input type="number" id="act-val" placeholder="Valor Comercial Estimado" style="background: rgba(0,0,0,0.6);">
+                <button class="btn btn-n" onclick="addActivo()" style="width: 100%; margin-top: 5px;">AGREGAR ACTIVO</button>
+                <div id="list-act" style="margin-top: 15px; max-height: 150px; overflow-y: auto; font-size: 0.85em;"></div>
             </div>
             <div style="background: rgba(168, 85, 247, 0.03); border: 1px solid var(--neon-m); padding: 20px; border-radius: 15px;">
-                <h3 style="color: var(--neon-m); margin-top:0; font-family:'Orbitron', sans-serif; font-size: 1em; letter-spacing: 1px;">- DEBE (GASTOS)</h3>
-                <input type="text" id="gas-desc" placeholder="Concepto (Ej. Arriendo o Tarjeta)" style="background: rgba(0,0,0,0.6);">
-                <input type="number" id="gas-val" placeholder="Monto $" style="background: rgba(0,0,0,0.6);">
-                <button class="btn btn-m" onclick="addGasto()" style="width: 100%; margin-top: 5px;">AGREGAR A DEBE</button>
+                <h3 style="color: var(--neon-m); margin-top:0; font-size: 0.9em; letter-spacing: 1px;">- PASIVOS (TUS DEUDAS TOTALES)</h3>
+                <input type="text" id="pas-desc" placeholder="Concepto (Ej. Hipoteca, Crédito Auto)" style="background: rgba(0,0,0,0.6);">
+                <input type="number" id="pas-val" placeholder="Monto Total a Pagar" style="background: rgba(0,0,0,0.6);">
+                <button class="btn btn-m" onclick="addPasivo()" style="width: 100%; margin-top: 5px;">AGREGAR PASIVO</button>
+                <div id="list-pas" style="margin-top: 15px; max-height: 150px; overflow-y: auto; font-size: 0.85em;"></div>
             </div>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: rgba(0,0,0,0.4); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; min-height: 120px;">
-            <div style="border-right: 1px solid rgba(255,255,255,0.05); padding: 15px;">
-                <div style="color: var(--neon-f); font-weight: bold; border-bottom: 2px solid var(--neon-f); padding-bottom: 5px; font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 10px;">Ingresos Registrados</div>
-                <div id="list-ing" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; font-size: 0.9em;"></div>
-            </div>
-            <div style="padding: 15px;">
-                <div style="color: var(--neon-m); font-weight: bold; border-bottom: 2px solid var(--neon-m); padding-bottom: 5px; font-size: 0.8em; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-bottom: 10px;">Gastos Registrados</div>
-                <div id="list-gas" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; font-size: 0.9em;"></div>
+
+        <!-- 🧠 PANEL DE MOTORES FINANCIEROS (LOS 5 BOTONES) -->
+        <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 15px; border: 1px dashed var(--neon-admin); text-align: center;">
+            <h4 style="color: var(--neon-admin); margin: 0 0 15px 0; font-family: 'Orbitron'; font-size: 1.1em;">🧠 LABORATORIO DE INTELIGENCIA FINANCIERA</h4>
+            <p style="font-size: 0.85em; color: #94a3b8; margin-bottom: 20px;">Asegúrate de ingresar toda tu información en las tablas de arriba antes de ejecutar los algoritmos.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <button class="btn" style="background: rgba(16,185,129,0.1); border: 1px solid var(--neon-f); color: var(--neon-f); padding: 15px; font-size: 0.85em; display:flex; flex-direction:column; align-items:center; gap:5px;" onclick="ejecutarCalculoAhorro()">
+                    <span style="font-size: 1.5em;">💰</span>
+                    <span>1. REGLA DEL 10%<br><small style="opacity:0.7;">(Análisis de Ahorro)</small></span>
+                </button>
+                <button class="btn" style="background: rgba(34,211,238,0.1); border: 1px solid var(--neon-n); color: var(--neon-n); padding: 15px; font-size: 0.85em; display:flex; flex-direction:column; align-items:center; gap:5px;" onclick="ejecutarPresupuestoRapido()">
+                    <span style="font-size: 1.5em;">⚡</span>
+                    <span>2. PRESUPUESTO RÁPIDO<br><small style="opacity:0.7;">(Flujo Disponible)</small></span>
+                </button>
+                <button class="btn" style="background: rgba(168,85,247,0.1); border: 1px solid var(--neon-m); color: var(--neon-m); padding: 15px; font-size: 0.85em; display:flex; flex-direction:column; align-items:center; gap:5px;" onclick="ejecutarBolaNieve()">
+                    <span style="font-size: 1.5em;">❄️</span>
+                    <span>3. BOLA DE NIEVE<br><small style="opacity:0.7;">(Plan Elimina Deudas)</small></span>
+                </button>
+                <button class="btn" style="background: rgba(251,191,36,0.1); border: 1px solid #fbbf24; color: #fbbf24; padding: 15px; font-size: 0.85em; display:flex; flex-direction:column; align-items:center; gap:5px;" onclick="abrirModalHipotecario()">
+                    <span style="font-size: 1.5em;">🏠</span>
+                    <span>4. SIMULADOR HIPOTECA<br><small style="opacity:0.7;">(Proyección a 30 años)</small></span>
+                </button>
+                <button class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid white; color: white; padding: 15px; font-size: 0.85em; grid-column: 1 / -1; display:flex; flex-direction:column; align-items:center; gap:5px;" onclick="ejecutarEstadoFinanciero()">
+                    <span style="font-size: 1.5em;">📄</span>
+                    <span>5. ESTADO FINANCIERO GLOBAL<br><small style="opacity:0.7;">(Patrimonio Neto & PDF Oficial)</small></span>
+                </button>
             </div>
         </div>
-        <button class="btn btn-n" style="width: 100%; font-size: 1.1em; padding: 16px; font-family: 'Orbitron', sans-serif;" onclick="processFinance()">GENERAR REPORTE DE LIBERTAD</button>
-        <button class="btn" style="width: 100%; margin-top: 10px; opacity: 0.6;" onclick="salirDelModulo()">CANCELAR</button>
+
+        <button class="btn" style="width: 100%; margin-top: 15px; opacity: 0.6;" onclick="salirDelModulo()">SALIR DEL LABORATORIO</button>
     </div>
+    
+    <!-- Pantallas de Resultados Dinámicas -->
     <div id="loader-calc" style="display:none; text-align: center; padding: 40px 10px;">
         <div class="spinner" style="border-left-color: var(--neon-m);"></div>
         <p style="font-family: 'Orbitron', sans-serif; color: var(--neon-m); letter-spacing: 2px; margin-top: 20px; font-size: 0.9em;">DESCIFRANDO TU ADN FINANCIERO...</p>
     </div>
+    
     <div id="results-calc" style="display:none; animation: fadeIn 0.5s ease-out;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px;">
-            
-            <div class="glass-panel" style="border-left: 4px solid var(--neon-n); padding: 15px; text-align: left;">
-                <h3 style="color: var(--neon-n); margin: 0 0 10px 0; font-size: 0.9em; font-family: 'Orbitron', sans-serif;">ESTADO ACTUAL</h3>
-                <p style="margin: 6px 0; font-size: 0.9em;">Total Ingresos: <span id="res-total-ing" style="color:#fff; font-weight:bold;"></span></p>
-                <p style="margin: 6px 0; font-size: 0.9em;">Total Gastos: <span id="res-total-gas" style="color:#fff; font-weight:bold;"></span></p>
-                <p style="margin: 6px 0; font-size: 0.9em;">Flujo Libre: <span id="res-flujo" style="color: var(--neon-f); font-weight:bold;"></span></p>
-                <div style="border-top:1px dashed rgba(255,255,255,0.1); margin: 10px 0; padding-top: 8px;"></div>
-                <p style="margin: 0; font-size: 0.8em; color: #ccc; line-height: 1.3;">Sugerencia (Aho/Inv/Pre): <br><span id="res-dist" style="color: var(--neon-n); font-weight: bold;"></span></p>
-            </div>
-            <div class="glass-panel" style="border-left: 4px solid var(--neon-f); padding: 15px; text-align: left;">
-                <h3 style="color: var(--neon-f); margin: 0 0 10px 0; font-size: 0.9em; font-family: 'Orbitron', sans-serif;">META NEURO-FINANCIERA</h3>
-                <p style="margin: 6px 0; font-size: 0.9em;">Ingreso Objetivo: <span id="id-ing" style="color:#fff; font-weight:bold;"></span></p>
-                <p style="margin: 6px 0; font-size: 0.9em;">Tu 10% de Oro: <span id="id-dist" style="color: var(--neon-f); font-weight:bold;"></span></p>
-            </div>
-            <div class="glass-panel" style="border-left: 4px solid var(--neon-m); padding: 15px; text-align: left; grid-column: span 1;">
-                <h2 id="status-name" style="color: var(--neon-m); margin: 0 0 5px 0; font-size: 1.1em; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;"></h2>
-                <p id="status-msg" style="margin: 0; font-size: 0.85em; color: #cbd5e1; line-height: 1.4;"></p>
-            </div>
-        </div>
-        <button id="wa-link-calc" class="btn btn-f" style="width: 100%; padding: 15px; font-weight: bold; margin-bottom: 15px;" onclick="window.open(this.getAttribute('data-href'), '_blank')">🚀 SOLICITAR ASESORÍA FINANCIERA GRATUITA</button>
-        <button class="btn btn-n" style="width: 100%;" onclick="reiniciarCalculadoraLocal()">NUEVO ANÁLISIS</button>
+        <!-- Contenedor Genérico para inyectar los resultados de los 5 botones -->
+        <div id="results-calc-container"></div>
+        <button class="btn btn-n" style="width: 100%; margin-top: 20px;" onclick="volverAlLaboratorio()">VOLVER A LOS MOTORES</button>
     </div>
+</div>
+
+<!-- 🎛️ MODAL: SIMULADOR HIPOTECARIO (OCULTO) -->
+<div id="modal-simulador-hipoteca" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000050 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid #fbbf24 !important; padding: 30px !important; box-shadow: 0 0 50px rgba(251, 191, 36, 0.4) !important; border-radius: 15px !important;">
+    <button onclick="cerrarModalHipotecario()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <h3 style="color: #fbbf24; font-family: 'Orbitron'; margin-top: 0; text-align: center;">🏠 PROYECCIÓN HIPOTECARIA</h3>
+    <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 20px; text-align: center;">Para simular tu capacidad de endeudamiento y proyectar el crédito, ingresa el valor comercial de la propiedad y la tasa de interés anual estimada.</p>
+    
+    <label style="font-size: 0.75em; color: #fbbf24;">Valor Propiedad (En la moneda seleccionada)</label>
+    <input type="number" id="hipoteca-valor-propiedad" placeholder="Ej: 2000" style="width: 100%; background: rgba(0,0,0,0.6); padding: 10px; border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 15px;">
+    
+    <label style="font-size: 0.75em; color: #fbbf24;">Tasa de Interés Anual (Ej: 4.5 para 4.5%)</label>
+    <input type="number" id="hipoteca-tasa" placeholder="4.5" step="0.1" value="4.5" style="width: 100%; background: rgba(0,0,0,0.6); padding: 10px; border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 20px;">
+    
+    <button class="btn" style="width: 100%; background: #fbbf24; color: black; font-weight: bold; padding: 15px; font-family: 'Orbitron';" onclick="ejecutarProyeccionHipotecaria()">CALCULAR PROYECCIÓN</button>
 </div>
 
 <div id="modulo-servicios-comunidad" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-n); padding: 25px;">
@@ -3931,6 +3987,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
             <button class="btn btn-n" style="font-size: 0.7em; flex: 1;" onclick="tabAlquimia('estetica')">ESTÉTICA</button>
             <button class="btn btn-m" style="font-size: 0.7em; flex: 1;" onclick="tabAlquimia('pilares')">PILARES</button>
             <button class="btn btn-f" style="font-size: 0.7em; flex: 1;" onclick="tabAlquimia('kairo')">SISTEMA</button>
+            <button class="btn btn-m" style="font-size: 0.7em; flex: 1; border-color: #fbbf24; color: #fbbf24;" onclick="tabAlquimia('divisas')">🪙 CONVERSORES</button>
         </div>
 
         <div id="tab-estetica" class="seccion-tab">
@@ -4011,6 +4068,35 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
             </div>
             
             <button class="btn btn-m" style="width: 100%; margin-top: 15px;" onclick="window.open('https://docs.google.com/spreadsheets/d/' + SHEET_ID_EXTERNO, '_blank')">ABRIR PLANILLA MAESTRA</button>
+        </div>
+        <!-- 🪙 PESTAÑA: GESTOR DE CONVERSIONES MULTI-DIVISA -->
+        <div id="tab-divisas" class="seccion-tab hidden" style="text-align: left;">
+            <h4 style="color: #fbbf24; margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; font-size: 0.9em; letter-spacing: 1px;">FACTORES DE CONVERSIÓN (BASE DE CÁLCULO: CLP)</h4>
+            <p style="font-size:0.75em; color:#94a3b8; margin-bottom:15px;">Define cuántos Pesos Chilenos (CLP) equivale una unidad de cada divisa extranjera.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                    <label style="font-size:0.75em; color:#cbd5e1;">1 UF = X Pesos CLP</label>
+                    <input type="number" id="conf-divisa-uf" placeholder="Ej: 38000" step="0.01">
+                </div>
+                <div>
+                    <label style="font-size:0.75em; color:#cbd5e1;">1 USD = X Pesos CLP</label>
+                    <input type="number" id="conf-divisa-usd" placeholder="Ej: 940" step="0.01">
+                </div>
+                <div>
+                    <label style="font-size:0.75em; color:#cbd5e1;">1 CLP = X COP (Colombia)</label>
+                    <input type="number" id="conf-divisa-cop" placeholder="Ej: 4.1" step="0.0001">
+                </div>
+                <div>
+                    <label style="font-size:0.75em; color:#cbd5e1;">1 SOL = X Pesos CLP (Perú)</label>
+                    <input type="number" id="conf-divisa-sol" placeholder="Ej: 250" step="0.01">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-size:0.75em; color:#cbd5e1;">1 ARG = X Pesos CLP (Argentina)</label>
+                    <input type="number" id="conf-divisa-arg" placeholder="Ej: 0.95" step="0.01">
+                </div>
+            </div>
+            <p style="font-size:0.65em; color:#fbbf24; margin-top:10px; font-style:italic;">⚠️ Nota: Al guardar, se inyectará automáticamente el Descargo de Responsabilidad por variabilidad cambiaria en todos los reportes descargables.</p>
         </div>
         <button class="btn btn-n" style="width: 100%; margin-top: 30px; font-size: 1.1em;" onclick="guardarConfiguracion()">GUARDAR CAMBIOS EN LA MATRIX</button>
     </div>
@@ -6160,6 +6246,11 @@ async function abrirAdminHerramientas() {
       document.getElementById('conf-legal-terminos').value = resConfig.legalTerminos || "";
       document.getElementById('conf-legal-privacidad').value = resConfig.legalPrivacidad || "";
       document.getElementById('conf-flyer-promo').value = resConfig.flyerPromo || "";
+      document.getElementById('conf-divisa-uf').value = resConfig.factorUF || 38000;
+      document.getElementById('conf-divisa-usd').value = resConfig.factorUSD || 940;
+      document.getElementById('conf-divisa-cop').value = resConfig.factorCOP || 0.24;
+      document.getElementById('conf-divisa-sol').value = resConfig.factorSOL || 250;
+      document.getElementById('conf-divisa-arg').value = resConfig.factorARG || 0.95;
   }
 }
 
@@ -6198,7 +6289,13 @@ async function guardarConfiguracion() {
     emailAdmin: document.getElementById('conf-email-admin').value,
     legalTerminos: document.getElementById('conf-legal-terminos').value,
     legalPrivacidad: document.getElementById('conf-legal-privacidad').value,
-    flyerPromo: document.getElementById('conf-flyer-promo').value
+    flyerPromo: document.getElementById('conf-flyer-promo').value,
+    // 🪙 PAYLOAD DE DIVISAS
+    factorUF: document.getElementById('conf-divisa-uf').value,
+    factorUSD: document.getElementById('conf-divisa-usd').value,
+    factorCOP: document.getElementById('conf-divisa-cop').value,
+    factorSOL: document.getElementById('conf-divisa-sol').value,
+    factorARG: document.getElementById('conf-divisa-arg').value
   };
 
   const root = document.documentElement;
@@ -7433,6 +7530,9 @@ function cerrarModalProspecto() {
 // =========================================================================
 var ingData = [];
 var gasData = [];
+var actData = [];
+var pasData = [];
+var divisasFactores = { CLP: 1, UF: 38000, USD: 940, COP: 0.24, SOL: 250, ARG: 0.95 }; // Kairo actualizará esto al abrir
 
 function iniciarcalculadorafinanciera() {
     apagarTodosLosModulos();
@@ -7579,6 +7679,308 @@ function reiniciarCalculadoraLocal() {
     document.getElementById('app-content-calc').style.display = 'block';
     document.getElementById('results-calc').style.display = 'none';
     document.getElementById('loader-calc').style.display = 'none';
+}
+
+// --- MOTORES FINANCIEROS C3D ---
+
+function addActivo() {
+    var desc = document.getElementById('act-desc').value.trim();
+    var val = parseFloat(document.getElementById('act-val').value);
+    if (desc && !isNaN(val)) {
+        actData.push({ concepto: desc, monto: val, tipo: 'ACTIVO' });
+        renderVisualPatrimonio();
+        document.getElementById('act-desc').value = '';
+        document.getElementById('act-val').value = '';
+    }
+}
+
+function addPasivo() {
+    var desc = document.getElementById('pas-desc').value.trim();
+    var val = parseFloat(document.getElementById('pas-val').value);
+    if (desc && !isNaN(val)) {
+        pasData.push({ concepto: desc, monto: val, tipo: 'PASIVO' });
+        renderVisualPatrimonio();
+        document.getElementById('pas-desc').value = '';
+        document.getElementById('pas-val').value = '';
+    }
+}
+
+function renderVisualPatrimonio() {
+    var htmlAct = "", htmlPas = "";
+    var moneda = document.getElementById('calc-moneda').value;
+    
+    actData.forEach(function(a, i) {
+        htmlAct += `<div style="display:flex; justify-content:space-between; padding:6px; background:rgba(255,255,255,0.02); border-radius:5px; margin-bottom:4px; border-left:2px solid var(--neon-n);"><span>${a.concepto}</span><div style="display:flex; gap:10px;"><span style="color:var(--neon-n); font-weight:bold;">${a.monto.toLocaleString()} ${moneda}</span><button onclick="actData.splice(${i},1); renderVisualPatrimonio()" style="background:none;border:none;color:#ef4444;cursor:pointer;font-weight:bold;">X</button></div></div>`;
+    });
+    pasData.forEach(function(p, i) {
+        htmlPas += `<div style="display:flex; justify-content:space-between; padding:6px; background:rgba(255,255,255,0.02); border-radius:5px; margin-bottom:4px; border-left:2px solid var(--neon-m);"><span>${p.concepto}</span><div style="display:flex; gap:10px;"><span style="color:var(--neon-m); font-weight:bold;">${p.monto.toLocaleString()} ${moneda}</span><button onclick="pasData.splice(${i},1); renderVisualPatrimonio()" style="background:none;border:none;color:#ef4444;cursor:pointer;font-weight:bold;">X</button></div></div>`;
+    });
+    
+    document.getElementById('list-act').innerHTML = htmlAct;
+    document.getElementById('list-pas').innerHTML = htmlPas;
+}
+
+function mostrarResultadoCalc(html) {
+    document.getElementById('app-content-calc').style.display = 'none';
+    document.getElementById('results-calc').style.display = 'block';
+    document.getElementById('results-calc-container').innerHTML = `<div class="glass-panel" style="text-align:center; padding:30px;">${html}</div>`;
+}
+
+function volverAlLaboratorio() {
+    document.getElementById('results-calc').style.display = 'none';
+    document.getElementById('app-content-calc').style.display = 'block';
+}
+
+// BOTÓN 1: REGLA DEL 10% (EMBUDO COACH)
+function ejecutarCalculoAhorro() {
+    let totalIng = ingData.reduce((acc, curr) => acc + curr.monto, 0);
+    let totalGas = gasData.reduce((acc, curr) => acc + curr.monto, 0);
+    if (totalIng === 0) return notify("Debes ingresar al menos un Ingreso primero.");
+    
+    let flujo = totalIng - totalGas;
+    let metaAhorro = totalIng * 0.10;
+    let moneda = document.getElementById('calc-moneda').value;
+
+    let html = ``;
+    if (flujo >= metaAhorro) {
+        html = `<div style="font-size:3rem; filter:drop-shadow(0 0 10px var(--neon-f)); margin-bottom:10px;">💰</div>
+                <h3 style="color:var(--neon-f); font-family:'Orbitron';">¡FELICIDADES! Tienes liquidez real</h3>
+                <p style="color:#cbd5e1;">Tu flujo libre actual es de <b style="color:white; font-size:1.2em;">${flujo.toLocaleString()} ${moneda}</b>. Tienes la capacidad comprobada de ahorrar o invertir tu 10% recomendado (<b style="color:var(--neon-f);">${metaAhorro.toLocaleString()} ${moneda}</b>).</p>`;
+    } else {
+        html = `<div style="font-size:3rem; filter:drop-shadow(0 0 10px #ef4444); margin-bottom:10px;">⚠️</div>
+                <h3 style="color:#ef4444; font-family:'Orbitron';">ALERTA FINANCIERA KAIRO</h3>
+                <p style="color:#cbd5e1;">Tu flujo libre actual es de solo <b style="color:white; font-size:1.2em;">${flujo.toLocaleString()} ${moneda}</b>. No te alcanza para cubrir el ahorro mínimo vital recomendado del 10% (<b style="color:#ef4444;">${metaAhorro.toLocaleString()} ${moneda}</b>).</p>
+                <p style="font-size:0.85em; color:#94a3b8; margin-bottom:20px;">Necesitas auditar y reducir tus gastos pasivos inmediatamente, o generar un nuevo ingreso. Kairo te aconseja tomar una asesoría gratuita de emergencia.</p>
+                <button class="btn btn-f" style="width:100%; padding:15px; font-weight:bold;" onclick="window.open('https://wa.me/56976003402?text=Hola,%20mi%20flujo%20no%20me%20permite%20ahorrar%20el%2010%25.%20Necesito%20el%20café%20financiero%20(SERV-FIN-006)','_blank')">☕ SOLICITAR CAFÉ CON COACH</button>`;
+    }
+    mostrarResultadoCalc(html);
+}
+
+// BOTÓN 2: PRESUPUESTO RÁPIDO
+function ejecutarPresupuestoRapido() {
+    let totalIng = ingData.reduce((acc, curr) => acc + curr.monto, 0);
+    let totalGas = gasData.reduce((acc, curr) => acc + curr.monto, 0);
+    if (totalIng === 0) return notify("Debes ingresar al menos un Ingreso primero.");
+    
+    let disponible = totalIng - totalGas;
+    let moneda = document.getElementById('calc-moneda').value;
+    let colorDisp = disponible >= 0 ? "var(--neon-n)" : "#ef4444";
+
+    let html = `<div style="font-size:3rem; filter:drop-shadow(0 0 10px var(--neon-n)); margin-bottom:10px;">⚡</div>
+                <h3 style="color:var(--neon-n); font-family:'Orbitron';">PRESUPUESTO RÁPIDO</h3>
+                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin:20px 0; border: 1px solid rgba(34, 211, 238, 0.3);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>Ingresos Totales:</span><strong style="color:var(--neon-f);">${totalIng.toLocaleString()} ${moneda}</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>Gastos Obligatorios:</span><strong style="color:#ef4444;">${totalGas.toLocaleString()} ${moneda}</strong></div>
+                    <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">
+                    <div style="display:flex; justify-content:space-between; font-size:1.3em;"><span>Dinero Disponible:</span><strong style="color:${colorDisp};">${disponible.toLocaleString()} ${moneda}</strong></div>
+                </div>
+                <p style="font-size:0.85em; color:#cbd5e1;">Usa este "Monto Disponible" para tus gastos variables del mes (ocio, salidas) sin romper tu economía básica.</p>`;
+    mostrarResultadoCalc(html);
+}
+
+// BOTÓN 3: BOLA DE NIEVE
+function ejecutarBolaNieve() {
+    if (pasData.length === 0) {
+        let html = `<div style="font-size:3rem; filter:drop-shadow(0 0 10px var(--neon-f)); margin-bottom:10px;">🏆</div>
+                    <h3 style="color:var(--neon-f); font-family:'Orbitron';">¡ESTADO ÓPTIMO!</h3>
+                    <p style="color:#cbd5e1;">No tienes pasivos registrados. ¡Estás completamente libre de deudas!</p>`;
+        return mostrarResultadoCalc(html);
+    }
+    
+    let moneda = document.getElementById('calc-moneda').value;
+    let deudas = [...pasData].sort((a, b) => a.monto - b.monto);
+    
+    let html = `<div style="font-size:3rem; filter:drop-shadow(0 0 10px var(--neon-m)); margin-bottom:10px;">❄️</div>
+                <h3 style="color:var(--neon-m); font-family:'Orbitron';">MÉTODO BOLA DE NIEVE</h3>
+                <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:20px;">Ataca tus deudas ordenándolas de menor a mayor monto para generar victorias psicológicas rápidas.</p>
+                <div style="text-align:left; background:rgba(0,0,0,0.5); padding:15px; border-radius:12px; border:1px dashed var(--neon-m); margin-bottom:20px;">`;
+    
+    deudas.forEach((d, i) => {
+        let color = i === 0 ? "var(--neon-f)" : "white";
+        let badge = i === 0 ? "🎯 PRIORIDAD #1" : `#${i+1}`;
+        html += `<div style="margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                    <span style="color:${color}; font-weight:bold; font-size:0.8em; display:block; font-family:'Orbitron';">${badge}</span>
+                    <div style="display:flex; justify-content:space-between; margin-top:5px;"><span style="color:#cbd5e1;">${d.concepto}</span><strong style="color:white;">${d.monto.toLocaleString()} ${moneda}</strong></div>
+                 </div>`;
+    });
+    
+    html += `</div>
+             <p style="font-size:0.8em; color:#94a3b8; margin-bottom:20px;">Aporta todo el capital extra que tengas a la Prioridad #1 y paga solo la cuota mínima en el resto de las deudas hasta eliminar la primera. Repite el proceso.</p>
+             <button class="btn btn-n" style="width:100%; padding:15px;" onclick="window.open('https://wa.me/56976003402?text=Quiero%20acelerar%20mi%20eliminación%20de%20deudas.%20Solicito%20el%20café%20con%20el%20Coach.','_blank')">☕ SOLICITAR CAFÉ CON COACH</button>`;
+    mostrarResultadoCalc(html);
+}
+
+// BOTÓN 4: HIPOTECARIO
+function abrirModalHipotecario() {
+    document.getElementById('modal-simulador-hipoteca').classList.remove('hidden');
+    document.getElementById('modal-simulador-hipoteca').style.display = 'block';
+}
+
+function cerrarModalHipotecario() {
+    document.getElementById('modal-simulador-hipoteca').classList.add('hidden');
+    document.getElementById('modal-simulador-hipoteca').style.display = 'none';
+}
+
+function ejecutarProyeccionHipotecaria() {
+    let totalIng = ingData.reduce((acc, curr) => acc + curr.monto, 0);
+    if (totalIng === 0) { cerrarModalHipotecario(); return notify("Ingresa tus ingresos primero para calcular tu capacidad de pago."); }
+    
+    let valorPropiedad = parseFloat(document.getElementById('hipoteca-valor-propiedad').value);
+    let tasaAnual = parseFloat(document.getElementById('hipoteca-tasa').value);
+    
+    if (isNaN(valorPropiedad) || isNaN(tasaAnual) || valorPropiedad <= 0) return notify("Ingresa un valor de propiedad y tasa válidos.");
+    
+    let divMaximoSugerido = totalIng * 0.25;
+    let i = (tasaAnual / 100) / 12; // Tasa mensual
+    let moneda = document.getElementById('calc-moneda').value;
+
+    let calcularDividendo = (n_anos) => {
+        let n = n_anos * 12;
+        return (valorPropiedad * i) / (1 - Math.pow(1 + i, -n));
+    };
+
+    let div20 = calcularDividendo(20);
+    let div25 = calcularDividendo(25);
+    let div30 = calcularDividendo(30);
+
+    cerrarModalHipotecario();
+
+    let formatRow = (anos, div) => {
+        let totalPagado = div * (anos * 12);
+        let interes = totalPagado - valorPropiedad;
+        let isOk = div <= divMaximoSugerido;
+        let color = isOk ? "var(--neon-f)" : "#ef4444";
+        let icon = isOk ? "✅" : "⚠️";
+        return `<div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:12px; border-left:4px solid ${color};">
+                    <strong style="color:white; font-family:'Orbitron'; font-size:1.1em;">PLAZO: ${anos} AÑOS</strong> ${icon}
+                    <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:0.9em; color:#cbd5e1;"><span>Dividendo Mensual:</span><strong style="color:${color};">${div.toLocaleString(undefined,{maximumFractionDigits:2})} ${moneda}</strong></div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8em; color:#94a3b8; margin-top:4px;"><span>Intereses Totales al Banco:</span><span>${interes.toLocaleString(undefined,{maximumFractionDigits:2})} ${moneda}</span></div>
+                </div>`;
+    };
+
+    let html = `<h3 style="color:#fbbf24; font-family:'Orbitron';">SIMULADOR DE RIESGO HIPOTECARIO</h3>
+                <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:20px;">Valor Compra: <b style="color:white;">${valorPropiedad.toLocaleString()} ${moneda}</b> | Tasa Anual: <b style="color:white;">${tasaAnual}%</b></p>
+                
+                <div style="background:rgba(251,191,36,0.1); padding:15px; border-radius:12px; margin-bottom:20px; text-align:center; border: 1px dashed #fbbf24;">
+                    <span style="font-size:0.8em; color:#fbbf24; display:block; text-transform:uppercase; font-weight:bold;">Tu Capacidad de Endeudamiento Sano (25%)</span>
+                    <strong style="font-size:1.4em; color:white; font-family:'Orbitron';">${divMaximoSugerido.toLocaleString(undefined,{maximumFractionDigits:2})} ${moneda}/mes</strong>
+                </div>
+                
+                <div style="text-align:left;">
+                    ${formatRow(20, div20)}
+                    ${formatRow(25, div25)}
+                    ${formatRow(30, div30)}
+                </div>
+                <p style="font-size:0.65em; color:#64748b; margin-top:20px; font-style:italic; text-align:justify;">Descargo Legal: Los cálculos son proyecciones matemáticas teóricas de amortización francesa basadas en los datos ingresados y no constituyen una simulación bancaria real. Los resultados están sujetos a políticas crediticias, inflación y seguros asociados de cada institución financiera.</p>`;
+    
+    mostrarResultadoCalc(html);
+}
+
+// BOTÓN 5: GENERADOR PDF ESTADO FINANCIERO
+function ejecutarEstadoFinanciero() {
+    let totalAct = actData.reduce((acc, curr) => acc + curr.monto, 0);
+    let totalPas = pasData.reduce((acc, curr) => acc + curr.monto, 0);
+    let patrimonio = totalAct - totalPas;
+    let moneda = document.getElementById('calc-moneda').value;
+    let nombreUserPrint = sessionUser ? (sessionUser.nombre + " " + sessionUser.apellido) : "Integrante C3D";
+
+    if(actData.length === 0 && pasData.length === 0) return notify("Debes ingresar al menos un Activo o Pasivo para consolidar el Patrimonio.");
+
+    let colorPat = patrimonio >= 0 ? "var(--neon-f)" : "#ef4444";
+    let colorPatHtml = patrimonio >= 0 ? "#10b981" : "#ef4444";
+
+    // Kairo compila el código HTML del PDF In-Memory
+    let htmlPDF = `
+        <html>
+        <head>
+            <title>Estado Financiero - ${nombreUserPrint}</title>
+            <style>
+                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; padding: 40px; background: #ffffff; }
+                .header-container { border-bottom: 3px solid #22d3ee; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
+                h1 { margin: 0; color: #0f172a; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+                .info-text { margin: 5px 0; font-size: 14px; color: #475569; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 14px; }
+                th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+                th { background-color: #f8fafc; color: #0f172a; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+                .summary-box { background: #f8fafc; border-left: 5px solid ${colorPatHtml}; padding: 25px; border-radius: 6px; margin-bottom: 40px; }
+                .footer { margin-top: 50px; font-size: 11px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="header-container">
+                <div>
+                    <h1>Estado Patrimonial Global</h1>
+                    <p class="info-text"><b>Declaración generada para:</b> ${nombreUserPrint}</p>
+                    <p class="info-text"><b>Fecha de Emisión:</b> ${new Date().toLocaleDateString()}</p>
+                    <p class="info-text"><b>Moneda de Expresión:</b> ${moneda}</p>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <h2 style="margin-top:0; color:#0f172a; font-size: 18px;">Resumen Consolidado (Net Worth)</h2>
+                <table style="margin-bottom:0; border:none;">
+                    <tr>
+                        <td style="border:none; padding: 5px 0;"><b>1. Total Activos Declarados:</b></td>
+                        <td style="border:none; text-align:right; padding: 5px 0;">${totalAct.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                        <td style="border:none; padding: 5px 0;"><b>2. Total Pasivos (Deuda):</b></td>
+                        <td style="border:none; text-align:right; color:#ef4444; padding: 5px 0;">- ${totalPas.toLocaleString()}</td>
+                    </tr>
+                    <tr><td colspan="2" style="border-bottom: 1px solid #cbd5e1; padding: 10px 0;"></td></tr>
+                    <tr>
+                        <td style="border:none; padding-top: 15px; font-size: 18px;"><b>PATRIMONIO NETO ACTUAL:</b></td>
+                        <td style="border:none; text-align:right; font-weight:bold; font-size: 18px; color:${colorPatHtml}; padding-top: 15px;">${patrimonio.toLocaleString()} ${moneda}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3 style="color:#0f172a; font-size: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">A. Desglose de Activos</h3>
+            <table>
+                <tr><th>Concepto Registrado</th><th style="text-align:right;">Valor Comercial</th></tr>
+                ${actData.map(a => `<tr><td>${a.concepto}</td><td style="text-align:right;">${a.monto.toLocaleString()}</td></tr>`).join('')}
+                ${actData.length === 0 ? '<tr><td colspan="2" style="text-align:center; color:#94a3b8;">Sin activos declarados.</td></tr>' : ''}
+            </table>
+
+            <h3 style="color:#0f172a; font-size: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">B. Desglose de Pasivos (Deudas)</h3>
+            <table>
+                <tr><th>Concepto Registrado</th><th style="text-align:right;">Monto Deudado</th></tr>
+                ${pasData.map(p => `<tr><td>${p.concepto}</td><td style="text-align:right;">${p.monto.toLocaleString()}</td></tr>`).join('')}
+                ${pasData.length === 0 ? '<tr><td colspan="2" style="text-align:center; color:#94a3b8;">Sin pasivos declarados.</td></tr>' : ''}
+            </table>
+
+            <div class="footer">
+                <p style="margin: 0 0 5px 0; color: #475569; font-weight: bold;">Certificado emitido digitalmente por la plataforma Coach 3D LATAM</p>
+                <p style="text-align: justify; margin: 0; line-height: 1.4;">Descargo de Responsabilidad: Este documento ha sido generado automáticamente de forma algorítmica en base a la información auto-declarada por el usuario en la sesión actual. No constituye un documento legal, tributario ni contable auditable ante instituciones gubernamentales. Coach 3D LATAM no asume responsabilidad civil ni penal por las decisiones de crédito o inversión tomadas a partir de esta consolidación.</p>
+            </div>
+            
+            <script>
+                // Disparo de impresión automatizada al cargar el documento
+                window.onload = function() { 
+                    setTimeout(function() { window.print(); }, 500); 
+                }
+            </script>
+        </body>
+        </html>
+    `;
+
+    // Abrimos una pestaña en blanco y le inyectamos el HTML para que el navegador despliegue el menú de impresión PDF
+    let printWindow = window.open('', '_blank');
+    if(printWindow) {
+        printWindow.document.write(htmlPDF);
+        printWindow.document.close();
+    } else {
+        notify("Tu navegador bloqueó la ventana emergente. Por favor permite los Pop-ups para ver tu PDF.");
+    }
+
+    let htmlUI = `<div style="font-size:3rem; filter:drop-shadow(0 0 10px white); margin-bottom:10px;">📄</div>
+                  <h3 style="color:white; font-family:'Orbitron';">DOCUMENTO GENERADO</h3>
+                  <p style="color:#cbd5e1; font-size:0.9em; margin-bottom:20px;">Kairo ha ensamblado tu Estado Financiero Global. Revisa la nueva pestaña que se acaba de abrir en tu navegador para guardarlo como PDF o imprimirlo.</p>
+                  <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+                      <p style="font-size:0.8em; color:#94a3b8; margin:0 0 5px 0; text-transform:uppercase; letter-spacing:1px;">Tu Patrimonio Neto Declarado es de</p>
+                      <b style="color:${colorPat}; font-size:1.8em; font-family:'Orbitron';">${patrimonio.toLocaleString()} ${moneda}</b>
+                  </div>`;
+    mostrarResultadoCalc(htmlUI);
 }
 
 // =========================================================================
