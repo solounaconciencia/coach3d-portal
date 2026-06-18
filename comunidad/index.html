@@ -3651,7 +3651,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <!-- SIDEBAR DE CARPETAS -->
         <div style="flex: 1 1 200px; max-width: 250px; background: rgba(0,0,0,0.3); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column;">
             <div style="padding: 15px;">
-                <button class="btn btn-n" style="width: 100%; font-size: 0.85em; padding: 12px;" onclick="abrirRedaccionMasiva()">✎ REDACTAR</button>
+                <button id="btn-redactar-buzon" class="btn btn-n hidden" style="width: 100%; font-size: 0.85em; padding: 12px;" onclick="abrirRedaccionMasiva()">✎ REDACTAR</button>
             </div>
             <div id="buzon-carpetas" style="flex: 1; overflow-y: auto;">
                 <div class="buzon-carpeta active" onclick="cambiarCarpetaBuzon(this, 'RECIBIDOS')" style="padding: 15px; cursor: pointer; border-left: 4px solid var(--neon-n); background: rgba(34, 211, 238, 0.1); color: white; font-weight: bold; transition: 0.3s;">📥 Bandeja de Entrada</div>
@@ -3705,26 +3705,40 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     </div>
 </div>
 
-<!-- 🎛️ MODAL: REDACCIÓN MASIVA ADMIN -->
-<div id="modal-redaccion-admin" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000005 !important; width: 95% !important; max-width: 600px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; border-radius: 15px !important;">
+<!-- 🎛️ MODAL: REDACCIÓN OFICIAL (COACH Y ADMIN) -->
+<div id="modal-redaccion-admin" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000005 !important; width: 95% !important; max-width: 600px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; border-radius: 15px !important;">
     <button onclick="cerrarRedaccionMasiva()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
-    <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0; display: flex; align-items: center; gap: 10px;"><span>📢</span> TRANSMISIÓN GLOBAL</h3>
-    <p style="font-size: 0.8em; color: #cbd5e1; margin-bottom: 15px;">Envía mensajes a toda la comunidad o a rangos específicos. Los correos saldrán en lotes automáticos para proteger el servidor.</p>
+    <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0; display: flex; align-items: center; gap: 10px;"><span>📢</span> TRANSMISIÓN DE COMUNICADO</h3>
     
-    <label style="font-size: 0.75em; color: var(--neon-m);">Destinatarios</label>
-    <select id="admin-masivo-destino" style="margin-bottom: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white;">
-        <option value="TODOS">Toda la Comunidad</option>
-        <option value="Suscriptor">Solo Suscriptores VIP</option>
-        <option value="Coach">Solo Coaches</option>
+    <label style="font-size: 0.75em; color: var(--neon-n);">Destinatarios</label>
+    <select id="admin-masivo-destino" style="margin-bottom: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white;" onchange="toggleInputEspecificoBuzon()">
     </select>
     
-    <label style="font-size: 0.75em; color: var(--neon-m);">Asunto</label>
-    <input type="text" id="admin-masivo-asunto" placeholder="Ej: Nueva actualización disponible" style="margin-bottom: 10px;">
+    <input type="email" id="admin-masivo-email-especifico" class="hidden" placeholder="Correo electrónico exacto del usuario..." style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
     
-    <label style="font-size: 0.75em; color: var(--neon-m);">Mensaje</label>
-    <textarea id="admin-masivo-mensaje" rows="6" placeholder="Escribe el comunicado oficial..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; padding: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-bottom: 15px;"></textarea>
+    <label style="font-size: 0.75em; color: var(--neon-n);">Asunto</label>
+    <input type="text" id="admin-masivo-asunto" placeholder="Ej: Nueva sesión de mentoría" style="margin-bottom: 10px;">
     
-    <button id="btn-enviar-masivo" class="btn btn-m" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';" onclick="ejecutarEnvioMasivo()">INICIAR PROTOCOLO DE DIFUSIÓN</button>
+    <label style="font-size: 0.75em; color: var(--neon-n);">Mensaje</label>
+    <textarea id="admin-masivo-mensaje" rows="6" placeholder="Escribe el comunicado..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; padding: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-bottom: 15px;"></textarea>
+    
+    <label id="box-enviar-email-admin" class="hidden" style="display:flex; align-items:center; gap:10px; margin-bottom:15px; font-size:0.8em; color:var(--neon-f); background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; border: 1px dashed var(--neon-f);">
+       <input type="checkbox" id="admin-masivo-enviar-email" style="width:16px; height:16px;">
+       Enviar copia a la bandeja de Correo Electrónico del usuario (Poder de Admin)
+    </label>
+    
+    <button id="btn-enviar-masivo" class="btn btn-n" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';" onclick="ejecutarEnvioMasivo()">ENVIAR MENSAJE</button>
+</div>
+
+<!-- 🎛️ MODAL: LECTOR DE MENSAJES (FRONTEND) -->
+<div id="modal-lector-mensaje" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000010 !important; width: 95% !important; max-width: 600px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 30px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; border-radius: 15px !important; max-height: 85vh !important; display: flex; flex-direction: column;">
+    <button onclick="cerrarLectorMensaje()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; transition: 0.3s;">×</button>
+    <h2 id="lector-asunto" style="color: white; font-family: 'Orbitron'; margin: 0 0 5px 0; font-size: 1.3em;">Asunto</h2>
+    <div style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span id="lector-remitente" style="color: var(--neon-n); font-size: 0.85em; font-weight: bold;"></span>
+        <span id="lector-fecha" style="color: #64748b; font-size: 0.75em;"></span>
+    </div>
+    <div id="lector-cuerpo" style="flex: 1; overflow-y: auto; color: #cbd5e1; font-size: 0.95em; line-height: 1.6; white-space: pre-wrap; padding-right: 10px;"></div>
 </div>
     
 <!-- 🎛️ MODAL: DECLARAR REFERIDO -->
@@ -11215,42 +11229,6 @@ function cerrarModalFrase() {
     document.getElementById('main-content').classList.remove('blur-effect');
 }
 
-async function confirmarDiaDesafio() {
-    trackAccionValiosa("Constancia", "Marcó Día en Reto 90");
-    const btn = document.querySelector('#modal-frase-diaria button');
-    btn.innerText = "SINCRONIZANDO CON LA MATRIX..."; 
-    btn.disabled = true;
-
-    const res = await apiCall("registrarDiaDesafio", { email: sessionUser.email });
-
-    btn.innerText = "ACEPTAR Y MARCAR DÍA"; 
-    btn.disabled = false;
-
-    if (res && res.success) {
-        cerrarModalFrase();
-        progresoUsuarioCache.racha = res.racha;
-        renderizarTablero90Dias(); // Redibuja el tablero en vivo
-
-        if (res.racha === 1 && res.rachaAnterior > 0) {
-            // Gatillo Aversión a la Pérdida
-            kairoMessage({mensaje: "Kairo ha detectado una fisura en tu constancia. Has perdido un día y tu racha ha vuelto a 0. El dolor es el mejor maestro. Levántate y vuelve a empezar.", icon: "⚠️"});
-        } else if (res.hito === 30 || res.hito === 60) {
-            // Premio VIP Temporal
-            sessionUser.rango = "Suscriptor"; 
-            sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser)); // Guardamos en memoria
-            kairoMessage({mensaje: `¡HITO ALCANZADO! Por superar los ${res.hito} días, Kairo te ha otorgado el rango de Suscriptor VIP de forma gratuita y temporal. Disfruta los beneficios del 2%.`, icon: "🎁"});
-        } else if (res.hito === 90) {
-            // Invitación a Coach
-            abrirModalSerCoach();
-        } else {
-            notify("✅ Día registrado con éxito en la Matrix.");
-        }
-    } else {
-        notify("❌ " + (res ? res.msg : "Error al conectar con la base de datos."));
-        cerrarModalFrase();
-    }
-}
-
 // Lógica Formulario Ser Coach
 function abrirModalSerCoach() {
     document.getElementById('main-content').classList.add('blur-effect');
@@ -11300,17 +11278,24 @@ async function enviarSolicitudCoach90Dias() {
 // =========================================================
 // 📩 MOTOR CORE: BUZÓN Y CHAT "MI COACH"
 // =========================================================
-
 function iniciarbuzon() {
-    apagarTodosLosModulos(); // 🛡️ EL INTERRUPTOR MAESTRO FOCUS
+    apagarTodosLosModulos(); 
     const modulo = document.getElementById('modulo-buzon');
     if (modulo) {
         modulo.classList.remove('hidden');
+        
+        // 🛡️ CONTROL DE PODERES: Solo Coach y Admin ven el botón de Redactar
+        const btnRedactar = document.getElementById('btn-redactar-buzon');
+        if (sessionUser && (sessionUser.rango === "Admin" || sessionUser.rango === "Coach")) {
+            btnRedactar.classList.remove('hidden');
+        } else {
+            btnRedactar.classList.add('hidden');
+        }
+
         notify("Sincronizando con el servidor de correos...");
-        sincronizarBuzonMatrix(); // ⚡ Motor encendido
+        sincronizarBuzonMatrix(); 
     }
 }
-
 function cambiarCarpetaBuzon(elemento, carpeta) {
     document.querySelectorAll('.buzon-carpeta').forEach(el => {
         el.classList.remove('active');
@@ -11353,53 +11338,6 @@ function cerrarMiCoach() {
     document.getElementById('chat-contador').innerText = "0/500";
 }
 
-function abrirRedaccionMasiva() {
-    if(sessionUser.rango !== "Admin") {
-        return notify("Acceso Denegado: Solo el Alto Consejo puede emitir transmisiones globales.");
-    }
-    document.getElementById('modulo-buzon').classList.add('blur-effect');
-    const modal = document.getElementById('modal-redaccion-admin');
-    modal.classList.remove('hidden');
-    modal.style.display = 'block';
-}
-
-function cerrarRedaccionMasiva() {
-    document.getElementById('modal-redaccion-admin').classList.add('hidden');
-    document.getElementById('modal-redaccion-admin').style.display = 'none';
-    document.getElementById('modulo-buzon').classList.remove('blur-effect');
-}
-
-async function ejecutarEnvioMasivo() {
-    const destino = document.getElementById('admin-masivo-destino').value;
-    const asunto = document.getElementById('admin-masivo-asunto').value.trim();
-    const mensaje = document.getElementById('admin-masivo-mensaje').value.trim();
-
-    if(!asunto || !mensaje) return notify("El asunto y el mensaje son obligatorios.");
-
-    const btn = document.getElementById('btn-enviar-masivo');
-    btn.innerText = "INYECTANDO A LA COLA DE CORREOS...";
-    btn.disabled = true;
-
-    const res = await apiCall("adminProgramarMasivo", {
-        remitente: sessionUser.email,
-        destinatario: destino,
-        asunto: asunto,
-        mensaje: mensaje
-    });
-
-    btn.innerText = "INICIAR PROTOCOLO DE DIFUSIÓN";
-    btn.disabled = false;
-
-    if(res && res.success) {
-        notify("✅ Difusión encolada con éxito. Kairo enviará los correos progresivamente y aparecerán en la bandeja del sistema de los usuarios.");
-        cerrarRedaccionMasiva();
-        document.getElementById('admin-masivo-asunto').value = "";
-        document.getElementById('admin-masivo-mensaje').value = "";
-        sincronizarBuzonMatrix(); // Refrescar para ver el mensaje en "Enviados"
-    } else {
-        notify("❌ Error de comunicación: " + (res ? res.msg : "Sin conexión"));
-    }
-}
 
 let buzonCache = [];
 let miCoachEmailCache = "";
@@ -11417,6 +11355,8 @@ async function sincronizarBuzonMatrix() {
     }
 }
 
+
+
 function renderizarListaBuzon(carpeta) {
     buzonCarpetaActual = carpeta;
     const contenedor = document.getElementById('buzon-lista-mensajes');
@@ -11425,35 +11365,41 @@ function renderizarListaBuzon(carpeta) {
     let filtrados = [];
     const miEmail = sessionUser.email.toLowerCase();
 
-    // Filtros de Carpeta Inteligentes
     if(carpeta === "RECIBIDOS") {
-        filtrados = buzonCache.filter(m => m.tipo !== "CHAT" && (m.destinatario.toLowerCase() === miEmail || m.destinatario === "todos"));
+        filtrados = buzonCache.filter(m => m.tipo !== "CHAT" && (m.destinatario.toLowerCase() === miEmail || m.destinatario === "todos" || m.destinatario.includes(miEmail)));
     } else if(carpeta === "ENVIADOS") {
         filtrados = buzonCache.filter(m => m.remitente.toLowerCase() === miEmail && m.tipo !== "CHAT");
     } else if(carpeta === "SISTEMA") {
-        filtrados = buzonCache.filter(m => m.tipo === "ALERTA" && (m.destinatario.toLowerCase() === miEmail || m.destinatario === "todos"));
+        filtrados = buzonCache.filter(m => m.tipo === "ALERTA" && (m.destinatario.toLowerCase() === miEmail || m.destinatario === "todos" || m.destinatario.includes(miEmail)));
     }
 
-    // Buscador Interno
     const query = document.getElementById('buzon-buscador').value.toLowerCase().trim();
     if(query !== "") {
         filtrados = filtrados.filter(m => m.remitente.toLowerCase().includes(query) || m.asunto.toLowerCase().includes(query) || m.cuerpo.toLowerCase().includes(query));
     }
 
-    // Orden Cronológico
     filtrados.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
 
     if(filtrados.length === 0) {
-        contenedor.innerHTML = "<p style='color:#94a3b8; text-align:center; margin-top:20px;'>Bandeja limpia. Sin mensajes aquí.</p>";
+        contenedor.innerHTML = `
+            <div style="background: rgba(34, 211, 238, 0.05); padding: 30px; border-radius: 12px; border: 1px dashed var(--neon-n); text-align: center; margin-top: 20px;">
+                <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.8;">📬</div>
+                <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0;">Bandeja al día</h3>
+                <p style="color: #cbd5e1; font-size: 0.9em; line-height: 1.5; margin-bottom: 20px;">No tienes correos pendientes de leer. Recuerda que tienes una línea directa y privada con tu Coach para acelerar tus resultados. Kairo te sugiere utilizarla.</p>
+                <button class="btn btn-n" style="padding: 10px 20px;" onclick="abrirMiCoach()">💬 HABLAR CON MI COACH AHORA</button>
+            </div>
+        `;
         return;
     }
 
     filtrados.forEach(m => {
-        const esNoLeido = (m.estado === "NO_LEIDO" && m.destinatario.toLowerCase() === miEmail) ? "font-weight: bold; color: white;" : "color: #cbd5e1;";
+        const esNoLeido = (m.estado === "NO_LEIDO" && m.destinatario.toLowerCase() !== sessionUser.email.toLowerCase() && carpeta === "RECIBIDOS") ? "font-weight: bold; color: white; border-left: 4px solid var(--neon-n);" : "color: #cbd5e1; border-left: 1px solid transparent;";
         const fechaStr = new Date(m.fecha).toLocaleDateString();
+        const asuntoSafe = m.asunto.replace(/'/g, "\\'");
+        const cuerpoSafe = m.cuerpo.replace(/'/g, "\\'").replace(/\n/g, "<br>");
 
         contenedor.innerHTML += `
-            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; ${esNoLeido}" onclick="notify('Visualizador de correo interno en desarrollo.')">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; ${esNoLeido}" onclick="abrirLectorMensaje('${m.id}', '${m.remitente}', '${m.fecha}', '${asuntoSafe}', '${cuerpoSafe}', '${m.estado}')">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                     <span style="font-size:0.8em; color:var(--neon-n);">${m.remitente}</span>
                     <span style="font-size:0.7em; color:#64748b;">${fechaStr}</span>
@@ -11753,9 +11699,17 @@ function abrirModalFrase(dia) {
     diaActualSeleccionado = dia;
     document.getElementById('desafio-dia-num').innerText = dia;
     
-    // Buscar la frase en la memoria, si no, poner genérica
+    // 🧠 NEURO-PROGRAMACIÓN: Textos de Alto Impacto para Hitos Clave
+    const neuroFrases = {
+        1: "El 98% se rinde hoy mismo. Tú no eres la mayoría. La disciplina es el precio exacto de tu libertad.",
+        30: "🔥 HITO DESBLOQUEADO: Has sobrevivido al primer mes. Tu mente ahora forja acero. El dolor es debilidad abandonando tu cuerpo.",
+        60: "⚡ HITO DESBLOQUEADO: Dos meses de constancia absoluta. La Matrix comienza a inclinarse a tu favor. Ya eres imparable.",
+        90: "👑 EL CAMINO DEL 2%: Has dominado tu biología y tu mente. Estás listo para guiar a otros. Eres la Élite."
+    };
+
+    // Buscar la frase en la memoria de Sheets, si no, usar la neuro-frase o una genérica
     const objFrase = cacheFrases90Dias.find(f => parseInt(f.dia) === parseInt(dia));
-    const fraseTexto = objFrase ? objFrase.frase : `Día ${dia}: Hoy decido construir la mejor versión de mí mismo.`;
+    const fraseTexto = objFrase ? objFrase.frase : (neuroFrases[dia] || `Día ${dia}: La constancia es la llave maestra de la Matrix. Mantén el ritmo y no te detengas.`);
     
     document.getElementById('desafio-frase-texto').innerText = fraseTexto;
     
@@ -11794,29 +11748,43 @@ async function confirmarDiaDesafio() {
 
     if (res && res.success) {
         cerrarModalFrase();
-        iniciarDesafio90(); // Recarga el tablero para pintar la casilla
         
-        // Lanzamos el modal de Graduación si llegó al 90
+        // 🔥 MEJORA RECUPERADA: Actualización instantánea y fluida sin recargar todo el módulo
+        progresoUsuarioCache.racha = res.racha;
+        renderizarTablero90Dias(); 
+        
+        // 🏆 HITOS VIP (Dopamina)
         if (res.hito === 90) {
             setTimeout(() => {
                 document.getElementById('main-content').classList.add('blur-effect');
-                document.getElementById('modal-invitacion-coach').classList.remove('hidden');
-                document.getElementById('modal-invitacion-coach').style.display = 'block';
+                abrirModalSerCoach(); // Llamada directa y limpia a la función del Coach
             }, 1000);
         } else if (res.hito === 30 || res.hito === 60) {
             setTimeout(() => {
                 sessionUser.rango = "Suscriptor";
                 sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
-                kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡RANGO VIP DESBLOQUEADO! 👑</h3><p>Tu constancia te ha premiado. Haz ascendido a Suscriptor en la Matrix.</p>`, icon: '🎖️' });
+                
+                let tituloHito = res.hito === 30 ? "NIVEL 1 SUPERADO" : "NIVEL 2 SUPERADO";
+                let msjHito = res.hito === 30 ? "El 90% de las personas renuncia antes del día 30. Tú no. Como recompensa a tu inquebrantable disciplina, Kairo te ha ascendido a Suscriptor VIP." : "Dos meses forjando tu mente. Tu constancia es absoluta. Kairo renueva tu pase VIP a la Élite.";
+                
+                kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡${tituloHito}! 👑</h3><p>${msjHito} Disfruta los beneficios del 2%.</p>`, icon: '🎖️' });
                 loadDashboard(); // Refresca los colores del perfil
             }, 1000);
+            
+        // 💔 AVERSIÓN A LA PÉRDIDA (Racha Rota)
+        } else if (res.racha === 1 && res.rachaAnterior > 0) {
+            kairoMessage({mensaje: "<h3 style='color:#ef4444; font-family:Orbitron;'>RACHA DESTRUIDA</h3><p>Kairo ha detectado una fisura en tu disciplina. Has fallado un día y tu progreso de <b>" + res.rachaAnterior + " días</b> se ha reducido a cero. El dolor del arrepentimiento es el mejor maestro. Levántate y recupera tu honor.</p>", icon: "⚠️"});
+            
+        // ✅ PROGRESO NORMAL
+        } else {
+            notify("✅ Día " + res.racha + " asegurado en la Matrix. Sigue avanzando.");
         }
     } else {
         notify("❌ " + (res ? res.msg : "Error de conexión."));
         cerrarModalFrase();
     }
 }
-
+        
 function cerrarModalFrase() {
     document.getElementById('modal-frase-diaria').classList.add('hidden');
     document.getElementById('modal-frase-diaria').style.display = 'none';
@@ -12184,6 +12152,120 @@ function actualizarGraficoAdmin() {
     
     let chartAdm = new google.visualization.LineChart(document.getElementById('chart-admin'));
     chartAdm.draw(dataAdm, baseOptions);
+}
+
+// Funciones del Lector de Mensajes
+function abrirLectorMensaje(id, remitente, fecha, asunto, cuerpo, estado) {
+    document.getElementById('modulo-buzon').classList.add('blur-effect');
+    document.getElementById('lector-asunto').innerText = asunto;
+    document.getElementById('lector-remitente').innerText = "De: " + remitente;
+    document.getElementById('lector-fecha').innerText = new Date(fecha).toLocaleString();
+    document.getElementById('lector-cuerpo').innerHTML = cuerpo;
+    
+    document.getElementById('modal-lector-mensaje').classList.remove('hidden');
+    document.getElementById('modal-lector-mensaje').style.display = 'flex';
+
+    if(estado === "NO_LEIDO" && remitente.toLowerCase() !== sessionUser.email.toLowerCase()) {
+        apiCall("marcarMensajeLeido", { idMensaje: id, email: sessionUser.email }).then(res => {
+            if(res && res.success) {
+                let m = buzonCache.find(x => x.id === id);
+                if(m) m.estado = "LEIDO";
+                renderizarListaBuzon(buzonCarpetaActual);
+            }
+        });
+    }
+}
+
+function cerrarLectorMensaje() {
+    document.getElementById('modal-lector-mensaje').classList.add('hidden');
+    document.getElementById('modal-lector-mensaje').style.display = 'none';
+    document.getElementById('modulo-buzon').classList.remove('blur-effect');
+}
+
+// Control Dinámico de Redacción según Rango
+function abrirRedaccionMasiva() {
+    const modal = document.getElementById('modal-redaccion-admin');
+    const selectDestino = document.getElementById('admin-masivo-destino');
+    const cajaEmail = document.getElementById('box-enviar-email-admin');
+    
+    selectDestino.innerHTML = "";
+    document.getElementById('admin-masivo-email-especifico').classList.add('hidden');
+
+    if (sessionUser.rango === "Admin") {
+        selectDestino.innerHTML = `
+            <option value="TODOS">Toda la Comunidad (Masivo)</option>
+            <option value="Suscriptor">Solo Suscriptores VIP</option>
+            <option value="Coach">Solo Coaches</option>
+            <option value="ESPECIFICO">Escribir a un Usuario Específico</option>
+        `;
+        cajaEmail.classList.remove('hidden');
+    } else if (sessionUser.rango === "Coach") {
+        selectDestino.innerHTML = `
+            <option value="MI_RED|${sessionUser.email}">Mi Organización (Descendencia directa hasta 6 Niveles)</option>
+            <option value="ESPECIFICO">Escribir a un Usuario Específico de mi red</option>
+        `;
+        cajaEmail.classList.add('hidden');
+    }
+
+    document.getElementById('modulo-buzon').classList.add('blur-effect');
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+}
+
+function cerrarRedaccionMasiva() {
+    document.getElementById('modal-redaccion-admin').classList.add('hidden');
+    document.getElementById('modal-redaccion-admin').style.display = 'none';
+    document.getElementById('modulo-buzon').classList.remove('blur-effect');
+}
+
+function toggleInputEspecificoBuzon() {
+    const destino = document.getElementById('admin-masivo-destino').value;
+    if (destino === "ESPECIFICO") {
+        document.getElementById('admin-masivo-email-especifico').classList.remove('hidden');
+    } else {
+        document.getElementById('admin-masivo-email-especifico').classList.add('hidden');
+    }
+}
+
+async function ejecutarEnvioMasivo() {
+    let destino = document.getElementById('admin-masivo-destino').value;
+    if (destino === "ESPECIFICO") {
+        const mailEsp = document.getElementById('admin-masivo-email-especifico').value.trim();
+        if(!mailEsp) return notify("Debes escribir el correo electrónico específico.");
+        destino = "ESPECIFICO|" + mailEsp;
+    }
+
+    const asunto = document.getElementById('admin-masivo-asunto').value.trim();
+    const mensaje = document.getElementById('admin-masivo-mensaje').value.trim();
+    const enviarCopiaEmail = document.getElementById('admin-masivo-enviar-email') ? document.getElementById('admin-masivo-enviar-email').checked : false;
+
+    if(!asunto || !mensaje) return notify("El asunto y el mensaje son obligatorios.");
+
+    const btn = document.getElementById('btn-enviar-masivo');
+    btn.innerText = "Sincronizando con la Matrix...";
+    btn.disabled = true;
+
+    const res = await apiCall("adminProgramarMasivo", {
+        remitente: sessionUser.email,
+        destinatario: destino,
+        asunto: asunto,
+        mensaje: mensaje,
+        enviarEmail: enviarCopiaEmail
+    });
+
+    btn.innerText = "ENVIAR MENSAJE";
+    btn.disabled = false;
+
+    if(res && res.success) {
+        notify("✅ Mensaje despachado exitosamente.");
+        cerrarRedaccionMasiva();
+        document.getElementById('admin-masivo-asunto').value = "";
+        document.getElementById('admin-masivo-mensaje').value = "";
+        document.getElementById('admin-masivo-email-especifico').value = "";
+        sincronizarBuzonMatrix(); 
+    } else {
+        notify("❌ Error de comunicación: " + (res ? res.msg : "Sin conexión"));
+    }
 }
 </script>
 
