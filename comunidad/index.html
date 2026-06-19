@@ -5208,6 +5208,10 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           let musculoVal = Number(sData.perfil.musculo) || 0;
           let restoVal = 100 - grasaVal - musculoVal;
           if (restoVal < 0) restoVal = 0; // Seguro matemático por si los datos superan 100
+          // 🛡️ SUTURA DE PRECISIÓN: Cortar los decimales fantasma de JavaScript
+          restoVal = Number(restoVal.toFixed(1));
+          grasaVal = Number(grasaVal.toFixed(1));
+          musculoVal = Number(musculoVal.toFixed(1));
 
           document.getElementById('dash-comp-peso').innerText = (sData.perfil.peso || 0) + " kg";
           document.getElementById('dash-comp-grasa').innerText = grasaVal + " %";
@@ -7938,18 +7942,20 @@ function mostrarResultadoCalc(html) {
         let totalPas = pasData.reduce((acc, curr) => acc + curr.monto, 0);
 
         apiCall("guardarEnBD", {
-            email: sessionUser.email,
-            totalIng: totalIng,
-            totalGas: totalGas,
-            flujo: totalIng - totalGas,
-            porcentajeUso: totalIng > 0 ? (totalGas / totalIng) * 100 : 100,
-            rangoEstado: "Consolidado",
-            ingObjetivo: totalGas > 0 ? totalGas / 0.5 : 0,
-            diezPorcientoOro: totalGas > 0 ? Math.floor((totalGas / 0.5) * 0.1) : 0,
-            totalAct: totalAct,
-            totalPas: totalPas,
-            gastosJson: JSON.stringify(gasData), // Mandamos el JSON crudo para armar la Dona
-            items: [] 
+            datos: { // 🛡️ SUTURA CRÍTICA: Faltaba esta envoltura para que el Backend lo leyera
+                email: sessionUser.email,
+                totalIng: totalIng,
+                totalGas: totalGas,
+                flujo: totalIng - totalGas,
+                porcentajeUso: totalIng > 0 ? (totalGas / totalIng) * 100 : 100,
+                rangoEstado: "Consolidado",
+                ingObjetivo: totalGas > 0 ? totalGas / 0.5 : 0,
+                diezPorcientoOro: totalGas > 0 ? Math.floor((totalGas / 0.5) * 0.1) : 0,
+                totalAct: totalAct,
+                totalPas: totalPas,
+                gastosJson: JSON.stringify(gasData), // Mandamos el JSON crudo para armar la Dona
+                items: [] 
+            }
         });
     }
 }
