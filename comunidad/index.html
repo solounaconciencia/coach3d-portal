@@ -5198,7 +5198,7 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           let patrimonioNeto = Number(sData.finanzas.activos) - Number(sData.finanzas.pasivos);
           let colorPatrimonio = patrimonioNeto >= 0 ? "var(--neon-f)" : "#ef4444";
 
-          if (gastosArr.length > 0) {
+          if (gastosArr.length > 0 && totalIngresos > 0) {
               let labels = gastosArr.map(g => g.concepto);
               let data = gastosArr.map(g => g.monto);
               let flujoDisponible = totalIngresos - totalGastos;
@@ -5224,8 +5224,8 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
               };
               chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent(JSON.stringify(qcConfig));
           } else {
-              // Estado inicial sin gastos registrados
-              chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent("{type:'doughnut',data:{labels:['Sin Gastos', 'Ingreso Disponible'],datasets:[{data:[0,1],backgroundColor:['#334155', '#10b981']}]}}");
+              // Estado inicial sin ingresos registrados o sin gastos
+              chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent("{type:'doughnut',data:{labels:['Sin Flujo', 'Ingreso Disponible'],datasets:[{data:[0,1],backgroundColor:['#334155', '#10b981']}]}}");
           }
 
           document.getElementById('dash-data-fin').innerHTML = `
@@ -5256,48 +5256,6 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
             
             <div style="background:rgba(0,0,0,0.5); border-radius:10px; padding:15px; margin-bottom:15px;">
                 <h4 style="color: white; font-family:'Orbitron'; font-size:0.8em; margin: 0 0 10px 0; text-align:center;">PROPORCIÓN DEL INGRESO TOTAL</h4>
-                <img src="${chartUrl}" style="width: 100%; max-width:300px; margin:0 auto; display:block;">
-            </div>
-            <button class="btn btn-n" style="width:100%; font-size:0.75em; padding:12px;" onclick="iniciarcalculadorafinanciera()">ACTUALIZAR ESTADO FINANCIERO</button>
-          `;
-      } else {
-          document.getElementById('dash-empty-fin').classList.remove('hidden');
-          document.getElementById('dash-data-fin').classList.add('hidden');
-      }
-              let labels = gastosArr.map(g => g.concepto);
-              let data = gastosArr.map(g => g.monto);
-              let qcConfig = {
-                  type: 'doughnut',
-                  data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#ef4444', '#f97316', '#fbbf24', '#22d3ee', '#a855f7', '#64748b'], borderWidth: 0 }] },
-                  options: { plugins: { legend: { position: 'right', labels: { fontColor: '#fff', fontSize: 10 } }, datalabels: { display: false } }, cutoutPercentage: 65 }
-              };
-              chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent(JSON.stringify(qcConfig));
-          } else {
-              chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent("{type:'doughnut',data:{labels:['Sin Gastos'],datasets:[{data:[1],backgroundColor:['#334155']}]}}");
-          }
-
-          document.getElementById('dash-data-fin').innerHTML = `
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; text-align:left; margin-bottom:15px;">
-                <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; border-left:3px solid var(--neon-f);">
-                    <span style="font-size:0.65em; color:#94a3b8; display:block;">INGRESOS</span>
-                    <strong style="color:var(--neon-f); font-size:1.2em; font-family:'Orbitron';">$${sData.finanzas.ingresos.toLocaleString()}</strong>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; border-left:3px solid #ef4444;">
-                    <span style="font-size:0.65em; color:#94a3b8; display:block;">GASTOS</span>
-                    <strong style="color:#ef4444; font-size:1.2em; font-family:'Orbitron';">$${sData.finanzas.gastos.toLocaleString()}</strong>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; border-left:3px solid var(--neon-n);">
-                    <span style="font-size:0.65em; color:#94a3b8; display:block;">ACTIVOS</span>
-                    <strong style="color:var(--neon-n); font-size:1.2em; font-family:'Orbitron';">$${sData.finanzas.activos.toLocaleString()}</strong>
-                </div>
-                <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; border-left:3px solid var(--neon-m);">
-                    <span style="font-size:0.65em; color:#94a3b8; display:block;">PASIVOS</span>
-                    <strong style="color:var(--neon-m); font-size:1.2em; font-family:'Orbitron';">$${sData.finanzas.pasivos.toLocaleString()}</strong>
-                </div>
-            </div>
-            
-            <div style="background:rgba(0,0,0,0.5); border-radius:10px; padding:15px; margin-bottom:15px;">
-                <h4 style="color: white; font-family:'Orbitron'; font-size:0.8em; margin: 0 0 10px 0; text-align:center;">DISTRIBUCIÓN DE GASTOS</h4>
                 <img src="${chartUrl}" style="width: 100%; max-width:300px; margin:0 auto; display:block;">
             </div>
             <button class="btn btn-n" style="width:100%; font-size:0.75em; padding:12px;" onclick="iniciarcalculadorafinanciera()">ACTUALIZAR ESTADO FINANCIERO</button>
