@@ -4886,8 +4886,21 @@ async function loadDashboard() {
                   const montoItem = localStorage.getItem('kairo_ecommerce_monto');
                   const detalleItem = localStorage.getItem('kairo_ecommerce_detalle');
                   const tokenEcom = localStorage.getItem('kairo_ecommerce_token_anonimo');
+                  const slotId = localStorage.getItem('kairo_ecommerce_slot_id');
+                  const coachName = localStorage.getItem('kairo_ecommerce_coach_name');
                   
                   var emailComprador = sessionUser ? sessionUser.email : "ANÓNIMO";
+
+                  // 🛡️ FIJACIÓN DE CALENDARIO: Aseguramos la cita que estaba pendiente de pago
+                  if (slotId && slotId !== "") {
+                      apiCall("consolidarReservaGratuita", {
+                          idHorario: slotId,
+                          token: tokenEcom,
+                          email: emailComprador,
+                          sku: skuItem,
+                          coach: coachName || "Coach de Turno"
+                      });
+                  }
 
                   // 1. Registramos asíncronamente la transacción en el nuevo HISTORIAL_COMPRAS
                   apiCall("registrarCompraHistorial", {
@@ -8337,7 +8350,6 @@ async function ejecutarAccionComercialServicio() {
     const s = servicioSeleccionadoActivo;
     if (!s) return;
 
-    // 🛡️ REGLA INTERCEPTORA: Si es un servicio con variantes y el Paso B está oculto, avanzamos el embudo primero
     if (s.accion === "VARIOS" && document.getElementById('ser-varios-paso-B').classList.contains('hidden')) {
         avanzarEmbudoRegaloVarios();
         return;
@@ -8351,7 +8363,16 @@ async function ejecutarAccionComercialServicio() {
     var tokenCompra = "TK-" + new Date().getTime() + "-" + Math.floor(Math.random() * 1000);
     var detalleString = "Compra Directa WhatsApp";
 
-    // 🛡️ BYPASS TRINIDAD - ACCIÓN: WHATSAPP (Va directo al chat sin importar el precio o pasarela)
+    // 🛡️ FOCUS: Capturamos el nombre del Coach INMEDIATAMENTE
+    let coachElegido = s.coach || ""; 
+    if (s.accion === "RESERVA") {
+        const sel = document.getElementById('ser-coach-elegido');
+        if (sel && sel.selectedIndex > 0) {
+            coachElegido = sel.options[sel.selectedIndex].text;
+            detalleString = `Reserva Agendada | Coach: ${coachElegido}`;
+        }
+    }
+
     if (s.accion === "WHATSAPP") {
         let txtMensajeDirecto = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Solicito información directa sobre el programa: "${s.nombre}".`);
         window.open(`https://wa.me/56976003402?text=${txtMensajeDirecto}`, '_blank');
@@ -8359,54 +8380,38 @@ async function ejecutarAccionComercialServicio() {
         return;
     }
 
-    // 🛡️ TRINIDAD - ACCIÓN: VARIOS (Captura relacional de Variantes desde tu hoja de PRODUCTOS)
     if (s.accion === "VARIOS") {
         const skuRegalo = document.getElementById('ser-select-regalo').value;
         const regaloObj = cacheRegalosDisponibles.find(x => x.sku === skuRegalo);
         const nombreRegalo = regaloObj ? regaloObj.nombre : "Regalo Suplemento";
         const comboSabores = document.getElementById('ser-select-sabor');
-        
         if (comboSabores && comboSabores.options.length > 0 && !document.getElementById('ser-contenedor-sabores').classList.contains('hidden')) {
-            const saborElegido = comboSabores.value;
-            detalleString = `Regalo: ${nombreRegalo} (Sabor: ${saborElegido}) | SKU Regalo: ${skuRegalo}`;
+            detalleString = `Regalo: ${nombreRegalo} (Sabor: ${comboSabores.value}) | SKU Regalo: ${skuRegalo}`;
         } else {
             detalleString = `Regalo: ${nombreRegalo} | SKU Regalo: ${skuRegalo}`;
         }
     }
 
-    // 🛡️ TRINIDAD - ACCIÓN: RESERVA (Bloqueo de agenda interactiva en tu cuadrícula mensual)
     if (s.accion === "RESERVA") {
-        if (!slotSeleccionadoCacheId) {
-            return notify("Por favor, selecciona un día y una hora en el calendario antes de continuar.");
-        }
-        
-        // Si el servicio es gratis, consolida directo en Sheets; si es de pago, pasa por el retenedor temporal
+        if (!slotSeleccionadoCacheId) return notify("Por favor, selecciona un día y una hora en el calendario.");
         if (precioFinalACobrar > 0) {
             document.getElementById('ser-btn-accion').innerText = "⚡ RETENIENDO HORARIO...";
-            const resBloqueo = await apiCall("intentarBloqueoTemporalHorario", {
-                idHorario: slotSeleccionadoCacheId,
-                email: emailUser,
-                sku: s.sku
-            });
-
+            const resBloqueo = await apiCall("intentarBloqueoTemporalHorario", { idHorario: slotSeleccionadoCacheId, email: emailUser, sku: s.sku });
             if (!resBloqueo || !resBloqueo.success) {
-                notify(resBloqueo ? resBloqueo.msg : "Ese horario acaba de ser tomado. Por favor, selecciona otro bloque.");
+                notify(resBloqueo ? resBloqueo.msg : "Ese horario acaba de ser tomado. Selecciona otro bloque.");
                 inicializarCalendarioEcomm3D(s.sku);
                 return;
             }
-            detalleString = `Hora Reservada: ${resBloqueo.fecha} a las ${resBloqueo.hora}`;
+            detalleString += ` | Hora: ${resBloqueo.fecha} a las ${resBloqueo.hora}`;
         } else {
-            await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre });
-            detalleString = `Reserva de Cortesía Agendada con Éxito`;
+            await apiCall("consolidarReservaGratuita", { idHorario: slotSeleccionadoCacheId, token: tokenCompra, email: emailUser, sku: s.sku, nombre: s.nombre, coach: coachElegido });
         }
     }
 
-    // 🛡️ PERSISTENCIA INTEGRAL: Si el servicio con variantes es GRATIS, lo registramos en la hoja antes de abrir el chat
     if (s.accion === "VARIOS" && precioFinalACobrar === 0) {
         await apiCall("registrarVarianteGratuitaBD", { token: tokenCompra, email: emailUser, sku: s.sku, detalle: detalleString });
     }
 
-    // 🛡️ CONTROL BANCARIO: Redirección exclusiva para servicios de Pago
     if (precioFinalACobrar > 0) {
         localStorage.setItem('kairo_ecommerce_sku', s.sku);
         localStorage.setItem('kairo_ecommerce_nombre', s.nombre);
@@ -8416,42 +8421,26 @@ async function ejecutarAccionComercialServicio() {
         localStorage.setItem('kairo_ecommerce_detalle', detalleString);
         localStorage.setItem('kairo_ecommerce_tipo', "SERVICIOS");
         localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS");
-        if (s.accion === "RESERVA") localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoCacheId);
+        
+        // 🛡️ INYECCIÓN VITAL PARA QUE NO SE PIERDA LA RESERVA TRAS PAGAR
+        if (s.accion === "RESERVA") {
+            localStorage.setItem('kairo_ecommerce_slot_id', slotSeleccionadoCacheId);
+            localStorage.setItem('kairo_ecommerce_coach_name', coachElegido);
+        }
+        
         if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
 
-        // 🛡️ FOCUS: Capturamos el nombre del Coach priorizando la Columna L (s.coach)
-        let coachElegido = s.coach || ""; 
-        if (s.accion === "RESERVA") {
-            const sel = document.getElementById('ser-coach-elegido');
-            if (sel && sel.selectedIndex > 0) {
-                coachElegido = sel.options[sel.selectedIndex].text;
-                detalleString += ` | Coach: ${coachElegido}`;
-            }
-        }
-
         cerrarDetalleServicio();
-        
-        // LIMPIAMOS EL CARRITO E INYECTAMOS EL SERVICIO ÚNICO PARA EL CHECKOUT
-        carritoCompras = [{
-            sku: s.sku, nombre: s.nombre, precio: precioFinalACobrar, variante: s.accion, cantidad: 1, foto: s.urlImagen
-        }];
-        
-        // Llamamos al Checkout Inteligente pasándole el nombre del Coach y avisando que es Compra Directa
+        carritoCompras = [{ sku: s.sku, nombre: s.nombre, precio: precioFinalACobrar, variante: s.accion, cantidad: 1, foto: s.urlImagen }];
         abrirCheckout(coachElegido, true, precioFinalACobrar);
         return;
     }
 
-    // --- SALIDA AUTOMATIZADA EXCLUSIVA PARA SERVICIOS GRATUITOS ---
-    // 🛡️ ENLACE FASE 4: Disparo asíncrono de correos premium (Comprobante Cliente + Auditoría Diego)
-    apiCall("dispararNotificacionesEmailServicio", {
-        emailUsuario: emailUser,
-        nombreUsuario: nombreUser,
-        nombreServicio: s.nombre,
-        skuServicio: s.sku,
-        monto: 0,
-        detalle: detalleString,
-        pais: paisUser
-    });
+    apiCall("dispararNotificacionesEmailServicio", { emailUsuario: emailUser, nombreUsuario: nombreUser, nombreServicio: s.nombre, skuServicio: s.sku, monto: 0, detalle: detalleString, pais: paisUser });
+    let txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de procesar el acceso de cortesía para: "${s.nombre}" (${detalleString}).`);
+    window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
+    cerrarDetalleServicio();
+}
 
     let txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de procesar el acceso de cortesía para: "${s.nombre}" (${detalleString}).`);
     window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
