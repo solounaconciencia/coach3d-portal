@@ -8513,11 +8513,6 @@ async function ejecutarAccionComercialServicio() {
     window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
     cerrarDetalleServicio();
 }
-
-    let txtMensaje = encodeURIComponent(`¡Hola Coach Diego! Mi nombre es ${nombreUser} de ${paisUser}. Acabo de procesar el acceso de cortesía para: "${s.nombre}" (${detalleString}).`);
-    window.open(`https://wa.me/56976003402?text=${txtMensaje}`, '_blank');
-    cerrarDetalleServicio();
-}
         
 function cerrarDetalleServicio() {
     document.getElementById('main-content').classList.remove('blur-effect');
