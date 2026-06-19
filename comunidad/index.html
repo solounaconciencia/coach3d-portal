@@ -2192,6 +2192,17 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 }
 .c3d-footer a { color: #94a3b8; text-decoration: none; transition: 0.2s; cursor: pointer; }
 .c3d-footer a:hover { color: var(--neon-n); text-decoration: underline; }
+
+/* --- ESTILOS WIZARD REGISTRO C3D --- */
+.wizard-progress { display: flex; justify-content: space-between; margin-bottom: 25px; position: relative; padding: 0 15px; }
+.wizard-progress::before { content: ''; background: rgba(255,255,255,0.1); position: absolute; top: 50%; left: 15px; right: 15px; transform: translateY(-50%); height: 2px; z-index: 1; }
+.progress-line { background: var(--neon-n); position: absolute; top: 50%; left: 15px; transform: translateY(-50%); height: 2px; z-index: 1; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; box-shadow: 0 0 10px var(--neon-n); }
+.progress-step { width: 35px; height: 35px; background: #0a0f1e; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 2; position: relative; transition: 0.4s ease; color: #cbd5e1; font-family: 'Orbitron', sans-serif; font-size: 0.9em; }
+.progress-step.active { border-color: var(--neon-n); background: var(--neon-n); color: #000; box-shadow: 0 0 15px var(--neon-n); }
+.wizard-slide { display: none; animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; text-align: left; }
+.wizard-slide.active { display: block; }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+.wizard-nav { display: flex; gap: 10px; margin-top: 20px; }
   </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
@@ -2228,7 +2239,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
       </div>
 
       <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/VABG6r9Ghlc" frameborder="0" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/VABG6r9Ghlc" frameborder="0" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe>
       </div>
 
     </div>
@@ -2240,55 +2251,96 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <h2>Acceso Integrante Comunidad</h2>
 
         <div id="kairo-error-login" style="display: none; background: #450a0a; color: #f87171; border: 1px solid #f87171; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 0.8em; font-weight: bold;">
-
         </div>
-
         <input type="email" id="login-email" placeholder="Correo Electrónico" onkeydown="if(event.key==='Enter') document.getElementById('login-pass').focus()">
-
         <input type="password" id="login-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter') ejecutarLogin()">
-
         <button class="btn btn-n" onclick="ejecutarLogin()" style="width: 100%;">ENTRAR</button>
-
         <button class="btn" onclick="cancelarRegistro()" style="margin-top: 10px; width: 100%; font-size: 0.8em;">CANCELAR</button>
-
     </div>
 
+    <div id="modal-register" class="hidden glass-panel" style="max-width: 600px; margin: auto; padding: 30px;">
+        <h2 style="color: var(--neon-n); font-family: 'Orbitron'; text-align: center; margin-top:0;">Evolución Tridimensional</h2>
+        
+        <!-- Barra de Progreso -->
+        <div class="wizard-progress">
+            <div class="progress-line" id="reg-progress-line"></div>
+            <div class="progress-step active" id="step-dot-1">1</div>
+            <div class="progress-step" id="step-dot-2">2</div>
+            <div class="progress-step" id="step-dot-3">3</div>
+        </div>
 
-
-    <div id="modal-register" class="hidden glass-panel" style="max-width: 600px; margin: auto;">
-        <h2>Registro de nuevo Integrante</h2>
-        <form id="regForm" onsubmit="event.preventDefault(); ejecutarRegistro();">
-          <input type="text" name="nombre" placeholder="Nombre" required>
-          <input type="text" name="apellido" placeholder="Apellido" required>
-          <input type="date" name="fechaNacimiento" required title="Fecha de Nacimiento" style="color: #cbd5e1;">
-          <input type="email" name="email" id="reg-email" placeholder="Email" required onblur="verificarEmailExistente(this.value)">
-          <input type="password" name="pass" placeholder="Contraseña" required>
-          <input type="password" name="confirmPass" placeholder="Confirmar Contraseña" required>
-          <input type="text" name="whatsapp" placeholder="WhatsApp"required>
-          <input type="text" name="pais" placeholder="País"required>
-          <input type="number" name="edad" placeholder="Edad" required min="15" max="120">
-          <select name="pregunta" required>
-            <option value="">Selecciona Pregunta de Seguridad</option>
-            <option>¿Nombre de tu primera mascota?</option>
-            <option>¿Ciudad donde naciste?</option>
-            <option>¿Libro favorito?</option>
-          </select>
-          <input type="text" name="respuesta" placeholder="Respuesta de Seguridad" required>
-          <select name="origen" id="reg-origen" onchange="toggleInvitador()" required>
-            <option value="">¿Cómo nos conociste?</option>
-            <option value="Internet">Llegué por Internet</option>
-            <option value="Invitado">Me invitó alguien</option>
-          </select>
-          <div id="campos-invitado" class="hidden" style="border-left: 2px solid var(--neon-n); padding-left: 10px; margin-top: 5px;">
-            <p style="font-size: 0.8em; color: var(--neon-n);">Datos de quien te invitó:</p>
-            <input type="text" name="invitador_nombre" placeholder="Nombre del Invitador">
-            <input type="email" name="invitador_email" placeholder="Email del Invitador">
+        <form id="regForm" onsubmit="event.preventDefault(); ejecutarRegistroSlide();">
+          
+          <!-- SLIDE 1: Identidad (El Enganche) -->
+          <div id="reg-slide-1" class="wizard-slide active">
+              <h3 style="color: white; font-size: 1.1em; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Paso 1: Tu Identidad</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                  <input type="text" name="nombre" id="reg-nombre" placeholder="Nombre *" required style="grid-column: span 1;">
+                  <input type="text" name="apellido" id="reg-apellido" placeholder="Apellido *" required style="grid-column: span 1;">
+                  <input type="email" name="email" id="reg-email" placeholder="Correo Electrónico *" required onblur="verificarEmailExistente(this.value)" style="grid-column: span 2;">
+                  <input type="password" name="pass" id="reg-pass" placeholder="Contraseña *" required style="grid-column: span 1;">
+                  <input type="password" name="confirmPass" id="reg-confirmPass" placeholder="Confirmar Contraseña *" required style="grid-column: span 1;">
+              </div>
+              <p style="font-size: 0.7em; color: #94a3b8; margin-top: 10px;">* La contraseña requiere entre 6 y 12 caracteres, mayúscula y números.</p>
+              <div class="wizard-nav">
+                  <button type="button" class="btn" style="flex: 1; border: 1px solid #444; color: #cbd5e1; background: rgba(0,0,0,0.5);" onclick="cancelarRegistro()">Cancelar</button>
+                  <button type="button" class="btn btn-n" style="flex: 1;" onclick="siguientePasoReg(1)">Siguiente ➔</button>
+              </div>
           </div>
-          <input type="hidden" name="tipo" value="Usuario">
-          <button type="submit" class="btn btn-f" onclick="ejecutarRegistro()">Unirse ahora</button>
-          <button type="button" class="btn" onclick="cancelarRegistro()">Cancelar</button>
-        </form>        
 
+          <!-- SLIDE 2: Perfil y Contacto (El Compromiso) -->
+          <div id="reg-slide-2" class="wizard-slide">
+              <h3 style="color: white; font-size: 1.1em; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Paso 2: Contacto y Perfil</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                  <input type="text" name="pais" id="reg-pais" placeholder="País de Residencia *" required style="grid-column: span 1;">
+                  <input type="text" name="whatsapp" id="reg-whatsapp" placeholder="WhatsApp (Ej: +569...)*" required style="grid-column: span 1;">
+                  <div style="grid-column: span 1; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; border: 1px solid #444;">
+                      <label style="font-size: 0.7em; color: var(--neon-n);">Fecha de Nacimiento *</label>
+                      <input type="date" name="fechaNacimiento" id="reg-fechaNacimiento" required style="margin: 0; padding: 5px; background: transparent; border: none; color: #cbd5e1;">
+                  </div>
+                  <div style="grid-column: span 1; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; border: 1px solid #444;">
+                      <label style="font-size: 0.7em; color: var(--neon-n);">Edad Actual *</label>
+                      <input type="number" name="edad" id="reg-edad" placeholder="Edad" required min="15" max="120" style="margin: 0; padding: 5px; background: transparent; border: none; color: white;">
+                  </div>
+              </div>
+              <div class="wizard-nav">
+                  <button type="button" class="btn btn-m" style="flex: 1; background: transparent; border: 1px solid var(--neon-m); color: var(--neon-m);" onclick="anteriorPasoReg(2)">⬅ Volver</button>
+                  <button type="button" class="btn btn-n" style="flex: 1;" onclick="siguientePasoReg(2)">Siguiente ➔</button>
+              </div>
+          </div>
+
+          <!-- SLIDE 3: Seguridad y Red (El Cierre) -->
+          <div id="reg-slide-3" class="wizard-slide">
+              <h3 style="color: white; font-size: 1.1em; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Paso 3: Seguridad y Ecosistema</h3>
+              <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                  <select name="pregunta" id="reg-pregunta" required>
+                    <option value="">Selecciona Pregunta de Seguridad *</option>
+                    <option>¿Nombre de tu primera mascota?</option>
+                    <option>¿Ciudad donde naciste?</option>
+                    <option>¿Libro favorito?</option>
+                  </select>
+                  <input type="text" name="respuesta" id="reg-respuesta" placeholder="Tu Respuesta Secreta *" required>
+                  
+                  <select name="origen" id="reg-origen" onchange="toggleInvitador()" required style="margin-top: 10px; border-color: var(--neon-f);">
+                    <option value="">¿Cómo nos conociste? *</option>
+                    <option value="Internet">Llegué por Internet</option>
+                    <option value="Invitado">Me invitó un Coach o Amigo</option>
+                  </select>
+                  
+                  <div id="campos-invitado" class="hidden" style="border-left: 3px solid var(--neon-f); padding-left: 15px; margin-top: 5px; background: rgba(16, 185, 129, 0.05); border-radius: 0 8px 8px 0; padding: 15px;">
+                    <p style="font-size: 0.8em; color: var(--neon-f); font-weight: bold; margin: 0 0 10px 0; text-transform: uppercase;">Acreditación de Red:</p>
+                    <input type="text" name="invitador_nombre" id="reg-inv-nombre" placeholder="Nombre de quien te invitó" style="margin-bottom: 10px;">
+                    <input type="email" name="invitador_email" id="reg-inv-email" placeholder="Email de quien te invitó">
+                  </div>
+              </div>
+              <input type="hidden" name="tipo" value="Usuario">
+              <div class="wizard-nav">
+                  <button type="button" class="btn btn-m" style="flex: 1; background: transparent; border: 1px solid var(--neon-m); color: var(--neon-m);" onclick="anteriorPasoReg(3)">⬅ Volver</button>
+                  <button type="button" id="btn-final-reg" class="btn btn-f" style="flex: 2; font-family: 'Orbitron';" onclick="ejecutarRegistroSlide()">CREAR PERFIL MATRIX 🚀</button>
+              </div>
+          </div>
+          
+        </form>        
     </div>
 
     <div id="modal-recover" class="hidden glass-panel" style="max-width: 500px; margin: auto;">
@@ -3199,7 +3251,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <!-- COLUMNA PRINCIPAL (VIDEO) -->
         <div id="cinema-main-col" style="flex: 1 1 400px; width: 100%;">
             <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);" id="wrapper-cinema-video">
-                <iframe id="cinema-video-frame" src="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <iframe id="cinema-video-frame" src="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" allow="autoplay; fullscreen"></iframe>
                 
                 <!-- 🔒 OVERLAY MURO DE PAGO GUILLOTINA -->
                 <div id="cinema-muro-pago" class="hidden" style="position: absolute; inset: 0; background: rgba(5,7,15,0.97); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; z-index: 2000110;">
@@ -4625,35 +4677,25 @@ function showForm(type) {
       const camposExtra = document.getElementById('campos-invitado');
 
   
-
       if (origen === 'Invitado') {
-
         camposExtra.classList.remove('hidden');
-
       } else {
-
         camposExtra.classList.add('hidden');
-
       }
-
     }
 
-
-
-    function cancelarRegistro() {
-
+function cancelarRegistro() {
       document.getElementById('view-welcome').classList.remove('hidden');
-
       document.getElementById('modal-register').classList.add('hidden');
-
       document.getElementById('modal-recover').classList.add('hidden');
-
       document.getElementById('modal-login').classList.add('hidden');
-      document.getElementById('kairo-btn-hamburguesa').classList.add('hidden'); // 🛡️ CORREGIDO: Se oculta al salir
+      document.getElementById('kairo-btn-hamburguesa').classList.add('hidden'); 
       document.getElementById('step-1-recover').classList.remove('hidden');
-
       document.getElementById('step-2-recover').classList.add('hidden');
-
+      
+      // FOCUS: Resetear el embudo visual
+      if(document.getElementById('reg-slide-2') && document.getElementById('reg-slide-2').classList.contains('active')) moverSlideReg(2, 1);
+      if(document.getElementById('reg-slide-3') && document.getElementById('reg-slide-3').classList.contains('active')) moverSlideReg(3, 1);
     }
 
 
@@ -9205,9 +9247,11 @@ async function procesarPagoCarrito() {
         }
     } 
     else if (metodo === "DLOCAL") {
+        localStorage.removeItem('kairo_carrito_ecom'); carritoCompras = []; renderizarCarrito();
         window.location.href = billeterasCoachActivoCache.dlocal;
     } 
     else if (metodo === "PAYPAL") {
+        localStorage.removeItem('kairo_carrito_ecom'); carritoCompras = []; renderizarCarrito();
         window.location.href = billeterasCoachActivoCache.paypal;
     }
     else if (metodo === "BINANCE") {
@@ -12281,6 +12325,71 @@ async function ejecutarEnvioMasivo() {
         notify("❌ Error de comunicación: " + (res ? res.msg : "Sin conexión"));
     }
 }
+
+function siguientePasoReg(pasoActual) {
+        // Validaciones Paso 1
+        if (pasoActual === 1) {
+            let n = document.getElementById('reg-nombre').value.trim();
+            let a = document.getElementById('reg-apellido').value.trim();
+            let e = document.getElementById('reg-email').value.trim();
+            let p = document.getElementById('reg-pass').value;
+            let c = document.getElementById('reg-confirmPass').value;
+            
+            if(!n || !a || !e || !p || !c) return notify("Por favor, completa todos los campos del Paso 1.");
+            if(p !== c) return notify("Las contraseñas no coinciden.");
+            if(!validarSeguridadPass(p)) return notify("Tu contraseña debe tener entre 6 y 12 caracteres, incluir una MAYÚSCULA y un NÚMERO.");
+            
+            moverSlideReg(1, 2);
+        }
+        // Validaciones Paso 2
+        else if (pasoActual === 2) {
+            let p = document.getElementById('reg-pais').value.trim();
+            let w = document.getElementById('reg-whatsapp').value.trim();
+            let f = document.getElementById('reg-fechaNacimiento').value;
+            let ed = document.getElementById('reg-edad').value;
+
+            if(!p || !w || !f || !ed) return notify("Por favor, completa todos los campos del Paso 2.");
+            
+            moverSlideReg(2, 3);
+        }
+    }
+
+    function anteriorPasoReg(pasoActual) {
+        moverSlideReg(pasoActual, pasoActual - 1);
+    }
+
+    function moverSlideReg(desde, hacia) {
+        document.getElementById(`reg-slide-${desde}`).classList.remove('active');
+        document.getElementById(`reg-slide-${hacia}`).classList.add('active');
+        
+        // Actualizar barra de progreso (Estética)
+        document.querySelectorAll('.progress-step').forEach(el => el.classList.remove('active'));
+        for(let i = 1; i <= hacia; i++) {
+            document.getElementById(`step-dot-${i}`).classList.add('active');
+        }
+        
+        const linea = document.getElementById('reg-progress-line');
+        if(hacia === 1) linea.style.width = '0%';
+        if(hacia === 2) linea.style.width = '50%';
+        if(hacia === 3) linea.style.width = '100%';
+    }
+
+    function ejecutarRegistroSlide() {
+        // Validaciones Paso 3 (El Final)
+        let p = document.getElementById('reg-pregunta').value;
+        let r = document.getElementById('reg-respuesta').value.trim();
+        let o = document.getElementById('reg-origen').value;
+        
+        if(!p || !r || !o) return notify("Por favor, completa los campos del Paso 3.");
+        if(o === 'Invitado') {
+            if(!document.getElementById('reg-inv-nombre').value.trim() || !document.getElementById('reg-inv-email').value.trim()) {
+                return notify("Por favor, completa los datos de quien te invitó para acreditar a tu Coach.");
+            }
+        }
+        
+        // Si todo está correcto, disparamos el motor original de registro que va al Backend
+        ejecutarRegistro(); 
+    }
 </script>
 
 <!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
