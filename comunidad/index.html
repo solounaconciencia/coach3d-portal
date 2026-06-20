@@ -12564,6 +12564,227 @@ function siguientePasoReg(pasoActual) {
         abrirModalSeguimientoRed();
     }, 500);
 }
+
+// =========================================================================
+// 📊 MOTOR JAVASCRIPT: CRM COACH (KANBAN Y SEGUIMIENTO)
+// =========================================================================
+let crmColumnas = [];
+let crmProspectos = [];
+let crmPlantillasWA = {
+    f1: "Hola {nombre}. Soy Coach de la comunidad. Vi el trabajo de {negocio} y veo mucho potencial. Estoy buscando a 10 emprendedores para digitalizarlos. ¿Me permites enviarte un audio corto?",
+    f3: "¡Excelente {nombre}! Te dejo el link para que Kairo analice tu negocio. Son preguntas rápidas, complétalo y nos ponemos a trabajar.",
+    f5: "¡Hola {nombre}! Ya tengo lista la Maqueta de {negocio}. Quedó espectacular. Mírala aquí y cuéntame si tienes 15 minutos para una videollamada.",
+    f6: "Hola {nombre}, te recuerdo que tenemos agendada nuestra videollamada para revisar los planes de activación de {negocio}. ¡Nos vemos en breve!"
+};
+
+async function iniciarCrmCoachMotor() {
+    document.getElementById('crm-kanban-board').innerHTML = "<div class='spinner'></div><p style='color:var(--neon-m); text-align:center; width:100%;'>Sincronizando Bóveda de Prospectos...</p>";
+    
+    // Usamos el apiCall MAESTRO de tu app
+    const resCol = await apiCall("crm_getColumnas", { email: sessionUser.email, rango: sessionUser.rango });
+    const resPros = await apiCall("crm_getProspectos", { email: sessionUser.email, rango: sessionUser.rango });
+    const configData = await apiCall("crm_getConfig", { email: sessionUser.email, rango: sessionUser.rango });
+
+    if (resPros && resPros.success === false) {
+        return document.getElementById('crm-kanban-board').innerHTML = "<p style='color:#ef4444; width:100%; text-align:center;'>Acceso Denegado a la Base de Datos: " + resPros.msg + "</p>";
+    }
+
+    crmColumnas = (resCol && resCol.success) ? resCol.columnas : [];
+    crmProspectos = (resPros && resPros.success) ? resPros.prospectos : [];
+
+    if(configData && configData.config) {
+        if(configData.config["msg_f1"]) crmPlantillasWA.f1 = configData.config["msg_f1"];
+        if(configData.config["msg_f3"]) crmPlantillasWA.f3 = configData.config["msg_f3"];
+        if(configData.config["msg_f5"]) crmPlantillasWA.f5 = configData.config["msg_f5"];
+        if(configData.config["msg_f6"]) crmPlantillasWA.f6 = configData.config["msg_f6"];
+    }
+
+    const activos = crmProspectos.filter(p => p.activo !== false);
+    const dashTotal = document.getElementById("crm-dash-total");
+    if(dashTotal) dashTotal.innerText = activos.length;
+
+    renderizarKanbanCrm();
+}
+
+function renderizarKanbanCrm() {
+    const kanban = document.getElementById("crm-kanban-board");
+    const dashFases = document.getElementById("crm-dash-fases");
+    kanban.innerHTML = "";
+    dashFases.innerHTML = "";
+
+    const activos = crmProspectos.filter(p => p.activo !== false);
+    const textoBuscado = document.getElementById("crm-buscador").value.toLowerCase();
+    const valorPrioridad = document.getElementById("crm-filtro-prioridad").value;
+
+    crmColumnas.sort((a,b)=>a.orden-b.orden).forEach(col => {
+        const count = activos.filter(p => String(p.estadoId) === String(col.id)).length;
+        const nombreCorto = col.nombre.split(":")[0]; 
+        dashFases.innerHTML += `
+            <div style="background:rgba(255,255,255,0.05); padding:10px 15px; border-radius:8px; border-left: 3px solid ${col.color}; text-align:center; min-width:100px;">
+                <div style="font-size:0.7em; color:#94a3b8; text-transform:uppercase;">${nombreCorto}</div>
+                <div style="font-size:1.5em; font-family:'Orbitron'; color:white;">${count}</div>
+            </div>`;
+
+        const div = document.createElement("div");
+        div.style.cssText = `min-width:300px; max-width:320px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-top: 4px solid ${col.color}; border-radius:10px; padding:15px; display:flex; flex-direction:column; gap:10px; height:max-content;`;
+        div.innerHTML = `<h3 style="margin:0 0 10px 0; color:white; font-size:1em;">${col.nombre}</h3>`;
+
+        activos.filter(p => String(p.estadoId) === String(col.id))
+        .filter(p => {
+            if(textoBuscado !== "") {
+                const datosStr = ((p.negocio||"")+" "+(p.contacto||"")+" "+(p.rubro||"")+" "+(p.etiquetas||"")).toLowerCase();
+                if(!datosStr.includes(textoBuscado)) return false;
+            }
+            if(valorPrioridad !== "") {
+                if(String(p.prioridad) !== String(valorPrioridad)) return false;
+            }
+            return true; 
+        }).forEach(p => {
+            let colorPri = p.prioridad === "Alta" ? "#ef4444" : (p.prioridad === "Media" ? "#fbbf24" : "#10b981"); 
+            let chipsEtiquetas = "";
+            if(p.etiquetas && p.etiquetas.trim() !== "") {
+                p.etiquetas.split(",").forEach(tag => {
+                    chipsEtiquetas += `<span style="background:rgba(255,255,255,0.1); color:#cbd5e1; font-size:0.65em; padding:2px 6px; border-radius:10px; margin:2px 2px 0 0; display:inline-block; border:1px solid #444;">${tag.trim()}</span>`;
+                });
+            }
+
+            const card = document.createElement('div');
+            card.style.cssText = `background:rgba(0,0,0,0.6); padding:15px; border-radius:8px; border-left:3px solid ${colorPri}; box-shadow:0 4px 6px rgba(0,0,0,0.3);`;
+            
+            card.innerHTML = `
+                <div onclick="abrirModalDetalleCrm('${p.id}')" style="cursor:pointer;">
+                    <strong style="color:var(--neon-n); font-size:1.1em; display:block; margin-bottom:3px;">${p.negocio}</strong>
+                    <span style="color:#cbd5e1; font-size:0.8em; display:block;">👤 ${p.contacto || "Sin Contacto"}</span>
+                    <div style="margin-top:5px;">${chipsEtiquetas}</div>
+                </div>
+                <div style="display:flex; gap:5px; margin-top:12px; border-top:1px dashed #444; padding-top:10px;">
+                    <button class="btn" style="flex:1; padding:6px; font-size:0.7em; background:#25D366; color:white; border:none;" onclick="waCrm('${p.whatsapp}', '${p.contacto}', '${p.negocio}', '${p.estadoId}')">WA</button>
+                    <button class="btn btn-m" style="flex:1; padding:6px; font-size:0.7em;" onclick="moverProspectoCrm('${p.id}')">MOVER</button>
+                </div>
+            `;
+            div.appendChild(card);
+        });
+        kanban.appendChild(div);
+    });
+}
+
+function waCrm(numero, contacto, negocio, estadoId){
+    if(!numero) return notify("El prospecto no tiene un WhatsApp registrado.");
+    let nombre = (contacto && contacto.trim() !== "") ? contacto : "emprendedor";
+    let nomNegocio = (negocio && negocio.trim() !== "") ? negocio : "tu negocio";
+    
+    let mensajeBase = "";
+    let columna = String(estadoId);
+
+    if (columna === "1" || columna.includes("Contactar") || columna.includes("FASE 1")) mensajeBase = crmPlantillasWA.f1;
+    else if (columna === "3" || columna.includes("Audio") || columna.includes("FASE 3")) mensajeBase = crmPlantillasWA.f3;
+    else if (columna === "5" || columna.includes("Prototipo") || columna.includes("FASE 5")) mensajeBase = crmPlantillasWA.f5;
+    else if (columna === "6" || columna.includes("Agendado") || columna.includes("FASE 6")) mensajeBase = crmPlantillasWA.f6;
+    else mensajeBase = `Hola ${nombre}, te contacto desde Coach3D respecto a los avances de ${nomNegocio}.`;
+    
+    let mensajeFinal = mensajeBase.replace(/{nombre}/g, nombre).replace(/{negocio}/g, nomNegocio);
+    
+    document.getElementById('crm-wa-numero').value = numero;
+    document.getElementById('crm-wa-mensaje').value = mensajeFinal;
+    document.getElementById('modal-crm-wa').classList.remove('hidden');
+}
+
+function dispararWhatsAppCrm() {
+    const num = document.getElementById('crm-wa-numero').value;
+    const txt = document.getElementById('crm-wa-mensaje').value;
+    document.getElementById('modal-crm-wa').classList.add('hidden');
+    window.open("https://wa.me/" + num.replace(/[^0-9]/g, '') + "?text=" + encodeURIComponent(txt));
+}
+
+// === LÓGICA DE CRUD DEL CRM ===
+function abrirModalNuevoProspecto() {
+    document.getElementById('crm-np-negocio').value = "";
+    document.getElementById('crm-np-contacto').value = "";
+    document.getElementById('crm-np-whatsapp').value = "";
+    document.getElementById('modal-crm-nuevo').classList.remove('hidden');
+}
+
+async function guardarProspectoCrm() {
+    const neg = document.getElementById('crm-np-negocio').value.trim();
+    if(!neg) return notify("El negocio es obligatorio.");
+    
+    document.getElementById('modal-crm-nuevo').classList.add('hidden');
+    mostrarLoading("Inyectando prospecto a la Matrix CRM...");
+    
+    const res = await apiCall("crm_createProspecto", {
+        email: sessionUser.email,
+        rango: sessionUser.rango,
+        estadoId: 1, 
+        negocio: neg,
+        contacto: document.getElementById('crm-np-contacto').value.trim(),
+        whatsapp: document.getElementById('crm-np-whatsapp').value.trim()
+    });
+    
+    ocultarLoading();
+    if(res && res.success) iniciarCrmCoachMotor();
+    else notify("Fallo al guardar en el servidor CRM.");
+}
+
+function moverProspectoCrm(id) {
+    document.getElementById('crm-mover-id').value = id;
+    const select = document.getElementById('crm-mover-destino');
+    select.innerHTML = ''; 
+    crmColumnas.sort((a,b) => a.orden - b.orden).forEach(col => {
+        select.innerHTML += `<option value="${col.id}">${col.nombre}</option>`;
+    });
+    document.getElementById('modal-crm-mover').classList.remove('hidden');
+}
+
+async function confirmarMovimientoCrm() {
+    const id = document.getElementById('crm-mover-id').value;
+    const dest = document.getElementById('crm-mover-destino').value;
+    document.getElementById('modal-crm-mover').classList.add('hidden');
+    
+    mostrarLoading("Moviendo prospecto...");
+    
+    const res = await apiCall("crm_updateEstado", { email: sessionUser.email, rango: sessionUser.rango, id: id, estadoId: dest });
+    
+    ocultarLoading();
+    if(res && res.success) iniciarCrmCoachMotor();
+    else notify("Error al mover en la Matrix.");
+}
+
+function abrirModalDetalleCrm(id) {
+    const p = crmProspectos.find(x => String(x.id) === String(id));
+    if(!p) return;
+    document.getElementById('crm-edit-id').value = p.id;
+    document.getElementById('crm-edit-negocio').value = p.negocio || "";
+    document.getElementById('crm-edit-contacto').value = p.contacto || "";
+    document.getElementById('crm-edit-rubro').value = p.rubro || "";
+    document.getElementById('crm-edit-correo').value = p.correo || "";
+    document.getElementById('crm-edit-prioridad').value = p.prioridad || "Media";
+    document.getElementById('crm-edit-etiquetas').value = p.etiquetas || "";
+    document.getElementById('crm-edit-observaciones').value = p.observaciones || "";
+    document.getElementById('modal-crm-detalle').classList.remove('hidden');
+}
+
+async function guardarCambiosDetalleCrm() {
+    document.getElementById('modal-crm-detalle').classList.add('hidden');
+    mostrarLoading("Sincronizando cambios de prospecto...");
+    
+    const res = await apiCall("crm_updateProspecto", {
+        email: sessionUser.email,
+        rango: sessionUser.rango,
+        id: document.getElementById('crm-edit-id').value,
+        negocio: document.getElementById('crm-edit-negocio').value,
+        contacto: document.getElementById('crm-edit-contacto').value,
+        rubro: document.getElementById('crm-edit-rubro').value,
+        correo: document.getElementById('crm-edit-correo').value,
+        prioridad: document.getElementById('crm-edit-prioridad').value,
+        etiquetas: document.getElementById('crm-edit-etiquetas').value,
+        observaciones: document.getElementById('crm-edit-observaciones').value
+    });
+    
+    ocultarLoading();
+    if(res && res.success) iniciarCrmCoachMotor();
+    else notify("Error de sincronización con el CRM.");
+}
+
 </script>
 
 <!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
