@@ -2691,11 +2691,14 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 <p id="user-info" style="opacity: 0.8; font-size: 0.85em; margin: 0 0 15px 0; color: #cbd5e1;">País | Edad</p>
                 
                 <!-- KPIs Variables según Rango -->
-                <!-- KPIs Variables según Rango -->
                 <div id="kpi-container-rango" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                     <div class="c3d-metric-badge">
                         <span class="c3d-metric-val" style="color:#fbbf24;" id="kpi-puntos">0</span>
                         <span class="c3d-metric-lbl">PUNTOS C3D</span>
+                    </div>
+                    <div class="c3d-metric-badge">
+                        <span class="c3d-metric-val" style="color:var(--neon-m);" id="kpi-fichas">0</span>
+                        <span class="c3d-metric-lbl">Fichas Sorteo</span>
                     </div>
                     <div class="c3d-metric-badge">
                         <span class="c3d-metric-val" id="kpi-ref-total">0</span>
@@ -5178,6 +5181,8 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
       // Inyección segura de Contadores Universales
       const kpiPuntos = document.getElementById('kpi-puntos');
       if (kpiPuntos) kpiPuntos.innerText = sData.puntos;
+      const kpiFichas = document.getElementById('kpi-fichas');
+      if (kpiFichas) kpiFichas.innerText = sData.fichas || 0;
 
       const kpiRefTotal = document.getElementById('kpi-ref-total');
       if (kpiRefTotal) kpiRefTotal.innerText = sData.refTotal;
@@ -11063,7 +11068,7 @@ function filtrarBazarCanje(tipo) {
                     <div style="font-size: 0.75em; color: #94a3b8; margin-top: 5px;">Stock: ${r.stock}</div>
                     <div class="store-card-price-row" style="margin-top: 15px;">
                         <span class="store-card-price" style="color:var(--neon-f); font-size:1.1rem;">${r.costo} Pts</span>
-                        <button class="btn btn-n" style="padding: 8px 15px; font-size: 0.75em; border-color:${colorBorde}; color:${colorBorde};" onclick="notify('Módulo de procesamiento de canje en desarrollo...')">CANJEAR</button>
+                        <button class="btn btn-n" style="padding: 8px 15px; font-size: 0.75em; border-color:${colorBorde}; color:${colorBorde};"onclick="procesarCanjeUsuario('${r.id}', ${r.costo}, '${r.tipo}', '${r.titulo.replace(/'/g, "\\'")}')">CANJEAR</button>
                     </div>
                 </div>
             </div>
@@ -11071,6 +11076,39 @@ function filtrarBazarCanje(tipo) {
     });
 }
 
+async function procesarCanjeUsuario(idCanje, costo, tipo, titulo) {
+    if(!confirm(`¿Deseas canjear "${titulo}" por ${costo} Puntos C3D?`)) return;
+
+    mostrarLoading("Procesando transacción en la Matrix...");
+    const res = await apiCall("procesarCanjeBazar", { 
+        email: sessionUser.email, 
+        idCanje: idCanje, 
+        costo: costo, 
+        tipo: tipo, 
+        titulo: titulo 
+    });
+    ocultarLoading();
+
+    if (res && res.success) {
+        let msgExito = `Canje exitoso. Tu nuevo saldo es ${res.nuevoSaldo} Pts. `;
+        if (tipo === "SORTEO") msgExito += "¡Has recibido 1 Ficha de Lotería! Revisa tu Dashboard.";
+        else msgExito += "Tu solicitud ha sido enviada al equipo de Logística.";
+        
+        kairoMessage({mensaje: `<h3 style="color:var(--neon-n); font-family:'Orbitron';">¡CANJE COMPLETADO! 🎁</h3><p>${msgExito}</p>`, icon: '✅'});
+        
+        // Actualizar UI
+        const saldoBoveda = document.getElementById('puntos-saldo-actual');
+        if(saldoBoveda) saldoBoveda.innerText = res.nuevoSaldo;
+        const saldoBazar = document.getElementById('bazar-saldo-usuario');
+        if(saldoBazar) saldoBazar.innerText = res.nuevoSaldo + " Puntos";
+        
+        // Refrescar sesión global en segundo plano
+        loadDashboard();
+    } else {
+        notify("❌ Error: " + (res ? res.msg : "Conexión fallida"));
+    }
+}
+        
 // --- LOGICA DEL ADMINISTRADOR ---
 async function inicializarAdminCanjes() {
     mostrarLoading("Calculando Pozo y Sincronizando Bóveda...");
