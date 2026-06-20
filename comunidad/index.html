@@ -2294,14 +2294,11 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                   <input type="text" name="pais" id="reg-pais" placeholder="País de Residencia *" required style="grid-column: span 1;">
                   <input type="text" name="whatsapp" id="reg-whatsapp" placeholder="WhatsApp (Ej: +569...)*" required style="grid-column: span 1;">
-                  <div style="grid-column: span 1; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; border: 1px solid #444;">
+                  <div style="grid-column: span 2; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; border: 1px solid #444;">
                       <label style="font-size: 0.7em; color: var(--neon-n);">Fecha de Nacimiento *</label>
-                      <input type="date" name="fechaNacimiento" id="reg-fechaNacimiento" required style="margin: 0; padding: 5px; background: transparent; border: none; color: #cbd5e1;">
-                  </div>
-                  <div style="grid-column: span 1; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; border: 1px solid #444;">
-                      <label style="font-size: 0.7em; color: var(--neon-n);">Edad Actual *</label>
-                      <input type="number" name="edad" id="reg-edad" placeholder="Edad" required min="15" max="120" style="margin: 0; padding: 5px; background: transparent; border: none; color: white;">
-                  </div>
+                      <input type="date" name="fechaNacimiento" id="reg-fechaNacimiento" required onchange="calcularEdadRegistro(this.value, 'reg-edad')" style="margin: 0; padding: 5px; background: transparent; border: none; color: white; width: 100%; cursor: pointer;">
+                      <input type="hidden" name="edad" id="reg-edad" value="0">
+                  </div>              
               </div>
               <div class="wizard-nav">
                   <button type="button" class="btn btn-m" style="flex: 1; background: transparent; border: 1px solid var(--neon-m); color: var(--neon-m);" onclick="anteriorPasoReg(2)">⬅ Volver</button>
@@ -4003,13 +4000,14 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <form id="inlineRegForm" onsubmit="event.preventDefault(); ejecutarRegistroInline();">
             <input type="text" id="inline-reg-nombre" placeholder="Nombre" required>
             <input type="text" id="inline-reg-apellido" placeholder="Apellido" required>
-            <input type="date" id="inline-reg-fechaNacimiento" required title="Fecha de Nacimiento" style="color: #cbd5e1;">
+            <label style="font-size: 0.7em; color: var(--neon-n); margin-bottom:-5px; display:block; text-align:left;">Fecha de Nacimiento *</label>
+            <input type="date" id="inline-reg-fechaNacimiento" required onchange="calcularEdadRegistro(this.value, 'inline-reg-edad')" style="color: white; background: rgba(0,0,0,0.6); cursor:pointer;">
+            <input type="hidden" id="inline-reg-edad" value="0">
             <input type="email" id="inline-reg-email" placeholder="Email para recibir informe PDF" required>
             <input type="password" id="inline-reg-pass" placeholder="Contraseña" required>
             <input type="password" id="inline-reg-confirmPass" placeholder="Confirmar Contraseña" required>
             <input type="text" id="inline-reg-whatsapp" placeholder="WhatsApp" required>
             <input type="text" id="inline-reg-pais" placeholder="País" required>
-            <input type="number" id="inline-reg-edad" placeholder="Edad" required min="15" max="120">
             <select id="inline-reg-pregunta" required>
                 <option value="">Selecciona Pregunta de Seguridad</option>
                 <option>¿Nombre de tu primera mascota?</option>
@@ -5102,7 +5100,16 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
 
   // Renderizado de datos del usuario en el panel principal
   document.getElementById('user-name').innerText = sessionUser.seudónimo || sessionUser.nombre || "Usuario";
-  document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + (sessionUser.edad || "0") + " años";
+  let edadDinamica = sessionUser.edad || "0";
+  if (sessionUser.fechaNacimiento && sessionUser.fechaNacimiento.trim() !== "") {
+      const birthDate = new Date(sessionUser.fechaNacimiento);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+      edadDinamica = age;
+  }
+  document.getElementById('user-info').innerText = (sessionUser.pais || "País") + " | " + edadDinamica + " años";
 
   const fotoCirculo = document.getElementById('user-photo');
   if (fotoCirculo) {
@@ -12826,7 +12833,20 @@ async function guardarCambiosDetalleCrm() {
     if(res && res.success) iniciarCrmCoachMotor();
     else notify("Error de sincronización con el CRM.");
 }
-
+function calcularEdadRegistro(fechaNacimiento, idInputEdad) {
+    if (!fechaNacimiento) return;
+    const birthDate = new Date(fechaNacimiento);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    // Resta 1 año si todavía no ha pasado su mes/día de cumpleaños este año
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    const inputEdad = document.getElementById(idInputEdad);
+    if (inputEdad) inputEdad.value = age;
+}
+    
 </script>
 
 <!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
