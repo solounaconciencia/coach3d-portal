@@ -2383,7 +2383,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 <button class="c3d-nav-btn" onclick="iniciarbuzon()"><span class="c3d-nav-icon">📬</span><span>BUZÓN</span></button>
                 <button class="c3d-nav-btn" onclick="iniciarMiRedNavbar()"><span class="c3d-nav-icon">🌐</span><span>MI RED</span></button>
                 <button class="c3d-nav-btn" onclick="iniciarservicios()"><span class="c3d-nav-icon">📈</span><span>EMPRENDE</span></button>
-                <button class="c3d-nav-btn" onclick="desplegarFormularioCoach3D()"><span class="c3d-nav-icon">🤝</span><span>SE COACH</span></button>
+                <button id="nav-btn-oficina" class="c3d-nav-btn" onclick="desplegarFormularioCoach3D()"><span id="nav-icon-oficina" class="c3d-nav-icon">🤝</span><span id="nav-txt-oficina">SE COACH</span></button>
             </div>
         </div>
     </div>
@@ -2703,11 +2703,11 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                     </div>
                     <div id="kpi-box-susc" class="c3d-metric-badge">
                         <span class="c3d-metric-val" style="color:var(--neon-f);" id="kpi-ref-susc">0</span>
-                        <span class="c3d-metric-lbl">Ref. Suscriptor</span>
+                        <span class="c3d-metric-lbl">Suscriptores</span>
                     </div>
                     <div id="kpi-box-coach" class="c3d-metric-badge hidden">
                         <span class="c3d-metric-val" style="color:var(--neon-m);" id="kpi-ref-coach">0</span>
-                        <span class="c3d-metric-lbl">Coaches Red</span>
+                        <span class="c3d-metric-lbl">Coaches</span>
                     </div>
                 </div>
 
@@ -2890,11 +2890,13 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 
     <div id="modal-portal-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: center;">
         <button onclick="cerrarPortalCoachMaestro()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
-        <span style="font-size: 3em;">👨‍💻</span>
-        <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 10px;">MI PORTAL</h3>
-        <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 25px;">Bienvenido a tu centro de control profesional.</p>
-        <button class="btn btn-n" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px;" onclick="abrirDisponibilidadCoach()">📅 MI DISPONIBILIDAD (AGENDA)</button>
-        <button class="btn btn-f" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px;" onclick="abrirCobrosCoach()">💰 MIS TOKEN DE COBROS</button>
+        <span style="font-size: 3em;">💼</span>
+        <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 10px;">MI OFICINA</h3>
+        <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 25px;">Centro de control y herramientas operativas para Coaches Oficiales.</p>
+        
+        <button class="btn btn-n" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px; font-weight: bold;" onclick="abrirDisponibilidadCoach()">📅 GESTIONAR MI AGENDA</button>
+        <button class="btn btn-m" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px; font-weight: bold;" onclick="abrirCrmCoach()">📊 MI CRM (RED Y SEGUIMIENTO)</button>
+        <button class="btn btn-f" style="width: 100%; padding: 15px; font-size: 1em; margin-bottom: 15px; font-weight: bold;" onclick="abrirCobrosCoach()">💰 MIS BILLETERAS DE COBRO</button>
     </div>
 
     <div id="modal-mi-agenda-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000001 !important; width: 95% !important; max-width: 600px !important; max-height: 85vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
@@ -5115,13 +5117,23 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
   }
 
   if(sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
-      const btnCoach = document.getElementById('btn-acceso-coach');
-      if (btnCoach) btnCoach.classList.remove('hidden');
-      const btnAuth = document.getElementById('btn-autorizaciones-coach'); // 🛡️ FOCUS
-      if (btnAuth) btnAuth.classList.remove('hidden');                     // 🛡️ FOCUS
+      // Mutación a "Mi Oficina"
+      const btnNav = document.getElementById('nav-btn-oficina');
+      if (btnNav) {
+          btnNav.onclick = abrirPortalCoachMaestro;
+          document.getElementById('nav-txt-oficina').innerText = "MI OFICINA";
+          document.getElementById('nav-icon-oficina').innerText = "💼";
+      }
+      const btnAuth = document.getElementById('btn-autorizaciones-coach'); 
+      if (btnAuth) btnAuth.classList.remove('hidden');                     
   } else {
-      const btnCoach = document.getElementById('btn-acceso-coach');
-      if (btnCoach) btnCoach.classList.add('hidden');
+      // Estado normal "Se Coach"
+      const btnNav = document.getElementById('nav-btn-oficina');
+      if (btnNav) {
+          btnNav.onclick = desplegarFormularioCoach3D;
+          document.getElementById('nav-txt-oficina').innerText = "SE COACH";
+          document.getElementById('nav-icon-oficina').innerText = "🤝";
+      }
   }
 
   // 🚀 SUPER DASHBOARD POPULATOR
@@ -7112,13 +7124,6 @@ function salirDelModulo() {
     if (herramientas) herramientas.classList.remove('hidden');
 
     if (sessionUser) {
-        // Renderizar botones de Coach según el rango al volver al Dashboard
-        if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
-            const btnCoach = document.getElementById('btn-acceso-coach');
-            const panelCoach = document.getElementById('panel-acceso-coach');
-            if (btnCoach) btnCoach.classList.remove('hidden');
-            if (panelCoach) panelCoach.classList.remove('hidden');
-        }
         if (typeof loadDashboard === 'function') loadDashboard();
     }
 }
@@ -10758,39 +10763,134 @@ function cerrarModalIngresoReferido() {
 
 let factorZoomArbol = 1;
 
-async function sincronizarDatosEconomiaRed() {
-    const res = await apiCall("sincronizarDatosEconomia", { email: sessionUser.email });
+function sincronizarDatosEconomia(payload) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheetReg = ss.getSheetByName("REGISTRO");
+    const dataReg = sheetReg.getDataRange().getValues();
+    const emailUsuario = payload.email.toLowerCase().trim();
     
-    if (res && res.success) {
-        // 1. Actualizar Bóveda
-        document.getElementById('puntos-saldo-actual').innerText = res.puntosTotales || 0;
-        document.getElementById('puntos-total-referidos').innerText = res.referidosDirectos.length || 0;
-        document.getElementById('puntos-ganados-red').innerText = res.puntosRed || 0;
-        
-        // 2. Actualizar Tabla
-        const tbody = document.getElementById('tabla-referidos-directos');
-        tbody.innerHTML = "";
-        if (res.referidosDirectos.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='text-align: center; padding: 20px; color: #94a3b8;'>Aún no tienes referidos directos registrados.</td></tr>";
-        } else {
-            res.referidosDirectos.forEach(r => {
-                let colorSusc = r.rango === "Suscriptor" ? "var(--neon-f)" : "#94a3b8";
-                tbody.innerHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <td style="padding: 12px; font-weight:bold;">${r.nombre}</td>
-                        <td style="padding: 12px;">${r.fecha}</td>
-                        <td style="padding: 12px; text-align: center; color: ${colorSusc}; font-weight:bold;">${r.rango}</td>
-                        <td style="padding: 12px; text-align: center; color: var(--neon-n);">${r.puntosAportados}</td>
-                        <td style="padding: 12px; text-align: center;">Activo</td>
-                    </tr>`;
-            });
-        }
-        
-        // 3. Guardar el árbol en memoria para cuando el usuario presione el botón
-        window.kairoArbolRed = res.nodosArbol;
-    } else {
-        notify("Error al sincronizar datos financieros: " + (res ? res.msg : "Sin conexión"));
+    let puntosTotales = 0;
+    let referidosDirectos = [];
+    let arbol = [];
+    let puntosGeneradosPorRed = 0; 
+    
+    let miIdEnLaRed = "";
+    let miRango = "Usuario";
+
+    for (let i = 1; i < dataReg.length; i++) {
+      let em = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
+      if (em === emailUsuario) {
+        miIdEnLaRed = em; 
+        miRango = dataReg[i][12] || "Usuario";
+        puntosTotales = dataReg[i][24] || 0; 
+        break;
+      }
     }
+
+    if (!miIdEnLaRed) return { success: false, msg: "Usuario no hallado en la Matrix." };
+
+    let emailsValidosEnBD = new Set();
+    for(let i=1; i<dataReg.length; i++) {
+        if(dataReg[i][3]) emailsValidosEnBD.add(dataReg[i][3].toString().toLowerCase().trim());
+    }
+
+    // 🛡️ LÓGICA DE PROFUNDIDAD (1 Nivel Usuarios, 6 Niveles Coaches, Ilimitado Admin)
+    let maxNiveles = 1;
+    if (miRango === "Coach") maxNiveles = 6;
+    if (miRango === "Admin") maxNiveles = 999;
+
+    let nivelActualMails = [emailUsuario];
+    let todosLosMailsEnArbol = new Set([emailUsuario]);
+
+    // Siempre me agrego a mí mismo como raíz principal
+    for (let i = 1; i < dataReg.length; i++) {
+        let em = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
+        if(em === emailUsuario) {
+            arbol.push({
+              id: em,
+              nombre: dataReg[i][11] || dataReg[i][1],
+              padreId: "", // La raíz nunca tiene padre en el mapa visual
+              rango: dataReg[i][12] || "Usuario",
+              genero: "Masculino",
+              pais: dataReg[i][6] || "Desconocido",
+              whatsapp: dataReg[i][5] || "No registrado",
+              nivel: 0
+            });
+            break;
+        }
+    }
+
+    if (miRango === "Admin") {
+        // ADMIN VE TODA LA MATRIX
+        for (let i = 1; i < dataReg.length; i++) {
+            let em = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
+            if (em && em !== emailUsuario) {
+                let padre = dataReg[i][15] ? dataReg[i][15].toString().toLowerCase().trim() : "";
+                // Anti-Crash: Si el padre no existe o fue borrado, lo amarramos a la raíz Admin
+                if (!emailsValidosEnBD.has(padre)) padre = emailUsuario; 
+
+                arbol.push({
+                    id: em,
+                    nombre: dataReg[i][11] || dataReg[i][1],
+                    padreId: padre,
+                    rango: dataReg[i][12] || "Usuario",
+                    genero: "Femenino",
+                    pais: dataReg[i][6] || "Desconocido",
+                    whatsapp: dataReg[i][5] || "No registrado",
+                    nivel: 1
+                });
+            }
+        }
+    } else {
+        // COACH O USUARIO REGULAR
+        for (let lvl = 1; lvl <= maxNiveles; lvl++) {
+            let siguienteNivelMails = [];
+
+            for (let i = 1; i < dataReg.length; i++) {
+                let suPatrocinador = dataReg[i][15] ? dataReg[i][15].toString().toLowerCase().trim() : "";
+                let suEmail = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
+
+                if (nivelActualMails.includes(suPatrocinador) && suEmail !== "" && !todosLosMailsEnArbol.has(suEmail)) {
+                    let nombreRef = dataReg[i][11] || dataReg[i][1];
+                    let rangoRef = dataReg[i][12] || "Usuario";
+                    
+                    todosLosMailsEnArbol.add(suEmail);
+                    siguienteNivelMails.push(suEmail);
+
+                    if (lvl === 1) {
+                        referidosDirectos.push({
+                            nombre: nombreRef,
+                            fecha: dataReg[i][20] || "Reciente",
+                            rango: rangoRef,
+                            esSuscriptor: (rangoRef === "Suscriptor" || rangoRef === "Coach" || rangoRef === "Admin"),
+                            puntosAportados: 0
+                        });
+                    }
+
+                    arbol.push({
+                        id: suEmail,
+                        nombre: nombreRef,
+                        padreId: suPatrocinador,
+                        rango: rangoRef,
+                        genero: "Femenino",
+                        pais: dataReg[i][6] || "Desconocido",
+                        whatsapp: dataReg[i][5] || "No registrado",
+                        nivel: lvl
+                    });
+                }
+            }
+            if (siguienteNivelMails.length === 0) break; // Fin de la red
+            nivelActualMails = siguienteNivelMails;
+        }
+    }
+
+    return {
+      success: true, puntosTotales: puntosTotales, referidosDirectos: referidosDirectos,
+      puntosRed: puntosGeneradosPorRed, nodosArbol: arbol
+    };
+
+  } catch(e) { return { success: false, msg: e.toString() }; }
 }
 
 async function registrarNuevoReferido() {
@@ -10858,22 +10958,35 @@ function dibujarArbol() {
 
     // Mapeo dinámico de los datos que vienen del backend
     let filasGrafico = window.kairoArbolRed.map(nodo => {
-        // Diseño de la tarjeta del nodo
         let colorFondo = nodo.rango === "Coach" ? "#a855f7" : (nodo.rango === "Suscriptor" ? "#10b981" : "#334155");
+        
+        // 🛡️ LÓGICA DE PRIVACIDAD: Solo Coach y Admin pueden hacer clic para ver el contacto
+        let interactivoHTML = "";
+        if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
+            let numLimpio = nodo.whatsapp.replace(/[^0-9+]/g, '');
+            interactivoHTML = `onclick="kairoMessage({mensaje: '<h3 style=\\'color:var(--neon-n); font-family:Orbitron;\\'>TARJETA DE CONTACTO</h3><p><b>WhatsApp:</b> <a href=\\'https://wa.me/${numLimpio}\\' target=\\'_blank\\' style=\\'color:white;\\'>${nodo.whatsapp}</a></p><p><b>Email:</b> ${nodo.id}</p><p><b>País:</b> ${nodo.pais}</p>', icon: '📱'})" style="cursor:pointer;"`;
+        }
+
         let nodoHTML = `
-            <div style="background: ${colorFondo}; color: white; padding: 10px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); min-width: 120px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+            <div ${interactivoHTML} style="background: ${colorFondo}; color: white; padding: 10px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); min-width: 120px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;" onmouseover="this.style.borderColor='var(--neon-n)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'">
                 <div style="font-size: 20px;">${nodo.genero === "Femenino" ? "👩" : "👨"}</div>
                 <strong style="font-size: 0.9em; font-family:'Orbitron'; display:block; margin-top:5px;">${nodo.nombre}</strong>
                 <small style="opacity: 0.8; font-size: 0.7em;">${nodo.rango}</small>
+                <small style="display:block; font-size:0.65em; color:var(--neon-n); margin-top:3px;">${nodo.pais}</small>
             </div>
         `;
-        // [Contenido HTML, ID del Padre, Tooltip]
         return [{ v: nodo.id, f: nodoHTML }, nodo.padreId, nodo.rango];
     });
 
     data.addRows(filasGrafico);
-
     var chart = new google.visualization.OrgChart(document.getElementById('canvas-arbol'));
+    
+    // 🛡️ ANTI-CRASH: Si el árbol encuentra un nodo huérfano, no explota, simplemente avisa.
+    google.visualization.events.addListener(chart, 'error', function (err) {
+         google.visualization.errors.removeError(err.id);
+         document.getElementById('canvas-arbol').innerHTML = "<p style='color:#ef4444; padding:20px;'>Kairo Alerta: La estructura de red presenta usuarios huérfanos.</p>";
+    });
+
     chart.draw(data, {allowHtml: true, size: 'medium', nodeClass: 'kairo-nodo-red'});
 }
 
@@ -11691,6 +11804,7 @@ async function iniciarDesafio90() {
     const resProgreso = await apiCall("sincronizarDatosLogros", { email: sessionUser.email });
     
     if (resProgreso && resProgreso.success) {
+        progresoUsuarioCache = resProgreso.progreso; // 🛡️ SUTURA CRÍTICA: Guardar en la memoria global
         const rachaActual = resProgreso.progreso.racha || 0;
         const ultimoDiaStr = resProgreso.progreso.ultimoDia || "";
         
@@ -11813,9 +11927,12 @@ async function confirmarDiaDesafio() {
     if (res && res.success) {
         cerrarModalFrase();
         
-        // 🔥 MEJORA RECUPERADA: Actualización instantánea y fluida sin recargar todo el módulo
+        // 🔥 SUTURA CRÍTICA: Aseguramos que la caché exista antes de actualizar
+        if (!progresoUsuarioCache) progresoUsuarioCache = {};
         progresoUsuarioCache.racha = res.racha;
-        renderizarTablero90Dias(); 
+        
+        document.getElementById('tablero-racha-num').innerText = res.racha; // Actualiza número visual
+        renderizarTableroGame(res.racha, true);
         
         // 🏆 HITOS VIP (Dopamina)
         if (res.hito === 90) {
@@ -11924,8 +12041,50 @@ function abrirModalSeguimientoRed() {
 function cerrarModalSeguimientoRed() {
     document.getElementById('modal-seguimiento-coach').classList.add('hidden');
 }
-function abrirModalOtorgarPuntos() {
+// 2. Cargar Catálogo Dinámico en la Ventana Offline
+async function abrirModalOtorgarPuntos() {
     document.getElementById('modal-otorgar-puntos').classList.remove('hidden');
+    const selectSku = document.getElementById('puntos-offline-sku');
+    selectSku.innerHTML = '<option value="">Sincronizando catálogo universal...</option>';
+
+    // 🛡️ FOCUS: Poblamos la red de clientes del Coach en el selector
+    const selectCliente = document.getElementById('puntos-offline-nombre');
+    selectCliente.innerHTML = '<option value="">-- Selecciona el Cliente de tu Red --</option>';
+    
+    if (window.kairoArbolRed && window.kairoArbolRed.length > 0) {
+        window.kairoArbolRed.forEach(nodo => {
+            // Evita que el coach se venda a sí mismo, pero muestra a los demás
+            if (nodo.id !== sessionUser.email) {
+                selectCliente.innerHTML += `<option value="${nodo.nombre}" data-email="${nodo.id}" data-wp="${nodo.whatsapp}" data-pais="${nodo.pais}">${nodo.nombre} (${nodo.id})</option>`;
+            }
+        });
+    } else {
+        selectCliente.innerHTML = '<option value="">No tienes clientes registrados en tu red.</option>';
+    }
+    
+    const res = await apiCall("obtenerCatalogoUniversal");
+    if (res && res.success) {
+        selectSku.innerHTML = '<option value="">Selecciona el Ítem Vendido</option>';
+        res.catalogo.forEach(i => {
+            selectSku.innerHTML += `<option value="${i.sku}">${i.nombre}</option>`;
+        });
+    } else {
+        selectSku.innerHTML = '<option value="">Error al cargar catálogo</option>';
+    }
+}
+
+// 🛡️ LÓGICA DE AUTOCOMPLETADO
+function autocompletarDatosVentaOffline(selectElement) {
+    if(selectElement.selectedIndex > 0) {
+        const opt = selectElement.options[selectElement.selectedIndex];
+        document.getElementById('puntos-offline-email').value = opt.getAttribute('data-email') || "";
+        document.getElementById('puntos-offline-wp').value = opt.getAttribute('data-wp') || "";
+        document.getElementById('puntos-offline-pais').value = opt.getAttribute('data-pais') || "";
+    } else {
+        document.getElementById('puntos-offline-email').value = "";
+        document.getElementById('puntos-offline-wp').value = "";
+        document.getElementById('puntos-offline-pais').value = "";
+    }
 }
 function cerrarModalOtorgarPuntos() {
     document.getElementById('modal-otorgar-puntos').classList.add('hidden');
@@ -12396,6 +12555,15 @@ function siguientePasoReg(pasoActual) {
         // Si todo está correcto, disparamos el motor original de registro que va al Backend
         ejecutarRegistro(); 
     }
+
+    function abrirCrmCoach() {
+    cerrarPortalCoachMaestro();
+    iniciarMiRedNavbar(); // Enciende el módulo de red
+    // Pequeño retraso para dar tiempo a que se renderice el módulo antes de sobreponer el modal del CRM
+    setTimeout(() => {
+        abrirModalSeguimientoRed();
+    }, 500);
+}
 </script>
 
 <!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
@@ -12415,7 +12583,7 @@ function siguientePasoReg(pasoActual) {
     <p style="color: #cbd5e1; font-size: 0.85em; text-align: center; margin-bottom: 20px;">Convierte tus ventas presenciales en Puntos C3D para tus clientes. Registraremos la transacción y se calculará el 5% de pago a la plataforma.</p>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
-        <input type="text" id="puntos-offline-nombre" placeholder="Nombre del Cliente" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <select id="puntos-offline-nombre" onchange="autocompletarDatosVentaOffline(this)" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;"><option value="">Selecciona Cliente de tu Red</option></select>
         <input type="date" id="puntos-offline-fecha" title="Fecha de Nacimiento" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: #cbd5e1; border-radius: 5px;">
         <input type="text" id="puntos-offline-wp" placeholder="WhatsApp" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
         <input type="email" id="puntos-offline-email" placeholder="Email" style="padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
