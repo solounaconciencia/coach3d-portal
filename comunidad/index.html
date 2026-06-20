@@ -12560,13 +12560,14 @@ function siguientePasoReg(pasoActual) {
     }
 
     function abrirCrmCoach() {
-    cerrarPortalCoachMaestro();
-    iniciarMiRedNavbar(); // Enciende el módulo de red
-    // Pequeño retraso para dar tiempo a que se renderice el módulo antes de sobreponer el modal del CRM
-    setTimeout(() => {
-        abrirModalSeguimientoRed();
-    }, 500);
-}
+        cerrarPortalCoachMaestro();
+        apagarTodosLosModulos();
+        const modCrm = document.getElementById('modulo-crm-coach');
+        if(modCrm) {
+            modCrm.classList.remove('hidden');
+            iniciarCrmCoachMotor();
+        }
+    }
 
 // =========================================================================
 // 📊 MOTOR JAVASCRIPT: CRM COACH (KANBAN Y SEGUIMIENTO)
