@@ -2411,6 +2411,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-rangos')" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">👥 COACHES</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-agenda'); cargarAdminAgenda();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">📅 AGENDAS</button>
             <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-canjes'); inicializarAdminCanjes();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#cbd5e1; cursor:pointer;">🎁 BAZAR</button>
+            <button class="tab-admin" onclick="cambiarTabAdmin('tab-admin-reservas'); cargarAdminReservas();" style="flex:1; min-width: 150px; padding:15px; background:transparent; border:none; color:#fbbf24; font-weight:bold; cursor:pointer; border-left:1px dashed #fbbf24;">🏦 RESERVAS</button>
         </div>
 
         <div id="tab-admin-productos" style="padding: 20px;">
@@ -2655,6 +2656,19 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
             <div id="admin-lista-canjes" style="background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); padding: 15px; max-height: 300px; overflow-y: auto;">
                 <p style="text-align: center; color: #94a3b8; font-size: 0.85em;">Sincronizando...</p>
             </div>
+        </div>
+
+        <div id="tab-admin-reservas" class="hidden" style="padding: 20px;">
+            <h3 style="color: #fbbf24; font-family: 'Orbitron'; margin-top: 0;"><span style="font-size: 1.2em;">🏦</span> RESERVAS Y RESPALDO FINANCIERO</h3>
+            <p style="font-size: 0.85em; color: #cbd5e1; margin-top:-5px;">Deuda actual de la plataforma con la comunidad (Puntos y Fichas en circulación).</p>
+            
+            <div id="admin-reservas-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                <p style="color: #fbbf24; text-align: center; grid-column: 1/-1;">Calculando deuda total de la Matrix...</p>
+            </div>
+            
+            <p style="font-size: 0.7em; color: #94a3b8; margin-top: 20px; text-align: justify;">
+                * <b>Auditoría de Kairo:</b> Esta pantalla muestra la fotografía en vivo del pasivo de la comunidad hoy. 
+            </p>
         </div>
 
     </div>
@@ -3494,7 +3508,10 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 <span style="color: #cbd5e1; font-size: 0.85em;">Puntos Ganados por Red:</span>
                 <strong id="puntos-ganados-red" style="color: #10b981; font-size: 1.2em;">0</strong>
             </div>
-            <button class="btn btn-n" style="width: 100%; padding: 12px; font-size: 0.8em;" onclick="abrirModalIngresoReferido()">+ DECLARAR NUEVO REFERIDO</button>
+            <button class="btn btn-n" style="width: 100%; padding: 12px; font-size: 0.8em;" onclick="abrirModalIngresoReferido()">+ INGRESAR NUEVO REFERIDO</button>
+            <p style="font-size: 0.7em; color: #94a3b8; margin: 10px 0 0 0; line-height: 1.4; text-align: left; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border-left: 2px solid var(--neon-n);">
+                💡 <b>Reglas de Recompensa:</b> Por cada usuario que se registre como invitado (indicando tu nombre y email) y alcance el Día 7 del desafío de 90 días, ganarás <b>10 fichas</b>. Por cada invitado que llegue a Suscriptor VIP, ganarás <b>1000 fichas</b>.
+            </p>
         </div>
     </div>
 
@@ -3816,9 +3833,11 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0; text-align: center;">🌐 RED TRIDIMENSIONAL</h3>
     
     <!-- CONTROLES EXCLUSIVOS COACH / ADMIN -->
+    <!-- CONTROLES EXCLUSIVOS COACH / ADMIN -->
     <div id="red-controles-coach" class="hidden" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
         <button class="btn btn-m" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirModalSeguimientoRed()">📊 SEGUIMIENTO</button>
         <button class="btn btn-f" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirModalOtorgarPuntos()">🪙 OTORGAR PUNTOS</button>
+        <button class="btn btn-n" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirAjustesArbol()">🎨 DISEÑO ÁRBOL</button>
     </div>
 
     <div style="text-align: center; margin-bottom: 10px;">
@@ -5197,10 +5216,10 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
 
       // Inyección segura de Contadores Universales
       const kpiPuntos = document.getElementById('kpi-puntos');
-      if (kpiPuntos) kpiPuntos.innerText = sData.puntos;
-      const kpiFichas = document.getElementById('kpi-fichas');
-      if (kpiFichas) kpiFichas.innerText = sData.fichas || 0;
+      if (kpiPuntos) kpiPuntos.innerText = "$" + Number(sData.puntos || 0).toLocaleString('es-CL');
 
+      const kpiFichas = document.getElementById('kpi-fichas');
+      if (kpiFichas) kpiFichas.innerText = Number(sData.fichas || 0).toLocaleString('es-CL');
       const kpiRefTotal = document.getElementById('kpi-ref-total');
       if (kpiRefTotal) kpiRefTotal.innerText = sData.refTotal;
 
@@ -5338,7 +5357,7 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
                 <h4 style="color: white; font-family:'Orbitron'; font-size:0.8em; margin: 0 0 10px 0; text-align:center;">PROPORCIÓN DEL INGRESO TOTAL</h4>
                 <img src="${chartUrl}" style="width: 100%; max-width:300px; margin:0 auto; display:block;">
             </div>
-            <button class="btn btn-n" style="width:100%; font-size:0.75em; padding:12px;" onclick="iniciarcalculadorafinanciera()">ACTUALIZAR ESTADO FINANCIERO</button>
+            <button class="btn btn-n" style="font-size: 0.7em; padding: 8px 15px;" onclick="iniciarcalculadorafinanciera()">ACTUALIZAR ESTADO FINANCIERO</button>
           `;
       } else {
           document.getElementById('dash-empty-fin').classList.remove('hidden');
@@ -10870,134 +10889,29 @@ function cerrarModalIngresoReferido() {
 
 let factorZoomArbol = 1;
 
-function sincronizarDatosEconomia(payload) {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheetReg = ss.getSheetByName("REGISTRO");
-    const dataReg = sheetReg.getDataRange().getValues();
-    const emailUsuario = payload.email.toLowerCase().trim();
-    
-    let puntosTotales = 0;
-    let referidosDirectos = [];
-    let arbol = [];
-    let puntosGeneradosPorRed = 0; 
-    
-    let miIdEnLaRed = "";
-    let miRango = "Usuario";
-
-    for (let i = 1; i < dataReg.length; i++) {
-      let em = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
-      if (em === emailUsuario) {
-        miIdEnLaRed = em; 
-        miRango = dataReg[i][12] || "Usuario";
-        puntosTotales = dataReg[i][24] || 0; 
-        break;
-      }
-    }
-
-    if (!miIdEnLaRed) return { success: false, msg: "Usuario no hallado en la Matrix." };
-
-    let emailsValidosEnBD = new Set();
-    for(let i=1; i<dataReg.length; i++) {
-        if(dataReg[i][3]) emailsValidosEnBD.add(dataReg[i][3].toString().toLowerCase().trim());
-    }
-
-    // 🛡️ LÓGICA DE PROFUNDIDAD (1 Nivel Usuarios, 6 Niveles Coaches, Ilimitado Admin)
-    let maxNiveles = 1;
-    if (miRango === "Coach") maxNiveles = 6;
-    if (miRango === "Admin") maxNiveles = 999;
-
-    let nivelActualMails = [emailUsuario];
-    let todosLosMailsEnArbol = new Set([emailUsuario]);
-
-    // Siempre me agrego a mí mismo como raíz principal
-    for (let i = 1; i < dataReg.length; i++) {
-        let em = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
-        if(em === emailUsuario) {
-            arbol.push({
-              id: em,
-              nombre: dataReg[i][11] || dataReg[i][1],
-              padreId: "", // La raíz nunca tiene padre en el mapa visual
-              rango: dataReg[i][12] || "Usuario",
-              genero: "Masculino",
-              pais: dataReg[i][6] || "Desconocido",
-              whatsapp: dataReg[i][5] || "No registrado",
-              nivel: 0
+async function sincronizarDatosEconomiaRed() {
+    const res = await apiCall("sincronizarDatosEconomia", { email: sessionUser.email });
+    if(res && res.success) {
+        const saldo = document.getElementById('puntos-saldo-actual');
+        if(saldo) saldo.innerText = "$" + Number(res.puntosTotales).toLocaleString('es-CL');
+        
+        const tbody = document.getElementById('tabla-referidos-directos');
+        if(tbody) {
+            tbody.innerHTML = "";
+            if(res.referidosDirectos.length === 0) tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No tienes referidos directos.</td></tr>";
+            res.referidosDirectos.forEach(r => {
+                tbody.innerHTML += `<tr><td>${r.nombre}</td><td>${r.fecha}</td><td style="text-align:center;">${r.esSuscriptor?'SÍ':'NO'}</td><td style="text-align:center;">${r.puntosAportados}</td><td style="text-align:center;">ACTIVO</td></tr>`;
             });
-            break;
         }
-    }
-
-    if (miRango === "Admin") {
-        // ADMIN VE TODA LA MATRIX
-        for (let i = 1; i < dataReg.length; i++) {
-            let em = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
-            if (em && em !== emailUsuario) {
-                let padre = dataReg[i][15] ? dataReg[i][15].toString().toLowerCase().trim() : "";
-                // Anti-Crash: Si el padre no existe o fue borrado, lo amarramos a la raíz Admin
-                if (!emailsValidosEnBD.has(padre)) padre = emailUsuario; 
-
-                arbol.push({
-                    id: em,
-                    nombre: dataReg[i][11] || dataReg[i][1],
-                    padreId: padre,
-                    rango: dataReg[i][12] || "Usuario",
-                    genero: "Femenino",
-                    pais: dataReg[i][6] || "Desconocido",
-                    whatsapp: dataReg[i][5] || "No registrado",
-                    nivel: 1
-                });
-            }
+        
+        window.kairoArbolRed = res.nodosArbol;
+        
+        if (!document.getElementById('modal-visor-red').classList.contains('hidden')) {
+            dibujarArbol();
         }
     } else {
-        // COACH O USUARIO REGULAR
-        for (let lvl = 1; lvl <= maxNiveles; lvl++) {
-            let siguienteNivelMails = [];
-
-            for (let i = 1; i < dataReg.length; i++) {
-                let suPatrocinador = dataReg[i][15] ? dataReg[i][15].toString().toLowerCase().trim() : "";
-                let suEmail = dataReg[i][3] ? dataReg[i][3].toString().toLowerCase().trim() : "";
-
-                if (nivelActualMails.includes(suPatrocinador) && suEmail !== "" && !todosLosMailsEnArbol.has(suEmail)) {
-                    let nombreRef = dataReg[i][11] || dataReg[i][1];
-                    let rangoRef = dataReg[i][12] || "Usuario";
-                    
-                    todosLosMailsEnArbol.add(suEmail);
-                    siguienteNivelMails.push(suEmail);
-
-                    if (lvl === 1) {
-                        referidosDirectos.push({
-                            nombre: nombreRef,
-                            fecha: dataReg[i][20] || "Reciente",
-                            rango: rangoRef,
-                            esSuscriptor: (rangoRef === "Suscriptor" || rangoRef === "Coach" || rangoRef === "Admin"),
-                            puntosAportados: 0
-                        });
-                    }
-
-                    arbol.push({
-                        id: suEmail,
-                        nombre: nombreRef,
-                        padreId: suPatrocinador,
-                        rango: rangoRef,
-                        genero: "Femenino",
-                        pais: dataReg[i][6] || "Desconocido",
-                        whatsapp: dataReg[i][5] || "No registrado",
-                        nivel: lvl
-                    });
-                }
-            }
-            if (siguienteNivelMails.length === 0) break; // Fin de la red
-            nivelActualMails = siguienteNivelMails;
-        }
+        notify("❌ Error al sincronizar red: " + (res ? res.msg : "Sin conexión"));
     }
-
-    return {
-      success: true, puntosTotales: puntosTotales, referidosDirectos: referidosDirectos,
-      puntosRed: puntosGeneradosPorRed, nodosArbol: arbol
-    };
-
-  } catch(e) { return { success: false, msg: e.toString() }; }
 }
 
 async function registrarNuevoReferido() {
@@ -11052,6 +10966,19 @@ function zoomArbol(factor) {
     document.getElementById('canvas-arbol').style.transform = `scale(${factorZoomArbol})`;
 }
 
+window.configArbol = window.configArbol || {
+    colores: { "Usuario": "#334155", "Suscriptor": "#10b981", "Coach": "#a855f7", "Admin": "#fbbf24" },
+    formas: {
+        0: "50%", // Nivel 0: Esfera
+        1: "15px", // Nivel 1: Cubo Suavizado
+        2: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)", // Nivel 2: Pentágono
+        3: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", // Nivel 3: Hexágono
+        4: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", // Nivel 4: Rombo (Octaedro 2D)
+        5: "polygon(50% 0%, 100% 100%, 0% 100%)", // Nivel 5: Triángulo (Tetraedro)
+        6: "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)" // Nivel 6: Trapecio
+    }
+};
+
 function dibujarArbol() {
     if (!window.kairoArbolRed || window.kairoArbolRed.length === 0) {
         document.getElementById('canvas-arbol').innerHTML = "<p style='color:#94a3b8; padding:40px;'>Tu red aún está en construcción.</p>";
@@ -11063,23 +10990,34 @@ function dibujarArbol() {
     data.addColumn('string', 'Manager');
     data.addColumn('string', 'ToolTip');
 
-    // Mapeo dinámico de los datos que vienen del backend
+    let statsRed = {};
+    if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
+        window.kairoArbolRed.forEach(n => {
+            let desc = getDescendants(n.id, window.kairoArbolRed);
+            statsRed[n.id] = { refs: desc.length, coaches: desc.filter(d => d.rango === "Coach" || d.rango === "Admin").length };
+        });
+    }
+
     let filasGrafico = window.kairoArbolRed.map(nodo => {
-        let colorFondo = nodo.rango === "Coach" ? "#a855f7" : (nodo.rango === "Suscriptor" ? "#10b981" : "#334155");
+        let colorFondo = window.configArbol.colores[nodo.rango] || "#334155";
+        let formaClip = window.configArbol.formas[Math.min(nodo.nivel, 6)] || "50%";
+        let estiloForma = formaClip.includes("polygon") ? `clip-path: ${formaClip}; border-radius: 0;` : `border-radius: ${formaClip};`;
         
-        // 🛡️ LÓGICA DE PRIVACIDAD: Solo Coach y Admin pueden hacer clic para ver el contacto
         let interactivoHTML = "";
+        let cursorEstilo = "default";
+
         if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
-            let numLimpio = nodo.whatsapp.replace(/[^0-9+]/g, '');
-            interactivoHTML = `onclick="kairoMessage({mensaje: '<h3 style=\\'color:var(--neon-n); font-family:Orbitron;\\'>TARJETA DE CONTACTO</h3><p><b>WhatsApp:</b> <a href=\\'https://wa.me/${numLimpio}\\' target=\\'_blank\\' style=\\'color:white;\\'>${nodo.whatsapp}</a></p><p><b>Email:</b> ${nodo.id}</p><p><b>País:</b> ${nodo.pais}</p>', icon: '📱'})" style="cursor:pointer;"`;
+            cursorEstilo = "pointer";
+            let numLimpio = nodo.whatsapp ? nodo.whatsapp.replace(/[^0-9+]/g, '') : "";
+            let s = statsRed[nodo.id] || {refs:0, coaches:0};
+            let msg = `<h3 style=\\'color:var(--neon-n); font-family:Orbitron;\\'>TARJETA DE CONTACTO</h3><p><b>Nombre:</b> ${nodo.nombre}</p><p><b>WhatsApp:</b> <a href=\\'https://wa.me/${numLimpio}\\' target=\\'_blank\\' style=\\'color:white;\\'>${nodo.whatsapp}</a></p><p><b>Email:</b> ${nodo.id}</p><p><b>País:</b> ${nodo.pais}</p><hr style=\\'border-color:rgba(255,255,255,0.1);\\'><p><b>Organización Completa:</b> ${s.refs} Referidos</p><p><b>Coaches en su red:</b> ${s.coaches}</p>`;
+            interactivoHTML = `onclick="kairoMessage({mensaje: '${msg}', icon: '📱'})"`;
         }
 
         let nodoHTML = `
-            <div ${interactivoHTML} style="background: ${colorFondo}; color: white; padding: 10px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); min-width: 120px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;" onmouseover="this.style.borderColor='var(--neon-n)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'">
-                <div style="font-size: 20px;">${nodo.genero === "Femenino" ? "👩" : "👨"}</div>
-                <strong style="font-size: 0.9em; font-family:'Orbitron'; display:block; margin-top:5px;">${nodo.nombre}</strong>
-                <small style="opacity: 0.8; font-size: 0.7em;">${nodo.rango}</small>
-                <small style="display:block; font-size:0.65em; color:var(--neon-n); margin-top:3px;">${nodo.pais}</small>
+            <div ${interactivoHTML} style="cursor: ${cursorEstilo}; background: ${colorFondo}; color: white; width: 110px; height: 110px; display:flex; flex-direction:column; justify-content:center; align-items:center; ${estiloForma} box-shadow: inset -5px -5px 15px rgba(0,0,0,0.6), inset 5px 5px 15px rgba(255,255,255,0.3); transition: 0.3s; margin:auto; position: relative;">
+                <div style="font-size: 26px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8)); margin-bottom:5px;">${nodo.genero === "Femenino" ? "👩" : "👨"}</div>
+                <strong style="font-size: 0.7em; font-family:'Orbitron'; display:block; text-shadow:0 2px 2px #000; text-align:center; padding: 0 5px; line-height: 1.1;">${nodo.nombre.split(' ')[0]}</strong>
             </div>
         `;
         return [{ v: nodo.id, f: nodoHTML }, nodo.padreId, nodo.rango];
@@ -11087,14 +11025,44 @@ function dibujarArbol() {
 
     data.addRows(filasGrafico);
     var chart = new google.visualization.OrgChart(document.getElementById('canvas-arbol'));
-    
-    // 🛡️ ANTI-CRASH: Si el árbol encuentra un nodo huérfano, no explota, simplemente avisa.
     google.visualization.events.addListener(chart, 'error', function (err) {
          google.visualization.errors.removeError(err.id);
-         document.getElementById('canvas-arbol').innerHTML = "<p style='color:#ef4444; padding:20px;'>Kairo Alerta: La estructura de red presenta usuarios huérfanos.</p>";
     });
-
     chart.draw(data, {allowHtml: true, size: 'medium', nodeClass: 'kairo-nodo-red'});
+}
+
+function getDescendants(parentId, allNodes) {
+    let desc = [];
+    let children = allNodes.filter(n => n.padreId === parentId);
+    children.forEach(c => {
+        desc.push(c);
+        desc = desc.concat(getDescendants(c.id, allNodes));
+    });
+    return desc;
+}
+
+function abrirAjustesArbol() {
+    let html = `
+        <h3 style="color:var(--neon-n); font-family:'Orbitron';">DISEÑO DE LA MATRIX</h3>
+        <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:15px;">Altera los colores de tu Organización.</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; text-align:left;">
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Usuario:</label><input type="color" id="c-user" value="${window.configArbol.colores['Usuario']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Suscriptor:</label><input type="color" id="c-susc" value="${window.configArbol.colores['Suscriptor']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Coach:</label><input type="color" id="c-coach" value="${window.configArbol.colores['Coach']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Admin:</label><input type="color" id="c-admin" value="${window.configArbol.colores['Admin']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
+        </div>
+        <button class="btn btn-n" style="width:100%; margin-top:20px;" onclick="guardarAjustesArbol()">APLICAR Y REDIBUJAR</button>
+    `;
+    kairoMessage({ mensaje: html, icon: '🎨' });
+}
+
+function guardarAjustesArbol() {
+    window.configArbol.colores['Usuario'] = document.getElementById('c-user').value;
+    window.configArbol.colores['Suscriptor'] = document.getElementById('c-susc').value;
+    window.configArbol.colores['Coach'] = document.getElementById('c-coach').value;
+    window.configArbol.colores['Admin'] = document.getElementById('c-admin').value;
+    cerrarKairoMsg();
+    dibujarArbol();
 }
 
 function abrirAutorizacionesCoach() {
@@ -12157,21 +12125,20 @@ function cerrarFlyerPromo() {
     document.getElementById('main-content').classList.remove('blur-effect');
 }
 // 🚀 NUEVO ENRUTADOR: MI RED (NAVBAR)
-function iniciarMiRedNavbar() {
+async function iniciarMiRedNavbar() {
     if (!sessionUser) return notify("Debes iniciar sesión en la Matrix.");
     
     const controlesCoach = document.getElementById('red-controles-coach');
-    
-    // Validamos permisos para encender los paneles de control
     if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
         if (controlesCoach) controlesCoach.classList.remove('hidden');
     } else {
         if (controlesCoach) controlesCoach.classList.add('hidden');
     }
     
-    // 🛡️ Nota: Asegúrate de tener la función abrirVisorArbolRed() definida en tu JS de Redes
-    if (typeof abrirVisorArbolRed === 'function') abrirVisorArbolRed();
-    else notify("El visor del árbol de red se está sincronizando...");
+    mostrarLoading("Hackeando la Matrix de Red...");
+    await sincronizarDatosEconomiaRed();
+    ocultarLoading();
+    abrirVisorArbolRed();
 }
 
 // 🛡️ APERTURAS DE MODALES FASE 1
@@ -12938,7 +12905,46 @@ function calcularEdadRegistro(fechaNacimiento, idInputEdad) {
     const inputEdad = document.getElementById(idInputEdad);
     if (inputEdad) inputEdad.value = age;
 }
+
+async function cargarAdminReservas() {
+    const grid = document.getElementById('admin-reservas-grid');
+    grid.innerHTML = "<p style='color: #fbbf24; text-align: center; grid-column: 1/-1;'><span class='spinner' style='display:inline-block; width:20px; height:20px; border-width:2px; vertical-align:middle; margin-right:10px; border-left-color:#fbbf24;'></span>Calculando deuda total de la Matrix...</p>";
     
+    // Cambiamos el color de los botones inactivos
+    document.getElementById('tab-admin-productos').classList.add('hidden');
+    document.getElementById('tab-admin-cursos').classList.add('hidden');
+    document.getElementById('tab-admin-servicios').classList.add('hidden');
+    document.getElementById('tab-admin-herramientas').classList.add('hidden');
+    document.getElementById('tab-admin-rangos').classList.add('hidden');
+    document.getElementById('tab-admin-agenda').classList.add('hidden');
+    document.getElementById('tab-admin-canjes').classList.add('hidden');
+    document.getElementById('tab-admin-reservas').classList.remove('hidden');
+
+    const res = await apiCall("adminObtenerReservas");
+    if(res && res.success) {
+        // Asumimos un costo promedio de 100 puntos por ficha para la valorización matemática
+        const valorEstimadoFichas = res.totalFichas * 100;
+        
+        grid.innerHTML = `
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-f); padding: 20px; border-radius: 12px; text-align: center; box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1);">
+                <h4 style="color: var(--neon-f); margin: 0 0 10px 0; font-family: 'Orbitron';">🪙 PUNTOS EN CIRCULACIÓN</h4>
+                <span style="font-size: 2.5rem; font-weight: bold; color: white;">${res.totalPuntos.toLocaleString('es-CL')}</span>
+                <p style="margin: 10px 0 0 0; color: #cbd5e1; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px;">Respaldo exigido en Banco:</p>
+                <strong style="color: var(--neon-f); font-size: 1.4rem;">$${res.totalPuntos.toLocaleString('es-CL')} CLP</strong>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); padding: 20px; border-radius: 12px; text-align: center; box-shadow: inset 0 0 20px rgba(168, 85, 247, 0.1);">
+                <h4 style="color: var(--neon-m); margin: 0 0 10px 0; font-family: 'Orbitron';">🎟️ FICHAS EN CIRCULACIÓN</h4>
+                <span style="font-size: 2.5rem; font-weight: bold; color: white;">${res.totalFichas.toLocaleString('es-CL')}</span>
+                <p style="margin: 10px 0 0 0; color: #cbd5e1; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px;">Valorización Teórica:</p>
+                <strong style="color: var(--neon-m); font-size: 1.4rem;">$${valorEstimadoFichas.toLocaleString('es-CL')} CLP</strong>
+                <p style="font-size: 0.65em; color: #94a3b8; margin: 5px 0 0 0;">(Estimado a 100 Pts x Ficha)</p>
+            </div>
+        `;
+    } else {
+        grid.innerHTML = "<p style='color: #ef4444; text-align: center; grid-column: 1/-1;'>Error de comunicación con la Base de Datos.</p>";
+    }
+}
 </script>
 
 <!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
