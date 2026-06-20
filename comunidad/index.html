@@ -10439,9 +10439,12 @@ async function añadirCoachAgendaAdmin() {
 
 // --- RUTAS DEL COACH ---
 function abrirPortalCoachMaestro() {
+    const modal = document.getElementById('modal-portal-coach');
+    document.body.appendChild(modal); // 🛡️ SUTURA FOCUS: Extraemos el modal de la trampa borrosa
+    
     document.getElementById('main-content').classList.add('blur-effect');
-    document.getElementById('modal-portal-coach').classList.remove('hidden');
-    document.getElementById('modal-portal-coach').style.display = 'block';
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
 }
 function cerrarPortalCoachMaestro() {
     document.getElementById('modal-portal-coach').classList.add('hidden');
