@@ -2703,11 +2703,11 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 
                 <!-- KPIs Variables según Rango -->
                 <div id="kpi-container-rango" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                    <div class="c3d-metric-badge">
+                    <div class="c3d-metric-badge" style="cursor: pointer; transition: 0.3s;" onclick="abrirModalPuntos()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <span class="c3d-metric-val" style="color:#fbbf24;" id="kpi-puntos">0</span>
                         <span class="c3d-metric-lbl">PUNTOS C3D</span>
                     </div>
-                    <div class="c3d-metric-badge">
+                    <div class="c3d-metric-badge" style="cursor: pointer; transition: 0.3s;" onclick="abrirModalFichas()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <span class="c3d-metric-val" style="color:var(--neon-m);" id="kpi-fichas">0</span>
                         <span class="c3d-metric-lbl">Fichas Sorteo</span>
                     </div>
@@ -9371,7 +9371,12 @@ async function procesarPagoCarrito() {
 
         if (res && res.success) {
             localStorage.setItem('kairo_ecommerce_token_anonimo', "ECOM-" + new Date().getTime());
-            localStorage.setItem('kairo_ecommerce_tipo', "PRODUCTOS");
+            // 🛡️ MOTOR INTELIGENTE: Detectar si el usuario está pagando Fichas (Gemas) o Productos
+            if (carritoCompras[0] && carritoCompras[0].sku.startsWith("FICHAS")) {
+                localStorage.setItem('kairo_ecommerce_tipo', "FICHAS");
+            } else {
+                localStorage.setItem('kairo_ecommerce_tipo', "PRODUCTOS");
+            }
             window.location.href = res.init_point;
         } else {
             btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
@@ -9462,31 +9467,63 @@ async function ejecutarEnvioBinance() {
 }
      
 
-// 🛡️ SENSOR DE RETORNO DE MERCADOPAGO (PRODUCTOS)
+// 🛡️ SENSOR DE RETORNO DE MERCADOPAGO (PRODUCTOS Y FICHAS)
 window.addEventListener('load', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('modulo') === 'retorno_pago_ecom' && urlParams.get('status') === 'approved') {
         document.getElementById('kairo-loader-global').style.display = 'none';
-        
         const paymentId = urlParams.get('payment_id');
-        const waTxt = encodeURIComponent(`🚀 *¡PAGO CONFIRMADO TIENDA C3D!*\n\n📌 *Transacción MP:* ${paymentId}\n\n*Hola Coach, acabo de pagar mi carrito de compras por MercadoPago. Coordinemos el envío/retiro.*`);
+        const tipoCompra = localStorage.getItem('kairo_ecommerce_tipo');
         
-        // Vaciamos el carrito porque ya se pagó
-        localStorage.removeItem('kairo_carrito_ecom');
-        carritoCompras = [];
-        
-        const tarjetaHTML = `
-            <div style="text-align: center; width: 100%;">
-                <p style="color: var(--neon-n); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡PAGO ACREDITADO!</p>
-                <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
-                    Tu pago ha sido validado por MercadoPago (Ref: ${paymentId}).<br><br>Escríbele a un Coach ahora mismo para coordinar la logística.
-                </p>
-                <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
-            </div>
-        `;
-        await kairoMessage({ mensaje: tarjetaHTML, icon: "🛍️" });
-        
-        // Limpiamos la URL para no repetir el mensaje si recarga la página
+        if (tipoCompra === 'FICHAS') {
+            // FLUJO AUTOMÁTICO DE FICHAS C3D
+            const carritoSalvado = JSON.parse(localStorage.getItem('kairo_carrito_ecom'));
+            const skuFichas = carritoSalvado[0].sku; // Ej: FICHAS-1150
+            const cantidadFichas = parseInt(skuFichas.split('-')[1]);
+            
+            mostrarLoading("Acreditando Fichas en tu Bóveda...");
+            const res = await apiCall("procesarCompraFichas", { email: sessionUser.email, cantidad: cantidadFichas, paymentId: paymentId, monto: carritoSalvado[0].precio });
+            ocultarLoading();
+            
+            if (res && res.success) {
+                localStorage.removeItem('kairo_carrito_ecom');
+                localStorage.removeItem('kairo_ecommerce_tipo');
+                carritoCompras = [];
+                
+                const tarjetaHTML = `
+                    <div style="text-align: center; width: 100%;">
+                        <div style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--neon-m));">🎟️</div>
+                        <p style="color: var(--neon-m); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; font-family:'Orbitron';">¡PAGO ACREDITADO!</p>
+                        <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
+                            Tu pago ha sido validado en la red (Ref: ${paymentId}). Se han inyectado <b>${cantidadFichas.toLocaleString('es-CL')} Fichas</b> a tu cuenta de forma automática.
+                        </p>
+                        <button class="btn btn-m" style="width: 100%; padding: 14px; font-weight: bold;" onclick="cerrarKairoMsg(); abrirModalFichas();">VER MIS FICHAS AHORA</button>
+                    </div>
+                `;
+                await kairoMessage({ mensaje: tarjetaHTML, icon: "✅" });
+                loadDashboard(); // Refrescamos el saldo en el dashboard
+            } else {
+                notify("Error al acreditar fichas. Guarda tu N° de Transacción y contacta a Soporte: " + paymentId);
+            }
+            
+        } else {
+            // FLUJO NORMAL DE PRODUCTOS FÍSICOS
+            const waTxt = encodeURIComponent(`🚀 *¡PAGO CONFIRMADO TIENDA C3D!*\n\n📌 *Transacción MP:* ${paymentId}\n\n*Hola Coach, acabo de pagar mi carrito de compras por MercadoPago. Coordinemos el envío/retiro.*`);
+            localStorage.removeItem('kairo_carrito_ecom');
+            localStorage.removeItem('kairo_ecommerce_tipo');
+            carritoCompras = [];
+            
+            const tarjetaHTML = `
+                <div style="text-align: center; width: 100%;">
+                    <p style="color: var(--neon-n); font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;">✅ ¡PAGO ACREDITADO!</p>
+                    <p style="font-size: 0.95em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">
+                        Tu pago ha sido validado por MercadoPago (Ref: ${paymentId}).<br><br>Escríbele a un Coach ahora mismo para coordinar la logística.
+                    </p>
+                    <button class="btn btn-f" style="width: 100%; padding: 14px; font-weight: bold; margin-bottom: 15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">🚀 CONTACTAR COACH POR WHATSAPP</button>
+                </div>
+            `;
+            await kairoMessage({ mensaje: tarjetaHTML, icon: "🛍️" });
+        }
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
@@ -12918,7 +12955,8 @@ async function cargarAdminReservas() {
     document.getElementById('tab-admin-rangos').classList.add('hidden');
     document.getElementById('tab-admin-agenda').classList.add('hidden');
     document.getElementById('tab-admin-canjes').classList.add('hidden');
-    document.getElementById('tab-admin-reservas').classList.remove('hidden');
+    document.getElementById('tab-admin-reservas').classList.add('hidden'); 
+    
 
     const res = await apiCall("adminObtenerReservas");
     if(res && res.success) {
@@ -12944,6 +12982,80 @@ async function cargarAdminReservas() {
     } else {
         grid.innerHTML = "<p style='color: #ef4444; text-align: center; grid-column: 1/-1;'>Error de comunicación con la Base de Datos.</p>";
     }
+}
+
+// =========================================================
+// 🪙 GESTOR DE ECONOMÍA RÁPIDA (DASHBOARD CLICK)
+// =========================================================
+
+function abrirModalPuntos() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    const modal = document.getElementById('modal-gestion-puntos');
+    const kpi = document.getElementById('kpi-puntos');
+    
+    // Inyecta el valor visual actual del Dashboard
+    document.getElementById('modal-puntos-saldo').innerText = kpi ? kpi.innerText : "$0";
+    
+    // Validar si es Coach/Admin para mostrar el botón de Otorgar
+    if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
+        document.getElementById('caja-otorgar-puntos').classList.remove('hidden');
+    } else {
+        document.getElementById('caja-otorgar-puntos').classList.add('hidden');
+    }
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+}
+
+function cerrarModalPuntos() {
+    document.getElementById('modal-gestion-puntos').classList.add('hidden');
+    document.getElementById('modal-gestion-puntos').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+function abrirModalFichas() {
+    document.getElementById('main-content').classList.add('blur-effect');
+    const modal = document.getElementById('modal-gestion-fichas');
+    const kpi = document.getElementById('kpi-fichas');
+    
+    document.getElementById('modal-fichas-saldo').innerText = kpi ? kpi.innerText : "0";
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+}
+
+function cerrarModalFichas() {
+    document.getElementById('modal-gestion-fichas').classList.add('hidden');
+    document.getElementById('modal-gestion-fichas').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+// =========================================================
+// 🎟️ MOTOR DE COMPRA DIRECTA DE FICHAS (GEMAS)
+// =========================================================
+
+function comprarPaqueteFichas(cantidad, precio) {
+    if (!sessionUser) return notify("Debes iniciar sesión para comprar fichas.");
+    
+    // 1. Cerramos el panel de Fichas
+    cerrarModalFichas();
+    
+    // 2. Creamos un Carrito de Compra instantáneo e invisible
+    carritoCompras = [{
+        sku: "FICHAS-" + cantidad,
+        nombre: "Paquete " + cantidad.toLocaleString('es-CL') + " Fichas C3D",
+        precio: precio,
+        variante: "Digital",
+        cantidad: 1,
+        foto: "https://img.icons8.com/fluency/96/ticket.png"
+    }];
+    
+    // Guardamos en la memoria local
+    guardarCarritoLocal();
+    
+    // 3. Abrimos el Checkout directo, enviando el precio total, sin Coach asociado
+    // Los parámetros son (coachName, esCompraDirecta, montoDirecto)
+    abrirCheckout("", true, precio);
 }
 </script>
 
@@ -12982,5 +13094,64 @@ async function cargarAdminReservas() {
     <button class="btn btn-f" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';" onclick="ejecutarPagoVentaOffline()">CALCULAR 5% Y GENERAR PAGO</button>
 </div>
 
+<!-- 🎛️ MODAL: GESTIÓN DE PUNTOS -->
+<div id="modal-gestion-puntos" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid #fbbf24 !important; padding: 25px !important; box-shadow: 0 0 50px rgba(251, 191, 36, 0.4) !important; text-align: center; border-radius: 15px !important;">
+    <button onclick="cerrarModalPuntos()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <div style="font-size: 3rem; filter: drop-shadow(0 0 15px #fbbf24); margin-bottom: 10px;">🪙</div>
+    <h3 style="color: #fbbf24; font-family: 'Orbitron'; margin-top: 0; letter-spacing: 1px;">BÓVEDA DE PUNTOS</h3>
+    <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 20px;">1 Punto C3D equivale a $1 CLP. Úsalos como dinero real en la plataforma para adquirir cursos, productos o servicios.</p>
+    
+    <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 12px; border: 1px dashed #fbbf24; margin-bottom: 20px;">
+        <span style="font-size: 0.8em; color: #fbbf24; text-transform: uppercase;">Saldo Actual Disponible</span>
+        <h1 id="modal-puntos-saldo" style="color: white; font-size: 2.5rem; font-family: 'Orbitron'; margin: 5px 0;">0</h1>
+    </div>
+
+    <div id="caja-otorgar-puntos" class="hidden">
+        <button class="btn btn-n" style="width: 100%; padding: 15px; font-weight: bold;" onclick="cerrarModalPuntos(); abrirModalOtorgarPuntos();">🤝 OTORGAR PUNTOS A MI RED</button>
+        <p style="font-size: 0.7em; color: #94a3b8; margin-top: 10px;">Opción exclusiva para transferir puntos a usuarios de tu organización.</p>
+    </div>
+</div>
+
+<!-- 🎛️ MODAL: GESTIÓN DE FICHAS (GAMIFICACIÓN) -->
+<div id="modal-gestion-fichas" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 450px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(168, 85, 247, 0.4) !important; text-align: center; max-height: 85vh !important; overflow-y: auto !important; border-radius: 15px !important;">
+    <button onclick="cerrarModalFichas()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
+    <div style="font-size: 3rem; filter: drop-shadow(0 0 15px var(--neon-m)); margin-bottom: 10px;">🎟️</div>
+    <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0; letter-spacing: 1px;">GESTOR DE FICHAS</h3>
+    <p style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 20px;">Tu pase exclusivo para participar en los Sorteos de la Comunidad.</p>
+    
+    <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; border: 1px dashed var(--neon-m); margin-bottom: 20px;">
+        <span style="font-size: 0.8em; color: var(--neon-m); text-transform: uppercase;">Fichas en tu poder</span>
+        <h1 id="modal-fichas-saldo" style="color: white; font-size: 2.5rem; font-family: 'Orbitron'; margin: 5px 0;">0</h1>
+    </div>
+
+    <!-- SECCIÓN DE COMPRA -->
+    <div style="text-align: left; margin-bottom: 20px;">
+        <h4 style="color: var(--neon-n); font-family: 'Orbitron'; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; font-size: 0.9em;">🛒 ADQUIRIR MÁS FICHAS</h4>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px;">
+            <button class="btn" style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; transition: 0.3s;" onclick="comprarPaqueteFichas(1150, 5900)" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+                <span><b style="color: var(--neon-m);">1.150</b> Fichas Básico</span> <strong>$5.900</strong>
+            </button>
+            <button class="btn" style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; transition: 0.3s;" onclick="comprarPaqueteFichas(2850, 11900)" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+                <span><b style="color: var(--neon-m);">2.850</b> Fichas Inicial</span> <strong>$11.900</strong>
+            </button>
+            <button class="btn" style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; transition: 0.3s;" onclick="comprarPaqueteFichas(5700, 19900)" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+                <span><b style="color: var(--neon-m);">5.700</b> Fichas Avanzado</span> <strong>$19.900</strong>
+            </button>
+            <button class="btn" style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; transition: 0.3s;" onclick="comprarPaqueteFichas(12400, 34900)" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+                <span><b style="color: var(--neon-m);">12.400</b> Fichas Élite</span> <strong>$34.900</strong>
+            </button>
+            <button class="btn" style="background: rgba(168, 85, 247, 0.1); border: 2px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);" onclick="comprarPaqueteFichas(25500, 59900)">
+                <span><b style="color: var(--neon-m); font-size: 1.1em;">25.500</b> Fichas Máster</span> <strong style="font-size: 1.1em;">$59.900</strong>
+            </button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE CONVERSIÓN -->
+    <div style="text-align: left; background: rgba(239, 68, 68, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #ef4444;">
+        <h4 style="color: #ef4444; margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🔄 CONVERTIR FICHAS A PUNTOS</h4>
+        <p style="font-size: 0.75em; color: #cbd5e1; margin-top: 0;">¿Necesitas liquidez monetaria? Transforma tus Fichas en Puntos C3D.</p>
+        <button class="btn btn-f" style="width: 100%; padding: 12px; background: transparent; border-color: #ef4444; color: #ef4444;" onclick="notify('Fórmula de conversión pendiente')">CONVERTIR AHORA</button>
+    </div>
+</div>
 </body>
 </html>
