@@ -2715,7 +2715,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                         <span class="c3d-metric-val" style="color:var(--neon-m);" id="kpi-fichas">0</span>
                         <span class="c3d-metric-lbl">Fichas Sorteo</span>
                     </div>
-                    <div class="c3d-metric-badge">
+                    <div class="c3d-metric-badge" style="cursor: pointer; transition: 0.3s;" onclick="abrirModalIngresoReferido()" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <span class="c3d-metric-val" id="kpi-ref-total">0</span>
                         <span class="c3d-metric-lbl">Referidos</span>
                     </div>
@@ -11045,11 +11045,11 @@ function dibujarArbol() {
 
     let statsRed = {};
     if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
-        window.kairoArbolRed.forEach(n => {
-            let desc = getDescendants(n.id, window.kairoArbolRed);
-            statsRed[n.id] = { refs: desc.length, coaches: desc.filter(d => d.rango === "Coach" || d.rango === "Admin").length };
-        });
-    }
+            cursorEstilo = "pointer";
+            // 🛡️ SUTURA: Forzamos la conversión a String para evitar el colapso del .replace
+            let safeWp = nodo.whatsapp ? String(nodo.whatsapp).replace(/'/g, "") : "";
+            interactivoHTML = `onclick="abrirTarjetaContactoRed('${nodo.id}', '${nodo.nombre}', '${safeWp}', '${nodo.pais}')"`;
+        }
 
     let filasGrafico = window.kairoArbolRed.map(nodo => {
         let colorFondo = window.configArbol.colores[nodo.rango] || "#334155";
@@ -11094,19 +11094,121 @@ function getDescendants(parentId, allNodes) {
     return desc;
 }
 
+// =========================================================
+// 👁️ MOTOR DE EXTRACCIÓN: EXPEDIENTE KAIRO DEL PROSPECTO
+// =========================================================
+async function abrirTarjetaContactoRed(emailTarget, nombre, wp, pais) {
+    mostrarLoading("Obteniendo expediente Matrix de " + nombre + "...");
+    
+    // 🛡️ Llamamos al super-motor que ya teníamos para extraer toda su información
+    const res = await apiCall("getSuperDashboardData", { email: emailTarget });
+    ocultarLoading();
+    
+    let numLimpio = wp ? String(wp).replace(/[^0-9+]/g, '') : "";
+    let btnWA = numLimpio ? `<a href="https://wa.me/${numLimpio}" target="_blank" class="btn btn-f" style="width:100%; padding: 10px; font-size: 0.8em; text-decoration:none; display: block; text-align: center; font-weight: bold; border-radius: 8px;">📱 CONTACTAR POR WHATSAPP</a>` : "";
+
+    let html = `<div style="text-align:left;">
+                <h3 style="color:var(--neon-n); font-family:'Orbitron'; margin-top:0;">EXPEDIENTE KAIRO</h3>
+                <p style="margin:5px 0; color:white;"><b>Nombre:</b> ${nombre}</p>
+                <p style="margin:5px 0; color:#cbd5e1;"><b>Email:</b> ${emailTarget}</p>
+                <p style="margin:5px 0; color:#cbd5e1;"><b>País:</b> ${pais}</p>
+                <div style="margin: 15px 0;">${btnWA}</div>
+                <hr style="border-color:rgba(255,255,255,0.1); margin:15px 0;">`;
+
+    if (res && res.success) {
+        html += `<h4 style="color:var(--neon-admin); font-family:'Orbitron'; margin:0 0 10px 0;">ESTADO ACTUAL DE LA CUENTA</h4>
+                 <p style="margin:5px 0; color:#cbd5e1;"><b>Organización:</b> ${res.refTotal} Referidos | ${res.refSusc} Suscriptores | ${res.refCoach} Coaches</p>`;
+        
+        let fNivel = res.diag ? res.diag.nivel : "Sin Datos";
+        html += `<p style="margin:5px 0; color:#cbd5e1;"><b>Nivel 3D:</b> <span style="color:var(--neon-m); font-weight:bold;">${fNivel}</span></p>`;
+        
+        let fPerf = res.perfil ? `${res.perfil.peso}kg | ${res.perfil.grasa}% Grasa | Edad Met. ${res.perfil.edadMet}` : "Sin Datos";
+        html += `<p style="margin:5px 0; color:#cbd5e1;"><b>Perfil Corporal:</b> <span style="color:var(--neon-n); font-weight:bold;">${fPerf}</span></p>`;
+        
+        let fFin = res.finanzas ? `Flujo Libre: $${(Number(res.finanzas.ingresos) - Number(res.finanzas.gastos)).toLocaleString()} | Activos: $${Number(res.finanzas.activos).toLocaleString()}` : "Sin Datos";
+        html += `<p style="margin:5px 0; color:#cbd5e1;"><b>Estado Financiero:</b> <span style="color:#fbbf24; font-weight:bold;">${fFin}</span></p>`;
+    } else {
+        html += `<p style="color:#ef4444; font-size: 0.85em;">No se pudo extraer la información de métricas de este usuario.</p>`;
+    }
+    html += `</div>`;
+    
+    kairoMessage({mensaje: html, icon: ' '});
+}
+
+function manejarCambioForma(nivelModificado, nuevaForma) {
+    let formaAntigua = window.configArbol.formas[nivelModificado];
+    
+    // Buscar qué otro nivel estaba usando esta nueva forma para hacer el intercambio
+    let nivelAIntercambiar = -1;
+    for (let i = 0; i <= 6; i++) {
+        if (i !== nivelModificado && window.configArbol.formas[i] === nuevaForma) {
+            nivelAIntercambiar = i;
+            break;
+        }
+    }
+
+    // Le asignamos la nueva forma elegida al nivel modificado
+    window.configArbol.formas[nivelModificado] = nuevaForma;
+
+    // Si encontramos al "dueño anterior" de esa forma, le pasamos la forma vieja (SWAP Automático)
+    if (nivelAIntercambiar !== -1) {
+        window.configArbol.formas[nivelAIntercambiar] = formaAntigua;
+        document.getElementById('sel-forma-' + nivelAIntercambiar).value = formaAntigua;
+    }
+}
+
 function abrirAjustesArbol() {
+    let optionsHTML = `
+        <option value="50%">Esfera</option>
+        <option value="15px">Cubo</option>
+        <option value="polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)">Pentágono</option>
+        <option value="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)">Hexágono</option>
+        <option value="polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)">Rombo</option>
+        <option value="polygon(50% 0%, 100% 100%, 0% 100%)">Triángulo</option>
+        <option value="polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)">Trapecio</option>
+    `;
+
+    let selectFormas = "";
+    for(let i=0; i<=6; i++) {
+        selectFormas += `
+            <div>
+                <label style="font-size:0.7em; color:#cbd5e1;">Nivel ${i}:</label>
+                <select id="sel-forma-${i}" onchange="manejarCambioForma(${i}, this.value)" style="width:100%; padding:5px; background:rgba(0,0,0,0.5); border:1px solid #444; color:white; font-size:0.75em; border-radius:4px;">
+                    ${optionsHTML}
+                </select>
+            </div>
+        `;
+    }
+
     let html = `
         <h3 style="color:var(--neon-n); font-family:'Orbitron';">DISEÑO DE LA MATRIX</h3>
-        <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:15px;">Altera los colores de tu Organización.</p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; text-align:left;">
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Usuario:</label><input type="color" id="c-user" value="${window.configArbol.colores['Usuario']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Suscriptor:</label><input type="color" id="c-susc" value="${window.configArbol.colores['Suscriptor']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Coach:</label><input type="color" id="c-coach" value="${window.configArbol.colores['Coach']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Admin:</label><input type="color" id="c-admin" value="${window.configArbol.colores['Admin']}" style="width:100%; height:40px; border:none; background:transparent;"></div>
+        <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:15px;">Personaliza Colores y Geometría de la Red.</p>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:left; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:15px;">
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Usuario:</label><input type="color" id="c-user" value="${window.configArbol.colores['Usuario']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Suscriptor:</label><input type="color" id="c-susc" value="${window.configArbol.colores['Suscriptor']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Coach:</label><input type="color" id="c-coach" value="${window.configArbol.colores['Coach']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Admin:</label><input type="color" id="c-admin" value="${window.configArbol.colores['Admin']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
         </div>
+
+        <label style="font-size:0.8em; color:var(--neon-n); display:block; text-align:left; margin-bottom:10px;">Intercambio de Formas (Niveles de Profundidad):</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:left;">
+            ${selectFormas}
+        </div>
+
         <button class="btn btn-n" style="width:100%; margin-top:20px;" onclick="guardarAjustesArbol()">APLICAR Y REDIBUJAR</button>
     `;
     kairoMessage({ mensaje: html, icon: '🎨' });
+
+    // Inyectar el valor visual correcto cuando se abre el modal
+    setTimeout(() => {
+        for(let i=0; i<=6; i++) {
+            let el = document.getElementById('sel-forma-' + i);
+            if(el && window.configArbol.formas[i]) {
+                el.value = window.configArbol.formas[i];
+            }
+        }
+    }, 100);
 }
 
 function guardarAjustesArbol() {
@@ -12238,11 +12340,40 @@ async function abrirModalOtorgarPuntos() {
     const selectSku = document.getElementById('puntos-offline-sku');
     selectSku.innerHTML = '<option value="">Sincronizando catálogo universal...</option>';
 
-    // 🛡️ FOCUS: Poblamos la red de clientes del Coach en el selector
     const selectCliente = document.getElementById('puntos-offline-nombre');
     selectCliente.innerHTML = '<option value="">-- Selecciona el Cliente de tu Red --</option>';
     
+    // 🛡️ SUTURA FOCUS: Si la red de clientes no está en la memoria caché, la descargamos silenciosamente
+    if (!window.kairoArbolRed || window.kairoArbolRed.length === 0) {
+        mostrarLoading("Sincronizando red de clientes...");
+        const resRed = await apiCall("sincronizarDatosEconomia", { email: sessionUser.email });
+        if (resRed && resRed.success) {
+            window.kairoArbolRed = resRed.nodosArbol;
+        }
+        ocultarLoading();
+    }
+
     if (window.kairoArbolRed && window.kairoArbolRed.length > 0) {
+        window.kairoArbolRed.forEach(nodo => {
+            // Evita que el coach se venda a sí mismo, pero muestra a los demás
+            if (nodo.id !== sessionUser.email) {
+                selectCliente.innerHTML += `<option value="${nodo.nombre}" data-email="${nodo.id}" data-wp="${nodo.whatsapp}" data-pais="${nodo.pais}">${nodo.nombre} (${nodo.id})</option>`;
+            }
+        });
+    } else {
+        selectCliente.innerHTML = '<option value="">No tienes clientes registrados en tu red.</option>';
+    }
+    
+    const res = await apiCall("obtenerCatalogoUniversal");
+    if (res && res.success) {
+        selectSku.innerHTML = '<option value="">Selecciona el Ítem Vendido</option>';
+        res.catalogo.forEach(i => {
+            selectSku.innerHTML += `<option value="${i.sku}">${i.nombre}</option>`;
+        });
+    } else {
+        selectSku.innerHTML = '<option value="">Error al cargar catálogo</option>';
+    }
+}
         window.kairoArbolRed.forEach(nodo => {
             // Evita que el coach se venda a sí mismo, pero muestra a los demás
             if (nodo.id !== sessionUser.email) {
