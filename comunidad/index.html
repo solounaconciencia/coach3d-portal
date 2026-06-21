@@ -2482,6 +2482,10 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                         <label style="font-size: 0.8em; color: #cbd5e1;">Precio Suscriptor VIP ($)</label>
                         <input type="number" id="admin-curso-susc" value="0" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid #444; border-radius: 4px;">
                     </div>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 0.8em; color: var(--neon-m); font-weight: bold;">Precio en Fichas</label>
+                        <input type="number" id="admin-curso-fichas" value="0" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.8); color: white; border: 1px solid var(--neon-m); border-radius: 4px;">
+                    </div>
                 </div>
 
                 <label style="font-size: 0.8em; color: #cbd5e1;">Link Checkout de Pago (Vacío si es GRATIS o GRUPAL)</label>
@@ -4332,6 +4336,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
         <div><label style="font-size: 0.75em; color: var(--neon-admin);">Precio Público ($)</label><input type="number" id="admin-prod-precio-n" placeholder="0"></div>
         <div><label style="font-size: 0.75em; color: var(--neon-f);">Precio Socio ($)</label><input type="number" id="admin-prod-precio-v" placeholder="0"></div>
+        <div><label style="font-size: 0.75em; color: var(--neon-m); font-weight: bold;">Precio en Fichas</label><input type="number" id="admin-prod-fichas" placeholder="0" style="border-color: var(--neon-m);"></div>
         <div><label style="font-size: 0.75em; color: var(--neon-n);">Stock Total</label><input type="number" id="admin-prod-stock" placeholder="0"></div>
     </div>
 
@@ -8817,6 +8822,7 @@ function cargarDatosModificarProducto(prod) {
     document.getElementById('admin-prod-desc').value = prod.descripcion;
     document.getElementById('admin-prod-precio-n').value = prod.precioNormal;
     document.getElementById('admin-prod-precio-v').value = prod.precioSuscriptor;
+    document.getElementById('admin-curso-fichas').value = c.precioFichas || 0;
     document.getElementById('admin-prod-stock').value = prod.stock;
     document.getElementById('admin-prod-sabores').value = prod.sabores;
     document.getElementById('admin-prod-colores').value = prod.colores;
@@ -8838,6 +8844,7 @@ async function guardarAdminProducto() {
         descripcion: document.getElementById('admin-prod-desc').value.trim(),
         precioNormal: document.getElementById('admin-prod-precio-n').value,
         precioSuscriptor: document.getElementById('admin-prod-precio-v').value,
+        precioFichas: document.getElementById('admin-prod-fichas').value,
         stock: document.getElementById('admin-prod-stock').value,
         sabores: document.getElementById('admin-prod-sabores').value.trim(),
         colores: document.getElementById('admin-prod-colores').value.trim(),
@@ -10281,6 +10288,7 @@ function editarCursoAdmin(sku) {
     document.getElementById('admin-curso-video').value = c.video;
     document.getElementById('admin-curso-precio').value = c.precioNormal;
     document.getElementById('admin-curso-susc').value = c.precioSusc;
+    document.getElementById('admin-curso-fichas').value = c.precioFichas || 0;
     document.getElementById('admin-curso-pago').value = c.linkPago;
     document.getElementById('admin-curso-pdf').value = c.pdf;
     document.getElementById('admin-curso-kairo').value = c.kairoExplica;
@@ -10308,6 +10316,7 @@ async function guardarCursoAdmin() {
         video: document.getElementById('admin-curso-video').value.trim(),
         precioNormal: Number(document.getElementById('admin-curso-precio').value) || 0,
         precioSusc: Number(document.getElementById('admin-curso-susc').value) || 0,
+        precioFichas: Number(document.getElementById('admin-curso-fichas').value) || 0,
         linkPago: document.getElementById('admin-curso-pago').value.trim(),
         pdf: document.getElementById('admin-curso-pdf').value.trim(),
         kairoExplica: document.getElementById('admin-curso-kairo').value.trim()
