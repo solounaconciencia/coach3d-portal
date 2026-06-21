@@ -11576,7 +11576,18 @@ function sincronizarDatosLogros(payload) {
             filaUsuario = i + 1;
             progreso.insignias = dataProg[i][1] ? dataProg[i][1].toString().split(",").map(s => s.trim()).filter(s => s !== "") : [];
             progreso.racha = Number(dataProg[i][2]) || 0;
-            progreso.ultimoDia = dataProg[i][3] ? dataProg[i][3].toString() : "";
+            
+            // 🛡️ SUTURA FOCUS: Control estricto de Formato de Fecha
+            if (dataProg[i][3]) {
+                if (dataProg[i][3] instanceof Date) {
+                    progreso.ultimoDia = Utilities.formatDate(dataProg[i][3], "GMT-3", "yyyy-MM-dd");
+                } else {
+                    progreso.ultimoDia = dataProg[i][3].toString().trim().substring(0, 10);
+                }
+            } else {
+                progreso.ultimoDia = "";
+            }
+            
             progreso.diplomas = dataProg[i][4] ? dataProg[i][4].toString().split(",").map(s => s.trim()).filter(s => s !== "") : [];
             
             // 🛡️ MOTOR DE AVERSIÓN A LA PÉRDIDA (Comprueba si falló al abrir la página)
