@@ -2207,7 +2207,9 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
 </head>
 <body onload="checkSession()">
 
@@ -11045,13 +11047,13 @@ function zoomArbol(factor) {
 window.configArbol = window.configArbol || {
     colores: { "Usuario": "#334155", "Suscriptor": "#10b981", "Coach": "#a855f7", "Admin": "#fbbf24" },
     formas: {
-        0: "50%", // Nivel 0: Esfera
-        1: "15px", // Nivel 1: Cubo Suavizado
-        2: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)", // Nivel 2: Pentágono
-        3: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", // Nivel 3: Hexágono
-        4: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", // Nivel 4: Rombo (Octaedro 2D)
-        5: "polygon(50% 0%, 100% 100%, 0% 100%)", // Nivel 5: Triángulo (Tetraedro)
-        6: "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)" // Nivel 6: Trapecio
+        0: "star",
+        1: "dot",
+        2: "diamond",
+        3: "triangle",
+        4: "hexagon",
+        5: "square",
+        6: "triangleDown"
     }
 };
 
@@ -11071,21 +11073,9 @@ function dibujarArbol() {
     let nodes = [];
     let edges = [];
 
-    // Mapeo de geometrías celulares según el nivel de profundidad
-    const formasVis = {
-        0: "star",     // El usuario central brilla como una estrella
-        1: "dot",      // Hijos directos son esferas
-        2: "diamond",  // Nietos
-        3: "triangle",
-        4: "hexagon",
-        5: "square",
-        6: "triangleDown"
-    };
-
     window.kairoArbolRed.forEach(nodo => {
         let colorFondo = window.configArbol.colores[nodo.rango] || "#334155";
-        let formaNodo = formasVis[Math.min(nodo.nivel, 6)] || "dot";
-
+        let formaNodo = window.configArbol.formas[Math.min(nodo.nivel, 6)] || "dot";
         // Creamos el Átomo (Nodo)
         nodes.push({
             id: nodo.id,
@@ -11217,13 +11207,13 @@ function manejarCambioForma(nivelModificado, nuevaForma) {
 
 function abrirAjustesArbol() {
     let optionsHTML = `
-        <option value="50%">Esfera</option>
-        <option value="15px">Cubo</option>
-        <option value="polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)">Pentágono</option>
-        <option value="polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)">Hexágono</option>
-        <option value="polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)">Rombo</option>
-        <option value="polygon(50% 0%, 100% 100%, 0% 100%)">Triángulo</option>
-        <option value="polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)">Trapecio</option>
+        <option value="star">Estrella (Núcleo)</option>
+        <option value="dot">Esfera</option>
+        <option value="diamond">Diamante</option>
+        <option value="triangle">Triángulo</option>
+        <option value="hexagon">Hexágono</option>
+        <option value="square">Cubo</option>
+        <option value="triangleDown">Triángulo Invertido</option>
     `;
 
     let selectFormas = "";
