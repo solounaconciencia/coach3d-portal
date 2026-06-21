@@ -2207,7 +2207,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 </head>
 <body onload="checkSession()">
 
@@ -3844,10 +3844,6 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <button class="btn btn-n" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirAjustesArbol()">🎨 DISEÑO ÁRBOL</button>
     </div>
 
-    <div style="text-align: center; margin-bottom: 10px;">
-        <button class="btn" style="padding: 5px 15px; font-size: 0.7em; border: 1px solid #444;" onclick="zoomArbol(1.2)">🔍 ACERCAR</button>
-        <button class="btn" style="padding: 5px 15px; font-size: 0.7em; border: 1px solid #444;" onclick="zoomArbol(0.8)">🔎 ALEJAR</button>
-    </div>
     <div id="contenedor-grafico-arbol" style="flex-grow: 1; overflow: auto; background: rgba(0,0,0,0.4); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1); position: relative;">
         <div id="canvas-arbol" style="transform-origin: top center; transition: transform 0.3s ease; text-align: center; padding: 20px;">
             <!-- Google Charts inyectará la red aquí -->
@@ -11032,13 +11028,8 @@ function abrirVisorArbolRed() {
     document.getElementById('modal-visor-red').classList.remove('hidden');
     document.getElementById('modal-visor-red').style.display = 'flex';
     
-    factorZoomArbol = 1;
-    document.getElementById('canvas-arbol').style.transform = `scale(${factorZoomArbol})`;
-
-    // Cargar Google Charts dinámicamente si no está listo
-    google.charts.load('current', {packages:["orgchart"]});
-    google.charts.setOnLoadCallback(dibujarArbol);
-}
+    dibujarArbol();
+    }
 
 function cerrarVisorArbolRed() {
     document.getElementById('modal-visor-red').classList.add('hidden');
@@ -11070,50 +11061,85 @@ function dibujarArbol() {
         return;
     }
 
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Name');
-    data.addColumn('string', 'Manager');
-    data.addColumn('string', 'ToolTip');
+    let contenedor = document.getElementById('canvas-arbol');
+    contenedor.innerHTML = ""; // Limpiamos el lienzo
+    
+    // Le damos altura al microscopio para que la célula pueda flotar
+    document.getElementById('contenedor-grafico-arbol').style.height = "600px";
+    contenedor.style.height = "100%";
 
-    let statsRed = {};
-    if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
-            cursorEstilo = "pointer";
-            // 🛡️ SUTURA: Forzamos la conversión a String para evitar el colapso del .replace
-            let safeWp = nodo.whatsapp ? String(nodo.whatsapp).replace(/'/g, "") : "";
-            interactivoHTML = `onclick="abrirTarjetaContactoRed('${nodo.id}', '${nodo.nombre}', '${safeWp}', '${nodo.pais}')"`;
-        }
+    let nodes = [];
+    let edges = [];
 
-    let filasGrafico = window.kairoArbolRed.map(nodo => {
+    // Mapeo de geometrías celulares según el nivel de profundidad
+    const formasVis = {
+        0: "star",     // El usuario central brilla como una estrella
+        1: "dot",      // Hijos directos son esferas
+        2: "diamond",  // Nietos
+        3: "triangle",
+        4: "hexagon",
+        5: "square",
+        6: "triangleDown"
+    };
+
+    window.kairoArbolRed.forEach(nodo => {
         let colorFondo = window.configArbol.colores[nodo.rango] || "#334155";
-        let formaClip = window.configArbol.formas[Math.min(nodo.nivel, 6)] || "50%";
-        let estiloForma = formaClip.includes("polygon") ? `clip-path: ${formaClip}; border-radius: 0;` : `border-radius: ${formaClip};`;
-        
-        let interactivoHTML = "";
-        let cursorEstilo = "default";
+        let formaNodo = formasVis[Math.min(nodo.nivel, 6)] || "dot";
 
-        if (sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
-            cursorEstilo = "pointer";
-            let numLimpio = nodo.whatsapp ? nodo.whatsapp.replace(/[^0-9+]/g, '') : "";
-            let s = statsRed[nodo.id] || {refs:0, coaches:0};
-            let msg = `<h3 style=\\'color:var(--neon-n); font-family:Orbitron;\\'>TARJETA DE CONTACTO</h3><p><b>Nombre:</b> ${nodo.nombre}</p><p><b>WhatsApp:</b> <a href=\\'https://wa.me/${numLimpio}\\' target=\\'_blank\\' style=\\'color:white;\\'>${nodo.whatsapp}</a></p><p><b>Email:</b> ${nodo.id}</p><p><b>País:</b> ${nodo.pais}</p><hr style=\\'border-color:rgba(255,255,255,0.1);\\'><p><b>Organización Completa:</b> ${s.refs} Referidos</p><p><b>Coaches en su red:</b> ${s.coaches}</p>`;
-            interactivoHTML = `onclick="kairoMessage({mensaje: '${msg}', icon: '📱'})"`;
+        // Creamos el Átomo (Nodo)
+        nodes.push({
+            id: nodo.id,
+            label: nodo.nombre.split(' ')[0], // Solo el primer nombre para no saturar
+            shape: formaNodo,
+            color: { 
+                background: colorFondo, 
+                border: colorFondo,
+                highlight: { background: "white", border: colorFondo }
+            },
+            font: { color: "#ffffff", face: "Orbitron", size: 14 },
+            size: nodo.nivel === 0 ? 30 : 15, // El núcleo es el doble de grande
+            shadow: { enabled: true, color: colorFondo, size: 15 }
+        });
+
+        // Creamos el Enlace (Si tiene un patrocinador)
+        if (nodo.padreId && nodo.padreId !== "") {
+            edges.push({
+                from: nodo.padreId,
+                to: nodo.id,
+                color: { color: "rgba(255, 255, 255, 0.2)", highlight: "var(--neon-n)" },
+                smooth: { type: 'continuous' } // Líneas orgánicas curvas
+            });
         }
-
-        let nodoHTML = `
-            <div ${interactivoHTML} style="cursor: ${cursorEstilo}; background: ${colorFondo}; color: white; width: 110px; height: 110px; display:flex; flex-direction:column; justify-content:center; align-items:center; ${estiloForma} box-shadow: inset -5px -5px 15px rgba(0,0,0,0.6), inset 5px 5px 15px rgba(255,255,255,0.3); transition: 0.3s; margin:auto; position: relative;">
-                <div style="font-size: 26px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8)); margin-bottom:5px;">${nodo.genero === "Femenino" ? "👩" : "👨"}</div>
-                <strong style="font-size: 0.7em; font-family:'Orbitron'; display:block; text-shadow:0 2px 2px #000; text-align:center; padding: 0 5px; line-height: 1.1;">${nodo.nombre.split(' ')[0]}</strong>
-            </div>
-        `;
-        return [{ v: nodo.id, f: nodoHTML }, nodo.padreId, nodo.rango];
     });
 
-    data.addRows(filasGrafico);
-    var chart = new google.visualization.OrgChart(document.getElementById('canvas-arbol'));
-    google.visualization.events.addListener(chart, 'error', function (err) {
-         google.visualization.errors.removeError(err.id);
+    let data = { nodes: nodes, edges: edges };
+    let options = {
+        physics: {
+            solver: "forceAtlas2Based", // Gravedad celular (Atrae al centro y repele a los lados)
+            forceAtlas2Based: {
+                gravitationalConstant: -50,
+                centralGravity: 0.01,
+                springLength: 100,
+                springConstant: 0.08
+            }
+        },
+        interaction: { hover: true, dragNodes: true, zoomView: true, dragView: true }
+    };
+
+    // Encendemos el motor celular
+    let network = new vis.Network(contenedor, data, options);
+
+    // Mantenemos el Super Poder de Kairo: Hacer clic para ver la Tarjeta
+    network.on("click", function (params) {
+        if (params.nodes.length > 0) {
+            let nodeId = params.nodes[0];
+            let nodoInfo = window.kairoArbolRed.find(n => n.id === nodeId);
+            if (nodoInfo && sessionUser && (sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
+                let safeWp = nodoInfo.whatsapp ? String(nodoInfo.whatsapp).replace(/'/g, "") : "";
+                abrirTarjetaContactoRed(nodoInfo.id, nodoInfo.nombre, safeWp, nodoInfo.pais);
+            }
+        }
     });
-    chart.draw(data, {allowHtml: true, size: 'medium', nodeClass: 'kairo-nodo-red'});
 }
 
 function getDescendants(parentId, allNodes) {
