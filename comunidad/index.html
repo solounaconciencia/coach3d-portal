@@ -12075,56 +12075,87 @@ function compartirFrase(redSocial) {
     }
 }
 
-async function confirmarDiaDesafio() {
+async function confirmarDiaDesafio(payloadExtra = {}) {
     const btn = document.getElementById('btn-marcar-dia');
-    btn.innerText = "Sincronizando..."; btn.disabled = true;
+    if (btn) { btn.innerText = "Sincronizando..."; btn.disabled = true; }
 
-    if (typeof trackAccionValiosa === 'function') trackAccionValiosa("Constancia", "Marcó Día " + diaActualSeleccionado);
+    if (typeof trackAccionValiosa === 'function' && !payloadExtra.usarEscudo && !payloadExtra.aceptarPerdida) {
+        trackAccionValiosa("Constancia", "Marcó Día " + diaActualSeleccionado);
+    }
 
-    const res = await apiCall("registrarDiaDesafio", { email: sessionUser.email });
+    const payload = { email: sessionUser.email, ...payloadExtra };
+    const res = await apiCall("registrarDiaDesafio", payload);
     
-    btn.innerText = "ACEPTAR Y MARCAR DÍA"; btn.disabled = false;
+    if (btn) { btn.innerText = "ACEPTAR Y MARCAR DÍA"; btn.disabled = false; }
 
     if (res && res.success) {
         cerrarModalFrase();
-        
-        // 🔥 SUTURA CRÍTICA: Aseguramos que la caché exista antes de actualizar
         if (!progresoUsuarioCache) progresoUsuarioCache = {};
         progresoUsuarioCache.racha = res.racha;
         
-        document.getElementById('tablero-racha-num').innerText = res.racha; // Actualiza número visual
+        document.getElementById('tablero-racha-num').innerText = res.racha;
         renderizarTableroGame(res.racha, true);
         
-        // 🏆 HITOS VIP (Dopamina)
         if (res.hito === 90) {
-            setTimeout(() => {
-                document.getElementById('main-content').classList.add('blur-effect');
-                abrirModalSerCoach(); // Llamada directa y limpia a la función del Coach
-            }, 1000);
+            setTimeout(() => { document.getElementById('main-content').classList.add('blur-effect'); abrirModalSerCoach(); }, 1000);
         } else if (res.hito === 30 || res.hito === 60) {
             setTimeout(() => {
                 sessionUser.rango = "Suscriptor";
                 sessionStorage.setItem('kairo_session', JSON.stringify(sessionUser));
-                
                 let tituloHito = res.hito === 30 ? "NIVEL 1 SUPERADO" : "NIVEL 2 SUPERADO";
-                let msjHito = res.hito === 30 ? "El 90% de las personas renuncia antes del día 30. Tú no. Como recompensa a tu inquebrantable disciplina, Kairo te ha ascendido a Suscriptor VIP." : "Dos meses forjando tu mente. Tu constancia es absoluta. Kairo renueva tu pase VIP a la Élite.";
-                
-                kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡${tituloHito}! 👑</h3><p>${msjHito} Disfruta los beneficios del 2%.</p>`, icon: '🎖️' });
-                loadDashboard(); // Refresca los colores del perfil
+                let msjHito = res.hito === 30 ? "El 90% de las personas renuncia antes del día 30. Tú no. Kairo te ha ascendido a Suscriptor VIP." : "Dos meses forjando tu mente. Kairo renueva tu pase VIP a la Élite.";
+                kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡${tituloHito}! 👑</h3><p>${msjHito} Disfruta los beneficios.</p>`, icon: '🎖️' });
+                loadDashboard(); 
             }, 1000);
-            
-        // 💔 AVERSIÓN A LA PÉRDIDA (Racha Rota)
-        } else if (res.racha === 1 && res.rachaAnterior > 0) {
-            kairoMessage({mensaje: "<h3 style='color:#ef4444; font-family:Orbitron;'>RACHA DESTRUIDA</h3><p>Kairo ha detectado una fisura en tu disciplina. Has fallado un día y tu progreso de <b>" + res.rachaAnterior + " días</b> se ha reducido a cero. El dolor del arrepentimiento es el mejor maestro. Levántate y recupera tu honor.</p>", icon: "⚠️"});
-            
-        // ✅ PROGRESO NORMAL
-        } else {
-            notify("✅ Día " + res.racha + " asegurado en la Matrix. Sigue avanzando.");
-        }
-    } else {
-        notify("❌ " + (res ? res.msg : "Error de conexión."));
+        } else if (res.racha === 1 && res.rachaAnterior && res.rachaAnterior > 0) {
+            kairoMessage({mensaje: "<h3 style='color:#ef4444; font-family:Orbitron;'>RACHA DESTRUIDA</h3><p>Has fallado un día y tu progreso se ha reducido a cero. El dolor del arrepentimiento es el mejor maestro.</p>", icon: "⚠️"});
+        } else { notify("✅ Día " + res.racha + " asegurado. Sigue avanzando."); }
+    } else if (res && res.requireEscudo) {
         cerrarModalFrase();
-    }
+        cerrarKairoMsg();
+        let msg = `
+            <div style="text-align:center;">
+                <div style="font-size:3.5rem; margin-bottom:10px; filter: drop-shadow(0 0 15px #ef4444);">⚠️</div>
+                <h3 style="color:#ef4444; font-family:'Orbitron';">FISURA TEMPORAL DETECTADA</h3>
+                <p style="color:#cbd5e1; font-size:0.95em; margin-bottom:15px;">Has estado inactivo por <b>${res.diasPerdidos} días</b>. Tu progreso de ${res.rachaSalvada} días está a punto de ser destruido y volver a cero.</p>
+                <div style="background:rgba(239,68,68,0.1); border:1px dashed #ef4444; padding:15px; border-radius:10px; margin-bottom:20px;">
+                    <p style="margin:0 0 10px 0; color:white; font-size:0.85em;">Puedes usar tus Fichas para reparar la fisura temporal y continuar hoy sin perder nada (2.000 🎟️ por día).</p>
+                    <strong style="color:var(--neon-m); font-size:1.25em;">Costo de Reparación: ${res.costoFichas.toLocaleString('es-CL')} 🎟️</strong>
+                </div>
+                <button class="btn btn-m" style="width:100%; padding:14px; margin-bottom:10px; font-weight:bold;" onclick="cerrarKairoMsg(); confirmarDiaDesafio({usarEscudo: true})">🛡️ USAR ESCUDO Y SALVAR RACHA</button>
+                <button class="btn btn-f" style="width:100%; padding:14px; background:transparent; border-color:#ef4444; color:#ef4444;" onclick="cerrarKairoMsg(); confirmarDiaDesafio({aceptarPerdida: true})">ACEPTAR DERROTA (VOLVER A CERO)</button>
+            </div>`;
+        kairoMessage({ mensaje: msg, icon: " " });
+    } else { notify("❌ " + (res ? res.msg : "Error de conexión.")); cerrarModalFrase(); }
+}
+
+// =========================================================
+// 🔄 ALQUIMIA FINANCIERA: CONVERSIÓN DE FICHAS A PUNTOS
+// =========================================================
+async function iniciarConversionFichas() {
+    if (!sessionUser) return notify("Debes iniciar sesión para realizar conversiones.");
+    let saldoVisualFichas = parseInt(document.getElementById('kpi-fichas').innerText.replace(/\./g, '')) || 0;
+    if (saldoVisualFichas <= 0) return notify("No posees Fichas C3D en tu bóveda.");
+
+    let inputCantidad = prompt(`Tu saldo actual: ${saldoVisualFichas.toLocaleString('es-CL')} Fichas.\nTasa del sistema: 1 Ficha = 1.5 Puntos C3D.\n\n¿Cuántas fichas deseas quemar y convertir a Puntos (Dinero)?`);
+    if (!inputCantidad) return; 
+    
+    let cantidadFichas = parseInt(inputCantidad);
+    if (isNaN(cantidadFichas) || cantidadFichas <= 0) return notify("Debes ingresar una cantidad numérica válida.");
+    if (cantidadFichas > saldoVisualFichas) return notify("No puedes convertir más fichas de las que posees.");
+
+    let puntosGanados = Math.floor(cantidadFichas * 1.5);
+    if (!confirm(`Estás a punto de destruir ${cantidadFichas.toLocaleString('es-CL')} Fichas para inyectar $${puntosGanados.toLocaleString('es-CL')} Puntos C3D en tu economía.\n\nEsta acción es irreversible. ¿Confirmas la transacción?`)) return;
+
+    mostrarLoading("Realizando Alquimia Financiera...");
+    const res = await apiCall("convertirFichasMatrix", { email: sessionUser.email, cantidadFichas: cantidadFichas, puntosGanados: puntosGanados });
+    ocultarLoading();
+
+    if (res && res.success) {
+        cerrarModalFichas();
+        kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡ALQUIMIA COMPLETADA! 🔄</h3><p>Tus Fichas han sido destruidas exitosamente. El Banco Central te ha transferido <b>${puntosGanados.toLocaleString('es-CL')} Puntos C3D</b>.</p>`, icon: '🪙' });
+        loadDashboard(); 
+    } else { notify("❌ Error en la Matrix: " + (res ? res.msg : "Sin conexión")); }
 }
         
 function cerrarModalFrase() {
@@ -13186,19 +13217,6 @@ async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
         <span style="font-size: 0.8em; color: var(--neon-m); text-transform: uppercase;">Fichas en tu poder</span>
         <h1 id="modal-fichas-saldo" style="color: white; font-size: 2.5rem; font-family: 'Orbitron'; margin: 5px 0;">0</h1>
     </div>
-
-    <!-- SECCIÓN DE CANJE (QUEMAR FICHAS) -->
-    <div style="text-align: left; background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-f); margin-bottom: 20px;">
-        <h4 style="color: var(--neon-f); margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🛡️ TIENDA EXCLUSIVA</h4>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 6px; border-left: 3px solid var(--neon-f);">
-            <div style="width: 70%;">
-                <strong style="color: white; font-size: 0.9em;">Escudo de Constancia</strong>
-                <p style="font-size: 0.7em; color: #cbd5e1; margin: 2px 0 0 0; line-height: 1.3;">Salva tu progreso. Si olvidas marcar tu Desafío de 90 Días, el escudo se rompe, pero tu racha se mantiene intacta.</p>
-            </div>
-            <button class="btn btn-f" style="padding: 10px; font-size: 0.8em; white-space: nowrap; font-weight: bold;" onclick="comprarItemFichas('escudo', 2000, 'ESCUDO-01', 'Escudo de Constancia')">2.000 🎟️</button>
-        </div>
-    </div>
     
     <!-- SECCIÓN DE COMPRA -->
     <div style="text-align: left; margin-bottom: 20px;">
@@ -13226,8 +13244,7 @@ async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
     <div style="text-align: left; background: rgba(239, 68, 68, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #ef4444;">
         <h4 style="color: #ef4444; margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🔄 CONVERTIR FICHAS A PUNTOS</h4>
         <p style="font-size: 0.75em; color: #cbd5e1; margin-top: 0;">¿Necesitas liquidez monetaria? Transforma tus Fichas en Puntos C3D.</p>
-        <button class="btn btn-f" style="width: 100%; padding: 12px; background: transparent; border-color: #ef4444; color: #ef4444;" onclick="notify('Fórmula de conversión pendiente')">CONVERTIR AHORA</button>
-    </div>
+        <button class="btn btn-f" style="width: 100%; padding: 12px; background: transparent; border-color: #ef4444; color: #ef4444;" onclick="iniciarConversionFichas()">CONVERTIR AHORA</button>    </div>
 </div>
 </body>
 </html>
