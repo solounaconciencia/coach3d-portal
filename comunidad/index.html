@@ -12354,12 +12354,21 @@ async function abrirModalOtorgarPuntos() {
     }
 
     if (window.kairoArbolRed && window.kairoArbolRed.length > 0) {
+        let opcionesHTML = ""; // Memoria temporal para no congelar la pantalla
+        
         window.kairoArbolRed.forEach(nodo => {
             // Evita que el coach se venda a sí mismo, pero muestra a los demás
             if (nodo.id !== sessionUser.email) {
-                selectCliente.innerHTML += `<option value="${nodo.nombre}" data-email="${nodo.id}" data-wp="${nodo.whatsapp}" data-pais="${nodo.pais}">${nodo.nombre} (${nodo.id})</option>`;
+                // Blindamos el WhatsApp convirtiéndolo a String seguro
+                let safeWp = nodo.whatsapp ? String(nodo.whatsapp).replace(/'/g, "") : "";
+                
+                opcionesHTML += `<option value="${nodo.nombre}" data-email="${nodo.id}" data-wp="${safeWp}" data-pais="${nodo.pais}">${nodo.nombre} (${nodo.id})</option>`;
             }
         });
+        
+        // Inyectamos todo de un solo golpe al DOM
+        selectCliente.innerHTML += opcionesHTML;
+        
     } else {
         selectCliente.innerHTML = '<option value="">No tienes clientes registrados en tu red.</option>';
     }
