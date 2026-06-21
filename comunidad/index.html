@@ -5302,23 +5302,26 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
           let patrimonioNeto = Number(sData.finanzas.activos) - Number(sData.finanzas.pasivos);
           let colorPatrimonio = patrimonioNeto >= 0 ? "var(--neon-f)" : "#ef4444";
 
-          if (gastosArr.length > 0 && totalIngresos > 0) {
+          let graficoYAlertasHTML = "";
+          
+          if (totalIngresos === 0 && totalGastos === 0) {
+              graficoYAlertasHTML = `<p style="color:#fbbf24; font-size:0.85em; margin-top:15px; padding:15px; border:1px dashed #fbbf24; border-radius:8px; text-align:center;">⚠️ Aún no has configurado tu mapa financiero. Ingresa a la Calculadora para agregar tus fuentes de ingresos y gastos.</p>`;
+          } else {
               let labels = gastosArr.map(g => g.concepto);
               let data = gastosArr.map(g => g.monto);
               let flujoDisponible = totalIngresos - totalGastos;
+              let porcentajeFlujo = totalIngresos > 0 ? (flujoDisponible / totalIngresos) * 100 : -100;
               
-              let backgroundColors = ['#ef4444', '#f97316', '#fbbf24', '#22d3ee', '#a855f7', '#e11d48', '#d97706', '#be185d', '#4f46e5', '#2563eb'];
+              let backgroundColors = ['#b91c1c', '#991b1b', '#7f1d1d', '#dc2626', '#ef4444', '#5a0c0c', '#450a0a', '#b91c1c', '#991b1b', '#7f1d1d'];
               
-              // Si queda dinero libre, lo agregamos al gráfico como "Flujo Disponible"
               if (flujoDisponible > 0) {
                   labels.push('Flujo Libre (Sobrante)');
                   data.push(flujoDisponible);
-                  backgroundColors.push('#10b981'); // Verde
+                  backgroundColors.push('#10b981'); 
               } else if (flujoDisponible < 0) {
-                  // Si está en negativo, el gráfico representará el déficit
                   labels.push('Déficit (Faltante)');
                   data.push(Math.abs(flujoDisponible));
-                  backgroundColors.push('#7f1d1d'); // Rojo oscuro
+                  backgroundColors.push('#7f1d1d'); 
               }
 
               let qcConfig = {
@@ -5326,10 +5329,39 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
                   data: { labels: labels, datasets: [{ data: data, backgroundColor: backgroundColors, borderWidth: 0 }] },
                   options: { plugins: { legend: { position: 'right', labels: { fontColor: '#fff', fontSize: 10 } }, datalabels: { display: false } }, cutoutPercentage: 65 }
               };
-              chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent(JSON.stringify(qcConfig));
-          } else {
-              // Estado inicial sin ingresos registrados o sin gastos
-              chartUrl = "https://quickchart.io/chart?width=300&height=150&backgroundColor=transparent&c=" + encodeURIComponent("{type:'doughnut',data:{labels:['Sin Flujo', 'Ingreso Disponible'],datasets:[{data:[0,1],backgroundColor:['#334155', '#10b981']}]}}");
+              let chartUrl = "https://quickchart.io/chart?width=250&height=150&backgroundColor=transparent&c=" + encodeURIComponent(JSON.stringify(qcConfig));
+              
+              // Matemática del Termómetro (Sube cuando el flujo cae por debajo del 30%)
+              let heat = 0;
+              if (porcentajeFlujo <= 30) {
+                  heat = ((30 - Math.max(porcentajeFlujo, 0)) / 30) * 100;
+                  if (porcentajeFlujo < 0) heat = 100; // Si hay déficit, el termómetro explota al 100%
+              }
+              
+              let displayExclamation = porcentajeFlujo <= 10 ? "flex" : "none";
+              let colorTermometro = porcentajeFlujo <= 10 ? "#ef4444" : "#f97316";
+
+              graficoYAlertasHTML = `
+                <style>@keyframes pulseAlert { 0% {transform:scale(1);} 50% {transform:scale(1.15);} 100% {transform:scale(1);} }</style>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;">
+                    
+                    <!-- Termómetro de Riesgo -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 90px; background: rgba(0,0,0,0.6); border-radius: 6px; border: 1px solid #444; position: relative; overflow: hidden; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);">
+                            <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: ${heat}%; background: ${colorTermometro}; box-shadow: 0 0 10px ${colorTermometro}; transition: height 1.5s ease-out;"></div>
+                        </div>
+                        <span style="font-size: 0.55em; color: #94a3b8; font-family: 'Orbitron'; letter-spacing: 1px;">RIESGO</span>
+                    </div>
+                    
+                    <!-- Gráfico Dona -->
+                    <img src="${chartUrl}" style="width: 100%; max-width:240px; object-fit: contain;">
+                    
+                    <!-- Alerta Crítica (10% o menos) -->
+                    <div style="display: ${displayExclamation}; align-items: center; justify-content: center; font-size: 2.2rem; filter: drop-shadow(0 0 10px #ef4444); animation: pulseAlert 1.2s infinite;">
+                        ⚠️
+                    </div>
+                </div>
+              `;
           }
 
           document.getElementById('dash-data-fin').innerHTML = `
@@ -5359,8 +5391,8 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
             </div>
             
             <div style="background:rgba(0,0,0,0.5); border-radius:10px; padding:15px; margin-bottom:15px;">
-                <h4 style="color: white; font-family:'Orbitron'; font-size:0.8em; margin: 0 0 10px 0; text-align:center;">PROPORCIÓN DEL INGRESO TOTAL</h4>
-                <img src="${chartUrl}" style="width: 100%; max-width:300px; margin:0 auto; display:block;">
+                <h4 style="color: white; font-family:'Orbitron'; font-size:0.8em; margin: 0 0 10px 0; text-align:center;">MAPA DE LIQUIDEZ</h4>
+                ${graficoYAlertasHTML}
             </div>
             <button class="btn btn-n" style="font-size: 0.7em; padding: 8px 15px;" onclick="iniciarcalculadorafinanciera()">ACTUALIZAR ESTADO FINANCIERO</button>
           `;
@@ -8822,7 +8854,7 @@ function cargarDatosModificarProducto(prod) {
     document.getElementById('admin-prod-desc').value = prod.descripcion;
     document.getElementById('admin-prod-precio-n').value = prod.precioNormal;
     document.getElementById('admin-prod-precio-v').value = prod.precioSuscriptor;
-    document.getElementById('admin-curso-fichas').value = c.precioFichas || 0;
+    document.getElementById('admin-prod-fichas').value = prod.precioFichas || 0;
     document.getElementById('admin-prod-stock').value = prod.stock;
     document.getElementById('admin-prod-sabores').value = prod.sabores;
     document.getElementById('admin-prod-colores').value = prod.colores;
@@ -12383,26 +12415,7 @@ async function abrirModalOtorgarPuntos() {
         selectSku.innerHTML = '<option value="">Error al cargar catálogo</option>';
     }
 }
-        window.kairoArbolRed.forEach(nodo => {
-            // Evita que el coach se venda a sí mismo, pero muestra a los demás
-            if (nodo.id !== sessionUser.email) {
-                selectCliente.innerHTML += `<option value="${nodo.nombre}" data-email="${nodo.id}" data-wp="${nodo.whatsapp}" data-pais="${nodo.pais}">${nodo.nombre} (${nodo.id})</option>`;
-            }
-        });
-    } else {
-        selectCliente.innerHTML = '<option value="">No tienes clientes registrados en tu red.</option>';
-    }
-    
-    const res = await apiCall("obtenerCatalogoUniversal");
-    if (res && res.success) {
-        selectSku.innerHTML = '<option value="">Selecciona el Ítem Vendido</option>';
-        res.catalogo.forEach(i => {
-            selectSku.innerHTML += `<option value="${i.sku}">${i.nombre}</option>`;
-        });
-    } else {
-        selectSku.innerHTML = '<option value="">Error al cargar catálogo</option>';
-    }
-}
+       
 
 // 🛡️ LÓGICA DE AUTOCOMPLETADO
 function autocompletarDatosVentaOffline(selectElement) {
