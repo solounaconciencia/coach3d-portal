@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Google Tag Manager / Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H3TGV05F85"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-H3TGV05F85');
+    </script>
 
-  gtag('config', 'G-H3TGV05F85');
-</script>
-    <title>Coach 3D Latam | Finanzas, Nutrición y Mentalidad</title>
-<meta name="description" content="Coach 3D Latam: Mentoría integral para transformar tu vida en 3 dimensiones: Cuerpo, Mente y Bolsillo. Disponible en Chile, Colombia y Ecuador.">
-<meta name="keywords" content="Coach 3D, Mentoría Finanzas, Nutrición Consciente, Mentalidad de Éxito, Desarrollo Personal Latam">
-
-<meta property="og:title" content="Coach 3D Latam | Portal Oficial">
-<meta property="og:description" content="Tu transformación integral en 3 dimensiones. Haz clic para conocer tu diagnóstico.">
-<meta property="og:image" content="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
-<meta property="og:url" content="https://coach3dlatam.app">
-<meta property="og:type" content="website">
-
-<link rel="icon" type="image/png" href="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Coach 3D Latam</title>
+    <title>Coach 3D Latam | Finanzas, Nutrición y Mentalidad</title>
+    <meta name="description" content="Coach 3D Latam: Mentoría integral para transformar tu vida en 3 dimensiones: Cuerpo, Mente y Bolsillo. Disponible en Chile, Colombia y Ecuador.">
+    <meta name="keywords" content="Coach 3D, Mentoría Finanzas, Nutrición Consciente, Mentalidad de Éxito, Desarrollo Personal Latam">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Coach 3D Latam | Portal Oficial">
+    <meta property="og:description" content="Tu transformación integral en 3 dimensiones. Haz clic para conocer tu diagnóstico.">
+    <meta property="og:image" content="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
+    <meta property="og:url" content="https://coach3dlatam.app">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
+
     <style>
         :root {
             --neon-n: #22d3ee; /* Nutrición */
@@ -30,6 +32,7 @@
             --neon-f: #10b981; /* Finanzas */
             --bg: #0a0f1e;
             --glass: rgba(255, 255, 255, 0.05);
+            --border-glass: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -41,7 +44,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            line-height: 1.6;
         }
 
         header {
@@ -50,172 +53,667 @@
             display: flex;
             justify-content: flex-end;
             box-sizing: border-box;
+            max-width: 1100px;
+        }
+
+        section {
+            width: 100%;
+            max-width: 1100px;
+            padding: 60px 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            margin: 0 0 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: clamp(1.8em, 4vw, 2.5em);
+            background: linear-gradient(to right, #fff, #bbb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+        }
+
+        p {
+            color: #b3c5ef;
+            font-size: 1.05em;
+            margin: 0 0 20px 0;
+        }
+
+        /* Botones del Sistema */
+        .btn-base {
+            display: inline-block;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+            box-sizing: border-box;
         }
 
         .btn-login {
             border: 2px solid var(--neon-n);
             color: var(--neon-n);
-            text-decoration: none;
-            padding: 10px 25px;
-            border-radius: 30px;
-            font-weight: bold;
-            transition: 0.3s;
-            text-transform: uppercase;
+            padding: 8px 22px;
             font-size: 0.8em;
+            background: transparent;
         }
 
         .btn-login:hover {
             background: var(--neon-n);
             color: #000;
-            box-shadow: 0 0 20px var(--neon-n);
+            box-shadow: 0 0 15px var(--neon-n);
         }
 
-        .hero {
-            text-align: center;
-            padding: 20px;
-            max-width: 900px;
+        .btn-primary {
+            background: linear-gradient(90deg, var(--neon-n), var(--neon-m));
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
         }
 
-        h1 {
-            font-size: 2.5em;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(168, 85, 247, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--neon-f);
+            color: var(--neon-f);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--neon-f);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-f);
+        }
+
+        /* Diseño de Tarjetas Responsive */
+        .grid-responsive {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            padding: 35px 25px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Bloque 1: Hero Principal */
+        .hero h1 {
+            font-size: clamp(2.2em, 6vw, 3.8em);
+            line-height: 1.15;
             background: linear-gradient(to right, #fff, var(--neon-n));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .hero p {
+            font-size: clamp(1.1em, 2.5vw, 1.3em);
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+        }
 
-        .video-container {
-            width: 100%;
+        /* Bloque 4: Desafío 3 Días */
+        .challenge-container {
             max-width: 800px;
-            aspect-ratio: 16/9;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            margin-bottom: 40px;
+            margin: 0 auto;
         }
 
-        .pilares-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            width: 90%;
-            max-width: 1100px;
-            padding-bottom: 50px;
-        }
-
-        .pilar-card {
+        .challenge-day {
             background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 4px solid var(--pilar-color);
+            border: 1px solid var(--border-glass);
+            border-radius: 25px;
             padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
+            margin-bottom: 25px;
+            text-align: left;
+            transition: all 0.4s ease;
         }
 
-        .pilar-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255,255,255,0.08);
+        .challenge-day.locked {
+            opacity: 0.25;
+            pointer-events: none;
+            filter: grayscale(100%);
         }
 
-        .opciones {
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        #final-unlock {
             display: none;
+            padding: 50px 30px;
+            border-radius: 25px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid var(--neon-m);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+            margin-top: 40px;
+        }
+
+        /* Bloque 5: Testimonios */
+        .testimonial-card img {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .testimonial-result {
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        /* Bloque 6: Beneficios */
+        .benefits-list {
+            text-align: left;
+            list-style: none;
+            padding: 0;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        .benefits-list li {
+            margin-bottom: 18px;
+            font-size: 1.15em;
+            display: flex;
+            align-items: center;
+        }
+        .benefits-list li::before {
+            content: '✓';
+            color: var(--neon-f);
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-right: 15px;
+        }
+
+        /* Bloque 7: Formulario */
+        .form-box {
+            max-width: 550px;
+            margin: 30px auto 0 auto;
+            padding: 40px 30px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            background: rgba(0,0,0,0.4);
+            color: white;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1em;
+            transition: 0.3s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--neon-n);
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* Bloque 8: FAQ Acordeón */
+        .faq-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        details {
+            background: var(--glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            text-align: left;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        summary {
+            padding: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary::after {
+            content: '+';
+            font-size: 1.4em;
+            color: var(--neon-n);
+            transition: 0.3s;
+        }
+        details[open] summary::after {
+            content: '−';
+            transform: rotate(90deg);
+        }
+        details p {
+            padding: 0 22px 22px 22px;
+            margin: 0;
+            color: #a4b3d6;
+        }
+
+        /* Estructura Modal Ventana Emergente */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 15, 0.85);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #0d1326;
+            padding: 40px 30px;
+            border-radius: 24px;
+            border: 1px solid var(--neon-n);
+            text-align: center;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+        .modal-buttons {
+            display: flex;
             flex-direction: column;
             gap: 12px;
             margin-top: 25px;
-            animation: fadeIn 0.5s ease;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-depth {
-            display: block;
-            padding: 12px;
-            border-radius: 12px;
-            text-decoration: none;
-            color: white;
-            font-size: 0.9em;
-            font-weight: 500;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.3s;
-        }
-
-        .btn-depth:hover {
-            background: var(--pilar-color);
-            color: #000;
-            border-color: transparent;
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8em; }
+        @media (min-width: 480px) {
+            .modal-buttons { flex-direction: row; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="https://coach3dlatam.app/comunidad" class="btn-login">Ingreso/Login</a>
+        <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-login" onclick="trackJoinEvent(event, this.href)">Ingreso / Login</a>
     </header>
 
+    <!-- BLOQUE 1: HERO PRINCIPAL -->
     <section class="hero">
-        <h1>TU TRANSFORMACIÓN 3D COMIENZA AQUÍ</h1>
-        <div class="video-container">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/7Ch5rMFoxNU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <h1>DEJA DE TRABAJAR UNA SOLA ÁREA DE TU VIDA</h1>
+        <p>Descubre cómo mejorar tus finanzas, tu bienestar y tu mentalidad desde una sola comunidad.</p>
+        <button class="btn-base btn-primary" onclick="scrollToElement('desafio')">Comenzar Ahora</button>
+    </section>
+
+    <!-- BLOQUE 2: EL MÉTODO 3D -->
+    <section>
+        <h2>EL MÉTODO 3D</h2>
+        <div class="grid-responsive">
+            <div class="card" style="border-bottom: 4px solid var(--neon-f);">
+                <h3 style="color: var(--neon-f)">Finanzas</h3>
+                <p>Aprende a administrar mejor tu dinero y construir estabilidad financiera.</p>
+            </div>
+            <div class="card" style="border-bottom: 4px solid var(--neon-n);">
+                <h3 style="color: var(--neon-n)">Nutrición</h3>
+                <p>Mejora tu energía y bienestar con hábitos sostenibles.</p>
+            </div>
+            <div class="card" style="border-bottom: 4px solid var(--neon-m);">
+                <h3 style="color: var(--neon-m)">Mentalidad</h3>
+                <p>Desarrolla disciplina, enfoque y crecimiento personal.</p>
+            </div>
         </div>
     </section>
 
-    <div class="pilares-grid">
-        <div class="pilar-card" style="--pilar-color: var(--neon-f);" onclick="toggleDepth('finanzas')">
-            <h2 style="color: var(--neon-f)">FINANZAS</h2>
-            <p style="font-size: 0.9em; opacity: 0.7;">Orden, Propulsión y Libertad</p>
-            <div id="finanzas" class="opciones">
-                <a href="https://wa.me/56976003402?text=Hola%20Coach,%20vengo%20de%20la%20web.%20Estoy%20listo%20para%20ordenar%20mis%20finanzas%20y%20quiero%20una%20sesión%20de%20diagnóstico." target="_blank" class="btn-depth">Un Café y Hablar con Coach sobre mi situacion financiera</a>
-                <a href="https://coach3dlatam.app/calculadorafinanciera" class="btn-depth">Calcula tu situación actual ahora, ingresando ingresos y gastos detalladamente</a>
-                <a href="https://coach3dlatam.app/comunidad" class="btn-depth">Registrarse en Comunidad y conocer todas las herramientas dispoibles</a>
+    <!-- BLOQUE 3: HERRAMIENTAS DISPONIBLES -->
+    <section>
+        <h2>HERRAMIENTAS DISPONIBLES</h2>
+        <div class="grid-responsive">
+            <div class="card">
+                <div>
+                    <h3>Diagnóstico 3D</h3>
+                    <p>Evalúa de forma integral tus pilares fundamentales.</p>
+                </div>
+                <button class="btn-base btn-secondary" onclick="openToolModal('https://coach3dlatam.app/d3d')">Acceder</button>
+            </div>
+            <div class="card">
+                <div>
+                    <h3>Perfil de Bienestar</h3>
+                    <p>Calcula tus parámetros corporales óptimos de forma digital.</p>
+                </div>
+                <button class="btn-base btn-secondary" onclick="openToolModal('https://coach3dlatam.app/perfilbienestar')">Acceder</button>
+            </div>
+            <div class="card">
+                <div>
+                    <h3>Calculadora Financiera</h3>
+                    <p>Monitorea y analiza tus estructuras de ingresos y gastos.</p>
+                </div>
+                <button class="btn-base btn-secondary" onclick="openToolModal('https://coach3dlatam.app/calculadorafinanciera')">Acceder</button>
             </div>
         </div>
+    </section>
 
-        <div class="pilar-card" style="--pilar-color: var(--neon-n);" onclick="toggleDepth('nutricion')">
-            <h2 style="color: var(--neon-n)">NUTRICIÓN</h2>
-            <p style="font-size: 0.9em; opacity: 0.7;">Energía, Salud y Bio-hacking</p>
-            <div id="nutricion" class="opciones">
-                <a href="https://wa.me/56976003402?text=Hola%20Coach,%20vi%20el%20video%20de%20bienvenida.%20Me%20interesa%20el%20pilar%20de%20Nutrición%20para%20mejorar%20mi%20composición%20y%20energía." target="_blank" class="btn-depth">Café con un Coach y sesion de orientacion GRATIS</a>
-                <a href="https://coach3dlatam.app/perfilbienestar" class="btn-depth">Perfil de Bienestar ONLINE (debes tener medidas en cm de cuello, cadera y cintura o datos de bioimpedancia)</a>
-                <a href="https://coach3dlatam.app/comunidad" class="btn-depth">Registrarse en Comunidad y conocer todas las herramientas</a>
+    <!-- BLOQUE 4: DESAFÍO GRATUITO DE 3 DÍAS -->
+    <section id="desafio">
+        <h2>DESAFÍO GRATUITO 3D</h2>
+        <p style="margin-bottom: 40px;">Completa los tres entrenamientos y desbloquea el acceso a nuestra comunidad.</p>
+        
+        <div class="challenge-container">
+            <!-- Día 1 -->
+            <div class="challenge-day" id="day1">
+                <h3 style="color: var(--neon-f)">Día 1: Finanzas</h3>
+                <div class="video-wrapper">
+                    <iframe id="yt-player-1" loading="lazy" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <button class="btn-base btn-secondary" id="btn-day1" onclick="completeDay(1)">Marcar como completado</button>
+            </div>
+
+            <!-- Día 2 -->
+            <div class="challenge-day locked" id="day2">
+                <h3 id="title-day2" style="color: var(--neon-n)">Día 2: Nutrición 🔒</h3>
+                <div class="video-wrapper">
+                    <iframe id="yt-player-2" loading="lazy" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <button class="btn-base btn-secondary" id="btn-day2" onclick="completeDay(2)">Marcar como completado</button>
+            </div>
+
+            <!-- Día 3 -->
+            <div class="challenge-day locked" id="day3">
+                <h3 id="title-day3" style="color: var(--neon-m)">Día 3: Mentalidad 🔒</h3>
+                <div class="video-wrapper">
+                    <iframe id="yt-player-3" loading="lazy" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <button class="btn-base btn-secondary" id="btn-day3" onclick="completeDay(3)">Marcar como completado</button>
+            </div>
+
+            <!-- Desbloqueo Final -->
+            <div id="final-unlock">
+                <h2 style="color: #fff; margin-bottom: 10px;">¡FELICITACIONES! 🏆</h2>
+                <p>Has completado satisfactoriamente el Desafío 3D.</p>
+                <br>
+                <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-primary" style="font-size: 1.1em;" onclick="trackJoinEvent(event, this.href)">UNIRME A LA COMUNIDAD</a>
             </div>
         </div>
+    </section>
 
-        <div class="pilar-card" style="--pilar-color: var(--neon-m);" onclick="toggleDepth('mentalidad')">
-            <h2 style="color: var(--neon-m)">MENTALIDAD</h2>
-            <p style="font-size: 0.9em; opacity: 0.7;">Propósito, Foco y Disciplina</p>
-            <div id="mentalidad" class="opciones">
-                <a href="https://wa.me/56976003402?text=Hola%20Coach,%20me%20gustaría%20trabajar%20mi%20Mentalidad.%20¿Cómo%20funciona%20el%20sistema%20de%20coaching%203D?" target="_blank" class="btn-depth">Un Café con un Coach y Mentoría de Propósito</a>
-                <a href="https://coach3dlatam.app/d3d" class="btn-depth">Diagnóstico 3D</a>
-                <a href="https://coach3dlatam.app/comunidad" class="btn-depth">Registrarse en Comunidad y conocer todas las herramientas</a>
+    <!-- BLOQUE 5: TESTIMONIOS -->
+    <section>
+        <h2>TESTIMONIOS REALES</h2>
+        <div class="grid-responsive">
+            <div class="card testimonial-card">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=60" alt="Carlos M.">
+                <h3>Carlos M.</h3>
+                <p><i>"Logré organizar mis deudas y empezar a construir mi tranquilidad financiera siguiendo los pasos del pilar."</i></p>
+                <span class="testimonial-result" style="color: var(--neon-f)">Resultado: Libre de deudas</span>
+            </div>
+            <div class="card testimonial-card">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=60" alt="Andrea G.">
+                <h3>Andrea G.</h3>
+                <p><i>"Entender la conexión entre mi nutrición y los niveles de energía diaria transformó por completo mi productividad."</i></p>
+                <span class="testimonial-result" style="color: var(--neon-n)">Resultado: Mayor vitalidad</span>
+            </div>
+            <div class="card testimonial-card">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=60" alt="Roberto S.">
+                <h3>Roberto S.</h3>
+                <p><i>"La mentalidad y la disciplina que se promueven dentro de la comunidad me dieron la fuerza para escalar mi negocio."</i></p>
+                <span class="testimonial-result" style="color: var(--neon-m)">Resultado: Enfoque y Crecimiento</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOQUE 6: BENEFICIOS DE LA COMUNIDAD -->
+    <section>
+        <h2>BENEFICIOS DE LA COMUNIDAD</h2>
+        <ul class="benefits-list">
+            <li>Herramientas exclusivas</li>
+            <li>Comunidad privada</li>
+            <li>Ofertas especiales</li>
+            <li>Entrenamientos avanzados</li>
+            <li>Eventos y mentorías</li>
+            <li>Acceso prioritario a novedades</li>
+        </ul>
+    </section>
+
+    <!-- BLOQUE 7: CONVIÉRTETE EN COACH -->
+    <section>
+        <h2>¿Quieres convertirte en Coach 3D?</h2>
+        <p>Buscamos personas comprometidas con el crecimiento personal, bienestar y liderazgo.</p>
+        
+        <div class="card form-box">
+            <form id="coach-form" onsubmit="submitPostulation(event)">
+                <input type="text" name="nombre" id="form-nombre" placeholder="Nombre completo" required>
+                <input type="email" name="correo" id="form-correo" placeholder="Correo electrónico" required>
+                <input type="number" name="edad" id="form-edad" placeholder="Edad" required>
+                <textarea name="motivo" id="form-motivo" rows="4" placeholder="Motivo por el cual deseas postularte" required></textarea>
+                <button type="submit" id="form-submit-btn" class="btn-base btn-primary">POSTULARME</button>
+            </form>
+            <div id="form-success" style="display: none; color: var(--neon-f); padding: 10px 0;">
+                <h3 style="margin-bottom: 10px;">¡Gracias por tu interés!</h3>
+                <p style="color: #fff; margin:0;">Revisaremos tu solicitud y te contactaremos para una reunión informativa.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOQUE 8: PREGUNTAS FRECUENTES -->
+    <section>
+        <h2>PREGUNTAS FRECUENTES</h2>
+        <div class="faq-wrapper">
+            <details>
+                <summary>¿La comunidad es gratuita?</summary>
+                <p>El ingreso inicial y los desafíos básicos de captación son gratuitos. Existen accesos a mentorías avanzadas y herramientas premium para miembros que deseen escalar resultados.</p>
+            </details>
+            <details>
+                <summary>¿Necesito comprar productos?</summary>
+                <p>No, la plataforma se enfoca en la educación integral y entrega de herramientas prácticas para finanzas, mentalidad y bienestar, sin obligatoriedad comercial de productos externos.</p>
+            </details>
+            <details>
+                <summary>¿Qué es el Diagnóstico 3D?</summary>
+                <p>Es una evaluación estructural interactiva diseñada para medir tu estado actual en las tres dimensiones de la comunidad, permitiendo trazar tus métricas iniciales.</p>
+            </details>
+            <details>
+                <summary>¿Puedo acceder desde cualquier país?</summary>
+                <p>¡Por supuesto! Coach 3D LATAM es un ecosistema 100% digital accesible desde cualquier dispositivo conectado a internet en todo el mundo.</p>
+            </details>
+            <details>
+                <summary>¿Cómo puedo convertirme en Coach?</summary>
+                <p>Completando el formulario de postulación ubicado en esta página. Analizaremos tu perfil, edad, motivos y te contactaremos en caso de cumplir con los requerimientos esenciales.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- BLOQUE 9: CTA FINAL -->
+    <section style="padding-bottom: 90px;">
+        <h2 style="font-size: clamp(1.8em, 5vw, 2.8em); line-height: 1.2;">Tu situación actual no determina tu futuro.</h2>
+        <p style="font-size: 1.15em; margin-bottom: 35px;">Comienza hoy tu transformación en las tres dimensiones más importantes de tu vida.</p>
+        <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-primary" style="padding: 16px 50px;" onclick="trackJoinEvent(event, this.href)">UNIRME A LA COMUNIDAD</a>
+    </section>
+
+    <!-- MODAL DE HERRAMIENTAS -->
+    <div class="modal-overlay" id="toolModal">
+        <div class="modal-content">
+            <h3 style="color: var(--neon-n); margin-bottom: 15px;">Acceso Restringido</h3>
+            <p style="font-size: 0.95em;">Esta herramienta requiere una cuenta gratuita para acceder a los resultados.</p>
+            <div class="modal-buttons">
+                <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-primary" onclick="trackJoinEvent(event, this.href)">Crear Cuenta</a>
+                <a href="#" id="modalContinueBtn" class="btn-base btn-secondary" style="border-color:#64748b; color:#94a3b8;">Continuar</a>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPTS DE CONTROL -->
     <script>
-        function toggleDepth(id) {
-            const current = document.getElementById(id);
-            const all = document.querySelectorAll('.opciones');
-            
-            // Si ya está abierto, lo cerramos, si no, cerramos otros y abrimos este
-            if (current.style.display === 'flex') {
-                current.style.display = 'none';
-            } else {
-                all.forEach(el => el.style.display = 'none');
-                current.style.display = 'flex';
+        /* ===================================================
+           CONFIGURACIONES Y VARIABLES GLOBALES
+        =================================================== */
+        const DAY1_VIDEO_ID = "7Ch5rMFoxNU"; // ID del video Día 1 Finanzas
+        const DAY2_VIDEO_ID = "dQw4w9WgXcQ"; // ID del video Día 2 Nutrición
+        const DAY3_VIDEO_ID = "dQw4w9WgXcQ"; // ID del video Día 3 Mentalidad
+
+        // >>> REEMPLAZA AQUÍ TU URL DE GOOGLE APPS SCRIPT PUBLICADA <<<
+        const SHEET_WEBAPP_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+
+        /* ===================================================
+           LÓGICA DEL DESAFÍO 3 DÍAS (LOCALSTORAGE)
+        =================================================== */
+        document.addEventListener("DOMContentLoaded", () => {
+            loadVideos();
+            checkChallengeProgress();
+        });
+
+        function loadVideos() {
+            document.getElementById('yt-player-1').src = `https://www.youtube.com/embed/${DAY1_VIDEO_ID}?enablejsapi=1`;
+            document.getElementById('yt-player-2').src = `https://www.youtube.com/embed/${DAY2_VIDEO_ID}?enablejsapi=1`;
+            document.getElementById('yt-player-3').src = `https://www.youtube.com/embed/${DAY3_VIDEO_ID}?enablejsapi=1`;
+        }
+
+        function checkChallengeProgress() {
+            const day1Done = localStorage.getItem('challenge_day1_completed') === 'true';
+            const day2Done = localStorage.getItem('challenge_day2_completed') === 'true';
+            const day3Done = localStorage.getItem('challenge_day3_completed') === 'true';
+
+            if (day1Done) {
+                setDayAsCompleted('btn-day1', 'day2', 'title-day2', 'Día 2: Nutrición');
             }
+            if (day2Done) {
+                setDayAsCompleted('btn-day2', 'day3', 'title-day3', 'Día 3: Mentalidad');
+            }
+            if (day3Done) {
+                document.getElementById('btn-day3').innerText = "Completado ✓";
+                document.getElementById('btn-day3').style.borderColor = "var(--neon-f)";
+                document.getElementById('btn-day3').style.background = "rgba(16, 185, 129, 0.1)";
+                document.getElementById('btn-day3').style.color = "var(--neon-f)";
+                document.getElementById('final-unlock').style.display = "block";
+            }
+        }
+
+        function setDayAsCompleted(btnId, nextDayContainerId, nextDayTitleId, activeTitleText) {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.innerText = "Completado ✓";
+                btn.style.borderColor = "var(--neon-f)";
+                btn.style.background = "rgba(16, 185, 129, 0.1)";
+                btn.style.color = "var(--neon-f)";
+            }
+            const nextContainer = document.getElementById(nextDayContainerId);
+            if (nextContainer) {
+                nextContainer.classList.remove('locked');
+            }
+            const nextTitle = document.getElementById(nextDayTitleId);
+            if (nextTitle) {
+                nextTitle.innerText = activeTitleText;
+            }
+        }
+
+        function completeDay(dayNum) {
+            localStorage.setItem(`challenge_day${dayNum}_completed`, 'true');
+            checkChallengeProgress();
+            
+            if (dayNum < 3) {
+                setTimeout(() => {
+                    document.getElementById(`day${dayNum + 1}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('final-unlock').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+
+        /* ===================================================
+           MODAL DE CONTROL DE HERRAMIENTAS
+        =================================================== */
+        function openToolModal(destinationUrl) {
+            const modal = document.getElementById('toolModal');
+            const continueLink = document.getElementById('modalContinueBtn');
+            continueLink.href = destinationUrl;
+            modal.style.display = 'flex';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('toolModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.getElementById('modalContinueBtn').addEventListener('click', () => {
+            document.getElementById('toolModal').style.display = 'none';
+        });
+
+        /* ===================================================
+           ENVÍO AUTOMÁTICO DE POSTULACIONES A GOOGLE SHEETS
+        =================================================== */
+        function submitPostulation(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('form-submit-btn');
+            submitBtn.innerText = "ENVIANDO...";
+            submitBtn.disabled = true;
+
+            const nombre = document.getElementById('form-nombre').value;
+            const correo = document.getElementById('form-correo').value;
+            const edad = document.getElementById('form-edad').value;
+            const motivo = document.getElementById('form-motivo').value;
+
+            // Formulación de los parámetros URL-encoded exactos
+            const urlEncodedData = `nombre=${encodeURIComponent(nombre)}&correo=${encodeURIComponent(correo)}&edad=${encodeURIComponent(edad)}&motivo=${encodeURIComponent(motivo)}`;
+
+            fetch(SHEET_WEBAPP_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: urlEncodedData
+            })
+            .then(() => {
+                document.getElementById('coach-form').style.display = 'none';
+                document.getElementById('form-success').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un inconveniente al enviar tu postulación. Por favor intenta nuevamente.');
+                submitBtn.innerText = "POSTULARME";
+                submitBtn.disabled = false;
+            });
+        }
+
+        /* ===================================================
+           MÉTRICA DE CONVERSIÓN (TRACKING DE EVENTO GA4)
+        =================================================== */
+        function trackJoinEvent(event, targetUrl) {
+            event.preventDefault();
+            
+            gtag('event', 'community_join_click', {
+                'origin': 'landing_principal',
+                'date': new Date().toISOString().split('T')[0],
+                'device': window.innerWidth < 768 ? 'mobile' : 'desktop',
+                'entry_page': window.location.pathname
+            });
+
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 250);
+        }
+
+        function scrollToElement(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
