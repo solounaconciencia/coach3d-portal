@@ -9005,6 +9005,12 @@ function renderizarGrillaEcommerce(lista = inventarioEcommerce) {
             htmlPrecio = `<span class="store-card-price">$${p.precioNormal.toLocaleString()}</span>`;
         }
 
+        // 🛡️ MOTOR INTELIGENTE: Si el producto tiene precio en fichas, dibujamos el botón Token
+        let botonFichas = "";
+        if (p.precioFichas && Number(p.precioFichas) > 0) {
+            botonFichas = `<button class="btn" style="width: 100%; margin-top: 10px; border: 1px solid var(--neon-m); color: white; background: rgba(168, 85, 247, 0.1); font-size: 0.8em; padding: 10px; box-sizing: border-box;" onclick="comprarItemFichas('producto', ${p.precioFichas}, '${p.sku}', '${p.nombre.replace(/'/g, "\\'")}')">CANJEAR POR ${Number(p.precioFichas).toLocaleString('es-CL')} 🎟️</button>`;
+        }
+
         const card = document.createElement('div');
         card.className = "store-card";
         card.innerHTML = `
@@ -9019,6 +9025,7 @@ function renderizarGrillaEcommerce(lista = inventarioEcommerce) {
                     <div>${htmlPrecio}</div>
                     <button class="btn btn-n" style="padding: 8px 15px; font-size: 0.8em;" onclick="abrirModalEcommerce('${p.sku}')">VER MÁS</button>
                 </div>
+                ${botonFichas}
             </div>
         `;
         grid.appendChild(card);
@@ -13066,6 +13073,53 @@ function comprarPaqueteFichas(cantidad, precio) {
     // Los parámetros son (coachName, esCompraDirecta, montoDirecto)
     abrirCheckout("", true, precio);
 }
+
+// =========================================================
+// 🎟️ MOTOR DE PAGO CON FICHAS (TOKEN-GATING)
+// =========================================================
+
+async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
+    if (!sessionUser) return notify("Debes iniciar sesión en la Matrix.");
+    
+    // Validar Saldo Visual Primero
+    const saldoVisualFichas = parseInt(document.getElementById('kpi-fichas').innerText.replace(/\./g, '')) || 0;
+    if (saldoVisualFichas < costo) {
+        return notify(`❌ Fichas insuficientes. Necesitas ${costo.toLocaleString('es-CL')} 🎟️ para este canje.`);
+    }
+
+    let confirmMsg = `¿Deseas canjear ${costo.toLocaleString('es-CL')} Fichas por "${nombreItem}"?`;
+    if (!confirm(confirmMsg)) return;
+
+    mostrarLoading("Hackeando la Matrix... Descontando Fichas...");
+    
+    const res = await apiCall("procesarPagoConFichas", {
+        email: sessionUser.email,
+        tipo: tipo,
+        costo: costo,
+        itemId: itemId,
+        nombreItem: nombreItem
+    });
+    
+    ocultarLoading();
+
+    if (res && res.success) {
+        // Descuento visual instantáneo
+        const nuevoSaldo = saldoVisualFichas - costo;
+        document.getElementById('kpi-fichas').innerText = nuevoSaldo.toLocaleString('es-CL');
+        
+        if (tipo === 'escudo') {
+            cerrarModalFichas();
+            kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">🛡️ ESCUDO ACTIVADO</h3><p>Tu constancia está protegida. La Matrix perdonará 1 día de ausencia en tu Desafío.</p>`, icon: "🛡️" });
+        } else {
+            // Notificamos al Coach que entregue el producto físico o digital
+            const waTxt = encodeURIComponent(`🚀 *¡CANJE POR FICHAS C3D!*\n\n*Usuario:* ${sessionUser.nombre}\n*Item:* ${nombreItem}\n*Pagado:* ${costo} Fichas 🎟️\n\n*Hola Coach, acabo de canjear mis Fichas por este beneficio. Coordinemos la entrega.*`);
+            kairoMessage({ mensaje: `<h3 style="color:var(--neon-m); font-family:'Orbitron';">🎟️ CANJE EXITOSO</h3><p>Tus Fichas han sido descontadas.</p><button class="btn btn-n" style="width:100%; margin-top:15px;" onclick="window.open('https://wa.me/56976003402?text=${waTxt}', '_blank')">CONTACTAR COACH</button>`, icon: "✅" });
+        }
+    } else {
+        notify("❌ Error en la transacción: " + (res ? res.msg : "Sin conexión"));
+    }
+}
+        
 </script>
 
 <!-- 🎛️ MODAL: SEGUIMIENTO DE ORGANIZACIÓN (Fase 1) -->
@@ -13133,6 +13187,19 @@ function comprarPaqueteFichas(cantidad, precio) {
         <h1 id="modal-fichas-saldo" style="color: white; font-size: 2.5rem; font-family: 'Orbitron'; margin: 5px 0;">0</h1>
     </div>
 
+    <!-- SECCIÓN DE CANJE (QUEMAR FICHAS) -->
+    <div style="text-align: left; background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-f); margin-bottom: 20px;">
+        <h4 style="color: var(--neon-f); margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🛡️ TIENDA EXCLUSIVA</h4>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 6px; border-left: 3px solid var(--neon-f);">
+            <div style="width: 70%;">
+                <strong style="color: white; font-size: 0.9em;">Escudo de Constancia</strong>
+                <p style="font-size: 0.7em; color: #cbd5e1; margin: 2px 0 0 0; line-height: 1.3;">Salva tu progreso. Si olvidas marcar tu Desafío de 90 Días, el escudo se rompe, pero tu racha se mantiene intacta.</p>
+            </div>
+            <button class="btn btn-f" style="padding: 10px; font-size: 0.8em; white-space: nowrap; font-weight: bold;" onclick="comprarItemFichas('escudo', 2000, 'ESCUDO-01', 'Escudo de Constancia')">2.000 🎟️</button>
+        </div>
+    </div>
+    
     <!-- SECCIÓN DE COMPRA -->
     <div style="text-align: left; margin-bottom: 20px;">
         <h4 style="color: var(--neon-n); font-family: 'Orbitron'; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; font-size: 0.9em;">🛒 ADQUIRIR MÁS FICHAS</h4>
