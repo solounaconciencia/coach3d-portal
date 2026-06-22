@@ -10771,8 +10771,14 @@ function cerrarPortalCoachMaestro() {
 }
 function abrirDisponibilidadCoach() {
     document.getElementById('modal-portal-coach').classList.add('hidden'); 
-    document.getElementById('modal-mi-agenda-coach').classList.remove('hidden');
-    document.getElementById('modal-mi-agenda-coach').style.display = 'block';
+    
+    // 🛡️ SUTURA FOCUS: Extraemos el modal de la trampa borrosa
+    const modalAgenda = document.getElementById('modal-mi-agenda-coach');
+    document.body.appendChild(modalAgenda);
+    
+    modalAgenda.classList.remove('hidden');
+    modalAgenda.style.display = 'block';
+    
     const tzoffset = (new Date()).getTimezoneOffset() * 60000;
     document.getElementById('coach-mi-agenda-fecha').value = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
     cargarMiAgendaCoach();
@@ -10995,8 +11001,13 @@ function desplegarHorasDelDiaCoach(fechaFiltro, nombreCoach, slotsCoachActivo) {
 
 function abrirCobrosCoach() {
     document.getElementById('modal-portal-coach').classList.add('hidden');
-    document.getElementById('modal-cobros-coach').classList.remove('hidden');
-    document.getElementById('modal-cobros-coach').style.display = 'block';
+    
+    // 🛡️ SUTURA FOCUS: Extraemos el modal de la trampa borrosa
+    const modalCobros = document.getElementById('modal-cobros-coach');
+    document.body.appendChild(modalCobros);
+    
+    modalCobros.classList.remove('hidden');
+    modalCobros.style.display = 'block';
     
     document.getElementById('coach-token-mp').value = sessionUser.tokenMP || "";
     document.getElementById('coach-token-dlocal').value = sessionUser.dlocal || "";
