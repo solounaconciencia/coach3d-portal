@@ -12542,23 +12542,6 @@ async function abrirModalSeguimientoRed() {
     }
 }
 
-// 2. Cargar Catálogo Dinámico en la Ventana Offline
-async function abrirModalOtorgarPuntos() {
-    document.getElementById('modal-otorgar-puntos').classList.remove('hidden');
-    const selectSku = document.getElementById('puntos-offline-sku');
-    selectSku.innerHTML = '<option value="">Sincronizando catálogo universal...</option>';
-    
-    const res = await apiCall("obtenerCatalogoUniversal");
-    if (res && res.success) {
-        selectSku.innerHTML = '<option value="">Selecciona el Ítem Vendido</option>';
-        res.catalogo.forEach(i => {
-            selectSku.innerHTML += `<option value="${i.sku}">${i.nombre}</option>`;
-        });
-    } else {
-        selectSku.innerHTML = '<option value="">Error al cargar catálogo</option>';
-    }
-}
-
 // 3. Generar la Venta y el Pago del 5%
 async function ejecutarPagoVentaOffline() {
     const payload = {
