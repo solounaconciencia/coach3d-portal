@@ -27,6 +27,13 @@
       overflow-x: hidden;
     }
 
+    /* 🛡️ SUTURA FOCUS: Barras desplazadoras globales estilo Neón Matrix */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.4); border-radius: 10px; border: 1px solid rgba(0,0,0,0.5); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--neon-n); }
+    * { scrollbar-color: rgba(34, 211, 238, 0.4) rgba(0, 0, 0, 0.3); scrollbar-width: thin; }
+
     .glass-panel {
     background: var(--glass);
     backdrop-filter: blur(10px);
@@ -13147,9 +13154,10 @@ function renderizarKanbanCrm() {
                 <div style="font-size:1.5em; font-family:'Orbitron'; color:white;">${count}</div>
             </div>`;
 
+        // 🛡️ SUTURA FOCUS: Columnas del Kanban más altas y con scroll interno
         const div = document.createElement("div");
-        div.style.cssText = `min-width:300px; max-width:320px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-top: 4px solid ${col.color}; border-radius:10px; padding:15px; display:flex; flex-direction:column; gap:10px; height:max-content;`;
-        div.innerHTML = `<h3 style="margin:0 0 10px 0; color:white; font-size:1em;">${col.nombre}</h3>`;
+        div.style.cssText = `min-width:300px; max-width:320px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-top: 4px solid ${col.color}; border-radius:10px; padding:15px; display:flex; flex-direction:column; gap:10px; min-height: 550px; max-height: 65vh; overflow-y:auto;`;
+        div.innerHTML = `<h3 style="margin:0 0 10px 0; color:white; font-size:1em; position:sticky; top:-15px; background:rgba(15, 25, 45, 0.95); padding:10px 0; z-index:10; border-bottom:1px dashed rgba(255,255,255,0.1);">${col.nombre}</h3>`;
 
         activos.filter(p => String(p.estadoId) === String(col.id))
         .filter(p => {
