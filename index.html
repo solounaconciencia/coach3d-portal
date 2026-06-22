@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Google Tag Manager / Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-H3TGV05F85"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -16,7 +15,6 @@
     <meta name="description" content="Coach 3D Latam: Mentoría integral para transformar tu vida en 3 dimensiones: Cuerpo, Mente y Bolsillo. Disponible en Chile, Colombia y Ecuador.">
     <meta name="keywords" content="Coach 3D, Mentoría Finanzas, Nutrición Consciente, Mentalidad de Éxito, Desarrollo Personal Latam">
 
-    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Coach 3D Latam | Portal Oficial">
     <meta property="og:description" content="Tu transformación integral en 3 dimensiones. Haz clic para conocer tu diagnóstico.">
     <meta property="og:image" content="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
@@ -211,6 +209,20 @@
             margin-top: 40px;
         }
 
+        .direct-access-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: var(--neon-n);
+            text-decoration: none;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .direct-access-link:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 10px var(--neon-n);
+        }
+
         /* Bloque 5: Testimonios */
         .testimonial-card img {
             width: 75px;
@@ -349,6 +361,18 @@
         @media (min-width: 480px) {
             .modal-buttons { flex-direction: row; justify-content: center; }
         }
+
+        /* Footer y Aviso Legal */
+        footer {
+            width: 100%;
+            max-width: 1100px;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            border-top: 1px solid var(--border-glass);
+            text-align: center;
+            font-size: 0.85em;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -357,7 +381,6 @@
         <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-login" onclick="trackJoinEvent(event, this.href)">Ingreso / Login</a>
     </header>
 
-    <!-- BLOQUE 1: HERO PRINCIPAL -->
     <section class="hero">
         <h1>DEJA DE TRABAJAR UNA SOLA ÁREA DE TU VIDA</h1>
         <p>Descubre cómo mejorar tus finanzas, tu bienestar y tu mentalidad desde una sola comunidad.</p>
@@ -369,7 +392,6 @@
         <button class="btn-base btn-primary" onclick="scrollToElement('desafio')">Comenzar Ahora</button>
     </section>
 
-    <!-- BLOQUE 2: EL MÉTODO 3D -->
     <section>
         <h2>EL MÉTODO 3D</h2>
         <div class="grid-responsive">
@@ -388,7 +410,6 @@
         </div>
     </section>
 
-    <!-- BLOQUE 3: HERRAMIENTAS DISPONIBLES -->
     <section>
         <h2>HERRAMIENTAS DISPONIBLES</h2>
         <div class="grid-responsive">
@@ -416,13 +437,11 @@
         </div>
     </section>
 
-    <!-- BLOQUE 4: DESAFÍO GRATUITO DE 3 DÍAS -->
     <section id="desafio">
         <h2>DESAFÍO GRATUITO 3D</h2>
         <p style="margin-bottom: 40px;">Completa los tres entrenamientos y desbloquea el acceso a nuestra comunidad.</p>
         
         <div class="challenge-container">
-            <!-- Día 1 -->
             <div class="challenge-day" id="day1">
                 <h3 style="color: var(--neon-f)">Día 1: Finanzas</h3>
                 <div class="video-wrapper">
@@ -431,7 +450,6 @@
                 <button class="btn-base btn-secondary" id="btn-day1" onclick="completeDay(1)">Marcar como completado</button>
             </div>
 
-            <!-- Día 2 -->
             <div class="challenge-day locked" id="day2">
                 <h3 id="title-day2" style="color: var(--neon-n)">Día 2: Nutrición 🔒</h3>
                 <div class="video-wrapper">
@@ -440,7 +458,6 @@
                 <button class="btn-base btn-secondary" id="btn-day2" onclick="completeDay(2)">Marcar como completado</button>
             </div>
 
-            <!-- Día 3 -->
             <div class="challenge-day locked" id="day3">
                 <h3 id="title-day3" style="color: var(--neon-m)">Día 3: Mentalidad 🔒</h3>
                 <div class="video-wrapper">
@@ -449,17 +466,19 @@
                 <button class="btn-base btn-secondary" id="btn-day3" onclick="completeDay(3)">Marcar como completado</button>
             </div>
 
-            <!-- Desbloqueo Final -->
             <div id="final-unlock">
                 <h2 style="color: #fff; margin-bottom: 10px;">¡FELICITACIONES! 🏆</h2>
                 <p>Has completado satisfactoriamente el Desafío 3D.</p>
                 <br>
                 <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-primary" style="font-size: 1.1em;" onclick="trackJoinEvent(event, this.href)">UNIRME A LA COMUNIDAD</a>
             </div>
+
+            <div>
+                <a href="https://coach3dlatam.app/comunidad" class="direct-access-link" onclick="trackJoinEvent(event, this.href)">¿Ya conoces nuestro método? Entra directamente a la comunidad aquí →</a>
+            </div>
         </div>
     </section>
 
-    <!-- BLOQUE 5: TESTIMONIOS -->
     <section>
         <h2>TESTIMONIOS REALES</h2>
         <div class="grid-responsive">
@@ -484,7 +503,6 @@
         </div>
     </section>
 
-    <!-- BLOQUE 6: BENEFICIOS DE LA COMUNIDAD -->
     <section>
         <h2>BENEFICIOS DE LA COMUNIDAD</h2>
         <ul class="benefits-list">
@@ -497,7 +515,6 @@
         </ul>
     </section>
 
-    <!-- BLOQUE 7: CONVIÉRTETE EN COACH -->
     <section>
         <h2>¿Quieres convertirte en Coach 3D?</h2>
         <p>Buscamos personas comprometidas con el crecimiento personal, bienestar y liderazgo.</p>
@@ -517,7 +534,6 @@
         </div>
     </section>
 
-    <!-- BLOQUE 8: PREGUNTAS FRECUENTES -->
     <section>
         <h2>PREGUNTAS FRECUENTES</h2>
         <div class="faq-wrapper">
@@ -544,14 +560,12 @@
         </div>
     </section>
 
-    <!-- BLOQUE 9: CTA FINAL -->
-    <section style="padding-bottom: 90px;">
+    <section style="padding-bottom: 60px;">
         <h2 style="font-size: clamp(1.8em, 5vw, 2.8em); line-height: 1.2;">Tu situación actual no determina tu futuro.</h2>
         <p style="font-size: 1.15em; margin-bottom: 35px;">Comienza hoy tu transformación en las tres dimensiones más importantes de tu vida.</p>
         <a href="https://coach3dlatam.app/comunidad" class="btn-base btn-primary" style="padding: 16px 50px;" onclick="trackJoinEvent(event, this.href)">UNIRME A LA COMUNIDAD</a>
     </section>
 
-    <!-- MODAL DE HERRAMIENTAS -->
     <div class="modal-overlay" id="toolModal">
         <div class="modal-content">
             <h3 style="color: var(--neon-n); margin-bottom: 15px;">Acceso Restringido</h3>
@@ -563,7 +577,12 @@
         </div>
     </div>
 
-    <!-- SCRIPTS DE CONTROL -->
+    <footer>
+        <p style="font-size: 0.9em; color: #64748b; margin: 0;">
+            © 2026 Coach 3D LATAM. Utilizamos cookies y tecnologías de almacenamiento local (LocalStorage) para optimizar el progreso de tu desafío y medir métricas de navegación de forma anónima.
+        </p>
+    </footer>
+
     <script>
         /* ===================================================
            CONFIGURACIONES Y VARIABLES GLOBALES
@@ -678,7 +697,6 @@
             const edad = document.getElementById('form-edad').value;
             const motivo = document.getElementById('form-motivo').value;
 
-            // Formulación de los parámetros URL-encoded exactos
             const urlEncodedData = `nombre=${encodeURIComponent(nombre)}&correo=${encodeURIComponent(correo)}&edad=${encodeURIComponent(edad)}&motivo=${encodeURIComponent(motivo)}`;
 
             fetch(SHEET_WEBAPP_URL, {
