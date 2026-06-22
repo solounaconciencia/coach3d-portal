@@ -5310,16 +5310,18 @@ onclick="cerrarKairoMsg(); showForm('register');">CREAR MI CUENTA GRATIS</button
               let flujoDisponible = totalIngresos - totalGastos;
               let porcentajeFlujo = totalIngresos > 0 ? (flujoDisponible / totalIngresos) * 100 : -100;
               
-              let backgroundColors = ['#b91c1c', '#991b1b', '#7f1d1d', '#dc2626', '#ef4444', '#5a0c0c', '#450a0a', '#b91c1c', '#991b1b', '#7f1d1d'];
+              // 🛡️ SUTURA FOCUS: Mapeo exacto de paleta de colores
+              let paletaRojos = ['#b91c1c', '#991b1b', '#7f1d1d', '#dc2626', '#ef4444', '#5a0c0c', '#450a0a', '#b91c1c', '#991b1b', '#7f1d1d'];
+              let backgroundColors = data.map((_, i) => paletaRojos[i % paletaRojos.length]);
               
               if (flujoDisponible > 0) {
                   labels.push('Flujo Libre (Sobrante)');
                   data.push(flujoDisponible);
-                  backgroundColors.push('#10b981'); 
+                  backgroundColors.push('#10b981'); // Verde Esmeralda
               } else if (flujoDisponible < 0) {
                   labels.push('Déficit (Faltante)');
                   data.push(Math.abs(flujoDisponible));
-                  backgroundColors.push('#7f1d1d'); 
+                  backgroundColors.push('#450a0a'); // Rojo muy oscuro
               }
 
               let qcConfig = {
@@ -11044,19 +11046,6 @@ function zoomArbol(factor) {
     document.getElementById('canvas-arbol').style.transform = `scale(${factorZoomArbol})`;
 }
 
-window.configArbol = window.configArbol || {
-    colores: { "Usuario": "#334155", "Suscriptor": "#10b981", "Coach": "#a855f7", "Admin": "#fbbf24" },
-    formas: {
-        0: "star",
-        1: "dot",
-        2: "diamond",
-        3: "triangle",
-        4: "hexagon",
-        5: "square",
-        6: "triangleDown"
-    }
-};
-
 function dibujarArbol() {
     if (!window.kairoArbolRed || window.kairoArbolRed.length === 0) {
         document.getElementById('canvas-arbol').innerHTML = "<p style='color:#94a3b8; padding:40px;'>Tu red aún está en construcción.</p>";
@@ -11064,9 +11053,7 @@ function dibujarArbol() {
     }
 
     let contenedor = document.getElementById('canvas-arbol');
-    contenedor.innerHTML = ""; // Limpiamos el lienzo
-    
-    // Le damos altura al microscopio para que la célula pueda flotar
+    contenedor.innerHTML = ""; 
     document.getElementById('contenedor-grafico-arbol').style.height = "600px";
     contenedor.style.height = "100%";
 
@@ -11075,29 +11062,55 @@ function dibujarArbol() {
 
     window.kairoArbolRed.forEach(nodo => {
         let colorFondo = window.configArbol.colores[nodo.rango] || "#334155";
-        let formaNodo = window.configArbol.formas[Math.min(nodo.nivel, 6)] || "dot";
-        // Creamos el Átomo (Nodo)
+        let formaNodo = window.configArbol.formas[nodo.rango] || "dot";
+        let avatar = nodo.genero === "Femenino" ? "👩" : "👨";
+
+        // 🛡️ MOTOR DE GENERACIÓN SVG DINÁMICO (Forma = Borde, Avatar = Centro)
+        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">`;
+        // Fondo semi-oscuro para que el avatar resalte y el borde tenga el color de la Matrix
+        let stroke = `stroke="${colorFondo}" stroke-width="6" fill="rgba(10, 15, 30, 0.9)"`;
+        
+        if (formaNodo === 'star') {
+            svg += `<polygon points="60,5 74,40 115,40 82,65 94,105 60,80 26,105 38,65 5,40 46,40" ${stroke}/>`;
+        } else if (formaNodo === 'diamond') {
+            svg += `<polygon points="60,5 115,60 60,115 5,60" ${stroke}/>`;
+        } else if (formaNodo === 'triangle') {
+            svg += `<polygon points="60,10 110,105 10,105" ${stroke}/>`;
+        } else if (formaNodo === 'hexagon') {
+            svg += `<polygon points="60,5 110,30 110,90 60,115 10,90 10,30" ${stroke}/>`;
+        } else if (formaNodo === 'square') {
+            svg += `<rect x="15" y="15" width="90" height="90" rx="15" ${stroke}/>`;
+        } else if (formaNodo === 'triangleDown') {
+            svg += `<polygon points="10,15 110,15 60,110" ${stroke}/>`;
+        } else { // Esfera (dot) por defecto
+            svg += `<circle cx="60" cy="60" r="50" ${stroke}/>`;
+        }
+        
+        // Calculamos la posición Y para que el avatar quede perfectamente centrado
+        let yPos = (formaNodo === 'triangle') ? 70 : (formaNodo === 'triangleDown' ? 45 : 65);
+        svg += `<text x="60" y="${yPos}" font-size="45" text-anchor="middle" dominant-baseline="middle">${avatar}</text>`;
+        svg += `</svg>`;
+        
+        let urlImagenSVG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+
+        // Creamos el Átomo enviando la imagen SVG generada
         nodes.push({
             id: nodo.id,
-            label: nodo.nombre.split(' ')[0], // Solo el primer nombre para no saturar
-            shape: formaNodo,
-            color: { 
-                background: colorFondo, 
-                border: colorFondo,
-                highlight: { background: "white", border: colorFondo }
-            },
-            font: { color: "#ffffff", face: "Orbitron", size: 14 },
-            size: nodo.nivel === 0 ? 30 : 15, // El núcleo es el doble de grande
+            label: nodo.nombre.split(' ')[0], // Solo el primer nombre
+            shape: 'image',
+            image: urlImagenSVG,
+            font: { color: "#ffffff", face: "Orbitron", size: 14, strokeWidth: 2, strokeColor: "#000" },
+            size: 35, 
             shadow: { enabled: true, color: colorFondo, size: 15 }
         });
 
-        // Creamos el Enlace (Si tiene un patrocinador)
+        // Conexiones de la red
         if (nodo.padreId && nodo.padreId !== "") {
             edges.push({
                 from: nodo.padreId,
                 to: nodo.id,
                 color: { color: "rgba(255, 255, 255, 0.2)", highlight: "var(--neon-n)" },
-                smooth: { type: 'continuous' } // Líneas orgánicas curvas
+                smooth: { type: 'continuous' } 
             });
         }
     });
@@ -11105,21 +11118,15 @@ function dibujarArbol() {
     let data = { nodes: nodes, edges: edges };
     let options = {
         physics: {
-            solver: "forceAtlas2Based", // Gravedad celular (Atrae al centro y repele a los lados)
-            forceAtlas2Based: {
-                gravitationalConstant: -50,
-                centralGravity: 0.01,
-                springLength: 100,
-                springConstant: 0.08
-            }
+            solver: "forceAtlas2Based",
+            forceAtlas2Based: { gravitationalConstant: -50, centralGravity: 0.01, springLength: 100, springConstant: 0.08 }
         },
         interaction: { hover: true, dragNodes: true, zoomView: true, dragView: true }
     };
 
-    // Encendemos el motor celular
     let network = new vis.Network(contenedor, data, options);
 
-    // Mantenemos el Super Poder de Kairo: Hacer clic para ver la Tarjeta
+    // Kairo: Hacer clic para ver el expediente
     network.on("click", function (params) {
         if (params.nodes.length > 0) {
             let nodeId = params.nodes[0];
@@ -11131,7 +11138,7 @@ function dibujarArbol() {
         }
     });
 }
-
+    
 function getDescendants(parentId, allNodes) {
     let desc = [];
     let children = allNodes.filter(n => n.padreId === parentId);
@@ -11205,42 +11212,67 @@ function manejarCambioForma(nivelModificado, nuevaForma) {
     }
 }
 
+window.configArbol = window.configArbol || {
+    colores: { "Usuario": "#334155", "Suscriptor": "#10b981", "Coach": "#a855f7", "Admin": "#fbbf24" },
+    formas: { "Usuario": "dot", "Suscriptor": "square", "Coach": "diamond", "Admin": "star" }
+};
+
+function manejarCambioForma(rangoModificado, nuevaForma) {
+    let formaAntigua = window.configArbol.formas[rangoModificado];
+    let rangoAIntercambiar = null;
+    
+    for (let r in window.configArbol.formas) {
+        if (r !== rangoModificado && window.configArbol.formas[r] === nuevaForma) {
+            rangoAIntercambiar = r;
+            break;
+        }
+    }
+
+    window.configArbol.formas[rangoModificado] = nuevaForma;
+
+    if (rangoAIntercambiar) {
+        window.configArbol.formas[rangoAIntercambiar] = formaAntigua;
+        document.getElementById('sel-forma-' + rangoAIntercambiar).value = formaAntigua;
+    }
+}
+
 function abrirAjustesArbol() {
     let optionsHTML = `
-        <option value="star">Estrella (Núcleo)</option>
         <option value="dot">Esfera</option>
-        <option value="diamond">Diamante</option>
-        <option value="triangle">Triángulo</option>
-        <option value="hexagon">Hexágono</option>
         <option value="square">Cubo</option>
+        <option value="diamond">Diamante</option>
+        <option value="star">Estrella (Núcleo)</option>
+        <option value="hexagon">Hexágono</option>
+        <option value="triangle">Triángulo</option>
         <option value="triangleDown">Triángulo Invertido</option>
     `;
 
     let selectFormas = "";
-    for(let i=0; i<=6; i++) {
+    const rangos = ["Usuario", "Suscriptor", "Coach", "Admin"];
+    rangos.forEach(r => {
         selectFormas += `
             <div>
-                <label style="font-size:0.7em; color:#cbd5e1;">Nivel ${i}:</label>
-                <select id="sel-forma-${i}" onchange="manejarCambioForma(${i}, this.value)" style="width:100%; padding:5px; background:rgba(0,0,0,0.5); border:1px solid #444; color:white; font-size:0.75em; border-radius:4px;">
+                <label style="font-size:0.7em; color:#cbd5e1;">${r}:</label>
+                <select id="sel-forma-${r}" onchange="manejarCambioForma('${r}', this.value)" style="width:100%; padding:8px; background:rgba(0,0,0,0.5); border:1px solid #444; color:white; font-size:0.75em; border-radius:4px; margin-top:5px;">
                     ${optionsHTML}
                 </select>
             </div>
         `;
-    }
+    });
 
     let html = `
         <h3 style="color:var(--neon-n); font-family:'Orbitron';">DISEÑO DE LA MATRIX</h3>
-        <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:15px;">Personaliza Colores y Geometría de la Red.</p>
+        <p style="font-size:0.85em; color:#cbd5e1; margin-bottom:15px;">Personaliza Colores y Geometría por Rango.</p>
         
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:left; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:15px;">
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Usuario:</label><input type="color" id="c-user" value="${window.configArbol.colores['Usuario']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Suscriptor:</label><input type="color" id="c-susc" value="${window.configArbol.colores['Suscriptor']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Coach:</label><input type="color" id="c-coach" value="${window.configArbol.colores['Coach']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
-            <div><label style="font-size:0.8em; color:var(--neon-n);">Admin:</label><input type="color" id="c-admin" value="${window.configArbol.colores['Admin']}" style="width:100%; height:30px; border:none; background:transparent;"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; text-align:left; margin-bottom:15px; border-bottom:1px dashed rgba(255,255,255,0.2); padding-bottom:15px;">
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Usuario:</label><input type="color" id="c-user" value="${window.configArbol.colores['Usuario']}" style="width:100%; height:40px; padding:2px; cursor:pointer; background:#000; border:1px solid #444; border-radius:6px; margin-top:5px;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Suscriptor:</label><input type="color" id="c-susc" value="${window.configArbol.colores['Suscriptor']}" style="width:100%; height:40px; padding:2px; cursor:pointer; background:#000; border:1px solid #444; border-radius:6px; margin-top:5px;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Coach:</label><input type="color" id="c-coach" value="${window.configArbol.colores['Coach']}" style="width:100%; height:40px; padding:2px; cursor:pointer; background:#000; border:1px solid #444; border-radius:6px; margin-top:5px;"></div>
+            <div><label style="font-size:0.8em; color:var(--neon-n);">Admin:</label><input type="color" id="c-admin" value="${window.configArbol.colores['Admin']}" style="width:100%; height:40px; padding:2px; cursor:pointer; background:#000; border:1px solid #444; border-radius:6px; margin-top:5px;"></div>
         </div>
 
-        <label style="font-size:0.8em; color:var(--neon-n); display:block; text-align:left; margin-bottom:10px;">Intercambio de Formas (Niveles de Profundidad):</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:left;">
+        <label style="font-size:0.8em; color:var(--neon-n); display:block; text-align:left; margin-bottom:10px;">Intercambio de Formas (Rangos):</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; text-align:left;">
             ${selectFormas}
         </div>
 
@@ -11248,14 +11280,13 @@ function abrirAjustesArbol() {
     `;
     kairoMessage({ mensaje: html, icon: '🎨' });
 
-    // Inyectar el valor visual correcto cuando se abre el modal
     setTimeout(() => {
-        for(let i=0; i<=6; i++) {
-            let el = document.getElementById('sel-forma-' + i);
-            if(el && window.configArbol.formas[i]) {
-                el.value = window.configArbol.formas[i];
+        rangos.forEach(r => {
+            let el = document.getElementById('sel-forma-' + r);
+            if(el && window.configArbol.formas[r]) {
+                el.value = window.configArbol.formas[r];
             }
-        }
+        });
     }, 100);
 }
 
@@ -11577,12 +11608,27 @@ function sincronizarDatosLogros(payload) {
             progreso.insignias = dataProg[i][1] ? dataProg[i][1].toString().split(",").map(s => s.trim()).filter(s => s !== "") : [];
             progreso.racha = Number(dataProg[i][2]) || 0;
             
-            // 🛡️ SUTURA FOCUS: Control estricto de Formato de Fecha
+            // 🛡️ SUTURA FOCUS: Decodificador Universal de Fechas (Anti-NaN)
+            let dUltimoLogro = null;
             if (dataProg[i][3]) {
                 if (dataProg[i][3] instanceof Date) {
-                    progreso.ultimoDia = Utilities.formatDate(dataProg[i][3], "GMT-3", "yyyy-MM-dd");
+                    dUltimoLogro = new Date(dataProg[i][3].getTime());
                 } else {
-                    progreso.ultimoDia = dataProg[i][3].toString().trim().substring(0, 10);
+                    let strDate = dataProg[i][3].toString().trim().substring(0, 10);
+                    if (strDate.includes("/")) {
+                        let p = strDate.split("/");
+                        dUltimoLogro = p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0]);
+                    } else if (strDate.includes("-")) {
+                        let p = strDate.split("-");
+                        dUltimoLogro = p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0]);
+                    } else {
+                        dUltimoLogro = new Date(strDate);
+                    }
+                }
+                if (dUltimoLogro && !isNaN(dUltimoLogro.getTime())) {
+                    progreso.ultimoDia = Utilities.formatDate(dUltimoLogro, "GMT-3", "yyyy-MM-dd");
+                } else {
+                    progreso.ultimoDia = "";
                 }
             } else {
                 progreso.ultimoDia = "";
@@ -12565,10 +12611,12 @@ async function ejecutarPagoVentaOffline() {
 // 📈 MOTOR FRONTIER: MÉTRICAS Y GOOGLE CHARTS 
 // =========================================================
 
-// Google Charts base config
-google.charts.load('current', {'packages':['corechart', 'line']});
-
 async function abrirMetricasGlobales() {
+    // 🛡️ SUTURA FOCUS: Solo cargamos Google Charts si se abre este modal
+    if (typeof google !== 'undefined' && google.charts) {
+        google.charts.load('current', {'packages':['corechart', 'line']});
+    }
+
     document.getElementById('main-content').classList.add('blur-effect');
     document.getElementById('modal-metricas-globales').classList.remove('hidden');
     document.getElementById('modal-metricas-globales').style.display = 'flex';
