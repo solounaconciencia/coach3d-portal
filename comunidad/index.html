@@ -7202,6 +7202,10 @@ function salirDelModulo() {
     const herramientas = document.getElementById('seccion-herramientas');
     if (herramientas) herramientas.classList.remove('hidden');
 
+    // 🛡️ SUTURA FOCUS: Encender el Footer legal de forma instantánea al volver
+    const footer = document.getElementById('c3d-global-footer');
+    if (footer) footer.classList.remove('hidden');
+
     if (sessionUser) {
         if (typeof loadDashboard === 'function') loadDashboard();
     }
@@ -12449,7 +12453,7 @@ async function abrirModalOtorgarPuntos() {
     const selectCliente = document.getElementById('puntos-offline-nombre');
     selectCliente.innerHTML = '<option value="">-- Selecciona el Cliente de tu Red --</option>';
     
-    // 🛡️ SUTURA FOCUS: Si la red de clientes no está en la memoria caché, la descargamos silenciosamente
+    // 🛡️ SUTURA FOCUS: Si la red de clientes no está en la memoria caché, la descargamos
     if (!window.kairoArbolRed || window.kairoArbolRed.length === 0) {
         mostrarLoading("Sincronizando red de clientes...");
         const resRed = await apiCall("sincronizarDatosEconomia", { email: sessionUser.email });
@@ -12460,19 +12464,17 @@ async function abrirModalOtorgarPuntos() {
     }
 
     if (window.kairoArbolRed && window.kairoArbolRed.length > 0) {
-        let opcionesHTML = ""; // Memoria temporal para no congelar la pantalla
+        let opcionesHTML = ""; 
         
+        // 🛡️ FOCUS: kairoArbolRed ya trae los 6 niveles (Coach) o infinito (Admin) desde Código.gs
         window.kairoArbolRed.forEach(nodo => {
-            // Evita que el coach se venda a sí mismo, pero muestra a los demás
+            // Evita que el coach se venda a sí mismo
             if (nodo.id !== sessionUser.email) {
-                // Blindamos el WhatsApp convirtiéndolo a String seguro
                 let safeWp = nodo.whatsapp ? String(nodo.whatsapp).replace(/'/g, "") : "";
-                
                 opcionesHTML += `<option value="${nodo.nombre}" data-email="${nodo.id}" data-wp="${safeWp}" data-pais="${nodo.pais}">${nodo.nombre} (${nodo.id})</option>`;
             }
         });
         
-        // Inyectamos todo de un solo golpe al DOM
         selectCliente.innerHTML += opcionesHTML;
         
     } else {
