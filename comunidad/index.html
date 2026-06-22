@@ -21,7 +21,7 @@
 
       margin: 0; padding: 0;
       background: var(--primary-bg);
-      background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80'); 
+      background-image: url('https://i.postimg.cc/MpZBdnKF/Gemini-Generated-Image-nfx69qnfx69qnfx6.png'); 
       background-size: cover; background-attachment: fixed;
       font-family: 'Segoe UI', sans-serif; color: var(--white);
       overflow-x: hidden;
@@ -3391,6 +3391,111 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 </div> 
 </div></div>   
 
+<!-- =========================================================================
+   📊 MÓDULO CRM COACH (KANBAN Y SEGUIMIENTO)
+========================================================================= -->
+<div id="modulo-crm-coach" class="hidden glass-panel seccion-dashboard" style="margin-top: 20px; border: 2px solid var(--neon-m); padding: 25px; display: flex; flex-direction: column; height: 85vh; max-height: 800px; overflow: hidden;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-size: 2rem; filter: drop-shadow(0 0 8px var(--neon-m));">📊</span>
+            <div>
+                <h2 style="color: var(--neon-m); font-family: 'Orbitron'; margin: 0; letter-spacing: 1px;">MI CRM (KANBAN)</h2>
+                <p style="color: #cbd5e1; font-size: 0.85em; margin: 5px 0 0 0;">Gestión y seguimiento de prospectos en tiempo real.</p>
+            </div>
+        </div>
+        <button class="btn" style="opacity: 0.6; padding: 8px 15px; font-size: 0.8em;" onclick="salirDelModulo()">X CERRAR</button>
+    </div>
+
+    <!-- DASHBOARD SUPERIOR -->
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+        <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-m); text-align: center; min-width: 120px;">
+            <div style="font-size: 0.7em; color: var(--neon-m); text-transform: uppercase; font-weight: bold;">Total Activos</div>
+            <div id="crm-dash-total" style="font-size: 2rem; font-family: 'Orbitron'; color: white; margin-top: 5px;">0</div>
+        </div>
+        <div id="crm-dash-fases" style="display: flex; gap: 10px; overflow-x: auto; flex-grow: 1; padding-bottom: 5px;"></div>
+    </div>
+
+    <!-- CONTROLES -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+        <input type="text" id="crm-buscador" placeholder="🔍 Buscar por nombre, negocio o etiqueta..." style="flex: 1; min-width: 250px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;" onkeyup="renderizarKanbanCrm()">
+        <select id="crm-filtro-prioridad" style="padding: 12px; background: rgba(0,0,0,0.8); border: 1px solid #444; color: white; border-radius: 5px;" onchange="renderizarKanbanCrm()">
+            <option value="">Todas las Prioridades</option>
+            <option value="Alta">🔴 Alta</option>
+            <option value="Media">🟡 Media</option>
+            <option value="Baja">🟢 Baja</option>
+        </select>
+        <button class="btn btn-n" style="padding: 12px 20px; font-weight: bold;" onclick="abrirModalNuevoProspecto()">➕ NUEVO PROSPECTO</button>
+    </div>
+
+    <!-- TABLERO KANBAN -->
+    <div id="crm-kanban-board" style="display: flex; gap: 20px; overflow-x: auto; flex-grow: 1; padding-bottom: 15px; align-items: flex-start;">
+        <!-- Las columnas de JavaScript se inyectan aquí -->
+    </div>
+</div>
+
+<!-- MODALES DEL CRM -->
+<!-- 1. NUEVO PROSPECTO -->
+<div id="modal-crm-nuevo" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+    <h3 style="color: var(--neon-n); font-family: 'Orbitron'; margin-top: 0;">➕ NUEVO PROSPECTO</h3>
+    <input type="text" id="crm-np-negocio" placeholder="Negocio / Proyecto *" required style="width: 100%; margin-bottom: 10px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+    <input type="text" id="crm-np-contacto" placeholder="Nombre del Contacto" style="width: 100%; margin-bottom: 10px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+    <input type="text" id="crm-np-whatsapp" placeholder="WhatsApp (Ej: +569...)" style="width: 100%; margin-bottom: 20px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" style="flex: 1; border: 1px solid #ef4444; color: #ef4444; background: transparent;" onclick="document.getElementById('modal-crm-nuevo').classList.add('hidden')">CANCELAR</button>
+        <button class="btn btn-n" style="flex: 1;" onclick="guardarProspectoCrm()">GUARDAR EN LA MATRIX</button>
+    </div>
+</div>
+
+<!-- 2. DETALLE PROSPECTO -->
+<div id="modal-crm-detalle" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 600px !important; max-height: 90vh !important; overflow-y: auto !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+    <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0;">⚙️ EXPEDIENTE PROSPECTO</h3>
+    <input type="hidden" id="crm-edit-id">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div><label style="font-size: 0.7em; color: var(--neon-m);">Negocio</label><input type="text" id="crm-edit-negocio" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></div>
+        <div><label style="font-size: 0.7em; color: var(--neon-m);">Contacto</label><input type="text" id="crm-edit-contacto" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></div>
+        <div><label style="font-size: 0.7em; color: #cbd5e1;">Rubro</label><input type="text" id="crm-edit-rubro" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></div>
+        <div><label style="font-size: 0.7em; color: #cbd5e1;">Correo</label><input type="email" id="crm-edit-correo" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></div>
+        <div>
+            <label style="font-size: 0.7em; color: #cbd5e1;">Prioridad</label>
+            <select id="crm-edit-prioridad" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+                <option value="Alta">🔴 Alta</option>
+                <option value="Media">🟡 Media</option>
+                <option value="Baja">🟢 Baja</option>
+            </select>
+        </div>
+        <div><label style="font-size: 0.7em; color: #cbd5e1;">Etiquetas</label><input type="text" id="crm-edit-etiquetas" placeholder="Ej: VIP, Online" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></div>
+    </div>
+    <label style="font-size: 0.7em; color: var(--neon-m);">Historial y Observaciones</label>
+    <textarea id="crm-edit-observaciones" rows="4" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 20px; box-sizing: border-box;"></textarea>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" style="flex: 1; border: 1px solid #ef4444; color: #ef4444; background: transparent;" onclick="document.getElementById('modal-crm-detalle').classList.add('hidden')">CANCELAR</button>
+        <button class="btn btn-m" style="flex: 1;" onclick="guardarCambiosDetalleCrm()">💾 APLICAR CAMBIOS</button>
+    </div>
+</div>
+
+<!-- 3. MOVER DE FASE -->
+<div id="modal-crm-mover" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000105 !important; width: 95% !important; max-width: 400px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid #fbbf24 !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important; text-align: center;">
+    <h3 style="color: #fbbf24; font-family: 'Orbitron'; margin-top: 0;">⏭️ AVANZAR DE FASE</h3>
+    <input type="hidden" id="crm-mover-id">
+    <select id="crm-mover-destino" style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(0,0,0,0.5); border: 1px solid #fbbf24; color: white; border-radius: 5px;"></select>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" style="flex: 1; border: 1px solid #444; color: #ccc; background: transparent;" onclick="document.getElementById('modal-crm-mover').classList.add('hidden')">CANCELAR</button>
+        <button class="btn" style="flex: 1; background: #fbbf24; color: black; font-weight: bold;" onclick="confirmarMovimientoCrm()">MOVER AHORA</button>
+    </div>
+</div>
+
+<!-- 4. MENSAJE WHATSAPP -->
+<div id="modal-crm-wa" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000105 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid #25D366 !important; padding: 25px !important; box-shadow: 0 0 50px rgba(0,0,0,0.9) !important;">
+    <h3 style="color: #25D366; font-family: 'Orbitron'; margin-top: 0; display: flex; align-items: center; gap: 10px; justify-content: center;"><img src="https://img.icons8.com/color/48/whatsapp--v1.png" style="width: 30px;"> CONEXIÓN WHATSAPP</h3>
+    <input type="text" id="crm-wa-numero" style="width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;">
+    <textarea id="crm-wa-mensaje" rows="5" style="width: 100%; padding: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box;"></textarea>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" style="flex: 1; border: 1px solid #444; color: #ccc; background: transparent;" onclick="document.getElementById('modal-crm-wa').classList.add('hidden')">CANCELAR</button>
+        <button class="btn" style="flex: 2; background: #25D366; color: white; font-weight: bold; border: none;" onclick="dispararWhatsAppCrm()">ABRIR WHATSAPP 🚀</button>
+    </div>
+</div>
+    
 <!-- FOOTER LEGAL -->
 <div id="c3d-global-footer" class="c3d-footer hidden" style="background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; width: 95%; max-width: 1000px; margin: 40px auto 20px auto; padding: 20px;">
     <p style="margin: 0 0 10px 0; font-family: 'Orbitron'; color: #cbd5e1;">© 2026 Área de Soluciones Tecnológicas - Coach 3D LATAM</p>
