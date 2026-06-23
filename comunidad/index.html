@@ -3649,7 +3649,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     <!-- ZONA 3: PODERES DE SUSCRIPTOR Y COACH (OCULTOS POR DEFECTO) -->
     <div id="puntos-zona-vip" style="margin-top: 30px; border-top: 1px dashed rgba(251, 191, 36, 0.4); padding-top: 25px;">
         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <button class="btn btn-f" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em;" onclick="abrirVisorArbolRed()">🌐 EXPLORAR MI RED (ÁRBOL)</button>
+            <button class="btn btn-f" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em;" onclick="abrirVisorArbolRed()">🌐 EXPLORAR MI RED</button>
             <button id="btn-autorizaciones-coach" class="btn btn-m hidden" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em; position: relative;" onclick="abrirAutorizacionesCoach()">
                 🛡️ AUTORIZACIONES
                 <span id="badge-autorizaciones" class="hidden" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
@@ -3952,10 +3952,13 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <button class="btn btn-n" style="padding: 10px 20px; font-size: 0.8em;" onclick="abrirAjustesArbol()">🎨 DISEÑO ÁRBOL</button>
     </div>
 
-    <div id="contenedor-grafico-arbol" style="flex-grow: 1; overflow: auto; background: rgba(0,0,0,0.4); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1); position: relative;">
-        <div id="canvas-arbol" style="transform-origin: top center; transition: transform 0.3s ease; text-align: center; padding: 20px;">
-            <!-- Google Charts inyectará la red aquí -->
+    <div id="contenedor-grafico-arbol" style="flex-grow: 1; overflow: hidden; background: rgba(0,0,0,0.4); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1); position: relative;">
+        <div style="position: absolute; bottom: 15px; right: 15px; display: flex; flex-direction: column; gap: 8px; z-index: 100;">
+            <button class="btn btn-n" style="width: 40px; height: 40px; padding: 0; font-size: 20px; border-radius: 8px;" onclick="if(window.networkArbol) window.networkArbol.moveTo({scale: window.networkArbol.getScale() * 1.3})">+</button>
+            <button class="btn btn-n" style="width: 40px; height: 40px; padding: 0; font-size: 20px; border-radius: 8px;" onclick="if(window.networkArbol) window.networkArbol.moveTo({scale: window.networkArbol.getScale() / 1.3})">-</button>
+            <button class="btn btn-m" style="width: 40px; height: 40px; padding: 0; font-size: 16px; border-radius: 8px;" onclick="if(window.networkArbol) window.networkArbol.fit()">🔲</button>
         </div>
+        <div id="canvas-arbol" style="width: 100%; height: 100%; text-align: center; outline: none;"></div>
     </div>
 </div>
             
@@ -4619,6 +4622,14 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     </div>
     <form id="form-ascenso-coach" onsubmit="event.preventDefault(); enviarSolicitudCoachUniversal();">
         <input type="hidden" id="coach-origen-postulacion" value="General">
+        <input type="text" id="coach90-nombre" placeholder="Nombre Completo" required style="width: 100%; margin-bottom: 10px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <input type="email" id="coach90-email" placeholder="Correo Electrónico" required style="width: 100%; margin-bottom: 10px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <input type="text" id="coach90-whatsapp" placeholder="WhatsApp (Ej: +569...)" required style="width: 100%; margin-bottom: 10px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <input type="text" id="coach90-pais" placeholder="País" required style="width: 100%; margin-bottom: 10px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
+        <textarea id="coach90-motivo" placeholder="¿Por qué deseas ser Coach 3D?" required rows="3" style="width: 100%; margin-bottom: 20px; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; font-family: inherit; resize: vertical;"></textarea>
+        <button type="submit" class="btn btn-m" style="width: 100%; padding: 15px; font-weight: bold;">ACEPTAR EL RETO Y POSTULAR</button>
+    </form>
+</div>
 
 <!-- 🎛️ MODAL: FLYER PROMOCIONAL EMERGENTE -->
 <div id="modal-flyer-promo" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 550px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.4) !important; display: flex; flex-direction: column; border-radius: 15px !important; text-align: center;">
@@ -11279,6 +11290,7 @@ function dibujarArbol() {
     };
 
     let network = new vis.Network(contenedor, data, options);
+    window.networkArbol = network;
 
     // Kairo: Hacer clic para ver el expediente
     network.on("click", function (params) {
@@ -11366,7 +11378,7 @@ function manejarCambioForma(nivelModificado, nuevaForma) {
     }
 }
 
-window.configArbol = window.configArbol || {
+window.configArbol = JSON.parse(localStorage.getItem('kairo_config_arbol')) || {
     colores: { "Usuario": "#334155", "Suscriptor": "#10b981", "Coach": "#a855f7", "Admin": "#fbbf24" },
     formas: { "Usuario": "dot", "Suscriptor": "square", "Coach": "diamond", "Admin": "star" }
 };
@@ -11449,6 +11461,7 @@ function guardarAjustesArbol() {
     window.configArbol.colores['Suscriptor'] = document.getElementById('c-susc').value;
     window.configArbol.colores['Coach'] = document.getElementById('c-coach').value;
     window.configArbol.colores['Admin'] = document.getElementById('c-admin').value;
+    localStorage.setItem('kairo_config_arbol', JSON.stringify(window.configArbol));
     cerrarKairoMsg();
     dibujarArbol();
 }
@@ -11991,7 +12004,7 @@ function iniciarbuzon() {
             btnRedactar.classList.add('hidden');
         }
 
-        notify("Sincronizando con el servidor de correos...");
+        mostrarLoading("Sincronizando con el servidor de correos...");
         sincronizarBuzonMatrix(); 
     }
 }
@@ -12044,6 +12057,7 @@ let buzonCarpetaActual = "RECIBIDOS";
 
 async function sincronizarBuzonMatrix() {
     const res = await apiCall("sincronizarBuzon", { email: sessionUser.email });
+    ocultarLoading();
     if(res && res.success) {
         buzonCache = res.mensajes;
         miCoachEmailCache = res.miCoach;
@@ -12587,15 +12601,16 @@ async function iniciarMiRedNavbar() {
 }
 
 // 🛡️ APERTURAS DE MODALES FASE 1
-function abrirModalSeguimientoRed() {
-    document.getElementById('modal-seguimiento-coach').classList.remove('hidden');
-}
+
 function cerrarModalSeguimientoRed() {
     document.getElementById('modal-seguimiento-coach').classList.add('hidden');
 }
 // 2. Cargar Catálogo Dinámico en la Ventana Offline
 async function abrirModalOtorgarPuntos() {
-    document.getElementById('modal-otorgar-puntos').classList.remove('hidden');
+    const modal = document.getElementById('modal-otorgar-puntos');
+    document.body.appendChild(modal); // FOCUS: Lo saca de la capa trasera
+    modal.classList.remove('hidden');
+    modal.style.display = 'block'; // FOCUS: Fuerza su aparición visual
     const selectSku = document.getElementById('puntos-offline-sku');
     selectSku.innerHTML = '<option value="">Sincronizando catálogo universal...</option>';
 
@@ -12663,7 +12678,11 @@ function cerrarModalOtorgarPuntos() {
 
 // 1. Obtener y Renderizar la Organización del Coach
 async function abrirModalSeguimientoRed() {
-    document.getElementById('modal-seguimiento-coach').classList.remove('hidden');
+    const modal = document.getElementById('modal-seguimiento-coach');
+    document.body.appendChild(modal); // FOCUS: Lo saca de la capa trasera
+    modal.classList.remove('hidden');
+    modal.style.display = 'block'; // FOCUS: Fuerza su aparición visual
+    const contenedor = document.getElementById('lista-seguimiento-coaches');
     const contenedor = document.getElementById('lista-seguimiento-coaches');
     contenedor.innerHTML = '<div class="spinner"></div><p style="color: var(--neon-m); text-align:center; width:100%;">Analizando métricas de la red...</p>';
 
