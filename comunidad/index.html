@@ -3650,10 +3650,6 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     <div id="puntos-zona-vip" style="margin-top: 30px; border-top: 1px dashed rgba(251, 191, 36, 0.4); padding-top: 25px;">
         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
             <button class="btn btn-f" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em;" onclick="abrirVisorArbolRed()">🌐 EXPLORAR MI RED</button>
-            <button id="btn-autorizaciones-coach" class="btn btn-m hidden" style="flex: 1; min-width: 200px; padding: 15px; font-size: 1em; position: relative;" onclick="abrirAutorizacionesCoach()">
-                🛡️ AUTORIZACIONES
-                <span id="badge-autorizaciones" class="hidden" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
-            </button>
         </div>
     </div>
     
@@ -3834,7 +3830,11 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <!-- SIDEBAR DE CARPETAS -->
         <div style="flex: 1 1 200px; max-width: 250px; background: rgba(0,0,0,0.3); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column;">
             <div style="padding: 15px;">
-                <button id="btn-redactar-buzon" class="btn btn-n hidden" style="width: 100%; font-size: 0.85em; padding: 12px;" onclick="abrirRedaccionMasiva()">✎ REDACTAR</button>
+                <button id="btn-redactar-buzon" class="btn btn-n hidden" style="width: 100%; font-size: 0.85em; padding: 12px; margin-bottom: 10px;" onclick="abrirRedaccionMasiva()">✎ REDACTAR</button>
+                <button id="btn-autorizaciones-coach" class="btn btn-m hidden" style="width: 100%; font-size: 0.85em; padding: 12px; position: relative;" onclick="abrirAutorizacionesCoach()">
+                    🛡️ AUTORIZACIONES
+                    <span id="badge-autorizaciones" class="hidden" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+                </button>
             </div>
             <div id="buzon-carpetas" style="flex: 1; overflow-y: auto;">
                 <div class="buzon-carpeta active" onclick="cambiarCarpetaBuzon(this, 'RECIBIDOS')" style="padding: 15px; cursor: pointer; border-left: 4px solid var(--neon-n); background: rgba(34, 211, 238, 0.1); color: white; font-weight: bold; transition: 0.3s;">📥 Bandeja de Entrada</div>
@@ -11098,28 +11098,19 @@ async function guardarBilleterasCoach() {
 // =========================================================
 
 function iniciarpuntosyreferidos() {
-    apagarTodosLosModulos(); // 🛡️ EL INTERRUPTOR MAESTRO FOCUS
-    
+    apagarTodosLosModulos();
     const modulo = document.getElementById('modulo-puntos-referidos');
     if (modulo) {
         modulo.classList.remove('hidden');
-        
         // Carga de seguridad: Solo mostramos la zona VIP si el rango lo permite
         const zonaVip = document.getElementById('puntos-zona-vip');
-        const btnAut = document.getElementById('btn-autorizaciones-coach');
         
         if (sessionUser && (sessionUser.rango === "Suscriptor" || sessionUser.rango === "Coach" || sessionUser.rango === "Admin")) {
             zonaVip.classList.remove('hidden');
-            if (sessionUser.rango === "Coach" || sessionUser.rango === "Admin") {
-                btnAut.classList.remove('hidden');
-            } else {
-                btnAut.classList.add('hidden');
-            }
         } else {
             zonaVip.classList.add('hidden');
         }
 
-        // Llamada a la API para traer los datos reales
         sincronizarDatosEconomiaRed();
     }
 }
@@ -11145,6 +11136,12 @@ async function sincronizarDatosEconomiaRed() {
         const saldo = document.getElementById('puntos-saldo-actual');
         if(saldo) saldo.innerText = "$" + Number(res.puntosTotales).toLocaleString('es-CL');
         
+        // 🛡️ SUTURA FOCUS: Actualizar los indicadores numéricos superiores
+        const lblTotalRef = document.getElementById('puntos-total-referidos');
+        if(lblTotalRef) lblTotalRef.innerText = res.referidosDirectos.length;
+        const lblPuntosRed = document.getElementById('puntos-ganados-red');
+        if(lblPuntosRed) lblPuntosRed.innerText = res.puntosRed || 0;
+
         const tbody = document.getElementById('tabla-referidos-directos');
         if(tbody) {
             tbody.innerHTML = "";
@@ -11155,7 +11152,6 @@ async function sincronizarDatosEconomiaRed() {
         }
         
         window.kairoArbolRed = res.nodosArbol;
-        
         if (!document.getElementById('modal-visor-red').classList.contains('hidden')) {
             dibujarArbol();
         }
@@ -11991,23 +11987,26 @@ async function enviarSolicitudCoach90Dias() {
 // 📩 MOTOR CORE: BUZÓN Y CHAT "MI COACH"
 // =========================================================
 function iniciarbuzon() {
-    apagarTodosLosModulos(); 
+    apagarTodosLosModulos();
     const modulo = document.getElementById('modulo-buzon');
     if (modulo) {
         modulo.classList.remove('hidden');
-        
-        // 🛡️ CONTROL DE PODERES: Solo Coach y Admin ven el botón de Redactar
+        // 🛡️ CONTROL DE PODERES: Solo Coach y Admin ven Redactar y Autorizaciones
         const btnRedactar = document.getElementById('btn-redactar-buzon');
+        const btnAut = document.getElementById('btn-autorizaciones-coach');
         if (sessionUser && (sessionUser.rango === "Admin" || sessionUser.rango === "Coach")) {
-            btnRedactar.classList.remove('hidden');
+            if(btnRedactar) btnRedactar.classList.remove('hidden');
+            if(btnAut) btnAut.classList.remove('hidden');
         } else {
-            btnRedactar.classList.add('hidden');
+            if(btnRedactar) btnRedactar.classList.add('hidden');
+            if(btnAut) btnAut.classList.add('hidden');
         }
 
         mostrarLoading("Sincronizando con el servidor de correos...");
-        sincronizarBuzonMatrix(); 
+        sincronizarBuzonMatrix();
     }
 }
+        
 function cambiarCarpetaBuzon(elemento, carpeta) {
     document.querySelectorAll('.buzon-carpeta').forEach(el => {
         el.classList.remove('active');
