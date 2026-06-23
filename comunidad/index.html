@@ -5862,6 +5862,18 @@ async function guardarCambiosPerfil() {
     fotoParaEnviar = sesionActiva.foto;
   }
 
+  // 🛡️ SUTURA FOCUS: Calculamos la edad matemática exacta antes de enviarla
+  let edadActualizada = sesionActiva.edad;
+  const inputFecha = document.getElementById('edit-fechaNacimiento').value;
+  if (inputFecha) {
+      const birthDate = new Date(inputFecha);
+      const today = new Date();
+      edadActualizada = today.getFullYear() - birthDate.getFullYear();
+      if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+          edadActualizada--;
+      }
+  }
+
   const datos = {
     email: sesionActiva.email,
     seudónimo: document.getElementById('edit-seudónimo').value.trim() || sesionActiva.nombre,
@@ -5872,7 +5884,8 @@ async function guardarCambiosPerfil() {
     pregunta: document.getElementById('edit-pregunta').value,
     respuesta: document.getElementById('edit-respuesta').value.trim(),
     pass: pass,
-    fechaNacimiento: document.getElementById('edit-fechaNacimiento').value, // 🛡️ FOCUS
+    fechaNacimiento: inputFecha, // 🛡️ FOCUS
+    edad: edadActualizada, // 🛡️ Inyectamos la edad actualizada a la base de datos
     foto: fotoParaEnviar
   };
     
