@@ -12683,7 +12683,6 @@ async function abrirModalSeguimientoRed() {
     modal.classList.remove('hidden');
     modal.style.display = 'block'; // FOCUS: Fuerza su aparición visual
     const contenedor = document.getElementById('lista-seguimiento-coaches');
-    const contenedor = document.getElementById('lista-seguimiento-coaches');
     contenedor.innerHTML = '<div class="spinner"></div><p style="color: var(--neon-m); text-align:center; width:100%;">Analizando métricas de la red...</p>';
 
     const res = await apiCall("obtenerSeguimientoRed", { email: sessionUser.email });
