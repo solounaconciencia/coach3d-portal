@@ -3206,17 +3206,8 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         
         <button class="btn btn-n" style="font-size: 0.68em; padding: 8px 16px; margin-bottom: 25px;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">▲ VOLVER ARRIBA</button>
 
-        <div id="ser-box-form-academia" class="hidden glass-panel" style="max-width: 600px; margin: 15px auto 0; border: 1px dashed var(--neon-m); text-align: left; background: rgba(10,15,30,0.9);">
-            <h3 style="color: var(--neon-m); font-family: 'Orbitron'; font-size: 1.1em; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Solicitud de Ingreso a Academia C3D</h3>
-            <form id="formAcademiaCoach" onsubmit="event.preventDefault(); procesarRegistroAcademiaCoach();">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
-                    <input type="text" id="ac-nombre" placeholder="Nombre Completo" required style="background: rgba(0,0,0,0.6);">
-                    <input type="email" id="ac-correo" placeholder="Correo Electrónico" required style="background: rgba(0,0,0,0.6);">
-                    <input type="number" id="ac-edad" placeholder="Edad" required min="18" max="99" style="background: rgba(0,0,0,0.6);">
-                </div>
-                <input type="text" id="ac-motivo" placeholder="¿Cuál es tu principal motivo para querer transformarte en un Coach Tridimensional?" required style="background: rgba(0,0,0,0.6); margin-top: 10px;">
-                <button type="submit" class="btn btn-m" style="width: 100%; margin-top: 15px; padding: 12px;">ENVIAR EXPENDIENTE DE POSTULACIÓN</button>
-            </form>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-m" style="padding: 12px 30px; font-weight: bold; font-family: 'Orbitron';" onclick="abrirModalSerCoach('academia')">POSTULAR A LA ACADEMIA DE COACHES</button>
         </div>
     </div>
 
@@ -4618,26 +4609,16 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     <button id="btn-marcar-dia" class="btn" style="background: #f97316; color: white; width: 100%; font-weight: bold; padding: 15px; font-family: 'Orbitron';" onclick="confirmarDiaDesafio()">ACEPTAR Y MARCAR DÍA</button>
 </div>
 
-<!-- 🎛️ MODAL: INVITACIÓN A SER COACH (HITO 90 DÍAS) -->
+<!-- 🎛️ MODAL UNIVERSAL: INVITACIÓN A SER COACH -->
 <div id="modal-invitacion-coach" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000000 !important; width: 95% !important; max-width: 500px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-m) !important; padding: 30px !important; box-shadow: 0 0 50px rgba(168, 85, 247, 0.5) !important;">
     <button onclick="cerrarModalInvitacionCoach()" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer;">×</button>
     <div style="text-align: center;">
         <div style="font-size: 4rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--neon-m));">👑</div>
-        <h2 style="color: var(--neon-m); font-family: 'Orbitron'; margin: 0 0 10px 0;">¡LA CONSTANCIA FORJA LEYENDAS!</h2>
-        <p style="font-size: 0.9em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">Has completado 90 días ininterrumpidos en la Matrix. Tu mentalidad ya no pertenece al promedio. Por tu profundo interés en el desarrollo personal, la comunidad te invita oficialmente a certificarte como <b>Coach Tridimensional</b>.</p>
+        <h2 id="modal-coach-titulo" style="color: var(--neon-m); font-family: 'Orbitron'; margin: 0 0 10px 0;">¡ÚNETE A LA ÉLITE TRIDIMENSIONAL!</h2>
+        <p id="modal-coach-desc" style="font-size: 0.9em; color: #cbd5e1; line-height: 1.5; margin-bottom: 20px;">La comunidad te invita oficialmente a postular a la academia y certificarte como <b>Coach Tridimensional</b>.</p>
     </div>
-    <form id="form-ascenso-coach" onsubmit="event.preventDefault(); enviarSolicitudCoach90Dias();">
-        <input type="text" id="coach90-nombre" placeholder="Nombre Completo" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
-        <input type="email" id="coach90-email" placeholder="Correo Electrónico" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 10px;">
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="coach90-whatsapp" placeholder="WhatsApp" required style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
-            <input type="text" id="coach90-pais" placeholder="País" required style="flex: 1; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px;">
-        </div>
-        <textarea id="coach90-motivo" placeholder="¿Por qué deseas guiar a otros como Coach?" required rows="3" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 20px; font-family: inherit; resize: vertical; box-sizing: border-box;"></textarea>
-        
-        <button type="submit" class="btn btn-m" style="width: 100%; padding: 15px; font-weight: bold; font-family: 'Orbitron';">ACEPTAR EL RETO Y POSTULAR</button>
-    </form>
-</div>
+    <form id="form-ascenso-coach" onsubmit="event.preventDefault(); enviarSolicitudCoachUniversal();">
+        <input type="hidden" id="coach-origen-postulacion" value="General">
 
 <!-- 🎛️ MODAL: FLYER PROMOCIONAL EMERGENTE -->
 <div id="modal-flyer-promo" class="hidden glass-panel" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 2000100 !important; width: 95% !important; max-width: 550px !important; background: rgba(10, 15, 30, 0.98) !important; border: 2px solid var(--neon-n) !important; padding: 25px !important; box-shadow: 0 0 50px rgba(34, 211, 238, 0.4) !important; display: flex; flex-direction: column; border-radius: 15px !important; text-align: center;">
@@ -8812,45 +8793,76 @@ async function procesarEmailRespaldoAnonimo(token, sku, nombre, monto, detalle) 
         `;
     }
 }
-        
+
+// =========================================================
+// 👑 JAVASCRIPT UNIFICADO: POSTULACIÓN A COACH C3D
+// =========================================================
 function desplegarFormularioCoach3D() {
-    const box = document.getElementById('ser-modal-capacitacion');
-    box.classList.toggle('hidden');
-    if(!box.classList.contains('hidden')) box.scrollIntoView({ behavior: 'smooth' });
+    // Redirige el botón de la barra de navegación superior (Se Coach)
+    abrirModalSerCoach('navbar');
 }
 
-async function procesarRegistroAcademiaCoach() {
-    const btn = document.querySelector('#formAcademiaCoach .btn');
-    if (btn) {
-        btn.innerText = "⚡ PROCESANDO REGISTRO RADIAL...";
-        btn.disabled = true;
+function abrirModalSerCoach(origen = '90dias') {
+    document.getElementById('main-content').classList.add('blur-effect');
+    const m = document.getElementById('modal-invitacion-coach');
+    m.classList.remove('hidden');
+    m.style.display = 'block';
+    
+    // Neuro-Copywriting Dinámico (La ventana cambia de texto según de dónde venga el usuario)
+    if(origen === 'academia' || origen === 'navbar') {
+        document.getElementById('modal-coach-titulo').innerText = "¡ÚNETE A LA ÉLITE TRIDIMENSIONAL!";
+        document.getElementById('modal-coach-desc').innerHTML = "La comunidad te invita oficialmente a postular a la academia y certificarte como <b>Coach Tridimensional</b>. Aprenderás a dominar la Matrix y a generar ingresos guiando a tu propio equipo.";
+        document.getElementById('coach-origen-postulacion').value = origen === 'navbar' ? "Barra Superior (Se Coach)" : "Catálogo de Servicios (Academia)";
+    } else {
+        document.getElementById('modal-coach-titulo').innerText = "¡LA CONSTANCIA FORJA LEYENDAS!";
+        document.getElementById('modal-coach-desc').innerHTML = "Has completado 90 días ininterrumpidos en la Matrix. Tu mentalidad ya no pertenece al promedio. La comunidad te invita oficialmente a certificarte como <b>Coach Tridimensional</b>.";
+        document.getElementById('coach-origen-postulacion').value = "Hito 90 Días";
     }
 
-    const variablesForm = {
-        nombre: document.getElementById('ac-nombre').value.trim(),
-        correo: document.getElementById('ac-correo').value.trim(),
-        edad: document.getElementById('ac-edad').value,
-        motivo: document.getElementById('ac-motivo').value.trim()
+    // Autocompletar datos usando la memoria del navegador
+    if (sessionUser) {
+        document.getElementById('coach90-nombre').value = sessionUser.nombre || "";
+        document.getElementById('coach90-email').value = sessionUser.email || "";
+        document.getElementById('coach90-whatsapp').value = sessionUser.whatsapp || "";
+        document.getElementById('coach90-pais').value = sessionUser.pais || "";
+    }
+}
+
+function cerrarModalInvitacionCoach() {
+    document.getElementById('modal-invitacion-coach').classList.add('hidden');
+    document.getElementById('modal-invitacion-coach').style.display = 'none';
+    document.getElementById('main-content').classList.remove('blur-effect');
+}
+
+async function enviarSolicitudCoachUniversal() {
+    const btn = document.querySelector('#form-ascenso-coach .btn-m');
+    btn.innerText = "⚡ TRANSMITIENDO A LA MATRIX..."; 
+    btn.disabled = true;
+
+    const payload = {
+        email: document.getElementById('coach90-email').value.trim(),
+        nombre: document.getElementById('coach90-nombre').value.trim(),
+        whatsapp: document.getElementById('coach90-whatsapp').value.trim(),
+        pais: document.getElementById('coach90-pais').value.trim(),
+        motivo: document.getElementById('coach90-motivo').value.trim(),
+        origen: document.getElementById('coach-origen-postulacion').value
     };
 
-    // Petición síncrona a la API central para disparo automatizado de correos
-    const res = await apiCall("procesarAdmisionCapacitacionCoach", variablesForm);
+    const res = await apiCall("procesarPostulacionCoachUniversal", payload);
     
-    if (btn) {
-        btn.innerText = "ENVIAR EXPENDIENTE DE POSTULACIÓN";
-        btn.disabled = false;
+    btn.innerText = "ACEPTAR EL RETO Y POSTULAR"; 
+    btn.disabled = false;
+
+    if (res && res.success) {
+        cerrarModalInvitacionCoach();
+        kairoMessage({
+            mensaje: `<h3 style="color:var(--neon-m); font-family:'Orbitron';">¡POSTULACIÓN ENVIADA! 👑</h3><p>Tu expediente ha sido enviado a la cúpula de Coaches con éxito. Pronto serás contactado para coordinar tu entrevista de certificación.</p>`,
+            icon: '🚀'
+        });
+        document.getElementById('form-ascenso-coach').reset();
+    } else {
+        notify("❌ Error al enviar la postulación: " + (res ? res.msg : "Sin conexión a la Matrix"));
     }
-    
-    const formularioAcademia = document.getElementById('formAcademiaCoach');
-    if (formularioAcademia) formularioAcademia.reset();
-    
-    const cajaAcademia = document.getElementById('ser-box-form-academia');
-    if (cajaAcademia) cajaAcademia.classList.add('hidden');
-    
-    kairoMessage({
-        mensaje: `<b style="color:var(--neon-f); font-size:1.15rem;">🎓 ¡MÁSTER REGISTRO COMPLETADO!</b><br><br>Gracias por tu interés en el próximo ciclo de capacitaciones, ${variablesForm.nombre}. Tu expediente ha sido inyectado al correo institucional de admisiones con éxito. Evaluaremos tu motivo y nos comunicaremos contigo.`,
-        icon: "🏆"
-    });
 }
 
 // =========================================================================
