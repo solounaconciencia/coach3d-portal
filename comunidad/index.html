@@ -2551,7 +2551,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
             <div style="background: rgba(168, 85, 247, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-m); display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                 <div style="flex: 1;">
                     <label style="font-size: 0.7em; color: var(--neon-m);">Añadir Nueva Columna de Coach al Calendario</label>
-                    <input type="text" id="gen-nuevo-coach" placeholder="Nombre exacto del Coach" style="width: 100%; padding:8px; margin-top:5px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px;">
+                    <input type="text" id="gen-nuevo-coach" placeholder="Ingresa el ID del Coach (Ej: C00005)" style="width: 100%; padding:8px; margin-top:5px; font-size:0.8em; background:#000; color:white; border:1px solid #444; border-radius:4px; text-transform: uppercase;">
                 </div>
                 <button class="btn btn-m" style="padding: 8px 15px; height: 35px; font-size: 0.8em;" onclick="añadirCoachAgendaAdmin()">+ CREAR COLUMNA</button>
             </div>
@@ -8661,12 +8661,14 @@ async function ejecutarAccionComercialServicio() {
     var detalleString = "Compra Directa WhatsApp";
 
     // 🛡️ FOCUS: Capturamos el nombre del Coach INMEDIATAMENTE
-    let coachElegido = s.coach || ""; 
+    let coachElegido = s.coach || ""; // Guardará el ID
+    let coachNombreVisual = "";
     if (s.accion === "RESERVA") {
         const sel = document.getElementById('ser-coach-elegido');
         if (sel && sel.selectedIndex > 0) {
-            coachElegido = sel.options[sel.selectedIndex].text;
-            detalleString = `Reserva Agendada | Coach: ${coachElegido}`;
+            coachElegido = sel.value; // ID inmutable
+            coachNombreVisual = sel.options[sel.selectedIndex].text;
+            detalleString = `Reserva Agendada | Coach: ${coachNombreVisual}`;
         }
     }
 
@@ -10678,29 +10680,26 @@ function renderizarTablaAgenda(coaches, horarios) {
         return;
     }
 
-    // Cabecera Dinámica (Hora + Nombres de los Coaches extraídos del Excel)
     let thead = `<div style="display:flex; background:rgba(0,0,0,0.8); padding:15px; border-bottom:1px solid var(--neon-m); font-weight:bold; font-size:0.8em; color:var(--neon-m);">
         <div style="flex:1; min-width: 80px;">HORA</div>`;
     coaches.forEach(c => {
-        thead += `<div style="flex:1; min-width: 100px; text-align:center;">${c.toUpperCase()}</div>`;
+        thead += `<div style="flex:1; min-width: 100px; text-align:center;">${c.nombre.toUpperCase()}</div>`;
     });
     thead += `</div>`;
     contenedor.innerHTML += thead;
 
-    // Filas (Horas)
     horarios.forEach(h => {
         let row = `<div style="display:flex; padding:10px 15px; border-bottom:1px solid rgba(255,255,255,0.05); align-items:center;">
             <div style="flex:1; min-width: 80px; color:white; font-family:'Orbitron'; font-size: 1.1em;">${h.hora}</div>`;
 
-        // Botones por cada coach
         coaches.forEach(c => {
-            let estado = h.estados[c] ? h.estados[c].toString().toUpperCase().trim() : "NO DISPONIBLE";
+            let estado = h.estados[c.id] ? h.estados[c.id].toString().toUpperCase().trim() : "NO DISPONIBLE";
             let isLibre = (estado === "LIBRE");
             let colorBtn = isLibre ? "var(--neon-f)" : "#ef4444";
             let textBtn = isLibre ? "LIBRE" : "NO DISP";
 
             row += `<div style="flex:1; min-width: 100px; text-align:center;">
-                <button onclick="alternarEstadoCoach('${h.id}', '${c}', '${isLibre ? 'NO DISPONIBLE' : 'LIBRE'}')" style="background:transparent; border:1px solid ${colorBtn}; color:${colorBtn}; padding:8px 12px; border-radius:4px; font-size:0.75em; cursor:pointer; width:90%; transition:0.3s; font-weight:bold;" onmouseover="this.style.background='${colorBtn}'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='${colorBtn}';">${textBtn}</button>
+                <button onclick="alternarEstadoCoach('${h.id}', '${c.id}', '${isLibre ? 'NO DISPONIBLE' : 'LIBRE'}')" style="background:transparent; border:1px solid ${colorBtn}; color:${colorBtn}; padding:8px 12px; border-radius:4px; font-size:0.75em; cursor:pointer; width:90%; transition:0.3s; font-weight:bold;" onmouseover="this.style.background='${colorBtn}'; this.style.color='#000';" onmouseout="this.style.background='transparent'; this.style.color='${colorBtn}';">${textBtn}</button>
             </div>`;
         });
         row += `</div>`;
@@ -10943,7 +10942,7 @@ async function inicializarCalendarioEcomm3D(skuServicio) {
     if (res && res.success) {
         databaseHorariosCache = res.horarios;
         let coachesMap = new Map();
-        databaseHorariosCache.forEach(slot => { slot.coaches.forEach(c => { coachesMap.set(c.nombre, c.linkPago); }); });
+        databaseHorariosCache.forEach(slot => { slot.coaches.forEach(c => { coachesMap.set(c.id, {nombre: c.nombre, link: c.linkPago}); }); });
 
         selectorCoach.innerHTML = '<option value=\"\" disabled selected>-- Elige con quién atenderte --</option>';
         if (coachesMap.size === 0) {
@@ -10951,11 +10950,11 @@ async function inicializarCalendarioEcomm3D(skuServicio) {
             mesh.innerHTML = ""; return;
         }
 
-        coachesMap.forEach((link, nombre) => {
+        coachesMap.forEach((obj, id) => {
             let opt = document.createElement('option');
-            opt.value = link; 
-            opt.setAttribute('data-nombre', nombre);
-            opt.innerText = nombre;
+            opt.value = id; // El value ahora es el ID del coach
+            opt.setAttribute('data-nombre', obj.nombre);
+            opt.innerText = obj.nombre;
             selectorCoach.appendChild(opt);
         });
         mesh.innerHTML = "<p style='color:#cbd5e1; font-size:0.75em; text-align:center; grid-column:1/-1; padding: 15px;'>↑ Selecciona a tu Coach arriba.</p>";
@@ -10991,7 +10990,8 @@ function renderizarCalendarioDinamico() {
 
     for (let i = 0; i < primerDiaMes; i++) mesh.appendChild(document.createElement('div'));
 
-    const slotsCoachActivo = databaseHorariosCache.filter(slot => slot.coaches.some(c => c.nombre === nombreCoach));
+    const idCoachActivo = selectorCoach.value;
+    const slotsCoachActivo = databaseHorariosCache.filter(slot => slot.coaches.some(c => c.id === idCoachActivo));
 
     for (let dia = 1; dia <= diasEnElMes; dia++) {
         let cell = document.createElement('div');
