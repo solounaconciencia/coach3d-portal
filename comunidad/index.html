@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coach 3D LATAM - Comunidad</title>
     <link rel="icon" href="https://i.postimg.cc/Dwqrq0gz/Logo_app_blanco.png">
@@ -2210,6 +2210,63 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 .wizard-slide.active { display: block; }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 .wizard-nav { display: flex; gap: 10px; margin-top: 20px; }
+
+/* ========================================================= */
+    /* 📱 SUTURA FOCUS: BLINDAJE MAESTRO PARA MÓVILES (GLOBAL)   */
+    /* ========================================================= */
+    @media (max-width: 768px) {
+        /* 1. Modales Complejos (CRM, Admin, Formularios) forzados a 1 columna */
+        #modal-crm-detalle div[style*="grid-template-columns"],
+        #modal-otorgar-puntos div[style*="grid-template-columns"],
+        #modal-admin-producto div[style*="grid-template-columns"],
+        #modal-registro-bienestar div[style*="grid-template-columns"],
+        #auth-inline-registro form,
+        #form-prospecto-reg,
+        #caja-canje-fechas,
+        #tab-estetica div[style*="grid-template-columns"],
+        #tab-kairo div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* 2. Cajas de Métricas (Dashboard) adaptables a 2 columnas simétricas en celular */
+        .c3d-metric-badge {
+            flex: 1 1 45% !important;
+            min-width: 40% !important;
+            padding: 10px !important;
+        }
+
+        /* 3. Botones pareados se apilan automáticamente si no caben */
+        div[style*="display: flex; gap: 10px;"] {
+            flex-wrap: wrap !important;
+        }
+        div[style*="display: flex; gap: 10px;"] > button.btn {
+            flex: 1 1 100% !important;
+            margin-bottom: 5px !important;
+        }
+
+        /* 4. Tableros Kanban y Tablas con Scroll Horizontal táctil natural */
+        #crm-kanban-board, #admin-matriz-agenda, #coach-matriz-agenda, .carrusel-destacados {
+            padding-bottom: 20px !important;
+            -webkit-overflow-scrolling: touch !important; /* Suavidad en iOS */
+        }
+
+        /* 5. Ajuste de Textos y Títulos Gigantes */
+        #pilar-titulo-detalle { font-size: 1.8rem !important; }
+        .c3d-user-hero h2 { font-size: 1.5rem !important; }
+        .texto-slide { font-size: 0.8em !important; }
+
+        /* 6. Evitar que el reproductor de Netflix C3D se deforme */
+        #modal-cinema-play { padding: 15px !important; }
+        #cinema-split-layout { flex-direction: column !important; }
+        #cinema-main-col, #cinema-playlist-col { width: 100% !important; flex: none !important; }
+
+        /* 7. Ajuste Milimétrico del Tablero 90 Días para que los 90 cuadros entren en pantalla */
+        #game-board-90 div { 
+            width: 32px !important; 
+            height: 32px !important; 
+            font-size: 0.7em !important; 
+        }
+    }
   </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
@@ -2390,6 +2447,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
                 <button class="c3d-nav-btn" onclick="iniciarbuzon()"><span class="c3d-nav-icon">📬</span><span>BUZÓN</span></button>
                 <button class="c3d-nav-btn" onclick="iniciarMiRedNavbar()"><span class="c3d-nav-icon">🌐</span><span>MI RED</span></button>
                 <button class="c3d-nav-btn" onclick="iniciarservicios()"><span class="c3d-nav-icon">📈</span><span>EMPRENDE</span></button>
+                <button class="c3d-nav-btn" onclick="toggleCart()"><span class="c3d-nav-icon">🛒<sub id="nav-cart-count" style="font-size:0.6em; color:var(--neon-f); font-weight:bold; font-family:'Orbitron';">0</sub></span><span>CARRITO</span></button>
                 <button id="nav-btn-oficina" class="c3d-nav-btn" onclick="desplegarFormularioCoach3D()"><span id="nav-icon-oficina" class="c3d-nav-icon">🤝</span><span id="nav-txt-oficina">SE COACH</span></button>
             </div>
         </div>
@@ -5643,12 +5701,20 @@ async function validarAcceso() {
 }
 
 function logout() {
-  // 🛡️ CAPA 4: Limpieza absoluta de ambas memorias (Evita el auto-login eterno)
   sessionStorage.clear();
+  // 🛡️ SUTURA FOCUS: Salvaguardar intenciones de compra y diseño antes del borrado
+  const cartBackup = localStorage.getItem('kairo_carrito_ecom');
+  const configArbolBackup = localStorage.getItem('kairo_config_arbol');
+  
   localStorage.clear();
+  
+  if(cartBackup) {
+      localStorage.setItem('kairo_carrito_ecom', cartBackup);
+      localStorage.setItem('kairo_carrito_estado', 'PENDIENTE'); // Queda congelado como Pendiente
+  }
+  if(configArbolBackup) localStorage.setItem('kairo_config_arbol', configArbolBackup);
+  
   sessionUser = null;
-  // Redirección limpia a tu misma página de GitHub Pages, no a Google Scripts externos
-  document.getElementById('kairo-btn-hamburguesa').classList.add('hidden');
   window.top.location.href = window.location.origin + window.location.pathname;
 }
 
@@ -8735,9 +8801,12 @@ async function ejecutarAccionComercialServicio() {
         }
         
         if (sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
-
         cerrarDetalleServicio();
         carritoCompras = [{ sku: s.sku, nombre: s.nombre, precio: precioFinalACobrar, variante: s.accion, cantidad: 1, foto: s.urlImagen }];
+        // 🛡️ SUTURA FOCUS: Forzar persistencia ante abandono de pasarela
+        guardarCarritoLocal();
+        renderizarCarrito();
+        localStorage.setItem('kairo_carrito_estado', 'PENDIENTE');
         abrirCheckout(coachElegido, true, precioFinalACobrar);
         return;
     }
@@ -9351,8 +9420,22 @@ function guardarCarritoLocal() {
 }
 
 function agregarAlCarritoDesdeModal() {
-    trackAccionValiosa("Intención de Compra", "Carrito: " + productoActivoEcom.sku);
     if(!productoActivoEcom) return;
+    cerrarModalEcommerce();
+    
+    let msg = `
+        <div style="text-align:center;">
+            <h3 style="color:var(--neon-n); font-family:'Orbitron';">OPCIONES DE COMPRA</h3>
+            <p style="color:#cbd5e1; font-size:0.95em; margin-bottom:20px;">¿Deseas consolidar este producto en tu carrito o proceder al pago inmediato?</p>
+            <button class="btn btn-f" style="width:100%; padding:14px; margin-bottom:10px; font-weight:bold;" onclick="cerrarKairoMsg(); accionarProductoCompra('CARRITO')">🛒 AGREGAR AL CARRITO</button>
+            <button class="btn btn-n" style="width:100%; padding:14px;" onclick="cerrarKairoMsg(); accionarProductoCompra('PAGAR')">💳 PAGAR ENSEGUIDA</button>
+        </div>`;
+    kairoMessage({ mensaje: msg, icon: "🛒" });
+}
+
+function accionarProductoCompra(accion) {
+    if(!productoActivoEcom) return;
+    trackAccionValiosa("Intención de Compra", "Accion: " + accion + " | SKU: " + productoActivoEcom.sku);
     const esSusc = (sessionUser && sessionUser.rango === "Suscriptor");
     const precio = esSusc ? productoActivoEcom.precioSuscriptor : productoActivoEcom.precioNormal;
     
@@ -9360,24 +9443,34 @@ function agregarAlCarritoDesdeModal() {
     if(!document.getElementById('ecom-modal-variantes').classList.contains('hidden')) {
         varianteElegida = document.getElementById('ecom-modal-select-variante').value;
     }
+    
+    const fotosArray = productoActivoEcom.imagenes ? productoActivoEcom.imagenes.split(',') : [];
+    const fotoItem = fotosArray.length > 0 ? fotosArray[0] : "https://img.icons8.com/fluency/96/box.png";
 
-    const idx = carritoCompras.findIndex(x => x.sku === productoActivoEcom.sku && x.variante === varianteElegida);
-    if(idx > -1) {
-        carritoCompras[idx].cantidad++;
+    let item = {
+        sku: productoActivoEcom.sku,
+        nombre: productoActivoEcom.nombre,
+        precio: precio,
+        variante: varianteElegida,
+        cantidad: 1,
+        foto: fotoItem
+    };
+
+    if(accion === 'CARRITO') {
+        const idx = carritoCompras.findIndex(x => x.sku === item.sku && x.variante === varianteElegida);
+        if(idx > -1) carritoCompras[idx].cantidad++;
+        else carritoCompras.push(item);
+        guardarCarritoLocal();
+        renderizarCarrito();
+        localStorage.setItem('kairo_carrito_estado', 'PENDIENTE');
+        toggleCart();
     } else {
-        carritoCompras.push({
-            sku: productoActivoEcom.sku,
-            nombre: productoActivoEcom.nombre,
-            precio: precio,
-            variante: varianteElegida,
-            cantidad: 1,
-            foto: document.getElementById('ecom-modal-img').src
-        });
+        carritoCompras = [item];
+        guardarCarritoLocal();
+        renderizarCarrito();
+        localStorage.setItem('kairo_carrito_estado', 'PENDIENTE');
+        abrirCheckout("", true, precio);
     }
-    guardarCarritoLocal();
-    renderizarCarrito();
-    cerrarModalEcommerce();
-    toggleCart(); 
 }
 
 function renderizarCarrito() {
@@ -9412,6 +9505,8 @@ function renderizarCarrito() {
     }
     document.getElementById('cart-total-price').innerText = "$" + total.toLocaleString();
     document.getElementById('cart-count').innerText = count;
+    const navCount = document.getElementById('nav-cart-count');
+    if(navCount) navCount.innerText = count;
 }
 
 function cambiarCantidadCart(index, delta) {
@@ -9953,8 +10048,13 @@ function desviarAPagoCurso() {
         localStorage.setItem('kairo_ecommerce_monto', precioActual);
         localStorage.setItem('kairo_ecommerce_detalle', "Acceso a Cinema Play");
         localStorage.setItem('kairo_ecommerce_tipo', "CURSOS");
-        localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS"); // Reusamos el enrutador
+        localStorage.setItem('kairo_prospecto_herramienta', "SERVICIOS");
         if(sessionUser) localStorage.setItem('kairo_prospecto_user_backup', JSON.stringify(sessionUser));
+        
+        // 🛡️ SUTURA FOCUS: Forzar persistencia ante abandono de pasarela Cinema
+        carritoCompras = [{ sku: cursoActivoCinema.sku, nombre: cursoActivoCinema.nombre, precio: precioActual, variante: "Cinema", cantidad: 1, foto: cursoActivoCinema.portada }];
+        guardarCarritoLocal();
+        localStorage.setItem('kairo_carrito_estado', 'PENDIENTE');
         
         cerrarModalCinemaPlay();
         mostrarLoading("Conectando con Banco Central de la Matrix...");
@@ -13563,29 +13663,44 @@ function cerrarModalFichas() {
 // =========================================================
 // 🎟️ MOTOR DE COMPRA DIRECTA DE FICHAS (GEMAS)
 // =========================================================
-
 function comprarPaqueteFichas(cantidad, precio) {
     if (!sessionUser) return notify("Debes iniciar sesión para comprar fichas.");
-    
-    // 1. Cerramos el panel de Fichas
     cerrarModalFichas();
     
-    // 2. Creamos un Carrito de Compra instantáneo e invisible
-    carritoCompras = [{
+    let msg = `
+        <div style="text-align:center;">
+            <h3 style="color:var(--neon-m); font-family:'Orbitron';">BÓVEDA DE FICHAS</h3>
+            <p style="color:#cbd5e1; font-size:0.95em; margin-bottom:20px;">¿Deseas procesar este paquete de fichas de inmediato o añadirlo al carrito para seguir sumando compras?</p>
+            <button class="btn btn-f" style="width:100%; padding:14px; margin-bottom:10px; font-weight:bold;" onclick="cerrarKairoMsg(); accionarFichasCompra(${cantidad}, ${precio}, 'CARRITO')">🛒 AGREGAR AL CARRITO</button>
+            <button class="btn btn-n" style="width:100%; padding:14px;" onclick="cerrarKairoMsg(); accionarFichasCompra(${cantidad}, ${precio}, 'PAGAR')">💳 PAGAR ENSEGUIDA</button>
+        </div>`;
+    kairoMessage({ mensaje: msg, icon: "🎟️" });
+}
+
+function accionarFichasCompra(cantidad, precio, accion) {
+    let item = {
         sku: "FICHAS-" + cantidad,
         nombre: "Paquete " + cantidad.toLocaleString('es-CL') + " Fichas C3D",
         precio: precio,
         variante: "Digital",
         cantidad: 1,
         foto: "https://img.icons8.com/fluency/96/ticket.png"
-    }];
-    
-    // Guardamos en la memoria local
-    guardarCarritoLocal();
-    
-    // 3. Abrimos el Checkout directo, enviando el precio total, sin Coach asociado
-    // Los parámetros son (coachName, esCompraDirecta, montoDirecto)
-    abrirCheckout("", true, precio);
+    };
+    if(accion === 'CARRITO') {
+        const idx = carritoCompras.findIndex(x => x.sku === item.sku);
+        if(idx > -1) carritoCompras[idx].cantidad++;
+        else carritoCompras.push(item);
+        guardarCarritoLocal();
+        renderizarCarrito();
+        localStorage.setItem('kairo_carrito_estado', 'PENDIENTE');
+        notify(`🎟️ ${cantidad.toLocaleString('es-CL')} Fichas agregadas al carro.`);
+    } else {
+        carritoCompras = [item];
+        guardarCarritoLocal();
+        renderizarCarrito();
+        localStorage.setItem('kairo_carrito_estado', 'PENDIENTE');
+        abrirCheckout("", true, precio);
+    }
 }
 
 // =========================================================
