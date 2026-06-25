@@ -9530,36 +9530,54 @@ async function procesarPagoCarrito() {
     btn.innerText = "CONECTANDO CON LA MATRIX..."; btn.disabled = true;
 
     // 1. DESCUENTO DE PUNTOS: Si el usuario aplicó puntos, los descontamos primero en el backend
-    if (puntosAUsarEnCheckout > 0 && sessionUser) {
-        const detalleCarrito = carritoCompras.map(i => i.cantidad + "x " + i.nombre + (i.variante ? " ("+i.variante+")" : "")).join(" | ");
-        
-        const resPts = await apiCall("aplicarPuntosCheckout", {
-            email: sessionUser.email,
-            puntosUsados: puntosAUsarEnCheckout,
-            esCompraTotal: (montoActualizadoCheckout === 0),
-            montoOriginal: totalCarritoCheckoutReal,
-            detalle: detalleCarrito
-        });
+        if (puntosAUsarEnCheckout > 0 && sessionUser) {
+            const detalleCarrito = carritoCompras.map(i => i.cantidad + "x " + i.nombre + (i.variante ? " ("+i.variante+")" : "")).join(" | ");
+            
+            // 🛡️ SUTURA FOCUS: Detectar si el carrito es puramente Fichas
+            const esCompraFichas = carritoCompras.length > 0 && carritoCompras[0].sku.startsWith("FICHAS");
+            let cantFichasAComprar = 0;
+            if(esCompraFichas) {
+                 cantFichasAComprar = parseInt(carritoCompras[0].sku.split('-')[1]) || 0;
+            }
 
-        if (!resPts || !resPts.success) {
-            btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
-            return notify("Error al aplicar puntos: " + (resPts ? resPts.msg : "Conexión fallida"));
+            const resPts = await apiCall("aplicarPuntosCheckout", {
+                email: sessionUser.email,
+                puntosUsados: puntosAUsarEnCheckout,
+                esCompraTotal: (montoActualizadoCheckout === 0),
+                montoOriginal: totalCarritoCheckoutReal,
+                detalle: detalleCarrito,
+                esCompraFichas: esCompraFichas,
+                cantidadFichas: cantFichasAComprar
+            });
+
+            if (!resPts || !resPts.success) {
+                btn.innerText = "CONFIRMAR Y PAGAR";
+                btn.disabled = false;
+                return notify("Error al aplicar puntos: " + (resPts ? resPts.msg : "Conexión fallida"));
+            }
+
+            // Actualizamos visualmente el Dashboard de fondo
+            const kpiPtos = document.getElementById('kpi-puntos');
+            if (kpiPtos) kpiPtos.innerText = resPts.nuevoSaldo;
+
+            // Si pagó el 100% con Puntos, terminamos la función aquí con victoria total.
+            if (resPts.pagoCompletado) {
+                localStorage.removeItem('kairo_carrito_ecom');
+                carritoCompras = []; renderizarCarrito();
+                cerrarCheckout();
+                
+                if (esCompraFichas) {
+                    const kpiF = document.getElementById('kpi-fichas');
+                    if(kpiF) kpiF.innerText = resPts.nuevoSaldoFichas;
+                    kairoMessage({ mensaje: `<h3 style="color:var(--neon-m); font-family:'Orbitron';">¡COMPRA EXITOSA! 🎟️</h3><p>Tu orden ha sido pagada con Puntos C3D.<br><br>Se han inyectado <b>${cantFichasAComprar.toLocaleString('es-CL')} Fichas</b> a tu bóveda automáticamente.</p>`, icon: '✅' });
+                } else {
+                    kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡TRANSACCIÓN EXITOSA! 💎</h3><p>Tu orden ha sido pagada íntegramente con tus Puntos C3D (N° ${resPts.orden_id}).<br><br>Escríbele a tu Coach para coordinar la logística de entrega.</p>`, icon: '🛒' });
+                }
+                
+                btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
+                return;
+            }
         }
-
-        // Actualizamos visualmente el Dashboard de fondo
-        const kpiPtos = document.getElementById('kpi-puntos');
-        if (kpiPtos) kpiPtos.innerText = resPts.nuevoSaldo;
-
-        // Si pagó el 100% con Puntos, terminamos la función aquí con victoria total.
-        if (resPts.pagoCompletado) {
-            localStorage.removeItem('kairo_carrito_ecom');
-            carritoCompras = []; renderizarCarrito();
-            cerrarCheckout();
-            kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡TRANSACCIÓN EXITOSA! 💎</h3><p>Tu orden ha sido pagada íntegramente con tus Puntos C3D (N° ${resPts.orden_id}).<br><br>Escríbele a tu Coach para coordinar la logística de entrega.</p>`, icon: '🛒' });
-            btn.innerText = "CONFIRMAR Y PAGAR"; btn.disabled = false;
-            return;
-        }
-    }
 
     // 2. PASARELAS TRADICIONALES: (Si sobró saldo por pagar)
     const metodoElegido = document.querySelector('input[name="metodoPago"]:checked');
