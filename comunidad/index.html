@@ -11693,7 +11693,8 @@ async function procesarCanjeUsuario(idCanje, costo, tipo, titulo) {
         if (tipo === "SORTEO") msgExito += "¡Has recibido 1 Ficha de Lotería! Revisa tu Dashboard.";
         else msgExito += "Tu solicitud ha sido enviada al equipo de Logística.";
         
-        kairoMessage({mensaje: `<h3 style="color:var(--neon-n); font-family:'Orbitron';">¡CANJE COMPLETADO! 🎁</h3><p>${msgExito}</p>`, icon: '✅'});
+        // 🛡️ SUTURA FOCUS: Pausamos la Matrix hasta que presiones ENTENDIDO
+        await kairoMessage({mensaje: `<h3 style="color:var(--neon-n); font-family:'Orbitron';">¡CANJE COMPLETADO! 🎁</h3><p>${msgExito}</p>`, icon: '✅'});
         
         // Actualizar UI
         const saldoBoveda = document.getElementById('puntos-saldo-actual');
@@ -12729,10 +12730,11 @@ async function iniciarConversionFichas() {
 
     if (res && res.success) {
         cerrarModalFichas();
-        kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡ALQUIMIA COMPLETADA! 🔄</h3><p>Tus Fichas han sido destruidas exitosamente. El Banco Central te ha transferido <b>${puntosGanados.toLocaleString('es-CL')} Puntos C3D</b>.</p>`, icon: '🪙' });
+        // 🛡️ SUTURA FOCUS: Obligamos al código a esperar a que el usuario presione el botón antes de recargar el dashboard
+        await kairoMessage({ mensaje: `<h3 style="color:var(--neon-f); font-family:'Orbitron';">¡ALQUIMIA COMPLETADA! 🔄</h3><p>Tus Fichas han sido destruidas exitosamente. El Banco Central te ha transferido <b>${puntosGanados.toLocaleString('es-CL')} Puntos C3D</b>.</p>`, icon: '🪙' });
         loadDashboard(); 
-    } else { notify("❌ Error en la Matrix: " + (res ? res.msg : "Sin conexión")); }
-}
+    } else { notify("❌ Error en la Matrix: " + (res ? res.msg : "Sin conexión"));
+    }
         
 function cerrarModalFrase() {
     document.getElementById('modal-frase-diaria').classList.add('hidden');
