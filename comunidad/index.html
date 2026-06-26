@@ -2195,7 +2195,15 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 
 .c3d-footer {
     border-top: 1px solid rgba(255,255,255,0.05);
-    padding: 25px 15px; margin-top: 50px; text-align: center; font-size: 0.75rem; color: #64748b;
+    padding: 25px 15px;
+    margin-top: auto !important; /* 🛡️ SUTURA FOCUS: Gravedad infinita hacia el fondo */
+    text-align: center; font-size: 0.75rem; color: #64748b;
+}
+
+#main-content {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 120px); /* 🛡️ SUTURA FOCUS: Obliga a la página a estirarse al 100% de la pantalla */
 }
 .c3d-footer a { color: #94a3b8; text-decoration: none; transition: 0.2s; cursor: pointer; }
 .c3d-footer a:hover { color: var(--neon-n); text-decoration: underline; }
@@ -3557,8 +3565,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 </div>
     
 <!-- FOOTER LEGAL -->
-<div id="c3d-global-footer" class="c3d-footer hidden" style="background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; width: 95%; max-width: 1000px; margin: 40px auto 20px auto; padding: 20px;">
-    <p style="margin: 0 0 10px 0; font-family: 'Orbitron'; color: #cbd5e1;">© 2026 Área de Soluciones Tecnológicas - Coach 3D LATAM</p>
+<div id="c3d-global-footer" class="c3d-footer hidden" style="background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; width: 95%; max-width: 1000px; margin: auto auto 20px auto; padding: 20px;">    <p style="margin: 0 0 10px 0; font-family: 'Orbitron'; color: #cbd5e1;">© 2026 Área de Soluciones Tecnológicas - Coach 3D LATAM</p>
     <p style="margin: 0; font-size: 0.85em;">
         <a onclick="abrirModalLegal('terminos')" style="color: var(--neon-n); font-weight: bold; padding: 0 10px;">Términos de Servicio</a> | 
         <a onclick="abrirModalLegal('privacidad')" style="color: var(--neon-n); font-weight: bold; padding: 0 10px;">Políticas de Privacidad</a>
