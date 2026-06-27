@@ -2316,12 +2316,10 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
       <div class="video-container">
         <iframe src="https://www.youtube.com/embed/VABG6r9Ghlc" frameborder="0" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe>
       </div>
-
     </div>
+ 
 
-  
-
-    <div id="modal-login" class="hidden glass-panel" style="max-width: 400px; margin: auto;">
+    <div id="modal-login" class="hidden glass-panel" style="max-width: 400px; margin: 50px auto auto auto;">
 
         <h2>Acceso Integrante Comunidad</h2>
 
@@ -2333,7 +2331,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <button class="btn" onclick="cancelarRegistro()" style="margin-top: 10px; width: 100%; font-size: 0.8em;">CANCELAR</button>
     </div>
 
-    <div id="modal-register" class="hidden glass-panel" style="max-width: 600px; margin: auto; padding: 30px;">
+    <div id="modal-register" class="hidden glass-panel" style="max-width: 600px; margin: 50px auto auto auto; padding: 30px;">
         <h2 style="color: var(--neon-n); font-family: 'Orbitron'; text-align: center; margin-top:0;">Evolución Tridimensional</h2>
         
         <!-- Barra de Progreso -->
@@ -2415,7 +2413,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         </form>        
     </div>
 
-    <div id="modal-recover" class="hidden glass-panel" style="max-width: 500px; margin: auto;">
+    <div id="modal-recover" class="hidden glass-panel" style="max-width: 500px; margin: 50px auto auto auto;">
 
         <h2>Recuperar Acceso</h2>
 
@@ -12697,14 +12695,30 @@ async function confirmarDiaDesafio(payloadExtra = {}) {
                 <h3 style="color:#ef4444; font-family:'Orbitron';">FISURA TEMPORAL DETECTADA</h3>
                 <p style="color:#cbd5e1; font-size:0.95em; margin-bottom:15px;">Has estado inactivo por <b>${res.diasPerdidos} días</b>. Tu progreso de ${res.rachaSalvada} días está a punto de ser destruido y volver a cero.</p>
                 <div style="background:rgba(239,68,68,0.1); border:1px dashed #ef4444; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <p style="margin:0 0 10px 0; color:white; font-size:0.85em;">Puedes usar tus Fichas para reparar la fisura temporal y continuar hoy sin perder nada (2.000 🎟️ por día).</p>
+                    <p style="margin:0 0 10px 0; color:white; font-size:0.85em;">Puedes usar tus Fichas para reparar la fisura temporal y continuar hoy sin perder nada (250 🎟️ por día).</p>
                     <strong style="color:var(--neon-m); font-size:1.25em;">Costo de Reparación: ${res.costoFichas.toLocaleString('es-CL')} 🎟️</strong>
                 </div>
                 <button class="btn btn-m" style="width:100%; padding:14px; margin-bottom:10px; font-weight:bold;" onclick="cerrarKairoMsg(); confirmarDiaDesafio({usarEscudo: true})">🛡️ USAR ESCUDO Y SALVAR RACHA</button>
                 <button class="btn btn-f" style="width:100%; padding:14px; background:transparent; border-color:#ef4444; color:#ef4444;" onclick="cerrarKairoMsg(); confirmarDiaDesafio({aceptarPerdida: true})">ACEPTAR DERROTA (VOLVER A CERO)</button>
             </div>`;
         kairoMessage({ mensaje: msg, icon: " " });
-    } else { notify("❌ " + (res ? res.msg : "Error de conexión.")); cerrarModalFrase(); }
+    } else { 
+        cerrarModalFrase();
+        // 🛡️ SUTURA FOCUS: Enrutador inteligente hacia la Bóveda de Fichas si faltan fondos
+        if (res && res.msg && (res.msg.includes("insuficientes") || res.msg.includes("Necesitas") || res.msg.includes("insuficiente"))) {
+            let msgTienda = `
+                <div style="text-align:center;">
+                    <div style="font-size:3rem; margin-bottom:10px; filter: drop-shadow(0 0 15px #fbbf24);">🎟️</div>
+                    <h3 style="color:#fbbf24; font-family:'Orbitron';">FONDOS INSUFICIENTES</h3>
+                    <p style="color:#cbd5e1; font-size:0.95em; margin-bottom:20px;">${res.msg}</p>
+                    <button class="btn btn-n" style="width:100%; padding:14px; margin-bottom:10px; font-weight:bold;" onclick="cerrarKairoMsg(); abrirModalFichas()">🎟️ IR A COMPRAR FICHAS / ESCUDOS</button>
+                    <button class="btn btn-f" style="width:100%; padding:14px; background:transparent; border-color:#ef4444; color:#ef4444;" onclick="cerrarKairoMsg(); iniciarDesafio90()">VOLVER AL TABLERO</button>
+                </div>`;
+            kairoMessage({ mensaje: msgTienda, icon: " " });
+        } else {
+            notify("❌ " + (res ? res.msg : "Error de conexión."));
+        }
+    }
 }
 
 // =========================================================
@@ -13821,9 +13835,18 @@ async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
     </div>
     
     <!-- SECCIÓN DE COMPRA -->
+    <div style="text-align: left; margin-bottom: 20px; background: rgba(168, 85, 247, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-m);">
+        <h4 style="color: var(--neon-m); margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🛡️ ADQUIRIR ESCUDOS PROTECTORES</h4>
+        <p style="font-size: 0.75em; color: #cbd5e1; margin-top: 0;">Cómpralos por adelantado. 1 Escudo perdona 1 día exacto de inactividad en tu Desafío de 90 días.</p>
+        <button class="btn" style="width: 100%; padding: 12px; background: transparent; border: 1px solid var(--neon-m); color: var(--neon-m); font-weight: bold;" onclick="comprarItemFichas('escudo', 250, 'ESCUDO-01', 'Escudo Protector')">COMPRAR 1 ESCUDO (250 🎟️)</button>
+    </div>
+
     <div style="text-align: left; margin-bottom: 20px;">
         <h4 style="color: var(--neon-n); font-family: 'Orbitron'; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; font-size: 0.9em;">🛒 ADQUIRIR MÁS FICHAS</h4>
         <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px;">
+            <button class="btn" style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; transition: 0.3s;" onclick="comprarPaqueteFichas(550, 2900)" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+                <span><b style="color: var(--neon-m);">550</b> Fichas Micro</span> <strong>$2.900</strong>
+            </button>
             <button class="btn" style="background: rgba(255,255,255,0.02); border: 1px solid var(--neon-m); color: white; display: flex; justify-content: space-between; padding: 12px; font-size: 0.85em; transition: 0.3s;" onclick="comprarPaqueteFichas(1150, 5900)" onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
                 <span><b style="color: var(--neon-m);">1.150</b> Fichas Básico</span> <strong>$5.900</strong>
             </button>
@@ -13842,6 +13865,12 @@ async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
         </div>
     </div>
 
+    <div style="text-align: left; margin-bottom: 20px; background: rgba(168, 85, 247, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-m);">
+        <h4 style="color: var(--neon-m); margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🛡️ ADQUIRIR ESCUDOS PROTECTORES</h4>
+        <p style="font-size: 0.75em; color: #cbd5e1; margin-top: 0;">Cómpralos por adelantado. 1 Escudo perdona 1 día exacto de inactividad en tu Desafío de 90 días.</p>
+        <button class="btn" style="width: 100%; padding: 12px; background: transparent; border: 1px solid var(--neon-m); color: var(--neon-m); font-weight: bold;" onclick="comprarItemFichas('escudo', 250, 'ESCUDO-01', 'Escudo Protector')">COMPRAR 1 ESCUDO (250 🎟️)</button>
+    </div>
+    
     <!-- SECCIÓN DE CONVERSIÓN -->
     <div style="text-align: left; background: rgba(239, 68, 68, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed #ef4444;">
         <h4 style="color: #ef4444; margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🔄 CONVERTIR FICHAS A PUNTOS</h4>
