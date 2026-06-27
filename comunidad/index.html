@@ -2196,14 +2196,10 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 .c3d-footer {
     border-top: 1px solid rgba(255,255,255,0.05);
     padding: 25px 15px;
-    margin-top: auto !important; /* 🛡️ SUTURA FOCUS: Gravedad infinita hacia el fondo */
-    text-align: center; font-size: 0.75rem; color: #64748b;
-}
-
-#main-content {
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100vh - 120px); /* 🛡️ SUTURA FOCUS: Obliga a la página a estirarse al 100% de la pantalla */
+    margin-top: 50px; 
+    text-align: center; 
+    font-size: 0.75rem; 
+    color: #64748b;
 }
 .c3d-footer a { color: #94a3b8; text-decoration: none; transition: 0.2s; cursor: pointer; }
 .c3d-footer a:hover { color: var(--neon-n); text-decoration: underline; }
@@ -2319,7 +2315,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     </div>
  
 
-    <div id="modal-login" class="hidden glass-panel" style="max-width: 400px; margin: 50px auto auto auto;">
+    <div id="modal-login" class="hidden glass-panel" style="max-width: 400px; margin: auto;">
 
         <h2>Acceso Integrante Comunidad</h2>
 
@@ -2331,7 +2327,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         <button class="btn" onclick="cancelarRegistro()" style="margin-top: 10px; width: 100%; font-size: 0.8em;">CANCELAR</button>
     </div>
 
-    <div id="modal-register" class="hidden glass-panel" style="max-width: 600px; margin: 50px auto auto auto; padding: 30px;">
+    <div id="modal-register" class="hidden glass-panel" style="max-width: 600px; margin: auto; padding: 30px;">
         <h2 style="color: var(--neon-n); font-family: 'Orbitron'; text-align: center; margin-top:0;">Evolución Tridimensional</h2>
         
         <!-- Barra de Progreso -->
@@ -2413,7 +2409,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
         </form>        
     </div>
 
-    <div id="modal-recover" class="hidden glass-panel" style="max-width: 500px; margin: 50px auto auto auto;">
+    <div id="modal-recover" class="hidden glass-panel" style="max-width: 500px; margin: auto;">
 
         <h2>Recuperar Acceso</h2>
 
@@ -3266,14 +3262,10 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
 
     <div style="margin-top: 50px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 35px; text-align: center;">
         <p style="font-size: 0.88rem; line-height: 1.6; color: #cbd5e1; max-width: 750px; margin: 0 auto 20px;">
-            Servicios Profesionales ofertados por el equipo de Coaches Tridimensionales en Latinoamérica. Si quieres capacitarte como Coach 3D y tener un ingreso extra, <a onclick="conmutarFormularioFormacion()" style="color: var(--neon-m); text-decoration: underline; cursor: pointer; font-weight: bold;">regístrate aquí</a> para informarte del próximo ciclo de capacitaciones.
+            Servicios Profesionales ofertados por el equipo de Coaches Tridimensionales en Latinoamérica. Si quieres capacitarte como Coach 3D y tener un ingreso extra, <a onclick="abrirModalSerCoach('academia')" style="color: var(--neon-m); text-decoration: underline; cursor: pointer; font-weight: bold;">regístrate aquí</a> para informarte del próximo ciclo de capacitaciones.
         </p>
         
         <button class="btn btn-n" style="font-size: 0.68em; padding: 8px 16px; margin-bottom: 25px;" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">▲ VOLVER ARRIBA</button>
-
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="btn btn-m" style="padding: 12px 30px; font-weight: bold; font-family: 'Orbitron';" onclick="abrirModalSerCoach('academia')">POSTULAR A LA ACADEMIA DE COACHES</button>
-        </div>
     </div>
 
     <button class="btn" style="width: 100%; margin-top: 25px; opacity: 0.7;" onclick="salirDelModulo()">VOLVER AL PANEL</button>
@@ -3658,7 +3650,7 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     
     <div style="text-align: center; margin-bottom: 25px;">
         <div style="font-size: 3.5rem; filter: drop-shadow(0 0 15px #fbbf24); margin-bottom: 10px;">🪙</div>
-        <h2 style="color: #fbbf24; font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Economía C3D & Mi Red</h2>
+        <h2 style="color: #fbbf24; font-family: 'Orbitron', sans-serif; letter-spacing: 3px; margin: 0; text-transform: uppercase;">Puntos y Referidos</h2>
         <p style="font-size: 0.85em; color: #cbd5e1; margin-top: 5px; line-height: 1.5;">
             Gana el <b>5%</b> de tus inversiones personales y el <b>2%</b> de lo que inviertan tus referidos directos en la plataforma. Acumula puntos (1 Pto = $1) y canjéalos por giftcards, productos o servicios.
         </p>
@@ -9900,7 +9892,7 @@ async function iniciarcursos() {
         
         vistaSoloMisCursos = false;
         const btnMisCursos = document.querySelector('#modulo-cursos-netflix .btn-m');
-        if(btnMisCursos) { btnMisCursos.innerText = "🎬 MIS CURSOS ADQUIRIDOS"; btnMisCursos.className = "btn btn-m"; }
+        if(btnMisCursos) { btnMisCursos.innerText = "🎬 QUIERO ENSEÑAR Y AYUDAR A OTROS"; btnMisCursos.className = "btn btn-m"; }
         
         cambiarPilarCursos('NUTRICION');
         renderizarUltimosCursos();
@@ -13863,12 +13855,6 @@ async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
                 <span><b style="color: var(--neon-m); font-size: 1.1em;">25.500</b> Fichas Máster</span> <strong style="font-size: 1.1em;">$59.900</strong>
             </button>
         </div>
-    </div>
-
-    <div style="text-align: left; margin-bottom: 20px; background: rgba(168, 85, 247, 0.05); padding: 15px; border-radius: 8px; border: 1px dashed var(--neon-m);">
-        <h4 style="color: var(--neon-m); margin: 0 0 10px 0; font-family: 'Orbitron'; font-size: 0.9em;">🛡️ ADQUIRIR ESCUDOS PROTECTORES</h4>
-        <p style="font-size: 0.75em; color: #cbd5e1; margin-top: 0;">Cómpralos por adelantado. 1 Escudo perdona 1 día exacto de inactividad en tu Desafío de 90 días.</p>
-        <button class="btn" style="width: 100%; padding: 12px; background: transparent; border: 1px solid var(--neon-m); color: var(--neon-m); font-weight: bold;" onclick="comprarItemFichas('escudo', 250, 'ESCUDO-01', 'Escudo Protector')">COMPRAR 1 ESCUDO (250 🎟️)</button>
     </div>
     
     <!-- SECCIÓN DE CONVERSIÓN -->
