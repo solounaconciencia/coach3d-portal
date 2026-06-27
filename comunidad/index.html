@@ -12074,12 +12074,6 @@ function ejecutarDiaDesafio(diaObjetivo) {
     document.getElementById('modal-frase-diaria').style.display = 'block';
 }
 
-function cerrarModalFrase() {
-    document.getElementById('modal-frase-diaria').classList.add('hidden');
-    document.getElementById('modal-frase-diaria').style.display = 'none';
-    document.getElementById('main-content').classList.remove('blur-effect');
-}
-
 // Lógica Formulario Ser Coach
 function abrirModalSerCoach() {
     document.getElementById('main-content').classList.add('blur-effect');
@@ -12742,6 +12736,7 @@ async function iniciarConversionFichas() {
         loadDashboard(); 
     } else { notify("❌ Error en la Matrix: " + (res ? res.msg : "Sin conexión"));
     }
+}
         
 function cerrarModalFrase() {
     document.getElementById('modal-frase-diaria').classList.add('hidden');
@@ -13766,7 +13761,7 @@ async function comprarItemFichas(tipo, costo, itemId, nombreItem) {
     <h3 style="color: var(--neon-m); font-family: 'Orbitron'; margin-top: 0; text-align: center;">📊 SEGUIMIENTO DE ORGANIZACIÓN</h3>
     <p style="color: #cbd5e1; font-size: 0.85em; text-align: center;">Lista de Coaches bajo tu mando y sus métricas de evolución.</p>
     <div id="lista-seguimiento-coaches" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 1px dashed var(--neon-m); min-height: 150px; display: flex; align-items: center; justify-content: center;">
-        <p style="color: var(--neon-m);">Sincronizando red en Fase 2...</p>
+        <p style="color: var(--neon-m);">Sincronizando red...</p>
     </div>
 </div>
 
