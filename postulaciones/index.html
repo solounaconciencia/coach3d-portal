@@ -4,21 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Únete a Coach 3D Latam - Asesor Comercial</title>
+    
+    <link rel="icon" type="image/png" href="Logo-app-blanco.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            /* Colores corporativos basados en la marca */
             --primary-cyan: #00E5FF;
             --primary-purple: #A259FF;
-            --bg-dark-overlay: rgba(15, 18, 25, 0.85); /* Fondo oscuro transparente */
-            --card-bg: #1A1D27; /* Fondo de contenedores */
-            --input-bg: #0B0E14; /* Fondo de inputs */
+            --bg-dark-overlay: rgba(10, 12, 16, 0.75); 
+            --card-bg: rgba(26, 29, 39, 0.85); 
+            --input-bg: rgba(11, 14, 20, 0.9);
             --text-main: #FFFFFF;
             --text-muted: #B0B5C1;
-            --border-color: #2A2F3D;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-image: url('https://i.postimg.cc/MpZBdnKF/Gemini-Generated-Image-nfx69qnfx69qnfx6.png');
             background-size: cover;
             background-position: center;
@@ -30,7 +35,6 @@
             position: relative;
         }
 
-        /* Capa oscura sobre la imagen de fondo para legibilidad */
         body::before {
             content: '';
             position: fixed;
@@ -39,195 +43,152 @@
             width: 100%;
             height: 100%;
             background: var(--bg-dark-overlay);
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px);
             z-index: -1;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .container {
-            max-width: 800px;
-            margin: 50px auto;
+            max-width: 850px;
+            margin: 60px auto;
             background: var(--card-bg);
-            padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            padding: 50px 60px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
+            animation: fadeIn 0.8s ease-out forwards;
         }
 
-        h1, h2, h3 {
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .logo-container { text-align: center; margin-bottom: 30px; }
+        .logo-container img { width: 100%; max-width: 180px; height: auto; object-fit: contain; transition: max-width 0.3s ease; }
 
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+        
         h1 {
             text-align: center;
-            color: var(--primary-cyan);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            font-size: 2.2em;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            color: var(--text-main);
-            margin-top: 40px;
-        }
-
-        h3 {
-            font-size: 1.2em;
-            color: var(--primary-purple);
-            margin-top: 30px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        p {
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-
-        strong {
-            color: var(--text-main);
-        }
-
-        .highlight-box {
-            background-color: rgba(255, 255, 255, 0.03);
-            border-left: 4px solid var(--primary-cyan);
-            border-radius: 0 8px 8px 0;
-            padding: 20px;
-            margin: 25px 0;
-            color: var(--text-muted);
-        }
-
-        hr {
-            border: 0;
-            height: 1px;
-            background: var(--border-color);
-            margin: 50px 0;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: block;
-            color: var(--text-main);
-            font-size: 0.95em;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="url"],
-        textarea {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-family: inherit;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-cyan);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .checkbox-group input {
-            margin-right: 12px;
-            margin-top: 5px;
-            accent-color: var(--primary-cyan);
-            transform: scale(1.2);
-        }
-
-        .checkbox-group label {
-            font-weight: normal;
-            color: var(--text-muted);
-        }
-
-        button {
             background: linear-gradient(90deg, var(--primary-cyan) 0%, var(--primary-purple) 100%);
-            color: #ffffff;
-            border: none;
-            padding: 16px 30px;
-            font-size: 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin-top: 20px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(162, 89, 255, 0.4);
+        h2 { font-size: 1.4em; color: var(--text-main); margin-top: 45px; margin-bottom: 15px; }
+        h3 { font-size: 1.1em; color: var(--primary-cyan); margin-top: 10px; margin-bottom: 25px;}
+        p { color: var(--text-muted); margin-bottom: 15px; font-size: 1.05em; }
+        strong { color: #fff; font-weight: 600; }
+
+        .benefits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+        .benefit-card {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-purple); padding: 20px; border-radius: 10px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .benefit-card:hover { transform: translateY(-5px); border-left-color: var(--primary-cyan); }
+        .benefit-card h4 { font-family: 'Montserrat', sans-serif; margin: 0 0 10px 0; color: var(--text-main); font-size: 1.1em; }
+        .benefit-card p { margin: 0; font-size: 0.95em; color: var(--primary-cyan); }
+
+        hr { border: 0; height: 1px; background: var(--border-color); margin: 60px 0; }
+
+        /* Botón Principal (Abre Modal) */
+        .btn-main {
+            background: linear-gradient(90deg, var(--primary-cyan) 0%, var(--primary-purple) 100%);
+            color: #ffffff; border: none; padding: 18px 40px; font-size: 18px; border-radius: 50px;
+            cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(162, 89, 255, 0.3); display: block; width: 100%; text-align: center;
+        }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 229, 255, 0.4); }
+
+        /* ======== MODAL Y MULTISTEP ======== */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 1000;
+            justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-content {
+            background: var(--card-bg); width: 100%; max-width: 600px;
+            padding: 40px; border-radius: 16px; border: 1px solid var(--primary-cyan);
+            box-shadow: 0 20px 50px rgba(0, 229, 255, 0.2); position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease;
+            max-height: 90vh; overflow-y: auto;
         }
 
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .status-message {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-            text-align: center;
-            font-weight: bold;
+        .close-modal {
+            position: absolute; top: 20px; right: 25px; font-size: 28px; color: var(--text-muted);
+            cursor: pointer; transition: color 0.2s ease; line-height: 1;
         }
+        .close-modal:hover { color: var(--primary-cyan); }
 
-        .success {
-            background-color: rgba(0, 229, 255, 0.1);
-            color: var(--primary-cyan);
-            border: 1px solid var(--primary-cyan);
-        }
+        /* Barra de Progreso */
+        .progress-container { width: 100%; background: var(--input-bg); border-radius: 10px; margin-bottom: 30px; height: 8px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-cyan), var(--primary-purple)); width: 0%; transition: width 0.4s ease; }
 
-        .error {
-            background-color: rgba(255, 89, 89, 0.1);
-            color: #FF5959;
-            border: 1px solid #FF5959;
+        /* Pasos del Formulario */
+        .form-step { display: none; animation: fadeIn 0.4s ease; }
+        .form-step.active { display: block; }
+
+        .form-group { margin-bottom: 20px; }
+        label { font-weight: 600; margin-bottom: 10px; display: block; color: var(--text-main); font-size: 0.95em; }
+        input[type="text"], input[type="email"], input[type="url"], textarea {
+            width: 100%; padding: 14px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main);
+            font-family: 'Inter', sans-serif; box-sizing: border-box; transition: all 0.3s ease;
         }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-cyan); box-shadow: 0 0 15px rgba(0, 229, 255, 0.15); background-color: rgba(11, 14, 20, 0.95); }
+        textarea { resize: vertical; min-height: 120px; }
+
+        .checkbox-group { display: flex; align-items: flex-start; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .checkbox-group input { margin-right: 15px; margin-top: 4px; accent-color: var(--primary-cyan); transform: scale(1.3); }
+        .checkbox-group label { font-weight: 400; color: var(--text-muted); font-size: 0.9em; line-height: 1.5; margin-bottom: 0; }
+
+        /* Botones de Navegación */
+        .btn-nav-group { display: flex; justify-content: space-between; margin-top: 30px; gap: 15px; }
+        .btn-nav {
+            padding: 14px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif; font-size: 14px; letter-spacing: 1px; flex: 1; transition: all 0.3s ease;
+        }
+        .btn-prev { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+        .btn-prev:hover { border-color: var(--text-main); color: var(--text-main); }
+        .btn-next, .btn-submit { background: var(--primary-cyan); color: #000; border: none; box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3); }
+        .btn-next:hover, .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 229, 255, 0.5); }
+        .btn-submit { background: linear-gradient(90deg, var(--primary-cyan) 0%, var(--primary-purple) 100%); color: #fff; }
+
+        .status-message { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; text-align: center; font-weight: 600; }
+        .success { background-color: rgba(0, 229, 255, 0.1); color: var(--primary-cyan); border: 1px solid var(--primary-cyan); }
+        .error { background-color: rgba(255, 89, 89, 0.1); color: #FF5959; border: 1px solid #FF5959; }
 
         @media (max-width: 768px) {
-            .container {
-                margin: 20px;
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
+            .container { margin: 20px; padding: 30px 20px; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8em; }
+            .logo-container img { max-width: 130px; }
+            .modal-content { padding: 30px 20px; width: 90%; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    
+    <div class="logo-container">
+        <img src="Logo-app-blanco.png" alt="Logo Coach 3D Latam">
+    </div>
+
     <h1>Únete a Coach 3D Latam como Asesor Comercial Freelance</h1>
     
     <div class="offer-details">
@@ -238,146 +199,260 @@
         <p>Buscamos un <strong>Asesor C3D (Freelance)</strong> para todo Chile. No buscamos "vendedores tradicionales" que presionen a los clientes. Buscamos consultores empáticos que sepan escuchar, diagnosticar problemas reales de los negocios y recomendar la solución digital adecuada (desde LinkPages y Landing Pages, hasta Ecommerce, CRM y plataformas personalizadas).</p>
 
         <h2>¿Cómo trabajarás?</h2>
-        <div class="highlight-box">
-            <strong>Libertad total:</strong> Tú decides tu horario y tu modalidad de trabajo (desde casa por LinkedIn/WhatsApp, o en terreno visitando negocios locales).<br><br>
-            <strong>Prospección activa:</strong> Eres dueño de tus resultados. Tu meta sugerida para tener éxito será generar al menos 10 contactos diarios.<br><br>
-            <strong>Metodología clara:</strong> Te capacitamos en nuestro "Método C3D" (Conectar, Comprender, Desarrollar, Confirmar) para que tus reuniones sean un éxito.
-        </div>
+        <div class="benefits-grid">
 
         <h2>Lo que ofrecemos (Tus Ingresos)</h2>
         <p>Este es un rol <strong>100% a comisión</strong>, diseñado para premiar directamente tu esfuerzo, sin topes de ingresos.</p>
-        <p><strong>Comisiones por Venta:</strong></p>
-        <p>Ventas Rápidas (Productos Simples)</p>
-        <p>Plataformas Personalizadas</p>
-        <p>Programas de Suscripciones</p>
-        <p>Bonos por Constancia Mensual</p>
+        
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <h4>Ventas Rápidas</h4>
+                <p>(Productos Simples)</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Plataformas</h4>
+                <p>Personalizadas</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Programas</h4>
+                <p>De Suscripciones</p>
+            </div>
+            <div class="benefit-card">
+                <h4>Bonos Adicionales</h4>
+                <p>Por Constancia Mensual</p>
+            </div>
+        </div>
 
         <h2>¿Qué perfil buscamos?</h2>
-        <p>Residencia en Chile (abierto a todo el país).</p>
-        <p>Mentalidad emprendedora: entiendes que a mayor proactividad, mayores ingresos.</p>
-        <p>Habilidad para escuchar (aplicamos la regla 80/20: el cliente habla el 80% del tiempo).</p>
-        <p>Disciplina para registrar tus avances en nuestro CRM corporativo.</p>
-        <p>Honestidad y transparencia: si el cliente no necesita el servicio, no se lo vendemos.</p>
+        <p>• Residencia en Chile (abierto a todo el país).</p>
+        <p>• Mentalidad Independiente: entiendes que a mayor proactividad, mayores ingresos.</p>
+        <p>• Habilidad para escuchar (aplicamos la regla 80/20: el cliente habla el 80% del tiempo).</p>
+        <p>• Disciplina para registrar tus avances en nuestro CRM corporativo.</p>
+        <p>• Honestidad y transparencia: si el cliente no necesita el servicio, no se lo vendemos.</p>
     </div>
 
     <hr>
 
-    <h2>Formulario de Postulación</h2>
-    <p>¿Estás listo para representar una nueva forma de hacer negocios? Completa el formulario a continuación.</p>
+    <button type="button" class="btn-main" id="openModalBtn">Comenzar Mi Postulación</button>
+</div>
 
-    <form id="reclutamientoForm">
-        <input type="text" name="trampa_bot" id="trampa_bot" style="display:none;" tabindex="-1" autocomplete="off">
+<div class="modal-overlay" id="postulacionModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
         
-        <h3>Sección 1: Datos Básicos</h3>
-        
-        <div class="form-group">
-            <label for="nombre">Nombre completo *</label>
-            <input type="text" id="nombre" name="nombre" required>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <div class="form-group">
-            <label for="correo">Correo electrónico *</label>
-            <input type="email" id="correo" name="correo" required>
-        </div>
+        <form id="reclutamientoForm">
+            <input type="text" name="trampa_bot" id="trampa_bot" style="display:none;" tabindex="-1" autocomplete="off">
+            
+            <div class="form-step active">
+                <h3>1. Datos Personales</h3>
+                <div class="form-group">
+                    <label>Nombre completo *</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo electrónico *</label>
+                    <input type="email" name="correo" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono / WhatsApp *</label>
+                    <input type="text" name="telefono" required>
+                </div>
+                <div class="btn-nav-group" style="justify-content: flex-end;">
+                    <button type="button" class="btn-nav btn-next">Siguiente</button>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="telefono">Teléfono / WhatsApp *</label>
-            <input type="text" id="telefono" name="telefono" required>
-        </div>
+            <div class="form-step">
+                <h3>2. Ubicación y Perfil</h3>
+                <div class="form-group">
+                    <label>Ciudad de residencia (Chile) *</label>
+                    <input type="text" name="ciudad" required>
+                </div>
+                <div class="form-group">
+                    <label>Enlace a tu perfil de LinkedIn (Opcional)</label>
+                    <input type="url" name="linkedin" placeholder="https://linkedin.com/in/...">
+                </div>
+                <div class="btn-nav-group">
+                    <button type="button" class="btn-nav btn-prev">Atrás</button>
+                    <button type="button" class="btn-nav btn-next">Siguiente</button>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="ciudad">Ciudad de residencia (Chile) *</label>
-            <input type="text" id="ciudad" name="ciudad" required>
-        </div>
+            <div class="form-step">
+                <h3>3. Evaluación C3D (1/4)</h3>
+                <div class="form-group">
+                    <label>En Coach 3D Latam decimos constantemente que "nuestro objetivo no es vender". Sabiendo que este es un rol comercial, ¿qué crees que significa esta frase para nosotros? *</label>
+                    <textarea name="pregunta1" required></textarea>
+                </div>
+                <div class="btn-nav-group">
+                    <button type="button" class="btn-nav btn-prev">Atrás</button>
+                    <button type="button" class="btn-nav btn-next">Siguiente</button>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="linkedin">Enlace a tu perfil de LinkedIn (Opcional)</label>
-            <input type="url" id="linkedin" name="linkedin">
-        </div>
+            <div class="form-step">
+                <h3>4. Evaluación C3D (2/4)</h3>
+                <div class="form-group">
+                    <label>Imagina este escenario: Entras a un gimnasio local y logras hablar con el dueño. Él te dice: "Ya tengo Instagram, no necesito una página web ni nada de eso". Según tu instinto, ¿cómo responderías o qué le preguntarías? *</label>
+                    <textarea name="pregunta2" required></textarea>
+                </div>
+                <div class="btn-nav-group">
+                    <button type="button" class="btn-nav btn-prev">Atrás</button>
+                    <button type="button" class="btn-nav btn-next">Siguiente</button>
+                </div>
+            </div>
 
-        <h3>Sección 2: Evaluación de Mentalidad C3D</h3>
+            <div class="form-step">
+                <h3>5. Evaluación C3D (3/4)</h3>
+                <div class="form-group">
+                    <label>Un cliente te pide que le cotices la plataforma de gestión más cara y compleja que tenemos, pero al escucharlo te das cuenta de que su negocio recién empieza y solo necesita una simple "Landing Page". ¿Qué le recomiendas y por qué? *</label>
+                    <textarea name="pregunta3" required></textarea>
+                </div>
+                <div class="btn-nav-group">
+                    <button type="button" class="btn-nav btn-prev">Atrás</button>
+                    <button type="button" class="btn-nav btn-next">Siguiente</button>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="pregunta1">1. En Coach 3D Latam decimos constantemente que "nuestro objetivo no es vender". Sabiendo que este es un rol comercial, ¿qué crees que significa esta frase para nosotros? *</label>
-            <textarea id="pregunta1" name="pregunta1" required></textarea>
-        </div>
+            <div class="form-step">
+                <h3>6. Evaluación C3D (4/4)</h3>
+                <div class="form-group">
+                    <label>Como Asesor C3D Freelance, tú eres el dueño de tu tiempo. ¿Cuál sería tu estrategia principal para lograr contactar al menos 3 posibles clientes (prospectos) cada día? *</label>
+                    <textarea name="pregunta4" required></textarea>
+                </div>
+                <div class="btn-nav-group">
+                    <button type="button" class="btn-nav btn-prev">Atrás</button>
+                    <button type="button" class="btn-nav btn-next">Siguiente</button>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="pregunta2">2. Imagina este escenario: Entras a un gimnasio local y logras hablar con el dueño. Él te dice: "Ya tengo Instagram, no necesito una página web ni nada de eso". Según tu instinto, ¿cómo responderías o qué le preguntarías? *</label>
-            <textarea id="pregunta2" name="pregunta2" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="pregunta3">3. Un cliente te pide que le cotices la plataforma de gestión más cara y compleja que tenemos, pero al escucharlo te das cuenta de que su negocio recién empieza y solo necesita una simple "Landing Page". ¿Qué le recomiendas y por qué? *</label>
-            <textarea id="pregunta3" name="pregunta3" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="pregunta4">4. Como Asesor C3D Freelance, tú eres el dueño de tu tiempo. ¿Cuál sería tu estrategia principal para lograr contactar almenos 3 posibles clientes (prospectos) cada día? *</label>
-            <textarea id="pregunta4" name="pregunta4" required></textarea>
-        </div>
-
-        <h3>Sección 3: Expectativas y Acuerdos</h3>
-
-        <div class="checkbox-group">
-            <input type="checkbox" id="acuerdo1" name="acuerdo1" required>
-            <label for="acuerdo1">Comprendo que este es un rol en modalidad Freelance, con libertad de horario y que mis ingresos serán 100% en base a comisiones y bonos por mis resultados. *</label>
-        </div>
-
-        <div class="checkbox-group">
-            <input type="checkbox" id="acuerdo2" name="acuerdo2" required>
-            <label for="acuerdo2">Confirmo que poseo la autodisciplina para organizar mi trabajo y utilizar las herramientas de gestión (CRM) de la empresa. *</label>
-        </div>
-
-        <button type="submit" id="btnSubmit">Enviar Postulación</button>
-
-        <div id="statusMessage" class="status-message"></div>
-    </form>
+            <div class="form-step">
+                <h3>7. Acuerdos Finales</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="acuerdo1" required>
+                    <label>Comprendo que este es un rol en modalidad Freelance, con libertad de horario y que mis ingresos serán 100% en base a comisiones y bonos por mis resultados. *</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="acuerdo2" required>
+                    <label>Confirmo que poseo la autodisciplina para organizar mi trabajo y utilizar las herramientas de gestión (CRM) de la empresa. *</label>
+                </div>
+                <div class="btn-nav-group">
+                    <button type="button" class="btn-nav btn-prev">Atrás</button>
+                    <button type="submit" class="btn-nav btn-submit" id="btnSubmit">Finalizar Postulación</button>
+                </div>
+                <div id="statusMessage" class="status-message"></div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
+    /* LÓGICA DEL MODAL */
+    const modal = document.getElementById('postulacionModal');
+    const openBtn = document.getElementById('openModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+
+    openBtn.addEventListener('click', () => modal.classList.add('active'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+
+    /* LÓGICA DEL MULTISTEP */
+    const steps = document.querySelectorAll('.form-step');
+    const nextBtns = document.querySelectorAll('.btn-next');
+    const prevBtns = document.querySelectorAll('.btn-prev');
+    const progressBar = document.getElementById('progressBar');
+    let currentStep = 0;
+
+    function updateForm() {
+        steps.forEach((step, index) => {
+            step.classList.toggle('active', index === currentStep);
+        });
+        const progress = ((currentStep) / (steps.length - 1)) * 100;
+        progressBar.style.width = progress + '%';
+    }
+
+    nextBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Validación de HTML5 para los campos requeridos en el paso actual
+            const currentInputs = steps[currentStep].querySelectorAll('input, textarea');
+            let isValid = true;
+            
+            currentInputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                currentStep++;
+                updateForm();
+            }
+        });
+    });
+
+    prevBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentStep--;
+            updateForm();
+        });
+    });
+
+    updateForm(); // Inicializar
+
+    /* LÓGICA DE ENVÍO (APPS SCRIPT) */
     document.getElementById('reclutamientoForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Evita que la página se recargue
+        e.preventDefault(); 
 
         const btn = document.getElementById('btnSubmit');
         const statusMsg = document.getElementById('statusMessage');
+        const prevBtnsInSubmit = document.querySelectorAll('.btn-prev');
         
-        // Cambiar estado del botón mientras procesa
-        btn.textContent = 'Enviando postulación...';
+        btn.textContent = 'Enviando...';
         btn.disabled = true;
+        prevBtnsInSubmit.forEach(b => b.disabled = true); // Bloquea botón atrás
 
         // ⚠️ IMPORTANTE: PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
         const scriptURL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
 
-        // Recolectar todos los datos del formulario (incluido el honeypot invisible)
         const formData = new FormData(this);
 
-        // Envío real a Google Apps Script
         fetch(scriptURL, { 
             method: 'POST', 
             body: formData,
-            mode: 'no-cors' // Crucial para evitar bloqueos de seguridad de Google (errores CORS)
+            mode: 'no-cors' 
         })
-        .then(response => {
-            // Si el fetch funciona (aunque sea modo no-cors), mostramos éxito
-            statusMsg.textContent = '¡Postulación enviada con éxito! Nos contactaremos contigo pronto.';
+        .then(() => {
+            statusMsg.textContent = '¡Postulación enviada con éxito! Nos contactaremos pronto.';
             statusMsg.className = 'status-message success';
             statusMsg.style.display = 'block';
             
-            // Limpiar formulario y restaurar el botón a su estado original
             document.getElementById('reclutamientoForm').reset();
-            btn.textContent = 'Enviar Postulación';
-            btn.disabled = false;
+            currentStep = 0;
+            updateForm();
+            
+            // Cierra el modal automáticamente después de 3 segundos
+            setTimeout(() => {
+                modal.classList.remove('active');
+                btn.textContent = 'Finalizar Postulación';
+                btn.disabled = false;
+                statusMsg.style.display = 'none';
+                prevBtnsInSubmit.forEach(b => b.disabled = false);
+            }, 3000);
         })
         .catch(error => {
-            // Si falla la conexión a internet o el servidor
-            console.error('Error en el envío:', error);
-            statusMsg.textContent = 'Hubo un error de conexión. Por favor, intenta nuevamente.';
+            console.error('Error:', error);
+            statusMsg.textContent = 'Hubo un error de conexión. Intenta nuevamente.';
             statusMsg.className = 'status-message error';
             statusMsg.style.display = 'block';
             
-            btn.textContent = 'Enviar Postulación';
+            btn.textContent = 'Finalizar Postulación';
             btn.disabled = false;
+            prevBtnsInSubmit.forEach(b => b.disabled = false);
         });
     });
 </script>
