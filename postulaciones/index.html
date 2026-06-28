@@ -6,62 +6,103 @@
     <title>Únete a Coach 3D Latam - Asesor Comercial</title>
     <style>
         :root {
-            --primary-color: #000000;
-            --secondary-color: #333333;
-            --bg-color: #f4f4f9;
-            --text-color: #333333;
-            --border-color: #cccccc;
+            /* Colores corporativos basados en la marca */
+            --primary-cyan: #00E5FF;
+            --primary-purple: #A259FF;
+            --bg-dark-overlay: rgba(15, 18, 25, 0.85); /* Fondo oscuro transparente */
+            --card-bg: #1A1D27; /* Fondo de contenedores */
+            --input-bg: #0B0E14; /* Fondo de inputs */
+            --text-main: #FFFFFF;
+            --text-muted: #B0B5C1;
+            --border-color: #2A2F3D;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-image: url('https://i.postimg.cc/MpZBdnKF/Gemini-Generated-Image-nfx69qnfx69qnfx6.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
             line-height: 1.6;
             margin: 0;
             padding: 0;
+            position: relative;
+        }
+
+        /* Capa oscura sobre la imagen de fondo para legibilidad */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark-overlay);
+            z-index: -1;
         }
 
         .container {
             max-width: 800px;
-            margin: 40px auto;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 50px auto;
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--border-color);
         }
 
         h1, h2, h3 {
-            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         h1 {
             text-align: center;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
-
-        .offer-details {
+            color: var(--primary-cyan);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
             margin-bottom: 40px;
+            font-size: 2.2em;
         }
 
-        .offer-details p {
+        h2 {
+            font-size: 1.5em;
+            color: var(--text-main);
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: var(--primary-purple);
+            margin-top: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        p {
+            color: var(--text-muted);
             margin-bottom: 15px;
         }
 
+        strong {
+            color: var(--text-main);
+        }
+
         .highlight-box {
-            background-color: #f9f9f9;
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            margin: 20px 0;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--primary-cyan);
+            border-radius: 0 8px 8px 0;
+            padding: 20px;
+            margin: 25px 0;
+            color: var(--text-muted);
         }
 
         hr {
             border: 0;
             height: 1px;
             background: var(--border-color);
-            margin: 40px 0;
+            margin: 50px 0;
         }
 
         form {
@@ -70,13 +111,15 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         label {
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-weight: 600;
+            margin-bottom: 10px;
             display: block;
+            color: var(--text-main);
+            font-size: 0.95em;
         }
 
         input[type="text"],
@@ -84,74 +127,100 @@
         input[type="url"],
         textarea {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
+            background-color: var(--input-bg);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-sizing: border-box;
+            border-radius: 8px;
+            color: var(--text-main);
             font-family: inherit;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
         }
 
         textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
         }
 
         .checkbox-group {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .checkbox-group input {
-            margin-right: 10px;
+            margin-right: 12px;
             margin-top: 5px;
+            accent-color: var(--primary-cyan);
+            transform: scale(1.2);
         }
 
         .checkbox-group label {
             font-weight: normal;
+            color: var(--text-muted);
         }
 
         button {
-            background-color: var(--primary-color);
+            background: linear-gradient(90deg, var(--primary-cyan) 0%, var(--primary-purple) 100%);
             color: #ffffff;
             border: none;
-            padding: 15px 20px;
-            font-size: 16px;
-            border-radius: 4px;
+            padding: 16px 30px;
+            font-size: 18px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
         }
 
         button:hover {
-            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(162, 89, 255, 0.4);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .status-message {
-            margin-top: 20px;
+            margin-top: 25px;
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 8px;
             display: none;
             text-align: center;
             font-weight: bold;
         }
 
         .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: rgba(0, 229, 255, 0.1);
+            color: var(--primary-cyan);
+            border: 1px solid var(--primary-cyan);
         }
 
         .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: rgba(255, 89, 89, 0.1);
+            color: #FF5959;
+            border: 1px solid #FF5959;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .container {
                 margin: 20px;
-                padding: 20px;
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.8em;
             }
         }
     </style>
@@ -178,15 +247,10 @@
         <h2>Lo que ofrecemos (Tus Ingresos)</h2>
         <p>Este es un rol <strong>100% a comisión</strong>, diseñado para premiar directamente tu esfuerzo, sin topes de ingresos.</p>
         <p><strong>Comisiones por Venta:</strong></p>
-        <p>Ventas Rápidas (Productos Simples): 50% de comisión sobre el valor neto.</p>
-        <p>Plataformas Personalizadas: 20% de comisión sobre el valor neto.</p>
-        <p>Suscripciones: $5.000 mensuales por cada cliente activo (hasta por 6 meses).</p>
-        
-        <p><strong>Bonos por Constancia Mensual:</strong></p>
-        <p>4 ventas: $20.000</p>
-        <p>8 ventas: $50.000</p>
-        <p>15 ventas: $100.000</p>
-        <p>20 ventas: $200.000</p>
+        <p>Ventas Rápidas (Productos Simples)</p>
+        <p>Plataformas Personalizadas</p>
+        <p>Programas de Suscripciones</p>
+        <p>Bonos por Constancia Mensual</p>
 
         <h2>¿Qué perfil buscamos?</h2>
         <p>Residencia en Chile (abierto a todo el país).</p>
@@ -202,6 +266,8 @@
     <p>¿Estás listo para representar una nueva forma de hacer negocios? Completa el formulario a continuación.</p>
 
     <form id="reclutamientoForm">
+        <input type="text" name="trampa_bot" id="trampa_bot" style="display:none;" tabindex="-1" autocomplete="off">
+        
         <h3>Sección 1: Datos Básicos</h3>
         
         <div class="form-group">
@@ -247,7 +313,7 @@
         </div>
 
         <div class="form-group">
-            <label for="pregunta4">4. Como Asesor C3D Freelance, tú eres el dueño de tu tiempo. ¿Cuál sería tu estrategia principal para lograr contactar a 10 posibles clientes (prospectos) cada día? *</label>
+            <label for="pregunta4">4. Como Asesor C3D Freelance, tú eres el dueño de tu tiempo. ¿Cuál sería tu estrategia principal para lograr contactar almenos 3 posibles clientes (prospectos) cada día? *</label>
             <textarea id="pregunta4" name="pregunta4" required></textarea>
         </div>
 
@@ -276,47 +342,43 @@
         const btn = document.getElementById('btnSubmit');
         const statusMsg = document.getElementById('statusMessage');
         
-        // Cambiar estado del botón
-        btn.textContent = 'Enviando...';
+        // Cambiar estado del botón mientras procesa
+        btn.textContent = 'Enviando postulación...';
         btn.disabled = true;
 
-        // Aquí irá la URL que te dará Google Apps Script (el Web App URL)
+        // ⚠️ IMPORTANTE: PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
         const scriptURL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
 
-        // Recolectar datos del formulario
+        // Recolectar todos los datos del formulario (incluido el honeypot invisible)
         const formData = new FormData(this);
 
-        // Bloque temporal simulando el envío (hasta que configuremos el Apps Script)
-        // Cuando tengas la URL de Apps Script, reemplazaremos este setTimeout por un fetch() real.
-        setTimeout(() => {
+        // Envío real a Google Apps Script
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: formData,
+            mode: 'no-cors' // Crucial para evitar bloqueos de seguridad de Google (errores CORS)
+        })
+        .then(response => {
+            // Si el fetch funciona (aunque sea modo no-cors), mostramos éxito
             statusMsg.textContent = '¡Postulación enviada con éxito! Nos contactaremos contigo pronto.';
             statusMsg.className = 'status-message success';
             statusMsg.style.display = 'block';
             
-            // Limpiar formulario y restaurar botón
+            // Limpiar formulario y restaurar el botón a su estado original
             document.getElementById('reclutamientoForm').reset();
             btn.textContent = 'Enviar Postulación';
             btn.disabled = false;
-        }, 1500);
-
-        /* // CÓDIGO REAL PARA GOOGLE APPS SCRIPT (Descomentar en la siguiente fase)
-        fetch(scriptURL, { method: 'POST', body: formData})
-            .then(response => {
-                statusMsg.textContent = '¡Postulación enviada con éxito! Nos contactaremos contigo pronto.';
-                statusMsg.className = 'status-message success';
-                statusMsg.style.display = 'block';
-                document.getElementById('reclutamientoForm').reset();
-                btn.textContent = 'Enviar Postulación';
-                btn.disabled = false;
-            })
-            .catch(error => {
-                statusMsg.textContent = 'Hubo un error al enviar. Por favor, intenta nuevamente.';
-                statusMsg.className = 'status-message error';
-                statusMsg.style.display = 'block';
-                btn.textContent = 'Enviar Postulación';
-                btn.disabled = false;
-            });
-        */
+        })
+        .catch(error => {
+            // Si falla la conexión a internet o el servidor
+            console.error('Error en el envío:', error);
+            statusMsg.textContent = 'Hubo un error de conexión. Por favor, intenta nuevamente.';
+            statusMsg.className = 'status-message error';
+            statusMsg.style.display = 'block';
+            
+            btn.textContent = 'Enviar Postulación';
+            btn.disabled = false;
+        });
     });
 </script>
 
