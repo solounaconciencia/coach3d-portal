@@ -3842,7 +3842,6 @@ body { padding-top: 85px; } /* Empuje unificado y preciso */
     <div class="pilar-filter-container" style="justify-content: center; flex-wrap: wrap;">
         <button class="filter-tab-premium active" onclick="filtrarBazarCanje('TODOS')">🌟 VER TODO</button>
         <button class="filter-tab-premium" onclick="filtrarBazarCanje('SORTEO')">🎟️ LOTERÍA Y SORTEOS</button>
-        <button class="filter-tab-premium" onclick="filtrarBazarCanje('PRODUCTO')">🛍️ MERCADO</button>
         <button class="filter-tab-premium" onclick="filtrarBazarCanje('SERVICIO')">🎓 SERVICIOS VIP</button>
         <button class="filter-tab-premium" onclick="filtrarBazarCanje('GIFTCARD')">💳 GIFTCARDS</button>
     </div>
@@ -9352,7 +9351,6 @@ function abrirModalEcommerce(sku) {
 function cerrarModalEcommerce() {
     document.getElementById('modal-ecommerce-producto').classList.add('hidden');
     document.getElementById('modal-ecommerce-producto').style.display = 'none';
-    productoActivoEcom = null;
 }
 
 // 🌐 FUNCIONES PATROCINADORES Y CTA TIENDA
