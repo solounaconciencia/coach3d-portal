@@ -123,6 +123,8 @@
     <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
     <button onclick="document.getElementById('modalManuales').style.display='flex'" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">📚 Manuales C3D</button>
     <button onclick="abrirGestorColumnas()" style="background:#3498db; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Gestionar Columnas</button>
+    <button id="btnReporteAdmin" onclick="abrirModalReporte('admin')" style="display:none; background:#1e293b; border:1px solid #00E5FF; color:#00E5FF; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📈 Reporte Avanzado</button>
+    <button id="btnReporteUser" onclick="abrirModalReporte('user')" style="display:none; background:#1e293b; border:1px solid #A259FF; color:#A259FF; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Mi Reporte Personal</button>
     <button id="btnBackup" onclick="descargarCSV()" style="display:none; background:#e74c3c; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💾 Backup DB</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
     <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes</button>
@@ -392,7 +394,58 @@ Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber 
         </div>
     </div>
 </div>
-    
+
+
+    <a href="URL_TU_PDF_MANUAL_TECNICO" target="_blank" style="text-decoration: none; background: #2c3e50; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;">
+                <span>📙 Guía Técnica de Soluciones</span>
+                <span>➔</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="modalReporte" class="modal">
+    <div class="modal-content" style="max-width: 700px; background: #0a0c10; border: 1px solid #00E5FF;">
+        <span class="close-btn" onclick="document.getElementById('modalReporte').style.display='none'">X</span>
+        <h2 style="color: #00E5FF;">📈 Panel de Rendimiento y Reportes</h2>
+        
+        <div id="filtrosReporteAdmin" style="display:none; gap:10px; margin-bottom: 20px; background: #1e293b; padding: 15px; border-radius: 8px;">
+            <select id="reporteSelectAsesor" style="padding:8px; border-radius:4px; flex:1; background: #0a0c10; color: white; border: 1px solid #334155;"></select>
+            <select id="reporteSelectTiempo" style="padding:8px; border-radius:4px; flex:1; background: #0a0c10; color: white; border: 1px solid #334155;">
+                <option value="1">Último Mes</option>
+                <option value="3">Últimos 3 Meses</option>
+                <option value="6">Últimos 6 Meses</option>
+            </select>
+            <button onclick="cargarDatosReporte()" style="background:#00E5FF; color:#000; border:none; padding:8px 15px; border-radius:4px;">Cargar</button>
+        </div>
+
+        <div id="zonaImpresionReporte" style="background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 20px;">
+            <h3 id="reporteTitulo" style="color:white; margin-top:0; border-bottom: 1px solid #334155; padding-bottom: 10px;">Reporte de Usuario</h3>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <div style="text-align: center; background: rgba(0,229,255,0.1); padding: 15px; border-radius: 6px; flex:1; margin: 0 5px; border: 1px solid #00E5FF;">
+                    <div style="font-size: 11px; color:#B0B5C1;">NUEVOS (PROSPECCIÓN)</div>
+                    <div id="repValProspeccion" style="font-size: 24px; color:#00E5FF; font-weight:bold;">0</div>
+                </div>
+                <div style="text-align: center; background: rgba(34,197,94,0.1); padding: 15px; border-radius: 6px; flex:1; margin: 0 5px; border: 1px solid #22c55e;">
+                    <div style="font-size: 11px; color:#B0B5C1;">VENTAS CONCRETADAS</div>
+                    <div id="repValConcretadas" style="font-size: 24px; color:#22c55e; font-weight:bold;">0</div>
+                </div>
+            </div>
+
+            <h4 style="color:#A259FF; font-size:12px; margin-bottom: 10px;">Evolución Comercial (Gráfico de Tendencia)</h4>
+            <div id="chartContainer" style="background:#0a0c10; height: 200px; border-radius: 6px; border: 1px solid #334155; position: relative; padding: 10px; display:flex; align-items:flex-end; gap:5px; justify-content:space-around;">
+                </div>
+            <div style="display:flex; justify-content:center; gap:15px; margin-top:10px; font-size:10px;">
+                <span style="color:#00E5FF;">■ Prospección</span>
+                <span style="color:#22c55e;">■ Ventas</span>
+            </div>
+        </div>
+
+        <button onclick="descargarReportePDF()" style="background:linear-gradient(90deg, #A259FF, #00E5FF); color:white; border:none; padding:12px; width:100%; cursor:pointer; border-radius:5px; font-weight:bold; font-size:14px;">⬇️ Descargar Reporte en PDF</button>
+    </div>
+</div>
+<script>
 <script>
 const API = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";   
 
@@ -448,6 +501,12 @@ async function iniciar(){
             selectAsesor.style.display = "inline-block";
             const btnBackup = document.getElementById("btnBackup");
             if(btnBackup) btnBackup.style.display = "inline-block";
+            const btnRepAdmin = document.getElementById("btnReporteAdmin");
+            if(btnRepAdmin) btnRepAdmin.style.display = "inline-block";
+        } else {
+            const btnRepUser = document.getElementById("btnReporteUser");
+            if(btnRepUser) btnRepUser.style.display = "inline-block";
+        }
             // Extraer asesores únicos de la base cargada
             const asesoresUnicos = [...new Set(prospectos.map(p => p.responsable).filter(r => r))];
             selectAsesor.innerHTML = '<option value="">Todos los Asesores</option>';
@@ -1210,6 +1269,93 @@ function descargarCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+// --- LÓGICA DE REPORTES DINÁMICOS Y PDF ---
+function abrirModalReporte(tipo) {
+    document.getElementById("modalReporte").style.display = "flex";
+    
+    if(tipo === "admin") {
+        document.getElementById("filtrosReporteAdmin").style.display = "flex";
+        const selectAsesorRep = document.getElementById("reporteSelectAsesor");
+        const asesoresUnicos = [...new Set(prospectos.map(p => p.responsable).filter(r => r))];
+        selectAsesorRep.innerHTML = '<option value="Todos">Todos los Asesores (General)</option>';
+        asesoresUnicos.forEach(as => { selectAsesorRep.innerHTML += `<option value="${as}">${as}</option>`; });
+    } else {
+        document.getElementById("filtrosReporteAdmin").style.display = "none";
+        cargarDatosReporte(); // El usuario normal carga sus datos del último mes automático
+    }
+}
+
+function cargarDatosReporte() {
+    let btnCargar = document.querySelector("#filtrosReporteAdmin button");
+    if(btnCargar) btnCargar.innerText = "...";
+    
+    let filtroAs = document.getElementById("reporteSelectAsesor") ? document.getElementById("reporteSelectAsesor").value : "Todos";
+    let meses = document.getElementById("reporteSelectTiempo") ? document.getElementById("reporteSelectTiempo").value : 1;
+    
+    let titulo = rolActual === "admin" ? `Reporte de Rendimiento: ${filtroAs} (${meses} Meses)` : `Mi Reporte Personal (Último Mes)`;
+    document.getElementById("reporteTitulo").innerText = titulo;
+
+    fetch(API + "?action=getDatosReporte&u=" + encodeURIComponent(usuarioActual) + "&r=" + encodeURIComponent(rolActual) + "&filtroAsesor=" + encodeURIComponent(filtroAs) + "&meses=" + meses)
+    .then(r => r.json())
+    .then(res => {
+        if(res.success) {
+            document.getElementById("repValProspeccion").innerText = res.datos.prospeccion;
+            document.getElementById("repValConcretadas").innerText = res.datos.ventasConcretadas;
+            dibujarGraficoHTML(res.datos.historicoSemanal);
+        }
+        if(btnCargar) btnCargar.innerText = "Cargar";
+    });
+}
+
+function dibujarGraficoHTML(dataSemanas) {
+    const contenedor = document.getElementById("chartContainer");
+    contenedor.innerHTML = "";
+    
+    let maxVal = 1; // Para escalar las barras
+    for(let key in dataSemanas) {
+        if(dataSemanas[key].prospeccion > maxVal) maxVal = dataSemanas[key].prospeccion;
+        if(dataSemanas[key].concretadas > maxVal) maxVal = dataSemanas[key].concretadas;
+    }
+
+    for(let key in dataSemanas) {
+        let hProsp = (dataSemanas[key].prospeccion / maxVal) * 90; // Porcentaje de altura
+        let hVent = (dataSemanas[key].concretadas / maxVal) * 90;
+
+        let grupo = document.createElement("div");
+        grupo.style = "display:flex; flex-direction:column; align-items:center; width: 40px;";
+        grupo.innerHTML = `
+            <div style="display:flex; align-items:flex-end; gap:2px; height:150px; width:100%; justify-content:center; border-bottom: 1px solid #334155; padding-bottom:5px;">
+                <div style="background:#00E5FF; width:12px; height:${hProsp}%; border-radius:2px 2px 0 0;" title="Prospección: ${dataSemanas[key].prospeccion}"></div>
+                <div style="background:#22c55e; width:12px; height:${hVent}%; border-radius:2px 2px 0 0;" title="Ventas: ${dataSemanas[key].concretadas}"></div>
+            </div>
+            <div style="color:#B0B5C1; font-size:8px; margin-top:5px; text-align:center; word-wrap: break-word;">${key.split(' ')[1]}</div>
+        `;
+        contenedor.appendChild(grupo);
+    }
+}
+
+function descargarReportePDF() {
+    // Al usar print, la configuración nativa del navegador genera el PDF del reporte.
+    let zona = document.getElementById("zonaImpresionReporte").innerHTML;
+    let ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html><head><title>Reporte Coach3D</title>
+        <style>
+            body { font-family: Arial; background: #0a0c10; color: white; padding: 20px; }
+        </style>
+        </head><body>
+        <div style="text-align:center; margin-bottom: 20px;">
+            <h1 style="color:#00E5FF; margin:0;">COACH 3D LATAM</h1>
+            <p style="color:#A259FF;">Reporte Ejecutivo Confidencial</p>
+        </div>
+        ${zona}
+        </body></html>
+    `);
+    ventana.document.close();
+    setTimeout(() => {
+        ventana.print();
+    }, 1000); // Esperar que los estilos se apliquen
 }
 </script>
 
