@@ -337,15 +337,6 @@
     </div>
 </div>
 
-
-    <a href="URL_TU_PDF_MANUAL_TECNICO" target="_blank" style="text-decoration: none; background: #2c3e50; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;">
-                <span>📙 Guía Técnica de Soluciones</span>
-                <span>➔</span>
-            </a>
-        </div>
-    </div>
-</div>
-
 <div id="modalReporte" class="modal">
     <div class="modal-content" style="max-width: 700px; background: #0a0c10; border: 1px solid #00E5FF;">
         <span class="close-btn" onclick="document.getElementById('modalReporte').style.display='none'">X</span>
@@ -387,7 +378,6 @@
         <button onclick="descargarReportePDF()" style="background:linear-gradient(90deg, #A259FF, #00E5FF); color:white; border:none; padding:12px; width:100%; cursor:pointer; border-radius:5px; font-weight:bold; font-size:14px;">⬇️ Descargar Reporte en PDF</button>
     </div>
 </div>
-<script>
 <script>
 const API = "https://script.google.com/macros/s/AKfycbybJoF5-oeyWPNp3sheDya3hfV8ndG4I7BySRZj9GRPVUvVTc4RMGXOtXB0TR2fOcqI_g/exec";   
 
@@ -452,8 +442,6 @@ async function iniciar(){
         renderizar();
 
         if(rolActual === "admin") {
-            const selectAsesor = document.getElementById("filtroAsesor");
-            selectAsesor.style.display = "inline-block";
             if(rolActual === "admin") {
             const selectAsesor = document.getElementById("filtroAsesor");
             selectAsesor.style.display = "inline-block";
