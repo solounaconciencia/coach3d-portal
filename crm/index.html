@@ -116,7 +116,7 @@
         <div style="font-size:12px; color:#7f8c8d; text-transform:uppercase; font-weight:bold;">Comisiones Reales</div>
         <div id="dash_comisiones" style="font-size:24px; font-weight:bold; color:#00E5FF;">$0</div>
     </div>
-    <div id="dash_columnas" style="display:flex; gap:15px; flex-wrap:wrap;"></div>
+    <div id="dash_columnas" style="display:flex; gap:15px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:8px; width:100%;"></div>
 </div>
 
 <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -192,6 +192,7 @@
         </select>
 
         <div id="seccionAprobacionAdmin" style="display:none; margin-bottom:15px; padding:12px; background:rgba(0,0,0,0.05); border-radius:6px; border-left:4px solid #f39c12;">
+            <p id="txtAsesorEncargado" style="margin:0 0 8px 0; font-size:12px; display:none;"><strong>👤 Asesor Asignado:</strong> <span id="nombreAsesor" style="font-weight:bold; color:#00E5FF;">Sin Asignar</span></p>
             <p style="margin:0 0 5px 0; font-size:12px;"><strong>Estado Comisión Real:</strong> <span id="txtComisionEstado" style="font-weight:bold;">Pendiente</span></p>
             <button id="btnAprobarComisionReal" onclick="ejecutarAprobacionComision()" type="button" style="background:#2ecc71; color:white; border:none; width:100%; border-radius:4px; padding:8px; display:none;">✓ Aprobar Comisión Real</button>
         </div>
@@ -643,14 +644,7 @@ function renderizar(){
     const dashCol = document.getElementById("dash_columnas");
     if(dashCol) {
         dashCol.innerHTML = "";
-        columnas.sort((a,b)=>a.orden-b.orden).forEach(col => {
-            const count = prospectosActivos.filter(p => String(p.estadoId) === String(col.id)).length;
-            
-            // Cortamos el nombre para que solo muestre "FASE X" en el resumen
-            const nombreCorto = col.nombre.split(":")[0]; 
-            
-            dashCol.innerHTML += `
-            <div style="background:white; padding:10px 15px; border-radius:5px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-bottom: 4px solid ${col.color};">
+        // Cortamos el nombre para que solo muestre "FASE X" en el resumen
                 <div style="font-size:12px; color:#7f8c8d; text-transform:uppercase; font-weight:bold;">${nombreCorto}</div>
                 <div style="font-size:20px; font-weight:bold; color:#2c3e50;">${count}</div>
             </div>`;
@@ -773,6 +767,16 @@ function abrirModal(id) {
     if(seccionAdmin) {
         seccionAdmin.style.display = "block";
         txtEstado.innerText = p.comisionAprobada || "Pendiente";
+        
+        // Revelar asesor asignado única y exclusivamente al Administrador
+        const txtAsesor = document.getElementById("txtAsesorEncargado");
+        const nomAsesor = document.getElementById("nombreAsesor");
+        if(rolActual === "admin") {
+            if(txtAsesor) txtAsesor.style.display = "block";
+            if(nomAsesor) nomAsesor.innerText = p.responsable || "Sin Asignar";
+        } else {
+            if(txtAsesor) txtAsesor.style.display = "none";
+        }
         
         // El botón para aprobar SOLO le aparece al Administrador y si está pendiente
         if(rolActual === "admin" && p.comisionAprobada !== "Aprobada") {
