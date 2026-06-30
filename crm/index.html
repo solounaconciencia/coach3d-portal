@@ -121,14 +121,18 @@
 
 <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
     <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
-    <button onclick="document.getElementById('modalManuales').style.display='flex'" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">📚 Manuales C3D</button>
+    <button onclick="document.getElementById('modalManuales').style.display='flex'" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">🎓 Capacitación C3D</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
     <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes (Mis Mensajes)</button>
     
     <button id="btnReporteAdmin" onclick="abrirModalReporte('admin')" style="display:none; background:#1e293b; border:1px solid #00E5FF; color:#00E5FF; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📈 Reporte Avanzado</button>
     <button id="btnReporteUser" onclick="abrirModalReporte('user')" style="display:none; background:#1e293b; border:1px solid #A259FF; color:#A259FF; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Mi Reporte Personal</button>
     <button id="btnBackup" onclick="descargarCSV()" style="display:none; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💾 Backup DB</button>
-    <button onclick="cerrarSesion()" style="background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; margin-left:auto;">🚪 Cerrar Sesión</button>
+    <select id="preferenciaMoneda" onchange="cambiarMonedaPreferencia()" style="background:#1e293b; color:white; border:1px solid var(--border-color); padding:8px; border-radius:5px; font-weight:bold; margin-left:auto; cursor:pointer;">
+        <option value="CLP">🇨🇱 CLP ($)</option>
+        <option value="USD">🇺🇸 USD ($)</option>
+    </select>
+    <button onclick="cerrarSesion()" style="background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; margin-left:10px;">🚪 Cerrar Sesión</button>
 </div>
 </header>
 
@@ -180,8 +184,12 @@
         <label style="font-size:12px; font-weight:bold;">Observaciones:</label>
         <textarea id="edit_observaciones" style="width:90%; padding:8px; margin-bottom:15px; height:60px;"></textarea>
 
-        <label style="font-size:12px; font-weight:bold;">Valor Estimado del Negocio ($):</label>
-        <input type="number" id="edit_valorEstimado" style="width:90%; padding:8px; margin-bottom:8px;">
+        <label style="font-size:12px; font-weight:bold;">Tipo de Ecosistema Comercial / Venta:</label>
+        <select id="edit_tipoVenta" style="width:90%; padding:8px; margin-bottom:8px;">
+            <option value="suscripcion">Suscripción (+ $5.000 CLP fijos)</option>
+            <option value="rapida">Venta Rápida (+ $10.000 CLP fijos)</option>
+            <option value="pagounico">Pago Único (20% de la venta total)</option>
+        </select>
 
         <div id="seccionAprobacionAdmin" style="display:none; margin-bottom:15px; padding:12px; background:rgba(0,0,0,0.05); border-radius:6px; border-left:4px solid #f39c12;">
             <p style="margin:0 0 5px 0; font-size:12px;"><strong>Estado Comisión Real:</strong> <span id="txtComisionEstado" style="font-weight:bold;">Pendiente</span></p>
@@ -315,10 +323,19 @@
 <div id="modalManuales" class="modal">
     <div class="modal-content" style="max-width: 450px; background: #1e293b; border: 1px solid #A259FF; color: white;">
         <span class="close-btn" onclick="document.getElementById('modalManuales').style.display='none'" style="color: #B0B5C1;">X</span>
-        <h2 style="color: #00E5FF; text-align: center;">📚 Biblioteca C3D</h2>
-        <p style="font-size: 13px; color: #B0B5C1; text-align: center; margin-bottom: 20px;">Accede a tu material de apoyo y capacitación constante.</p>
+        <h2 style="color: #00E5FF; text-align: center;">🎓 Academia & Capacitación C3D</h2>
+        <p style="font-size: 13px; color: #B0B5C1; text-align: center; margin-bottom: 20px;">Audios, manuales y videos estratégicos para asesores.</p>
         
         <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="background:#2c3e50; padding:10px; border-radius:8px; border-left:4px solid #00E5FF;">
+                <span style="font-weight:bold; display:block; margin-bottom:8px; font-size:12px; color:white;">📺 Clase Magna (Estrategia C3D):</span>
+                <iframe width="100%" height="180" src="https://youtu.be/kwzS-sac5aw" frameborder="0" allowfullscreen style="border-radius:5px;"></iframe>
+            </div>
+
+            <div style="background:#2c3e50; padding:10px; border-radius:8px; border-left:4px solid #A259FF;">
+                <span style="font-weight:bold; display:block; margin-bottom:8px; font-size:12px; color:white;">🎙️ Audio Guion de Práctica (Escucha Directa):</span>
+                <audio controls src="https://drive.google.com/file/d/1z6vsHFzDrgZno-M_avyqyqX3T-dmSatc/view?usp=drive_link" style="width:100%; margin-top:2px;"></audio>
+            </div>
             <a href="https://drive.google.com/file/d/1rnsHrhJH35B07Z0YQJ7Q3LhKvKwSd6_9/view?usp=drive_link" target="_blank" style="text-decoration: none; background: #2c3e50; padding: 15px; border-radius: 8px; border-left: 4px solid #A259FF; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;">
                 <span>📘 Manual Maestro (Integración)</span>
                 <span>➔</span>
@@ -385,10 +402,14 @@ let columnas = [];
 let prospectos = [];
 let usuarioActual = "";
 let rolActual = "";
+let paisActual = "Chile";
+let valorUsdActual = 950;
 window.onload = function() {
     if(sessionStorage.getItem("crm_user")) {
         usuarioActual = sessionStorage.getItem("crm_user");
         rolActual = sessionStorage.getItem("crm_rol");
+        paisActual = sessionStorage.getItem("crm_pais") || "Chile";
+        valorUsdActual = sessionStorage.getItem("crm_usd") || 950;
         document.getElementById("loginScreen").style.display = "none";
         
         if(sessionStorage.getItem("crm_contrato") === "No" || sessionStorage.getItem("crm_contrato") === "") {
@@ -423,6 +444,9 @@ async function iniciar(){
         const configData = await fetch(API + "?action=getAjustesUsuario&u=" + encodeURIComponent(usuarioActual)).then(r=>r.json());
         
         // Carga los mensajes guardados del usuario (si existen)
+        if(configData.moneda) monedaActual = configData.moneda;
+        if(configData.usdRate) valorDolarGlobal = configData.usdRate;
+        document.getElementById("preferenciaMoneda").value = monedaActual;
         if(configData.f1) plantillasWA.f1 = configData.f1;
         if(configData.f2) plantillasWA.f2 = configData.f2;
         if(configData.f3) plantillasWA.f3 = configData.f3;
@@ -507,10 +531,19 @@ function renderizar(){
             let valorElemento = parseFloat(p.valorEstimado) || 0;
             totalPipeline += valorElemento;
             
-            // Si la comisión ya fue aprobada por ti, pasa al panel de Comisiones Reales
+            // Algoritmo de Neuro-Comisiones Dinámicas C3D
             if(p.comisionAprobada === "Aprobada") {
-                let factorComision = String(p.rubro).toLowerCase().includes("simple") ? 0.50 : 0.20;
-                totalComisionesReales += (valorElemento * factorComision);
+                let comisionElemento = 0;
+                let tipoV = String(p.tipoVenta || "").toLowerCase();
+                
+                if(tipoV.includes("suscripcion")) {
+                    comisionElemento = 5000;
+                } else if(tipoV.includes("rapida")) {
+                    comisionElemento = 10000;
+                } else if(tipoV.includes("pagounico")) {
+                    comisionElemento = valorElemento * 0.20;
+                }
+                totalComisionesReales += comisionElemento;
             }
             
             return true; 
@@ -591,11 +624,20 @@ function renderizar(){
         document.getElementById("dash_total").innerText = prospectosActivos.length;
     }
 
+    let esChile = String(paisActual).toLowerCase() === "chile";
+    let moneda = esChile ? "$" : "USD$ ";
+    let calculoPipeline = esChile ? totalPipeline : (totalPipeline / valorUsdActual);
+    let calculoComisiones = esChile ? totalComisionesReales : (totalComisionesReales / valorUsdActual);
+
+    let esCLP = (monedaActual === "CLP");
+    let signoMoneda = esCLP ? "$" : "USD ";
+    let tasaDivisora = esCLP ? 1 : valorDolarGlobal;
+
     if(document.getElementById("dash_pipeline")) {
-        document.getElementById("dash_pipeline").innerText = "$" + totalPipeline.toLocaleString("es-CL");
+         document.getElementById("dash_pipeline").innerText = signoMoneda + (totalPipeline / tasaDivisora).toLocaleString(esCLP ? "es-CL" : "en-US", {maximumFractionDigits: esCLP ? 0 : 2});
     }
     if(document.getElementById("dash_comisiones")) {
-        document.getElementById("dash_comisiones").innerText = "$" + totalComisionesReales.toLocaleString("es-CL");
+        document.getElementById("dash_comisiones").innerText = signoMoneda + (totalComisionesReales / tasaDivisora).toLocaleString(esCLP ? "es-CL" : "en-US", {maximumFractionDigits: esCLP ? 0 : 2});
     }
     
     const dashCol = document.getElementById("dash_columnas");
@@ -641,7 +683,6 @@ function dispararWhatsAppReal() {
 }
 
 // --- SISTEMA DE LOGIN ---
-// --- SISTEMA DE LOGIN Y CONTRATO ---
 function verificarLogin() {
     const u = document.getElementById("loginUser").value;
     const p = document.getElementById("loginPass").value;
@@ -659,6 +700,10 @@ function verificarLogin() {
             sessionStorage.setItem("crm_user", res.usuario);
             sessionStorage.setItem("crm_rol", res.rol);
             sessionStorage.setItem("crm_contrato", res.contrato);
+            sessionStorage.setItem("crm_pais", res.pais);
+            sessionStorage.setItem("crm_usd", res.usd);
+            paisActual = res.pais;
+            valorUsdActual = res.usd;
             
             document.getElementById("loginScreen").style.display = "none";
             
@@ -696,11 +741,7 @@ function firmarContrato() {
         body: JSON.stringify({ action: "aceptarContrato", usuario: usuarioActual })
     })
     .then(r => r.json())
-    .then(res => {
-        if(res.success) {
-            document.getElementById("modalContrato").style.display = "none";
-            iniciar(); // Arranca el CRM tras firmar
-        } else {
+    document.getElementById("modalContrato").style.display = "none";
             alert("Hubo un error al registrar tu firma. Intenta nuevamente.");
             btn.innerText = "Firmar y Acceder";
             btn.disabled = false;
@@ -722,6 +763,7 @@ function abrirModal(id) {
     document.getElementById("edit_etiquetas").value = p.etiquetas || "";
     document.getElementById("edit_observaciones").value = p.observaciones || "";
     document.getElementById("edit_valorEstimado").value = p.valorEstimado || 0;
+    document.getElementById("edit_observaciones").value = p.observaciones || "";
     
     // Control de la sección de aprobación de comisiones
     const seccionAdmin = document.getElementById("seccionAprobacionAdmin");
@@ -777,9 +819,10 @@ function guardarProspecto() {
         })
     })
     .then(r => r.json())
-    .then(res => {
+    .then(async res => {
         if(res.success){
-            iniciar(); 
+            await iniciar(); 
+            abrirModal(res.id); // Lanza la edición detallada automáticamente
         } else {
             alert("Error al guardar el prospecto.");
         }
@@ -1009,7 +1052,8 @@ function guardarCambiosDetalle() {
             prioridad: document.getElementById("edit_prioridad").value,
             etiquetas: document.getElementById("edit_etiquetas").value,
             observaciones: document.getElementById("edit_observaciones").value,
-            valorEstimado: document.getElementById("edit_valorEstimado").value
+            valorEstimado: document.getElementById("edit_valorEstimado").value,
+            tipoVenta: document.getElementById("edit_tipoVenta").value
         })
     })
     .then(r => r.json())
@@ -1296,6 +1340,22 @@ function descargarReportePDF() {
     setTimeout(() => {
         ventana.print();
     }, 1000); // Esperar que los estilos se apliquen
+}
+
+function cambiarMonedaPreferencia() {
+    monedaActual = document.getElementById("preferenciaMoneda").value;
+    renderizar(); // Cambia toda la interfaz visual al instante
+    
+    // Guardar en segundo plano la preferencia del usuario en el Excel
+    let payload = { 
+        action: "updateAjustesUsuario", 
+        usuario: usuarioActual,
+        moneda: monedaActual,
+        f1: plantillasWA.f1, f2: plantillasWA.f2, f3: plantillasWA.f3,
+        f4: plantillasWA.f4, f5: plantillasWA.f5, f6: plantillasWA.f6,
+        f7: plantillasWA.f7, f8: plantillasWA.f8, f9: plantillasWA.f9
+    };
+    fetch(API, { method: 'POST', body: JSON.stringify(payload) }).catch(e => console.error(e));
 }
 </script>
 
