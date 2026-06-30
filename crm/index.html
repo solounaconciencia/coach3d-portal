@@ -330,7 +330,7 @@
         <div style="display: flex; flex-direction: column; gap: 15px;">
             <div style="background:#2c3e50; padding:10px; border-radius:8px; border-left:4px solid #00E5FF;">
                 <span style="font-weight:bold; display:block; margin-bottom:8px; font-size:12px; color:white;">📺 Clase Magna (Estrategia C3D):</span>
-                <iframe width="100%" height="180" src="https://youtu.be/kwzS-sac5aw" frameborder="0" allowfullscreen style="border-radius:5px;"></iframe>
+                <iframe width="100%" height="180" src="https://www.youtube.com/embed/kwzS-sac5aw" frameborder="0" allowfullscreen style="border-radius:5px;"></iframe>
             </div>
 
             <div style="background:#2c3e50; padding:10px; border-radius:8px; border-left:4px solid #A259FF;">
@@ -644,7 +644,13 @@ function renderizar(){
     const dashCol = document.getElementById("dash_columnas");
     if(dashCol) {
         dashCol.innerHTML = "";
-        // Cortamos el nombre para que solo muestre "FASE X" en el resumen
+        const prospectosActivos = prospectos.filter(p => p.activo !== false);
+        columnas.sort((a,b)=>a.orden-b.orden).forEach(col => {
+            const count = prospectosActivos.filter(p => String(p.estadoId) === String(col.id)).length;
+            // Cortamos el nombre para que solo muestre "FASE X" en el resumen
+            const nombreCorto = col.nombre.split(":")[0];
+            dashCol.innerHTML += `
+            <div style="background:white; padding:10px 15px; border-radius:5px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-bottom: 4px solid ${col.color}; min-width: 110px; flex-shrink: 0;">
                 <div style="font-size:12px; color:#7f8c8d; text-transform:uppercase; font-weight:bold;">${nombreCorto}</div>
                 <div style="font-size:20px; font-weight:bold; color:#2c3e50;">${count}</div>
             </div>`;
