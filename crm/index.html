@@ -741,12 +741,22 @@ function firmarContrato() {
         body: JSON.stringify({ action: "aceptarContrato", usuario: usuarioActual })
     })
     .then(r => r.json())
-    document.getElementById("modalContrato").style.display = "none";
+    .then(res => {
+        if(res.success) {
+            sessionStorage.setItem("crm_contrato", "Sí"); // Actualiza la memoria local
+            document.getElementById("modalContrato").style.display = "none";
+            iniciar(); // Arranca el CRM tras firmar
+        } else {
             alert("Hubo un error al registrar tu firma. Intenta nuevamente.");
             btn.innerText = "Firmar y Acceder";
             btn.disabled = false;
         }
-    }).catch(e => console.error(e));
+    }).catch(e => {
+        console.error(e);
+        alert("Error de conexión con el servidor.");
+        btn.innerText = "Firmar y Acceder";
+        btn.disabled = false;
+    });
 }
     
 function abrirModal(id) {
