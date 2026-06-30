@@ -122,14 +122,12 @@
 <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
     <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
     <button onclick="document.getElementById('modalManuales').style.display='flex'" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">📚 Manuales C3D</button>
-    <button onclick="abrirGestorColumnas()" style="background:#3498db; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Gestionar Columnas</button>
-    <button id="btnReporteAdmin" onclick="abrirModalReporte('admin')" style="display:none; background:#1e293b; border:1px solid #00E5FF; color:#00E5FF; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📈 Reporte Avanzado</button>
-    <button id="btnReporteUser" onclick="abrirModalReporte('user')" style="display:none; background:#1e293b; border:1px solid #A259FF; color:#A259FF; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Mi Reporte Personal</button>
-    <button id="btnBackup" onclick="descargarCSV()" style="display:none; background:#e74c3c; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💾 Backup DB</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
-    <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes</button>
-    <button onclick="toggleTeleprompter('cajaGuionFase2')" style="background:#8e44ad; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🎙️ Guion Fase 2 (Audio)</button>
-    <button onclick="toggleTeleprompter('cajaGuionCierre')" style="background:#2c3e50; color:white; border:none; border-radius:5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💻 Guion Videollamada (Cierre)</button>
+    <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes (Mis Mensajes)</button>
+    
+    <button id="btnReporteAdmin" onclick="abrirModalReporte('admin')" style="display:none; background:#1e293b; border:1px solid #00E5FF; color:#00E5FF; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📈 Reporte Avanzado</button>
+    <button id="btnReporteUser" onclick="abrirModalReporte('user')" style="display:none; background:#1e293b; border:1px solid #A259FF; color:#A259FF; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Mi Reporte Personal</button>
+    <button id="btnBackup" onclick="descargarCSV()" style="display:none; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💾 Backup DB</button>
 </div>
 </header>
 
@@ -148,44 +146,6 @@
     </select>
 </div>
 
-<div id="cajaGuion" style="display:none; position:fixed; bottom:20px; right:20px; width:350px; background:white; border-left:5px solid #8e44ad; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; border-radius:8px; flex-direction:column;">
-    <div style="background:#ecf0f1; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
-        <strong style="color:#2c3e50; font-size:13px;">🎙️ Guion de Audio (Fase 2)</strong>
-        <span onclick="toggleGuion()" style="cursor:pointer; font-weight:bold; color:#e74c3c; font-size:16px;">X</span>
-    </div>
-    <div style="padding:15px;">
-        <textarea id="textoGuion" style="width:100%; height:220px; border:none; resize:none; font-size:14px; font-family:Arial; line-height:1.5; outline:none; color:#34495e;" onchange="guardarGuionAuto()">¡Hola [Nombre], gracias por responder! Te cuento súper rápido. Veo que muchos negocios acá siguen dependiendo de contestar WhatsApp a mano todo el día. Como desarrollador, mi objetivo con esta primera etapa de Coach3D es armarles a 10 negocios pioneros un sistema que funcione solo: que reciba al cliente, le muestre lo que ofrecen y concrete la venta.
-
-Pero no quiero venderte promesas en el aire. Quiero armarte una 'Maqueta Digital' gratuita para que veas directo en tu celular cómo se vería tu negocio funcionando con esta tecnología. Es solo un demo visual, sin compromiso.
-
-Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber qué colores te gustan y tus productos estrella. Al final, si quieres, subes tu logo. Llénalo cuando tengas un minutito y me pongo a trabajar en tu prototipo. ¡Un abrazo!</textarea>
-        <div style="text-align:right; margin-top:8px;">
-            <small style="color:#7f8c8d; font-style:italic;" id="guionStatus">Si editas el texto, se guarda solo.</small>
-        </div>
-    </div>
-</div>
-
-<div id="cajaGuionFase2" style="display:none; position:fixed; bottom:20px; right:20px; width:340px; background:white; border-left:5px solid #8e44ad; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; border-radius:8px; flex-direction:column;">
-    <div style="background:#ecf0f1; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
-        <strong style="color:#2c3e50; font-size:12px;">🎙️ Guion Fase 2 (Nota de Voz)</strong>
-        <span onclick="toggleTeleprompter('cajaGuionFase2')" style="cursor:pointer; font-weight:bold; color:#e74c3c; font-size:16px;">X</span>
-    </div>
-    <div style="padding:15px;">
-        <textarea id="txtGuionFase2" style="width:100%; height:180px; border:none; resize:none; font-size:13px; font-family:Arial; line-height:1.4; outline:none; color:#34495e;" onchange="guardarConfigAuto('guion_fase2', this.value, 'statusF2')"></textarea>
-        <div style="text-align:right; margin-top:5px;"><small style="color:#7f8c8d; font-style:italic;" id="statusF2">Autoguardado habilitado.</small></div>
-    </div>
-</div>
-
-<div id="cajaGuionCierre" style="display:none; position:fixed; bottom:20px; right:380px; width:340px; background:white; border-left:5px solid #2c3e50; box-shadow:0 10px 25px rgba(0,0,0,0.3); z-index:9999; border-radius:8px; flex-direction:column;">
-    <div style="background:#ecf0f1; padding:10px 15px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
-        <strong style="color:#2c3e50; font-size:12px;">💻 Guion Videollamada (Precios)</strong>
-        <span onclick="toggleTeleprompter('cajaGuionCierre')" style="cursor:pointer; font-weight:bold; color:#e74c3c; font-size:16px;">X</span>
-    </div>
-    <div style="padding:15px;">
-        <textarea id="txtGuionCierre" style="width:100%; height:180px; border:none; resize:none; font-size:13px; font-family:Arial; line-height:1.4; outline:none; color:#34495e;" onchange="guardarConfigAuto('guion_cierre', this.value, 'statusCierre')"></textarea>
-        <div style="text-align:right; margin-top:5px;"><small style="color:#7f8c8d; font-style:italic;" id="statusCierre">Autoguardado habilitado.</small></div>
-    </div>
-</div>
 
 <div id="kanban"></div>
     
@@ -299,23 +259,6 @@ Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber 
     </div>
 </div>
 
-<div id="modalGestorColumnas" class="modal">
-    <div class="modal-content" style="max-width: 500px;">
-        <span class="close-btn" onclick="document.getElementById('modalGestorColumnas').style.display='none'">X</span>
-        <h2>📊 Gestionar Columnas</h2>
-        
-        <div id="lista_columnas_mini" style="background:#f9f9f9; padding:10px; border-radius:8px; max-height:250px; overflow-y:auto; margin-bottom:15px; border:1px solid #ddd;">
-            </div>
-
-        <h4 style="margin-bottom:5px; color:#2c3e50;">+ Crear Nueva</h4>
-        <input type="text" id="nc_nombre" placeholder="Ej: FASE 8: Fidelización" style="width:90%; padding:8px; margin-bottom:10px;">
-        <label for="nc_color" style="font-weight:bold; font-size:12px;">Color:</label>
-        <input type="color" id="nc_color" value="#3498db" style="margin-bottom:15px; cursor:pointer;">
-        
-        <button onclick="guardarColumna()" style="background:#3498db; color:white; border:none; padding:10px; width:100%; cursor:pointer; border-radius:5px;">Añadir Columna</button>
-    </div>
-</div>
-
 <div id="modalWhatsAppPersonalizado" class="modal">
     <div class="modal-content" style="max-width: 550px;">
         <span class="close-btn" onclick="document.getElementById('modalWhatsAppPersonalizado').style.display='none'">X</span>
@@ -331,26 +274,24 @@ Te voy a dejar un link cortito aquí abajo. Son 7 preguntas rápidas para saber 
 
 <!-- Modal Ajustes -->
 <div id="modalAjustes" class="modal">
-    <div class="modal-content" style="max-width: 550px;">
+    <div class="modal-content" style="max-width: 600px;">
         <span class="close-btn" onclick="document.getElementById('modalAjustes').style.display='none'">X</span>
-        <h2>⚙️ Ajustes de Campaña</h2>
-        <p style="font-size:11px; color:#7f8c8d; margin-bottom:15px;">En todas las plantillas puedes usar los comodines: <b>{nombre}</b> y <b>{negocio}</b>.</p>
+        <h2 style="color:#00E5FF;">⚙️ Mis Mensajes de Neuro-Ventas</h2>
+        <p style="font-size:11px; color:#7f8c8d; margin-bottom:15px;">Personaliza tus mensajes. Usa los comodines: <b>{nombre}</b> y <b>{negocio}</b>.</p>
         
-        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
-            <label style="font-size:12px; font-weight:bold; color:#2c3e50;">1. Mensaje Rompehielo (Fase 1):</label>
-            <textarea id="ajuste_msg_f1" style="width:100%; padding:6px; margin-bottom:12px; height:70px; font-size:12px;"></textarea>
-            
-            <label style="font-size:12px; font-weight:bold; color:#8e44ad;">2. Mensaje Envío Encuesta (Fase 3):</label>
-            <textarea id="ajuste_msg_f3" style="width:100%; padding:6px; margin-bottom:12px; height:70px; font-size:12px;"></textarea>
-            
-            <label style="font-size:12px; font-weight:bold; color:#e67e22;">3. Mensaje Envío Prototipo (Fase 5):</label>
-            <textarea id="ajuste_msg_f5" style="width:100%; padding:6px; margin-bottom:12px; height:70px; font-size:12px;"></textarea>
-            
-            <label style="font-size:12px; font-weight:bold; color:#7f8c8d;">4. Mensaje Recordatorio Cita (Fase 6):</label>
-            <textarea id="ajuste_msg_f6" style="width:100%; padding:6px; margin-bottom:15px; height:70px; font-size:12px;"></textarea>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 15px;">
+            <div><label style="font-size:12px; font-weight:bold; color:#00E5FF;">Fase 1: Prospección Inicial</label><textarea id="ajuste_f1" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#00E5FF;">Fase 2: Contacto Realizado / Interés</label><textarea id="ajuste_f2" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#A259FF;">Fase 3: Reunión Agendada</label><textarea id="ajuste_f3" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#A259FF;">Fase 4: Reunión Realizada</label><textarea id="ajuste_f4" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#f59e0b;">Fase 5: Cotización Enviada</label><textarea id="ajuste_f5" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#f59e0b;">Fase 6: Prototipo Entregado</label><textarea id="ajuste_f6" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#22c55e;">Fase 7: Reunión de Cierre</label><textarea id="ajuste_f7" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#22c55e;">Fase 8: Seguimiento / Prueba</label><textarea id="ajuste_f8" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
+            <div><label style="font-size:12px; font-weight:bold; color:#2ecc71;">Fase 9: Cerrado / Fidelización</label><textarea id="ajuste_f9" style="width:100%; padding:6px; height:60px; font-size:12px;"></textarea></div>
         </div>
         
-        <button onclick="guardarAjustesMaestros()" style="background:#2ecc71; color:white; border:none; padding:12px; width:100%; cursor:pointer; border-radius:4px; font-weight:bold;">Guardar Configuración General</button>
+        <button onclick="guardarAjustesUsuario()" style="background:#00E5FF; color:#000; border:none; padding:12px; width:100%; cursor:pointer; border-radius:4px; font-weight:bold; margin-top:15px;">Guardar Mis Mensajes</button>
     </div>
 </div>
 
@@ -454,10 +395,15 @@ let prospectos = [];
 let usuarioActual = "";
 let rolActual = "";
 let plantillasWA = {
-    f1: "Hola {nombre}. Soy Diego, desarrollador independiente. Vengo siguiendo el trabajo de {negocio} acá en Cauquenes y veo mucho potencial. Estoy lanzando una iniciativa llamada Coach3D para digitalizar a solo 10 negocios de la zona. ¿Me permites enviarte un audio corto contándote de qué se trata?",
-    f3: "¡Excelente {nombre}! Te dejo aquí el link de nuestra plataforma para que Kairo analice tu negocio: coach3dlatam.app/campañadigitalcauquenes . Son 7 preguntas rápidas, complétalo y nos ponemos a trabajar.",
-    f5: "¡Hola {nombre}! Ya tengo lista la Maqueta Digital Premium de {negocio}. Quedó espectacular. Mírala desde tu celular en este enlace privado. Cuéntame si tienes 15 minutos mañana para una videollamada y explicarte la activación.",
-    f6: "Hola {nombre}, te recuerdo que tenemos agendada nuestra videollamada para revisar los planes de activación de la plataforma de {negocio}. ¡Nos vemos en breve!"
+    f1: "Hola {nombre}. Soy asesor tecnológico y vengo siguiendo el trabajo de {negocio}. Veo un potencial enorme. Estoy seleccionando negocios de la zona para digitalizarlos. ¿Tienes 1 minuto para enviarte un audio corto?",
+    f2: "¡Genial {nombre}! Como te comentaba, quiero armarles una 'Maqueta Digital' gratuita para que veas en tu celular cómo {negocio} puede vender en automático. Llena estas preguntas rápidas aquí: [LINK]",
+    f3: "¡Hola {nombre}! Te confirmo nuestra reunión agendada para revisar la activación de tu ecosistema. Te enviaré el enlace unos minutos antes.",
+    f4: "¡Excelente charla, {nombre}! Me encantó conocer más sobre {negocio}. Ya estoy trabajando con el equipo técnico para aterrizar lo conversado.",
+    f5: "Hola {nombre}. Ya tengo lista la propuesta de inversión para potenciar {negocio}. Te la dejé en tu correo. Revísala y me cuentas a qué hora te viene bien comentarla.",
+    f6: "¡Hola {nombre}! Ya tengo el enlace de la Maqueta Premium de {negocio}. Mírala desde tu celular aquí: [LINK]. Cuéntame qué te parece.",
+    f7: "¡Hola {nombre}! Te recuerdo que hoy tenemos nuestra videollamada para definir el lanzamiento de {negocio}. ¡Tengo todo listo por acá!",
+    f8: "Hola {nombre}, ¿cómo va todo con la plataforma en estos días de prueba? Quiero asegurarme de que le estés sacando el máximo provecho.",
+    f9: "¡Felicidades {nombre}! Oficialmente {negocio} ya está operando con su nuevo ecosistema. Gracias por confiar en nosotros."
 };
 
 async function iniciar(){
@@ -465,26 +411,19 @@ async function iniciar(){
         columnas = await fetch(API + "?action=getColumnas").then(r=>r.json());
         prospectos = await fetch(API + "?action=getProspectos&u=" + encodeURIComponent(usuarioActual) + "&r=" + encodeURIComponent(rolActual)).then(r=>r.json());
         
-        const configData = await fetch(API + "?action=getConfig").then(r=>r.json());
+        const configData = await fetch(API + "?action=getAjustesUsuario&u=" + encodeURIComponent(usuarioActual)).then(r=>r.json());
         
-        // Carga de mensajes de WhatsApp
-        if(configData["msg_f1"]) plantillasWA.f1 = configData["msg_f1"];
-        if(configData["msg_f3"]) plantillasWA.f3 = configData["msg_f3"];
-        if(configData["msg_f5"]) plantillasWA.f5 = configData["msg_f5"];
-        if(configData["msg_f6"]) plantillasWA.f6 = configData["msg_f6"];
+        // Carga los mensajes guardados del usuario (si existen)
+        if(configData.f1) plantillasWA.f1 = configData.f1;
+        if(configData.f2) plantillasWA.f2 = configData.f2;
+        if(configData.f3) plantillasWA.f3 = configData.f3;
+        if(configData.f4) plantillasWA.f4 = configData.f4;
+        if(configData.f5) plantillasWA.f5 = configData.f5;
+        if(configData.f6) plantillasWA.f6 = configData.f6;
+        if(configData.f7) plantillasWA.f7 = configData.f7;
+        if(configData.f8) plantillasWA.f8 = configData.f8;
+        if(configData.f9) plantillasWA.f9 = configData.f9;        
         
-        // Carga de Guiones de Teleprompter
-        if(configData["guion_fase2"]) {
-            document.getElementById("txtGuionFase2").value = configData["guion_fase2"];
-        } else {
-            document.getElementById("txtGuionFase2").value = "¡Hola [Nombre], gracias por responder!... (Edita este guion desde aquí)";
-        }
-        
-        if(configData["guion_cierre"]) {
-            document.getElementById("txtGuionCierre").value = configData["guion_cierre"];
-        } else {
-            document.getElementById("txtGuionCierre").value = "Mira [Nombre], una automatización así cuesta más de un millón... (Edita este guion desde aquí)";
-        }
 
         const prospectosActivos = prospectos.filter(p => p.activo !== false);
         if(document.getElementById("dash_total")) {
@@ -678,24 +617,13 @@ function wa(numero, contacto, negocio, estadoId){
     let nombre = (contacto && contacto !== "undefined" && contacto !== "") ? contacto : "emprendedor";
     let nomNegocio = (negocio && negocio !== "undefined" && negocio !== "") ? negocio : "tu negocio";
     
-    let mensajeBase = "";
-    let columna = String(estadoId);
-
-    if (columna === "1" || columna.includes("Contactar") || columna.includes("FASE 1")) { 
-        mensajeBase = plantillasWA.f1;
-    } else if (columna === "3" || columna.includes("Audio") || columna.includes("ESPERANDO") || columna.includes("FASE 3")) { 
-        mensajeBase = plantillasWA.f3;
-    } else if (columna === "5" || columna.includes("Prototipo") || columna.includes("ENVIADO") || columna.includes("FASE 5")) { 
-        mensajeBase = plantillasWA.f5;
-    } else if (columna === "6" || columna.includes("Agendado") || columna.includes("FASE 6")) { 
-        mensajeBase = plantillasWA.f6;
-    } else {
-        mensajeBase = `Hola ${nombre}, te contacto desde Coach3D respecto a los avances de ${nomNegocio}.`;
-    }
+    // Suponiendo que tus IDs de estadoId van del 1 al 9. Si usan texto, extraemos el número.
+    let numFase = String(estadoId).replace(/\D/g, ""); // Extrae solo el número de la columna
+    if(!numFase || numFase < 1 || numFase > 9) numFase = 1; // Por defecto Fase 1
     
+    let mensajeBase = plantillasWA[`f${numFase}`] || plantillasWA.f1;
     let mensajeFinal = mensajeBase.replace(/{nombre}/g, nombre).replace(/{negocio}/g, nomNegocio);
     
-    // Abrimos la ventana grande en vez del 'prompt'
     document.getElementById('wa_numero_oculto').value = numero;
     document.getElementById('wa_mensaje_final').value = mensajeFinal;
     document.getElementById('modalWhatsAppPersonalizado').style.display = 'flex';
@@ -1147,33 +1075,35 @@ function guardarConfigAuto(clave, valor, idStatus) {
     }).catch(e => console.error(e));
 }
 
+
 function abrirAjustes() {
-    document.getElementById('ajuste_msg_f1').value = plantillasWA.f1;
-    document.getElementById('ajuste_msg_f3').value = plantillasWA.f3;
-    document.getElementById('ajuste_msg_f5').value = plantillasWA.f5;
-    document.getElementById('ajuste_msg_f6').value = plantillasWA.f6;
+    for(let i=1; i<=9; i++) {
+        document.getElementById(`ajuste_f${i}`).value = plantillasWA[`f${i}`];
+    }
     document.getElementById('modalAjustes').style.display = 'flex';
 }
 
-function guardarAjustesMaestros() {
-    document.getElementById('modalAjustes').style.display = 'none';
+function guardarAjustesUsuario() {
+    const btn = document.querySelector("#modalAjustes button");
+    btn.innerText = "Guardando...";
     
-    const claves = ["msg_f1", "msg_f3", "msg_f5", "msg_f6"];
-    const inputs = ["ajuste_msg_f1", "ajuste_msg_f3", "ajuste_msg_f5", "ajuste_msg_f6"];
+    let payload = { action: "updateAjustesUsuario", usuario: usuarioActual };
+    for(let i=1; i<=9; i++) {
+        let val = document.getElementById(`ajuste_f${i}`).value;
+        plantillasWA[`f${i}`] = val;
+        payload[`f${i}`] = val;
+    }
     
-    inputs.forEach((id, index) => {
-        const val = document.getElementById(id).value;
-        if(index===0) plantillasWA.f1 = val;
-        if(index===1) plantillasWA.f3 = val;
-        if(index===2) plantillasWA.f5 = val;
-        if(index===3) plantillasWA.f6 = val;
-        
-        fetch(API, {
-            method: 'POST',
-            body: JSON.stringify({ action: "updateConfig", clave: claves[index], valor: val })
-        }).catch(e => console.error(e));
+    fetch(API, { method: 'POST', body: JSON.stringify(payload) })
+    .then(r => r.json())
+    .then(res => {
+        document.getElementById('modalAjustes').style.display = 'none';
+        btn.innerText = "Guardar Mis Mensajes";
+        alert("¡Tus mensajes personalizados se han guardado con éxito!");
+    }).catch(e => {
+        btn.innerText = "Guardar Mis Mensajes";
+        alert("Error al guardar.");
     });
-    alert("¡Ecosistema de mensajes guardado y sincronizado!");
 }
 
 
