@@ -467,11 +467,13 @@ async function iniciar(){
 }
 
 function renderizar(){
+    // Acumuladores financieros globales del dashboard
+    let totalPipeline = 0;
+    let totalComisionesReales = 0;
+    
     const kanban = document.getElementById("kanban");
     kanban.innerHTML = "";
-
-    columnas.sort((a,b)=>a.orden-b.orden).forEach(col=>{
-        const div = document.createElement("div");
+    columnas.sort((a,b)=>a.orden-b.orden).forEach(col=>{        const div = document.createElement("div");
         div.className = "columna";
         div.style.background = col.color;
         div.innerHTML = `<h2>${col.nombre}</h2>`;
@@ -479,11 +481,6 @@ function renderizar(){
         const textoBusqueda = document.getElementById("buscadorGlobal") ? document.getElementById("buscadorGlobal").value.toLowerCase() : "";
         const valorPrioridad = document.getElementById("filtroPrioridad") ? document.getElementById("filtroPrioridad").value : "";
         const filtroAsesor = document.getElementById("filtroAsesor") ? document.getElementById("filtroAsesor").value.toLowerCase() : "";
-        
-        // Resetear acumuladores financieros del dashboard
-        let totalPipeline = 0;
-        let totalComisionesReales = 0;
-        
 
         prospectos
         .filter(p => String(p.estadoId) === String(col.id) && p.activo !== false)
