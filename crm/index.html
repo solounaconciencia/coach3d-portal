@@ -121,6 +121,8 @@
 
 <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
     <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
+    <button onclick="abrirCotizador()" style="background:linear-gradient(90deg, #f1c40f, #e67e22); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(241,196,15,0.4);">🧾 Generar Cotización PDF</button>
+    <button onclick="alert('Módulo de cobros con DLocal en desarrollo...')" style="background:#8e44ad; color:white; border:none; border-radius:5px; font-weight:bold;">💳 Cobrar</button>
     <button onclick="document.getElementById('modalManuales').style.display='flex'" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">🎓 Capacitación C3D</button>
     <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
     <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes (Mis Mensajes)</button>
@@ -394,6 +396,58 @@
         </div>
 
         <button onclick="descargarReportePDF()" style="background:linear-gradient(90deg, #A259FF, #00E5FF); color:white; border:none; padding:12px; width:100%; cursor:pointer; border-radius:5px; font-weight:bold; font-size:14px;">⬇️ Descargar Reporte en PDF</button>
+    </div>
+</div>
+
+    <div id="modalCotizador" class="modal">
+    <div class="modal-content" style="max-width: 800px; background: #0a0c10; border: 1px solid #f1c40f;">
+        <span class="close-btn" onclick="document.getElementById('modalCotizador').style.display='none'">X</span>
+        <h2 style="color: #f1c40f;">🧾 Cotizador Inteligente C3D</h2>
+        
+        <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #334155; padding-bottom:10px;">
+            <button id="btnTabSueltos" onclick="setModoCotizador('sueltos')" style="background:#1e293b; color:#00E5FF; border:1px solid #00E5FF; border-radius:5px;">🧩 Armar a Medida (Módulos)</button>
+            <button id="btnTabPlanes" onclick="setModoCotizador('planes')" style="background:#1e293b; color:#A259FF; border:1px solid #A259FF; border-radius:5px;">🏆 Planes Sugeridos (Cerrados)</button>
+        </div>
+
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div style="flex:2; min-width:300px;">
+                <div id="zonaModulosSueltos">
+                    <select id="cot_select_nivel" onchange="renderListaModulos()" style="width:100%; padding:10px; margin-bottom:15px; background:#1e293b; color:white; border:1px solid #334155; border-radius:5px;">
+                        <option value="BASICO">Nivel Básico</option>
+                        <option value="PROFESIONAL">Nivel Profesional</option>
+                        <option value="PREMIUM">Nivel Premium</option>
+                    </select>
+                    <div id="cot_lista_modulos" style="max-height:250px; overflow-y:auto; padding-right:10px;"></div>
+                </div>
+                <div id="zonaPlanesSugeridos" style="display:none; max-height:300px; overflow-y:auto; padding-right:10px;"></div>
+            </div>
+
+            <div style="flex:1; min-width:250px; background:#1e293b; padding:15px; border-radius:8px; border:1px solid #334155; display:flex; flex-direction:column;">
+                <h3 style="color:white; margin-top:0; font-size:14px; border-bottom:1px solid #334155; padding-bottom:10px;">🛒 Resumen de Cotización</h3>
+                <div id="cot_resumen_carrito" style="font-size:12px; color:#B0B5C1; flex-grow:1; max-height:120px; overflow-y:auto; margin-bottom:10px;"></div>
+                
+                <div id="zonaDescuentoManual" style="margin-bottom:15px; padding:10px; background:rgba(0,0,0,0.2); border-radius:5px;">
+                    <label style="font-size:11px; color:#f1c40f; font-weight:bold;">🔥 Descuento Asesor (Solo Módulos Sueltos)</label>
+                    <div style="display:flex; align-items:center; gap:5px; margin-top:5px;">
+                        <input type="number" id="cot_descuento_input" min="0" max="20" value="0" onchange="calcularTotalCotizador()" style="width:60px; padding:5px; background:#0a0c10; color:white; border:1px solid #334155; text-align:center;"> <span style="font-size:12px;">% (Max 20%)</span>
+                    </div>
+                </div>
+
+                <div style="font-size:22px; font-weight:bold; color:#2ecc71; text-align:center; border-top:1px solid #334155; padding-top:10px;" id="cot_total_final">$0</div>
+                <button onclick="mostrarFormularioCliente()" style="background:#f39c12; color:white; border:none; padding:12px; border-radius:5px; width:100%; margin-top:15px; cursor:pointer;">Continuar a Datos del Cliente ➔</button>
+            </div>
+        </div>
+
+        <div id="zonaFormularioCliente" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid #334155;">
+            <h3 style="color:#00E5FF; margin-top:0;">📝 Datos Finales para el PDF</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <input type="text" id="cot_negocio" placeholder="Nombre del Negocio" style="padding:10px; background:#1e293b; border:1px solid #334155; color:white; border-radius:5px;">
+                <input type="text" id="cot_nombre" placeholder="Nombre del Cliente" style="padding:10px; background:#1e293b; border:1px solid #334155; color:white; border-radius:5px;">
+                <input type="email" id="cot_email" placeholder="Correo del Cliente" style="padding:10px; background:#1e293b; border:1px solid #334155; color:white; border-radius:5px;">
+                <input type="text" id="cot_whatsapp" placeholder="WhatsApp (Ej: 56912345678)" style="padding:10px; background:#1e293b; border:1px solid #334155; color:white; border-radius:5px;">
+            </div>
+            <button id="btnEmitirPDF" onclick="procesarEmisionPDF()" style="background:linear-gradient(90deg, #f1c40f, #e67e22); color:#000; font-weight:bold; border:none; padding:15px; border-radius:5px; width:100%; margin-top:15px; font-size:16px;">🧾 GENERAR PDF Y ENVIAR</button>
+        </div>
     </div>
 </div>
 <script>
@@ -1376,6 +1430,461 @@ function cambiarMonedaPreferencia() {
         f7: plantillasWA.f7, f8: plantillasWA.f8, f9: plantillasWA.f9
     };
     fetch(API, { method: 'POST', body: JSON.stringify(payload) }).catch(e => console.error(e));
+}
+// ==========================================
+// LÓGICA COTIZADOR C3D (MULTIMONEDA)
+// ==========================================
+let cot_modulosBase = [];
+let cot_programasBase = [];
+let cot_seleccionados = []; // Array de IDs
+let cot_modoActual = "sueltos"; // o "planes"
+let cot_descuentoPlanFijo = 0;
+
+async function abrirCotizador() {
+    document.getElementById("modalCotizador").style.display = "flex";
+    document.getElementById("zonaFormularioCliente").style.display = "none";
+    document.getElementById("cot_negocio").value = "";
+    document.getElementById("cot_nombre").value = "";
+    document.getElementById("cot_email").value = "";
+    document.getElementById("cot_whatsapp").value = "";
+    
+    // Si no han cargado, los buscamos al servidor
+    if(cot_modulosBase.length === 0) {
+        document.getElementById("cot_lista_modulos").innerHTML = "<p style='color:white; text-align:center;'>Cargando módulos desde la nube...</p>";
+        const resMod = await fetch(API + "?action=getModulosCotizador").then(r=>r.json());
+        if(resMod.success) cot_modulosBase = resMod.data;
+        
+        const resProg = await fetch(API + "?action=getProgramasCotizador").then(r=>r.json());
+        if(resProg.success) cot_programasBase = resProg.data;
+    }
+    
+    setModoCotizador('sueltos');
+}
+
+function setModoCotizador(modo) {
+    cot_modoActual = modo;
+    cot_seleccionados = [];
+    cot_descuentoPlanFijo = 0;
+    
+    if(modo === "sueltos") {
+        document.getElementById("btnTabSueltos").style.background = "#00E5FF";
+        document.getElementById("btnTabSueltos").style.color = "#000";
+        document.getElementById("btnTabPlanes").style.background = "#1e293b";
+        document.getElementById("btnTabPlanes").style.color = "#A259FF";
+        
+        document.getElementById("zonaModulosSueltos").style.display = "block";
+        document.getElementById("zonaPlanesSugeridos").style.display = "none";
+        
+        // El asesor PUEDE dar descuento manual
+        document.getElementById("cot_descuento_input").disabled = false;
+        document.getElementById("cot_descuento_input").value = 0;
+        document.getElementById("zonaDescuentoManual").style.opacity = "1";
+        
+        renderListaModulos();
+    } else {
+        document.getElementById("btnTabPlanes").style.background = "#A259FF";
+        document.getElementById("btnTabPlanes").style.color = "#000";
+        document.getElementById("btnTabSueltos").style.background = "#1e293b";
+        document.getElementById("btnTabSueltos").style.color = "#00E5FF";
+        
+        document.getElementById("zonaModulosSueltos").style.display = "none";
+        document.getElementById("zonaPlanesSugeridos").style.display = "block";
+        
+        // El asesor NO PUEDE dar descuento en planes (tienen descuento cerrado)
+        document.getElementById("cot_descuento_input").disabled = true;
+        document.getElementById("cot_descuento_input").value = 0;
+        document.getElementById("zonaDescuentoManual").style.opacity = "0.5";
+        
+        renderPlanesSugeridos();
+    }
+    calcularTotalCotizador();
+}
+
+function renderListaModulos() {
+    const nivel = document.getElementById("cot_select_nivel").value;
+    const cont = document.getElementById("cot_lista_modulos");
+    cont.innerHTML = "";
+    
+    let conversion = (monedaActual === "CLP") ? valorDolarGlobal : 1;
+    let simbolo = (monedaActual === "CLP") ? "$" : "USD ";
+    
+    cot_modulosBase.filter(m => m.nivel === nivel).forEach(m => {
+        let precioMostrado = (m.precio * conversion).toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
+        let check = cot_seleccionados.includes(m.id) ? "checked" : "";
+        cont.innerHTML += `
+        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155;">
+            <div style="flex:1;">
+                <div style="color:white; font-size:13px; font-weight:bold;">${m.modulo}</div>
+                <div style="color:#B0B5C1; font-size:11px;">${simbolo}${precioMostrado}</div>
+            </div>
+            <input type="checkbox" ${check} onchange="toggleModuloCotizador('${m.id}')" style="transform:scale(1.3); cursor:pointer;">
+        </div>`;
+    });
+}
+
+function renderPlanesSugeridos() {
+    const cont = document.getElementById("zonaPlanesSugeridos");
+    cont.innerHTML = "";
+    
+    cot_programasBase.forEach(p => {
+        let sel = (cot_seleccionados.length > 0 && cot_descuentoPlanFijo === p.descuento && p.nombre.includes("Plan")) ? "border-color:#2ecc71;" : ""; // Simulación básica de selección visual
+        cont.innerHTML += `
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:5px; margin-bottom:10px; border:1px solid #A259FF; ${sel}">
+            <h4 style="margin:0 0 5px 0; color:#A259FF;">${p.nombre}</h4>
+            <p style="font-size:11px; color:#B0B5C1; margin:0 0 10px 0;">${p.descripcion}</p>
+            <div style="font-size:11px; color:#f1c40f; margin-bottom:10px;">🎁 Descuento Incluido: ${(p.descuento*100)}%</div>
+            <button onclick="seleccionarPlanCotizador('${p.plan}')" style="background:#2c3e50; color:white; border:none; padding:8px; width:100%; border-radius:4px; cursor:pointer;">Seleccionar Paquete</button>
+        </div>`;
+    });
+}
+
+function toggleModuloCotizador(id) {
+    if(cot_seleccionados.includes(id)) {
+        cot_seleccionados = cot_seleccionados.filter(x => x !== id);
+    } else {
+        cot_seleccionados.push(id);
+    }
+    calcularTotalCotizador();
+}
+
+function seleccionarPlanCotizador(planName) {
+    const plan = cot_programasBase.find(p => p.plan === planName);
+    if(!plan) return;
+    
+    cot_seleccionados = [...plan.modulos];
+    cot_descuentoPlanFijo = plan.descuento;
+    calcularTotalCotizador();
+}
+
+function calcularTotalCotizador() {
+    let sumaUSD = 0;
+    const resHTML = document.getElementById("cot_resumen_carrito");
+    resHTML.innerHTML = "";
+    
+    if(cot_seleccionados.length === 0) {
+        resHTML.innerHTML = "Ningún módulo seleccionado.";
+        document.getElementById("cot_total_final").innerText = "$0";
+        return;
+    }
+
+    let conversion = (monedaActual === "CLP") ? valorDolarGlobal : 1;
+    let simbolo = (monedaActual === "CLP") ? "$" : "USD ";
+
+    cot_seleccionados.forEach(id => {
+        let mod = cot_modulosBase.find(m => String(m.id) === String(id));
+        if(mod) {
+            sumaUSD += parseFloat(mod.precio);
+            let valConv = (mod.precio * conversion).toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
+            resHTML.innerHTML += `<div style="margin-bottom:4px; border-bottom:1px solid #334155; padding-bottom:2px;">• ${mod.modulo} (${simbolo}${valConv})</div>`;
+        }
+    });
+
+    let descuento = 0;
+    if(cot_modoActual === "sueltos") {
+        let inputDesc = parseFloat(document.getElementById("cot_descuento_input").value) || 0;
+        if(inputDesc > 20) { inputDesc = 20; document.getElementById("cot_descuento_input").value = 20; }
+        if(inputDesc < 0) { inputDesc = 0; document.getElementById("cot_descuento_input").value = 0; }
+        descuento = inputDesc / 100;
+    } else {
+        descuento = cot_descuentoPlanFijo;
+    }
+
+    let totalConDescuentoUSD = sumaUSD - (sumaUSD * descuento);
+    let totalConvertido = totalConDescuentoUSD * conversion;
+
+    document.getElementById("cot_total_final").innerText = simbolo + totalConvertido.toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
+    // Guardamos el total final matemático en un atributo oculto para enviarlo al PDF
+    document.getElementById("cot_total_final").setAttribute("data-total", totalConDescuentoUSD);
+}
+
+function mostrarFormularioCliente() {
+    if(cot_seleccionados.length === 0) {
+        alert("Debes seleccionar al menos un módulo o plan."); return;
+    }
+    document.getElementById("zonaFormularioCliente").style.display = "block";
+    document.getElementById("zonaFormularioCliente").scrollIntoView({behavior: "smooth"});
+}
+
+function procesarEmisionPDF() {
+    const negocio = document.getElementById("cot_negocio").value;
+    const nombre = document.getElementById("cot_nombre").value;
+    const email = document.getElementById("cot_email").value;
+    const whatsapp = document.getElementById("cot_whatsapp").value;
+    
+    if(!negocio || !nombre) {
+        alert("El Nombre del Cliente y el Negocio son obligatorios."); return;
+    }
+
+    const btn = document.getElementById("btnEmitirPDF");
+    btn.innerText = "⏳ Generando PDF en la nube...";
+    btn.disabled = true;
+
+    // Recolectar la data de los módulos seleccionados
+    const modulosData = cot_seleccionados.map(id => {
+        let mod = cot_modulosBase.find(m => String(m.id) === String(id));
+        return { modulo: mod.modulo, precio: mod.precio };
+    });
+
+    // Añadir línea de descuento si hubo
+    let desc = (cot_modoActual === "sueltos") ? (parseFloat(document.getElementById("cot_descuento_input").value)||0) : (cot_descuentoPlanFijo*100);
+    if(desc > 0) {
+        modulosData.push({ modulo: "BONO APLICADO C3D (-" + desc + "%)", precio: 0 }); // El total ya tiene el desc aplicado, es solo visual
+    }
+
+    const totalUSD = document.getElementById("cot_total_final").getAttribute("data-total");
+
+    const payload = {
+        action: "generarCotizacionPDF",
+        negocio: negocio, nombre: nombre, email: email, whatsapp: whatsapp,
+        modulos: modulosData, total: totalUSD,
+        moneda: monedaActual, tasaConversion: (monedaActual === "CLP" ? valorDolarGlobal : 1)
+    };
+
+    fetch(API, { method: 'POST', body: JSON.stringify(payload) })
+    .then(r=>r.json())
+    .then(res => {
+        if(res.success) {
+            alert("¡PDF Generado con Éxito!\nSe ha enviado al correo del cliente y al Administrador.");
+            window.open(res.url, '_blank');
+            document.getElementById("modalCotizador").style.display = "none";
+        } else {
+            alert("Error al generar PDF: " + res.error);
+        }
+        btn.innerText = "🧾 GENERAR PDF Y ENVIAR";
+        btn.disabled = false;
+    }).catch(e => {
+        alert("Error de conexión.");
+        btn.innerText = "🧾 GENERAR PDF Y ENVIAR";
+        btn.disabled = false;
+    });
+}
+
+// ==========================================
+// LÓGICA COTIZADOR C3D (MULTIMONEDA)
+// ==========================================
+let cot_modulosBase = [];
+let cot_programasBase = [];
+let cot_seleccionados = []; // Array de IDs
+let cot_modoActual = "sueltos"; // o "planes"
+let cot_descuentoPlanFijo = 0;
+
+async function abrirCotizador() {
+    document.getElementById("modalCotizador").style.display = "flex";
+    document.getElementById("zonaFormularioCliente").style.display = "none";
+    document.getElementById("cot_negocio").value = "";
+    document.getElementById("cot_nombre").value = "";
+    document.getElementById("cot_email").value = "";
+    document.getElementById("cot_whatsapp").value = "";
+    
+    // Si no han cargado, los buscamos al servidor
+    if(cot_modulosBase.length === 0) {
+        document.getElementById("cot_lista_modulos").innerHTML = "<p style='color:white; text-align:center;'>Cargando módulos desde la nube...</p>";
+        const resMod = await fetch(API + "?action=getModulosCotizador").then(r=>r.json());
+        if(resMod.success) cot_modulosBase = resMod.data;
+        
+        const resProg = await fetch(API + "?action=getProgramasCotizador").then(r=>r.json());
+        if(resProg.success) cot_programasBase = resProg.data;
+    }
+    
+    setModoCotizador('sueltos');
+}
+
+function setModoCotizador(modo) {
+    cot_modoActual = modo;
+    cot_seleccionados = [];
+    cot_descuentoPlanFijo = 0;
+    
+    if(modo === "sueltos") {
+        document.getElementById("btnTabSueltos").style.background = "#00E5FF";
+        document.getElementById("btnTabSueltos").style.color = "#000";
+        document.getElementById("btnTabPlanes").style.background = "#1e293b";
+        document.getElementById("btnTabPlanes").style.color = "#A259FF";
+        
+        document.getElementById("zonaModulosSueltos").style.display = "block";
+        document.getElementById("zonaPlanesSugeridos").style.display = "none";
+        
+        // El asesor PUEDE dar descuento manual
+        document.getElementById("cot_descuento_input").disabled = false;
+        document.getElementById("cot_descuento_input").value = 0;
+        document.getElementById("zonaDescuentoManual").style.opacity = "1";
+        
+        renderListaModulos();
+    } else {
+        document.getElementById("btnTabPlanes").style.background = "#A259FF";
+        document.getElementById("btnTabPlanes").style.color = "#000";
+        document.getElementById("btnTabSueltos").style.background = "#1e293b";
+        document.getElementById("btnTabSueltos").style.color = "#00E5FF";
+        
+        document.getElementById("zonaModulosSueltos").style.display = "none";
+        document.getElementById("zonaPlanesSugeridos").style.display = "block";
+        
+        // El asesor NO PUEDE dar descuento en planes (tienen descuento cerrado)
+        document.getElementById("cot_descuento_input").disabled = true;
+        document.getElementById("cot_descuento_input").value = 0;
+        document.getElementById("zonaDescuentoManual").style.opacity = "0.5";
+        
+        renderPlanesSugeridos();
+    }
+    calcularTotalCotizador();
+}
+
+function renderListaModulos() {
+    const nivel = document.getElementById("cot_select_nivel").value;
+    const cont = document.getElementById("cot_lista_modulos");
+    cont.innerHTML = "";
+    
+    let conversion = (monedaActual === "CLP") ? valorDolarGlobal : 1;
+    let simbolo = (monedaActual === "CLP") ? "$" : "USD ";
+    
+    cot_modulosBase.filter(m => m.nivel === nivel).forEach(m => {
+        let precioMostrado = (m.precio * conversion).toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
+        let check = cot_seleccionados.includes(m.id) ? "checked" : "";
+        cont.innerHTML += `
+        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155;">
+            <div style="flex:1;">
+                <div style="color:white; font-size:13px; font-weight:bold;">${m.modulo}</div>
+                <div style="color:#B0B5C1; font-size:11px;">${simbolo}${precioMostrado}</div>
+            </div>
+            <input type="checkbox" ${check} onchange="toggleModuloCotizador('${m.id}')" style="transform:scale(1.3); cursor:pointer;">
+        </div>`;
+    });
+}
+
+function renderPlanesSugeridos() {
+    const cont = document.getElementById("zonaPlanesSugeridos");
+    cont.innerHTML = "";
+    
+    cot_programasBase.forEach(p => {
+        let sel = (cot_seleccionados.length > 0 && cot_descuentoPlanFijo === p.descuento && p.nombre.includes("Plan")) ? "border-color:#2ecc71;" : ""; // Simulación básica de selección visual
+        cont.innerHTML += `
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:5px; margin-bottom:10px; border:1px solid #A259FF; ${sel}">
+            <h4 style="margin:0 0 5px 0; color:#A259FF;">${p.nombre}</h4>
+            <p style="font-size:11px; color:#B0B5C1; margin:0 0 10px 0;">${p.descripcion}</p>
+            <div style="font-size:11px; color:#f1c40f; margin-bottom:10px;">🎁 Descuento Incluido: ${(p.descuento*100)}%</div>
+            <button onclick="seleccionarPlanCotizador('${p.plan}')" style="background:#2c3e50; color:white; border:none; padding:8px; width:100%; border-radius:4px; cursor:pointer;">Seleccionar Paquete</button>
+        </div>`;
+    });
+}
+
+function toggleModuloCotizador(id) {
+    if(cot_seleccionados.includes(id)) {
+        cot_seleccionados = cot_seleccionados.filter(x => x !== id);
+    } else {
+        cot_seleccionados.push(id);
+    }
+    calcularTotalCotizador();
+}
+
+function seleccionarPlanCotizador(planName) {
+    const plan = cot_programasBase.find(p => p.plan === planName);
+    if(!plan) return;
+    
+    cot_seleccionados = [...plan.modulos];
+    cot_descuentoPlanFijo = plan.descuento;
+    calcularTotalCotizador();
+}
+
+function calcularTotalCotizador() {
+    let sumaUSD = 0;
+    const resHTML = document.getElementById("cot_resumen_carrito");
+    resHTML.innerHTML = "";
+    
+    if(cot_seleccionados.length === 0) {
+        resHTML.innerHTML = "Ningún módulo seleccionado.";
+        document.getElementById("cot_total_final").innerText = "$0";
+        return;
+    }
+
+    let conversion = (monedaActual === "CLP") ? valorDolarGlobal : 1;
+    let simbolo = (monedaActual === "CLP") ? "$" : "USD ";
+
+    cot_seleccionados.forEach(id => {
+        let mod = cot_modulosBase.find(m => String(m.id) === String(id));
+        if(mod) {
+            sumaUSD += parseFloat(mod.precio);
+            let valConv = (mod.precio * conversion).toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
+            resHTML.innerHTML += `<div style="margin-bottom:4px; border-bottom:1px solid #334155; padding-bottom:2px;">• ${mod.modulo} (${simbolo}${valConv})</div>`;
+        }
+    });
+
+    let descuento = 0;
+    if(cot_modoActual === "sueltos") {
+        let inputDesc = parseFloat(document.getElementById("cot_descuento_input").value) || 0;
+        if(inputDesc > 20) { inputDesc = 20; document.getElementById("cot_descuento_input").value = 20; }
+        if(inputDesc < 0) { inputDesc = 0; document.getElementById("cot_descuento_input").value = 0; }
+        descuento = inputDesc / 100;
+    } else {
+        descuento = cot_descuentoPlanFijo;
+    }
+
+    let totalConDescuentoUSD = sumaUSD - (sumaUSD * descuento);
+    let totalConvertido = totalConDescuentoUSD * conversion;
+
+    document.getElementById("cot_total_final").innerText = simbolo + totalConvertido.toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
+    // Guardamos el total final matemático en un atributo oculto para enviarlo al PDF
+    document.getElementById("cot_total_final").setAttribute("data-total", totalConDescuentoUSD);
+}
+
+function mostrarFormularioCliente() {
+    if(cot_seleccionados.length === 0) {
+        alert("Debes seleccionar al menos un módulo o plan."); return;
+    }
+    document.getElementById("zonaFormularioCliente").style.display = "block";
+    document.getElementById("zonaFormularioCliente").scrollIntoView({behavior: "smooth"});
+}
+
+function procesarEmisionPDF() {
+    const negocio = document.getElementById("cot_negocio").value;
+    const nombre = document.getElementById("cot_nombre").value;
+    const email = document.getElementById("cot_email").value;
+    const whatsapp = document.getElementById("cot_whatsapp").value;
+    
+    if(!negocio || !nombre) {
+        alert("El Nombre del Cliente y el Negocio son obligatorios."); return;
+    }
+
+    const btn = document.getElementById("btnEmitirPDF");
+    btn.innerText = "⏳ Generando PDF en la nube...";
+    btn.disabled = true;
+
+    // Recolectar la data de los módulos seleccionados
+    const modulosData = cot_seleccionados.map(id => {
+        let mod = cot_modulosBase.find(m => String(m.id) === String(id));
+        return { modulo: mod.modulo, precio: mod.precio };
+    });
+
+    // Añadir línea de descuento si hubo
+    let desc = (cot_modoActual === "sueltos") ? (parseFloat(document.getElementById("cot_descuento_input").value)||0) : (cot_descuentoPlanFijo*100);
+    if(desc > 0) {
+        modulosData.push({ modulo: "BONO APLICADO C3D (-" + desc + "%)", precio: 0 }); // El total ya tiene el desc aplicado, es solo visual
+    }
+
+    const totalUSD = document.getElementById("cot_total_final").getAttribute("data-total");
+
+    const payload = {
+        action: "generarCotizacionPDF",
+        negocio: negocio, nombre: nombre, email: email, whatsapp: whatsapp,
+        modulos: modulosData, total: totalUSD,
+        moneda: monedaActual, tasaConversion: (monedaActual === "CLP" ? valorDolarGlobal : 1)
+    };
+
+    fetch(API, { method: 'POST', body: JSON.stringify(payload) })
+    .then(r=>r.json())
+    .then(res => {
+        if(res.success) {
+            alert("¡PDF Generado con Éxito!\nSe ha enviado al correo del cliente y al Administrador.");
+            window.open(res.url, '_blank');
+            document.getElementById("modalCotizador").style.display = "none";
+        } else {
+            alert("Error al generar PDF: " + res.error);
+        }
+        btn.innerText = "🧾 GENERAR PDF Y ENVIAR";
+        btn.disabled = false;
+    }).catch(e => {
+        alert("Error de conexión.");
+        btn.innerText = "🧾 GENERAR PDF Y ENVIAR";
+        btn.disabled = false;
+    });
 }
 </script>
 
