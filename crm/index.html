@@ -119,22 +119,39 @@
     <div id="dash_columnas" style="display:flex; gap:15px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:8px; width:100%;"></div>
 </div>
 
-<div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-    <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px;">+ Nuevo Prospecto</button>
-    <button onclick="abrirCotizador()" style="background:linear-gradient(90deg, #f1c40f, #e67e22); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(241,196,15,0.4);">🧾 Generar Cotización PDF</button>
-    <button onclick="abrirModalCobro()" style="background:#8e44ad; color:white; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(142,68,173,0.4);">💳 Generar Link de Cobro</button>
-    <button onclick="document.getElementById('modalManuales').style.display='flex'" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">🎓 Capacitación C3D</button>
-    <button onclick="modalCorreoMasivo()" style="background:#e67e22; color:white; border:none; border-radius:5px;">Correo Masivo</button>
-    <button onclick="abrirAjustes()" style="background:#2c3e50; color:white; border:none; border-radius:5px;">⚙️ Ajustes (Mis Mensajes)</button>
+<div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; background: #1e293b; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
     
-    <button id="btnReporteAdmin" onclick="abrirModalReporte('admin')" style="display:none; background:#1e293b; border:1px solid #00E5FF; color:#00E5FF; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📈 Reporte Avanzado</button>
-    <button id="btnReporteUser" onclick="abrirModalReporte('user')" style="display:none; background:#1e293b; border:1px solid #A259FF; color:#A259FF; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">📊 Mi Reporte Personal</button>
-    <button id="btnBackup" onclick="descargarCSV()" style="display:none; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">💾 Backup DB</button>
-    <select id="preferenciaMoneda" onchange="cambiarMonedaPreferencia()" style="background:#1e293b; color:white; border:1px solid var(--border-color); padding:8px; border-radius:5px; font-weight:bold; margin-left:auto; cursor:pointer;">
-        <option value="CLP">🇨🇱 CLP ($)</option>
-        <option value="USD">🇺🇸 USD ($)</option>
-    </select>
-    <button onclick="cerrarSesion()" style="background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold; margin-left:10px;">🚪 Cerrar Sesión</button>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button onclick="modalNuevoProspecto()" style="background:#2ecc71; color:white; border:none; border-radius:5px; padding:10px 15px; font-size:12px; box-shadow: 0 2px 5px rgba(46,204,113,0.3);">+ Nuevo Prospecto</button>
+        
+        <div class="dropdown" style="position: relative;">
+            <button onclick="toggleMenuC3D('menuNegocios')" style="background:linear-gradient(90deg, #f1c40f, #e67e22); color:#000; border:none; border-radius:5px; padding:10px 15px; font-size:12px; font-weight:bold; box-shadow: 0 2px 5px rgba(241,196,15,0.4);">💼 NEGOCIOS ▼</button>
+            <div id="menuNegocios" class="dropdown-content" style="display:none; position:absolute; top:115%; left:0; background:#0a0c10; min-width:220px; border-radius:8px; border:1px solid #f1c40f; box-shadow:0 10px 25px rgba(0,0,0,0.8); z-index:1000; flex-direction:column; overflow:hidden;">
+                <button onclick="abrirCotizador(); toggleMenuC3D('menuNegocios')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">🧾 Generar Cotización PDF</button>
+                <button onclick="abrirModalCobro(); toggleMenuC3D('menuNegocios')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; font-size:12px; cursor:pointer;">💳 Cobrar (Link de Pago)</button>
+            </div>
+        </div>
+
+        <div class="dropdown" style="position: relative;">
+            <button onclick="toggleMenuC3D('menuHerramientas')" style="background:linear-gradient(90deg, #00E5FF, #A259FF); color:#000; border:none; border-radius:5px; padding:10px 15px; font-size:12px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,229,255,0.4);">🛠️ HERRAMIENTAS ▼</button>
+            <div id="menuHerramientas" class="dropdown-content" style="display:none; position:absolute; top:115%; left:0; background:#0a0c10; min-width:240px; border-radius:8px; border:1px solid #00E5FF; box-shadow:0 10px 25px rgba(0,0,0,0.8); z-index:1000; flex-direction:column; overflow:hidden;">
+                <button onclick="document.getElementById('modalManuales').style.display='flex'; toggleMenuC3D('menuHerramientas')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">🎓 Capacitación C3D</button>
+                <button onclick="abrirAjustes(); toggleMenuC3D('menuHerramientas')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">⚙️ Ajustes (Mis Mensajes)</button>
+                <button onclick="modalCorreoMasivo(); toggleMenuC3D('menuHerramientas')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">📧 Correo Masivo</button>
+                <button id="btnReporteUser" onclick="abrirModalReporte('user'); toggleMenuC3D('menuHerramientas')" style="display:none; background:transparent; color:#A259FF; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">📊 Mi Reporte Personal</button>
+                <button id="btnReporteAdmin" onclick="abrirModalReporte('admin'); toggleMenuC3D('menuHerramientas')" style="display:none; background:transparent; color:#00E5FF; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">📈 Reporte Avanzado (Admin)</button>
+                <button id="btnBackup" onclick="descargarCSV(); toggleMenuC3D('menuHerramientas')" style="display:none; background:transparent; color:#e74c3c; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; font-size:12px; cursor:pointer;">💾 Backup DB (Admin)</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <select id="preferenciaMoneda" onchange="cambiarMonedaPreferencia()" style="background:#0a0c10; color:white; border:1px solid var(--border-color); padding:8px 12px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:12px; outline:none;">
+            <option value="CLP">🇨🇱 CLP ($)</option>
+            <option value="USD">🇺🇸 USD ($)</option>
+        </select>
+        <button onclick="cerrarSesion()" style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:10px 15px; font-weight:bold; font-size:12px; box-shadow: 0 2px 5px rgba(231,76,60,0.3);">🚪 Salir</button>
+    </div>
 </div>
 </header>
 
@@ -1753,6 +1770,25 @@ function generarLinkDePago() {
         btn.disabled = false;
     });
 }
+
+// Motor para abrir/cerrar menús estilo app
+    function toggleMenuC3D(id) {
+        const menu = document.getElementById(id);
+        const isVisible = menu.style.display === 'flex';
+        
+        // Oculta todos los submenús primero por limpieza
+        document.querySelectorAll('.dropdown-content').forEach(el => el.style.display = 'none');
+        
+        // Si no estaba visible, lo abre
+        if(!isVisible) menu.style.display = 'flex';
+    }
+
+    // Si el usuario toca cualquier otra parte de la pantalla, los menús se cierran automáticamente
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown-content').forEach(el => el.style.display = 'none');
+        }
+    });
 </script>
 
 </body>
