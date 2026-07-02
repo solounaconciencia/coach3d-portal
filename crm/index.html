@@ -521,23 +521,22 @@ async function iniciar(){
         renderizar();
 
         if(rolActual === "admin") {
-            if(rolActual === "admin") {
             const selectAsesor = document.getElementById("filtroAsesor");
             selectAsesor.style.display = "inline-block";
             const btnBackup = document.getElementById("btnBackup");
             if(btnBackup) btnBackup.style.display = "inline-block";
             const btnRepAdmin = document.getElementById("btnReporteAdmin");
             if(btnRepAdmin) btnRepAdmin.style.display = "inline-block";
-        } else {
-            const btnRepUser = document.getElementById("btnReporteUser");
-            if(btnRepUser) btnRepUser.style.display = "inline-block";
-        }
+            
             // Extraer asesores únicos de la base cargada
             const asesoresUnicos = [...new Set(prospectos.map(p => p.responsable).filter(r => r))];
             selectAsesor.innerHTML = '<option value="">Todos los Asesores</option>';
             asesoresUnicos.forEach(as => {
                 selectAsesor.innerHTML += `<option value="${as}">${as}</option>`;
             });
+        } else {
+            const btnRepUser = document.getElementById("btnReporteUser");
+            if(btnRepUser) btnRepUser.style.display = "inline-block";
         }
     }catch(error){
         console.error(error);
@@ -1659,233 +1658,6 @@ function procesarEmisionPDF() {
     });
 }
 
-// ==========================================
-// LÓGICA COTIZADOR C3D (MULTIMONEDA)
-// ==========================================
-let cot_modulosBase = [];
-let cot_programasBase = [];
-let cot_seleccionados = []; // Array de IDs
-let cot_modoActual = "sueltos"; // o "planes"
-let cot_descuentoPlanFijo = 0;
-
-async function abrirCotizador() {
-    document.getElementById("modalCotizador").style.display = "flex";
-    document.getElementById("zonaFormularioCliente").style.display = "none";
-    document.getElementById("cot_negocio").value = "";
-    document.getElementById("cot_nombre").value = "";
-    document.getElementById("cot_email").value = "";
-    document.getElementById("cot_whatsapp").value = "";
-    
-    // Si no han cargado, los buscamos al servidor
-    if(cot_modulosBase.length === 0) {
-        document.getElementById("cot_lista_modulos").innerHTML = "<p style='color:white; text-align:center;'>Cargando módulos desde la nube...</p>";
-        const resMod = await fetch(API + "?action=getModulosCotizador").then(r=>r.json());
-        if(resMod.success) cot_modulosBase = resMod.data;
-        
-        const resProg = await fetch(API + "?action=getProgramasCotizador").then(r=>r.json());
-        if(resProg.success) cot_programasBase = resProg.data;
-    }
-    
-    setModoCotizador('sueltos');
-}
-
-function setModoCotizador(modo) {
-    cot_modoActual = modo;
-    cot_seleccionados = [];
-    cot_descuentoPlanFijo = 0;
-    
-    if(modo === "sueltos") {
-        document.getElementById("btnTabSueltos").style.background = "#00E5FF";
-        document.getElementById("btnTabSueltos").style.color = "#000";
-        document.getElementById("btnTabPlanes").style.background = "#1e293b";
-        document.getElementById("btnTabPlanes").style.color = "#A259FF";
-        
-        document.getElementById("zonaModulosSueltos").style.display = "block";
-        document.getElementById("zonaPlanesSugeridos").style.display = "none";
-        
-        // El asesor PUEDE dar descuento manual
-        document.getElementById("cot_descuento_input").disabled = false;
-        document.getElementById("cot_descuento_input").value = 0;
-        document.getElementById("zonaDescuentoManual").style.opacity = "1";
-        
-        renderListaModulos();
-    } else {
-        document.getElementById("btnTabPlanes").style.background = "#A259FF";
-        document.getElementById("btnTabPlanes").style.color = "#000";
-        document.getElementById("btnTabSueltos").style.background = "#1e293b";
-        document.getElementById("btnTabSueltos").style.color = "#00E5FF";
-        
-        document.getElementById("zonaModulosSueltos").style.display = "none";
-        document.getElementById("zonaPlanesSugeridos").style.display = "block";
-        
-        // El asesor NO PUEDE dar descuento en planes (tienen descuento cerrado)
-        document.getElementById("cot_descuento_input").disabled = true;
-        document.getElementById("cot_descuento_input").value = 0;
-        document.getElementById("zonaDescuentoManual").style.opacity = "0.5";
-        
-        renderPlanesSugeridos();
-    }
-    calcularTotalCotizador();
-}
-
-function renderListaModulos() {
-    const nivel = document.getElementById("cot_select_nivel").value;
-    const cont = document.getElementById("cot_lista_modulos");
-    cont.innerHTML = "";
-    
-    let conversion = (monedaActual === "CLP") ? valorDolarGlobal : 1;
-    let simbolo = (monedaActual === "CLP") ? "$" : "USD ";
-    
-    cot_modulosBase.filter(m => m.nivel === nivel).forEach(m => {
-        let precioMostrado = (m.precio * conversion).toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
-        let check = cot_seleccionados.includes(m.id) ? "checked" : "";
-        cont.innerHTML += `
-        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155;">
-            <div style="flex:1;">
-                <div style="color:white; font-size:13px; font-weight:bold;">${m.modulo}</div>
-                <div style="color:#B0B5C1; font-size:11px;">${simbolo}${precioMostrado}</div>
-            </div>
-            <input type="checkbox" ${check} onchange="toggleModuloCotizador('${m.id}')" style="transform:scale(1.3); cursor:pointer;">
-        </div>`;
-    });
-}
-
-function renderPlanesSugeridos() {
-    const cont = document.getElementById("zonaPlanesSugeridos");
-    cont.innerHTML = "";
-    
-    cot_programasBase.forEach(p => {
-        let sel = (cot_seleccionados.length > 0 && cot_descuentoPlanFijo === p.descuento && p.nombre.includes("Plan")) ? "border-color:#2ecc71;" : ""; // Simulación básica de selección visual
-        cont.innerHTML += `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:5px; margin-bottom:10px; border:1px solid #A259FF; ${sel}">
-            <h4 style="margin:0 0 5px 0; color:#A259FF;">${p.nombre}</h4>
-            <p style="font-size:11px; color:#B0B5C1; margin:0 0 10px 0;">${p.descripcion}</p>
-            <div style="font-size:11px; color:#f1c40f; margin-bottom:10px;">🎁 Descuento Incluido: ${(p.descuento*100)}%</div>
-            <button onclick="seleccionarPlanCotizador('${p.plan}')" style="background:#2c3e50; color:white; border:none; padding:8px; width:100%; border-radius:4px; cursor:pointer;">Seleccionar Paquete</button>
-        </div>`;
-    });
-}
-
-function toggleModuloCotizador(id) {
-    if(cot_seleccionados.includes(id)) {
-        cot_seleccionados = cot_seleccionados.filter(x => x !== id);
-    } else {
-        cot_seleccionados.push(id);
-    }
-    calcularTotalCotizador();
-}
-
-function seleccionarPlanCotizador(planName) {
-    const plan = cot_programasBase.find(p => p.plan === planName);
-    if(!plan) return;
-    
-    cot_seleccionados = [...plan.modulos];
-    cot_descuentoPlanFijo = plan.descuento;
-    calcularTotalCotizador();
-}
-
-function calcularTotalCotizador() {
-    let sumaUSD = 0;
-    const resHTML = document.getElementById("cot_resumen_carrito");
-    resHTML.innerHTML = "";
-    
-    if(cot_seleccionados.length === 0) {
-        resHTML.innerHTML = "Ningún módulo seleccionado.";
-        document.getElementById("cot_total_final").innerText = "$0";
-        return;
-    }
-
-    let conversion = (monedaActual === "CLP") ? valorDolarGlobal : 1;
-    let simbolo = (monedaActual === "CLP") ? "$" : "USD ";
-
-    cot_seleccionados.forEach(id => {
-        let mod = cot_modulosBase.find(m => String(m.id) === String(id));
-        if(mod) {
-            sumaUSD += parseFloat(mod.precio);
-            let valConv = (mod.precio * conversion).toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
-            resHTML.innerHTML += `<div style="margin-bottom:4px; border-bottom:1px solid #334155; padding-bottom:2px;">• ${mod.modulo} (${simbolo}${valConv})</div>`;
-        }
-    });
-
-    let descuento = 0;
-    if(cot_modoActual === "sueltos") {
-        let inputDesc = parseFloat(document.getElementById("cot_descuento_input").value) || 0;
-        if(inputDesc > 20) { inputDesc = 20; document.getElementById("cot_descuento_input").value = 20; }
-        if(inputDesc < 0) { inputDesc = 0; document.getElementById("cot_descuento_input").value = 0; }
-        descuento = inputDesc / 100;
-    } else {
-        descuento = cot_descuentoPlanFijo;
-    }
-
-    let totalConDescuentoUSD = sumaUSD - (sumaUSD * descuento);
-    let totalConvertido = totalConDescuentoUSD * conversion;
-
-    document.getElementById("cot_total_final").innerText = simbolo + totalConvertido.toLocaleString(monedaActual==="CLP"?"es-CL":"en-US", {maximumFractionDigits:0});
-    // Guardamos el total final matemático en un atributo oculto para enviarlo al PDF
-    document.getElementById("cot_total_final").setAttribute("data-total", totalConDescuentoUSD);
-}
-
-function mostrarFormularioCliente() {
-    if(cot_seleccionados.length === 0) {
-        alert("Debes seleccionar al menos un módulo o plan."); return;
-    }
-    document.getElementById("zonaFormularioCliente").style.display = "block";
-    document.getElementById("zonaFormularioCliente").scrollIntoView({behavior: "smooth"});
-}
-
-function procesarEmisionPDF() {
-    const negocio = document.getElementById("cot_negocio").value;
-    const nombre = document.getElementById("cot_nombre").value;
-    const email = document.getElementById("cot_email").value;
-    const whatsapp = document.getElementById("cot_whatsapp").value;
-    
-    if(!negocio || !nombre) {
-        alert("El Nombre del Cliente y el Negocio son obligatorios."); return;
-    }
-
-    const btn = document.getElementById("btnEmitirPDF");
-    btn.innerText = "⏳ Generando PDF en la nube...";
-    btn.disabled = true;
-
-    // Recolectar la data de los módulos seleccionados
-    const modulosData = cot_seleccionados.map(id => {
-        let mod = cot_modulosBase.find(m => String(m.id) === String(id));
-        return { modulo: mod.modulo, precio: mod.precio };
-    });
-
-    // Añadir línea de descuento si hubo
-    let desc = (cot_modoActual === "sueltos") ? (parseFloat(document.getElementById("cot_descuento_input").value)||0) : (cot_descuentoPlanFijo*100);
-    if(desc > 0) {
-        modulosData.push({ modulo: "BONO APLICADO C3D (-" + desc + "%)", precio: 0 }); // El total ya tiene el desc aplicado, es solo visual
-    }
-
-    const totalUSD = document.getElementById("cot_total_final").getAttribute("data-total");
-
-    const payload = {
-        action: "generarCotizacionPDF",
-        negocio: negocio, nombre: nombre, email: email, whatsapp: whatsapp,
-        modulos: modulosData, total: totalUSD,
-        moneda: monedaActual, tasaConversion: (monedaActual === "CLP" ? valorDolarGlobal : 1)
-    };
-
-    fetch(API, { method: 'POST', body: JSON.stringify(payload) })
-    .then(r=>r.json())
-    .then(res => {
-        if(res.success) {
-            alert("¡PDF Generado con Éxito!\nSe ha enviado al correo del cliente y al Administrador.");
-            window.open(res.url, '_blank');
-            document.getElementById("modalCotizador").style.display = "none";
-        } else {
-            alert("Error al generar PDF: " + res.error);
-        }
-        btn.innerText = "🧾 GENERAR PDF Y ENVIAR";
-        btn.disabled = false;
-    }).catch(e => {
-        alert("Error de conexión.");
-        btn.innerText = "🧾 GENERAR PDF Y ENVIAR";
-        btn.disabled = false;
-    });
-}
 </script>
 
 </body>
