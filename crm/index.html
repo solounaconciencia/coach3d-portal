@@ -128,7 +128,9 @@
             <button onclick="toggleMenuC3D('menuNegocios')" style="background:linear-gradient(90deg, #f1c40f, #e67e22); color:#000; border:none; border-radius:5px; padding:10px 15px; font-size:12px; font-weight:bold; box-shadow: 0 2px 5px rgba(241,196,15,0.4);">💼 NEGOCIOS ▼</button>
             <div id="menuNegocios" class="dropdown-content" style="display:none; position:absolute; top:115%; left:0; background:#0a0c10; min-width:220px; border-radius:8px; border:1px solid #f1c40f; box-shadow:0 10px 25px rgba(0,0,0,0.8); z-index:1000; flex-direction:column; overflow:hidden;">
                 <button onclick="abrirCotizador(); toggleMenuC3D('menuNegocios')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">🧾 Generar Cotización PDF</button>
-                <button onclick="abrirModalCobro(); toggleMenuC3D('menuNegocios')" style="background:transparent; color:white; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; font-size:12px; cursor:pointer;">💳 Cobrar (Link de Pago)</button>
+                <button onclick="abrirModalCobro('rapido'); toggleMenuC3D('menuNegocios')" style="background:transparent; color:#00E5FF; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">⚡ Servicios Rápidos</button>
+                <button onclick="abrirModalCobro('suscripcion'); toggleMenuC3D('menuNegocios')" style="background:transparent; color:#A259FF; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; border-bottom:1px solid #334155; font-size:12px; cursor:pointer;">🔄 Suscripciones</button>
+                <button onclick="abrirModalCobro(); toggleMenuC3D('menuNegocios')" style="background:transparent; color:#2ecc71; width:100%; text-align:left; border:none; border-radius:0; padding:12px 15px; font-size:12px; cursor:pointer;">💳 Cobrar (Monto Manual)</button>
             </div>
         </div>
 
@@ -475,6 +477,15 @@
         <p style="font-size:12px; color:#B0B5C1; margin-bottom:20px;">Crea un link de pago seguro para tu cliente. La pasarela se asignará automáticamente según la moneda activa del CRM.</p>
         
         <div style="background:#1e293b; padding:15px; border-radius:8px; border:1px solid #334155; margin-bottom:15px;">
+            
+            <div id="caja_catalogo_cobro" style="display:none; margin-bottom:15px;">
+                <label style="font-size:12px; font-weight:bold; color:#f1c40f;">Seleccionar del Catálogo:</label>
+                <select id="cobro_catalogo" onchange="autocompletarCobro()" style="width:100%; padding:10px; margin-top:5px; background:#0a0c10; color:white; border:1px solid #f1c40f; border-radius:5px; font-size:13px;"></select>
+                <label id="lbl_costo_admin" style="font-size:11px; color:#A259FF; display:none; margin-top:5px; cursor:pointer;">
+                    <input type="checkbox" id="check_costo_admin" onchange="autocompletarCobro()" style="vertical-align:middle;"> Agregar +$25.000 (Dominio y Correo Corp)
+                </label>
+            </div>
+
             <label style="font-size:12px; font-weight:bold; color:#00E5FF;">Concepto / Servicio a cobrar:</label>
             <input type="text" id="cobro_concepto" placeholder="Ej: Anticipo Desarrollo Web..." style="width:100%; padding:10px; margin-top:5px; margin-bottom:15px; background:#0a0c10; border:1px solid #334155; color:white; border-radius:5px;">
             
@@ -1711,23 +1722,88 @@ function procesarEmisionPDF() {
 // ==========================================
 // LÓGICA DE COBROS Y PASARELAS
 // ==========================================
-function abrirModalCobro() {
+function abrirModalCobro(tipo = 'manual') {
     document.getElementById("modalCobro").style.display = "flex";
     document.getElementById("cobro_concepto").value = "";
     document.getElementById("cobro_monto").value = "";
+    document.getElementById("cobro_monto").readOnly = false;
+    document.getElementById("check_costo_admin").checked = false;
     
+    const cajaCat = document.getElementById("caja_catalogo_cobro");
+    const selectCat = document.getElementById("cobro_catalogo");
+    const lblAdmin = document.getElementById("lbl_costo_admin");
+    
+    if(tipo === 'rapido') {
+        cajaCat.style.display = "block";
+        lblAdmin.style.display = "none";
+        selectCat.innerHTML = `
+            <option value="">-- Elige un Servicio Rápido --</option>
+            <option value="Landing Page|20000">Landing Page</option>
+            <option value="Link Page|20000">Link Page</option>
+            <option value="CV Page|20000">CV Page</option>
+            <option value="Register Page|20000">Register Page</option>
+            <option value="Tarjeta VCard Digital (NFC)|20000">Tarjeta VCard Digital</option>
+        `;
+    } else if (tipo === 'suscripcion') {
+        cajaCat.style.display = "block";
+        lblAdmin.style.display = "block";
+        selectCat.innerHTML = `
+            <option value="">-- Elige una Suscripción --</option>
+            <option value="Suscripción: Ecommerce|25000">Ecommerce ($25k/mes)</option>
+            <option value="Suscripción: Plataforma Cursos|25000">Plataforma Cursos ($25k/mes)</option>
+            <option value="Suscripción: Sistema de Reservas|25000">Reservas ($25k/mes)</option>
+            <option value="Suscripción: Servicios por Suscripción|25000">Servicios Recurrentes ($25k/mes)</option>
+            <option value="Suscripción: Plataforma MLM|30000">Plataforma MLM ($30k/mes)</option>
+            <option value="Suscripción: Plataforma Full|50000">Plataforma Full ($50k/mes)</option>
+        `;
+    } else {
+        cajaCat.style.display = "none";
+        lblAdmin.style.display = "none";
+    }
+
     // Adaptación automática a la moneda global del CRM
     const esCLP = (monedaActual === "CLP");
     const simbolo = esCLP ? "$" : "USD$";
     const pasarela = esCLP ? "MercadoPago (Tarjetas / Transferencia)" : "DLocal / PayPal (Internacional)";
-    const colorBorde = esCLP ? "#00b1ea" : "#2980b9"; // MP celeste, PayPal/Dlocal Azul
+    const colorBorde = esCLP ? "#00b1ea" : "#2980b9";
     
     document.getElementById("cobro_simbolo").innerText = simbolo;
     document.getElementById("cobro_moneda_txt").innerText = monedaActual;
     
     const alerta = document.getElementById("cobro_alerta_pasarela");
-    alerta.innerHTML = `Pasarela detectada: <strong>${pasarela}</strong>`;
+    alerta.innerHTML = `Pasarela detectada: <strong>${pasarela}</strong>${esCLP ? " (Valores + IVA)" : ""}`;
     alerta.style.borderLeft = `4px solid ${colorBorde}`;
+}
+
+function autocompletarCobro() {
+    const val = document.getElementById("cobro_catalogo").value;
+    if(!val) return;
+    
+    let partes = val.split("|");
+    let concepto = partes[0];
+    let montoBase = parseFloat(partes[1]);
+    
+    // Sumar costo administrativo si es suscripción y está marcado
+    if(document.getElementById("check_costo_admin").checked) {
+        montoBase += 25000;
+        concepto += " + Setup Admin (Dominio/Correo)";
+    }
+
+    // Convertir si la moneda actual es USD
+    if(monedaActual === "USD") {
+        montoBase = (montoBase / valorDolarGlobal).toFixed(2);
+    }
+    
+    document.getElementById("cobro_concepto").value = concepto;
+    
+    // Si es CLP y estamos calculando IVA para MercadoPago, lo agregamos al monto final
+    if(monedaActual === "CLP") {
+        let iva = montoBase * 0.19;
+        document.getElementById("cobro_monto").value = montoBase + iva;
+        document.getElementById("cobro_concepto").value = concepto + " (IVA Incluido)";
+    } else {
+        document.getElementById("cobro_monto").value = montoBase;
+    }
 }
 
 function generarLinkDePago() {
