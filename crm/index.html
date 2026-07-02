@@ -459,12 +459,14 @@ let usuarioActual = "";
 let rolActual = "";
 let paisActual = "Chile";
 let valorUsdActual = 950;
+let nombreAsesorActual = "";
 window.onload = function() {
     if(sessionStorage.getItem("crm_user")) {
         usuarioActual = sessionStorage.getItem("crm_user");
         rolActual = sessionStorage.getItem("crm_rol");
         paisActual = sessionStorage.getItem("crm_pais") || "Chile";
         valorUsdActual = sessionStorage.getItem("crm_usd") || 950;
+        nombreAsesorActual = sessionStorage.getItem("crm_nombreAsesor") || usuarioActual;
         document.getElementById("loginScreen").style.display = "none";
         
         if(sessionStorage.getItem("crm_contrato") === "No" || sessionStorage.getItem("crm_contrato") === "") {
@@ -755,8 +757,10 @@ function verificarLogin() {
             sessionStorage.setItem("crm_contrato", res.contrato);
             sessionStorage.setItem("crm_pais", res.pais);
             sessionStorage.setItem("crm_usd", res.usd);
+            sessionStorage.setItem("crm_nombreAsesor", res.nombreAsesor);
             paisActual = res.pais;
             valorUsdActual = res.usd;
+            nombreAsesorActual = res.nombreAsesor;
             
             document.getElementById("loginScreen").style.display = "none";
             
@@ -1636,7 +1640,8 @@ function procesarEmisionPDF() {
         action: "generarCotizacionPDF",
         negocio: negocio, nombre: nombre, email: email, whatsapp: whatsapp,
         modulos: modulosData, total: totalUSD,
-        moneda: monedaActual, tasaConversion: (monedaActual === "CLP" ? valorDolarGlobal : 1)
+        moneda: monedaActual, tasaConversion: (monedaActual === "CLP" ? valorDolarGlobal : 1),
+        asesor: nombreAsesorActual
     };
 
     fetch(API, { method: 'POST', body: JSON.stringify(payload) })
